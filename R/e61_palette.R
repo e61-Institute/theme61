@@ -6,7 +6,7 @@
 #'   1, maximum is 10. Using more than 6 colours is not recommended as it may
 #'   make it difficult to distinguish between colours.
 #' @param reverse Logical. Reverse the standard colour order, defaults to FALSE.
-#' @return Returns a vector of colours.
+#' @return Returns a vector of HEX codes.
 #' @examples
 #' @export
 
@@ -104,6 +104,7 @@ get_palette <- function(n) {
   palette <- sapply(palette, function(x) get(paste0("e61_", x)))
 
   return(palette)
+
 }
 
 
