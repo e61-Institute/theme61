@@ -211,3 +211,24 @@ e61_greydark7 <- "#CDCDCD"
 usethis::use_data(e61_greydark7, overwrite = TRUE)
 e61_greydark8 <- "#DDDDDD"
 usethis::use_data(e61_greydark8, overwrite = TRUE)
+
+
+e61_palette_set <- list(
+  `dark`  = c(e61_bluedark,e61_tealdark,e61_skydark,e61_orangedark),
+
+  `light` = c(e61_bluelight,e61_teallight,e61_skylight,e61_orangelight),
+
+
+  `diverging` = c(e61_teallight,
+                  "white",
+                  e61_orangelight),
+
+  `grey`  = c(e61_greydark,
+              e61_greydark3,
+              e61_greydark5,
+              e61_greydark7,
+              e61_greylight1,)
+)
+
+
+usethis::use_data(grattan_palette_set, overwrite = TRUE)

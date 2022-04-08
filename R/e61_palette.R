@@ -105,3 +105,13 @@ get_palette <- function(n) {
 
   return(palette)
 }
+
+
+e61_pal <- function(palette = "full", reverse = FALSE, ...) {
+
+  pal <- theme61::e61_palette_set[[palette]]
+
+  if (reverse) pal <- rev(pal)
+
+  grDevices::colorRampPalette(pal, ...)
+}
