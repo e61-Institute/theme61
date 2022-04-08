@@ -36,13 +36,13 @@ cm_to_in <- function(cm, round = FALSE) {
 #'
 
 theme_e61 <- function(base_size = 14,
-                               base_family = "sans",
-                               base_line_size = points_to_mm(0.75),
-                               base_rect_size = points_to_mm(1),
-                               background = "white",
-                               legend = "none",
-                              legend_tiTle = FALSE,
-                               panel_borders = FALSE) {
+                      base_family = "sans",
+                      base_line_size = points_to_mm(0.75),
+                      base_rect_size = points_to_mm(1),
+                      background = "white",
+                      legend = "none",
+                      legend_title = FALSE,
+                      panel_borders = FALSE) {
 
   half_line <- base_size / 2
 
