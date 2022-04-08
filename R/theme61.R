@@ -229,8 +229,7 @@ theme_e61 <- function(base_size = 14,
 
   if (background == "orange" |  background == "box") {
     ret <- ret +
-      ggplot2::theme(rect = element_rect(
-        fill = theme61::e61_greylight6))
+      ggplot2::theme(rect = element_rect(fill = e61_greylight6))
   }
 
   ret
