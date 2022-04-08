@@ -4,44 +4,44 @@
 ## Blue
 
 # Dark
-e61_blue_dark <- "#003039"
-usethis::use_data(e61_blue_dark, overwrite = TRUE)
-e61_blue_dark1 <- "#003039"
-usethis::use_data(e61_blue_dark1, overwrite = TRUE)
-e61_blue_dark2 <- "#204a52"
-usethis::use_data(e61_blue_dark2, overwrite = TRUE)
-e61_blue_dark3 <- "#40646b"
-usethis::use_data(e61_blue_dark3, overwrite = TRUE)
-e61_blue_dark4 <- "#607e83"
-usethis::use_data(e61_blue_dark4, overwrite = TRUE)
-e61_blue_dark5 <- "#80979c"
-usethis::use_data(e61_blue_dark5, overwrite = TRUE)
-e61_blue_dark6 <- "#9fb1b5"
-usethis::use_data(e61_blue_dark6, overwrite = TRUE)
-e61_blue_dark7 <- "#bfcbce"
-usethis::use_data(e61_blue_dark7, overwrite = TRUE)
-e61_blue_dark8 <- "#dfe5e6"
-usethis::use_data(e61_blue_dark8, overwrite = TRUE)
+e61_bluedark <- "#003039"
+usethis::use_data(e61_bluedark, overwrite = TRUE)
+e61_bluedark1 <- "#003039"
+usethis::use_data(e61_bluedark1, overwrite = TRUE)
+e61_bluedark2 <- "#204a52"
+usethis::use_data(e61_bluedark2, overwrite = TRUE)
+e61_bluedark3 <- "#40646b"
+usethis::use_data(e61_bluedark3, overwrite = TRUE)
+e61_bluedark4 <- "#607e83"
+usethis::use_data(e61_bluedark4, overwrite = TRUE)
+e61_bluedark5 <- "#80979c"
+usethis::use_data(e61_bluedark5, overwrite = TRUE)
+e61_bluedark6 <- "#9fb1b5"
+usethis::use_data(e61_bluedark6, overwrite = TRUE)
+e61_bluedark7 <- "#bfcbce"
+usethis::use_data(e61_bluedark7, overwrite = TRUE)
+e61_bluedark8 <- "#dfe5e6"
+usethis::use_data(e61_bluedark8, overwrite = TRUE)
 
 # Light
-e61_blue_light <- "#004f54"
-usethis::use_data(e61_blue_light, overwrite = TRUE)
-e61_blue_light1 <- "#004f54"
-usethis::use_data(e61_blue_light1, overwrite = TRUE)
-e61_blue_light2 <- "#206569"
-usethis::use_data(e61_blue_light2, overwrite = TRUE)
-e61_blue_light3 <- "#407b7f"
-usethis::use_data(e61_blue_light3, overwrite = TRUE)
-e61_blue_light4 <- "#609194"
-usethis::use_data(e61_blue_light4, overwrite = TRUE)
-e61_blue_light5 <- "#80a7aa"
-usethis::use_data(e61_blue_light5, overwrite = TRUE)
-e61_blue_light6 <- "#9fbdbf"
-usethis::use_data(e61_blue_light6, overwrite = TRUE)
-e61_blue_light7 <- "#bfd3d4"
-usethis::use_data(e61_blue_light7, overwrite = TRUE)
-e61_blue_light8 <- "#dfe9ea"
-usethis::use_data(e61_blue_light8, overwrite = TRUE)
+e61_bluelight <- "#004f54"
+usethis::use_data(e61_bluelight, overwrite = TRUE)
+e61_bluelight1 <- "#004f54"
+usethis::use_data(e61_bluelight1, overwrite = TRUE)
+e61_bluelight2 <- "#206569"
+usethis::use_data(e61_bluelight2, overwrite = TRUE)
+e61_bluelight3 <- "#407b7f"
+usethis::use_data(e61_bluelight3, overwrite = TRUE)
+e61_bluelight4 <- "#609194"
+usethis::use_data(e61_bluelight4, overwrite = TRUE)
+e61_bluelight5 <- "#80a7aa"
+usethis::use_data(e61_bluelight5, overwrite = TRUE)
+e61_bluelight6 <- "#9fbdbf"
+usethis::use_data(e61_bluelight6, overwrite = TRUE)
+e61_bluelight7 <- "#bfd3d4"
+usethis::use_data(e61_bluelight7, overwrite = TRUE)
+e61_bluelight8 <- "#dfe9ea"
+usethis::use_data(e61_bluelight8, overwrite = TRUE)
 
 ## Teal
 
@@ -169,3 +169,45 @@ e61_orangedark7 <- "#f2dac5"
 usethis::use_data(e61_orangedark7, overwrite = TRUE)
 e61_orangedark8 <- "#f8ece2"
 usethis::use_data(e61_orangedark8, overwrite = TRUE)
+
+## Grey
+
+# Light
+e61_greylight <- "#828282"
+usethis::use_data(e61_greylight, overwrite = TRUE)
+e61_greylight1 <- "#8F8F8F"
+usethis::use_data(e61_greylight1, overwrite = TRUE)
+e61_greylight2 <- "#9B9B9B"
+usethis::use_data(e61_greylight2, overwrite = TRUE)
+e61_greylight3 <- "#A8A8A8"
+usethis::use_data(e61_greylight3, overwrite = TRUE)
+e61_greylight4 <- "#B4B4B4"
+usethis::use_data(e61_greylight4, overwrite = TRUE)
+e61_greylight5 <- "#C1C1C1"
+usethis::use_data(e61_greylight5, overwrite = TRUE)
+e61_greylight6 <- "#CDCDCD"
+usethis::use_data(e61_greylight6, overwrite = TRUE)
+e61_greylight7 <- "#DADADA"
+usethis::use_data(e61_greylight7, overwrite = TRUE)
+e61_greylight8 <- "#E6E6E6"
+usethis::use_data(e61_greylight8, overwrite = TRUE)
+
+# Dark
+e61_greydark <- "#575757"
+usethis::use_data(e61_greydark, overwrite = TRUE)
+e61_greydark1 <- "#686868"
+usethis::use_data(e61_greydark1, overwrite = TRUE)
+e61_greydark2 <- "#797979"
+usethis::use_data(e61_greydark2, overwrite = TRUE)
+e61_greydark3 <- "#898989"
+usethis::use_data(e61_greydark3, overwrite = TRUE)
+e61_greydark4 <- "#9A9A9A"
+usethis::use_data(e61_greydark4, overwrite = TRUE)
+e61_greydark5 <- "#ABABAB"
+usethis::use_data(e61_greydark5, overwrite = TRUE)
+e61_greydark6 <- "#BCBCBC"
+usethis::use_data(e61_greydark6, overwrite = TRUE)
+e61_greydark7 <- "#CDCDCD"
+usethis::use_data(e61_greydark7, overwrite = TRUE)
+e61_greydark8 <- "#DDDDDD"
+usethis::use_data(e61_greydark8, overwrite = TRUE)
