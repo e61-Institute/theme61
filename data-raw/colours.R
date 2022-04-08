@@ -231,4 +231,4 @@ e61_palette_set <- list(
 )
 
 
-usethis::use_data(grattan_palette_set, overwrite = TRUE)
+usethis::use_data(e61_palette_set, overwrite = TRUE)

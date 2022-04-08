@@ -12,6 +12,7 @@ g <- grid::rasterGrob(img, interpolate=TRUE)
 #'
 #' @return ggplot2 object
 #' @import ggplot2
+#' @export
 #'
 #' @examples
 #' library(ggplot2)

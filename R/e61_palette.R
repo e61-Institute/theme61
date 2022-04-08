@@ -108,6 +108,18 @@ get_palette <- function(n) {
 }
 
 
+
+
+#' Create Continuous Palette
+#'
+#' @param palette Character. e61 colour palette
+#' @param reverse Logical. Reverse colour order.
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 e61_pal <- function(palette = "full", reverse = FALSE, ...) {
 
   pal <- theme61::e61_palette_set[[palette]]

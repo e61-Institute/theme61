@@ -4,8 +4,7 @@ Title: Create Graphs in the e61 Institute Style
 Version: 0.0.0.9000
 Authors@R:c(
     person("Aaron", "Wong", email = "aaron.wong@e61.in", role = c("aut", "cre")),
-    person("Elyse", "Dwyer", email = "elyse.dwyer@e61.in", role = c("aut"))
-)
+    person("Elyse", "Dwyer", email = "elyse.dwyer@e61.in", role = c("aut")))
 Description: Provides functions and colour palettes to allow users to create
     ggplot2 charts that conform to the e61 Institute style guide (which is yet
     to be written).

@@ -26,6 +26,7 @@ cm_to_in <- function(cm, round = FALSE) {
 #'
 #' @return ggplot2 object
 #' @import ggplot2
+#' @export
 #'
 #' @examples
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
@@ -216,7 +217,7 @@ theme_e61 <- function(base_size = 10,
   if (background == "orange" |  background == "box") {
     ret <- ret +
       ggplot2::theme(rect = element_rect(
-        fill = theme61::e61_greylight6)
+        fill = theme61::e61_greylight6))
   }
 
   ret
