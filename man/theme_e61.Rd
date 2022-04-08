@@ -5,12 +5,13 @@
 \title{e61 themed graph options}
 \usage{
 theme_e61(
-  base_size = 10,
-  base_family = "URWHelvetica",
+  base_size = 14,
+  base_family = "sans",
   base_line_size = points_to_mm(0.75),
   base_rect_size = points_to_mm(1),
   background = "white",
   legend = "none",
+  legend_tiTle = FALSE,
   panel_borders = FALSE
 )
 }
@@ -28,6 +29,8 @@ theme_e61(
 \item{legend}{Character. Legend position.}
 
 \item{panel_borders}{Logical. Add panel borders?}
+
+\item{legend_title}{Logical. Include Legend Title?}
 }
 \value{
 ggplot2 object

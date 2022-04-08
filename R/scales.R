@@ -10,6 +10,7 @@
 #'
 #' @return ggplot2 object
 #' @rdname e61_scale
+#' @export
 #' @import ggplot2
 #'
 #' @examples
@@ -29,7 +30,7 @@ e61_colour_manual <- function(n = 0,
   if (discrete) {
     return(
       ggplot2::scale_colour_manual(...,
-                                   values = theme61::e61_palette(n = n,reverse = reverse,))
+                                   values = theme61::e61_palette(n = n,reverse = reverse))
     )
   }
 
@@ -40,7 +41,8 @@ e61_colour_manual <- function(n = 0,
 
 
 }
-
+#' @rdname e61_scale
+#' @export
 e61_fill_manual <- function(n = 0, reverse = FALSE,
                             discrete = TRUE,
                             palette = "light", ...) {

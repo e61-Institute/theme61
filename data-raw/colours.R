@@ -227,7 +227,7 @@ e61_palette_set <- list(
               e61_greydark3,
               e61_greydark5,
               e61_greydark7,
-              e61_greylight1,)
+              e61_greylight1)
 )
 
 

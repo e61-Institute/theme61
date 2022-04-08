@@ -4,7 +4,7 @@
 \alias{e61_pal}
 \title{Create Continuous Palette}
 \usage{
-e61_pal(palette = "full", reverse = FALSE, ...)
+e61_pal(palette = "light", reverse = FALSE, ...)
 }
 \arguments{
 \item{palette}{Character. e61 colour palette}

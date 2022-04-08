@@ -13,7 +13,6 @@ cm_to_in <- function(cm, round = FALSE) {
 }
 
 
-
 #' e61 themed graph options
 #'
 #' @param base_size Numeric. Chart font size. Default 10.
@@ -22,6 +21,7 @@ cm_to_in <- function(cm, round = FALSE) {
 #' @param base_rect_size Numeric. Default rect width.
 #' @param background Character. Default chart background colour.
 #' @param legend Character. Legend position.
+#' @param legend_title Logical. Include Legend Title?
 #' @param panel_borders Logical. Add panel borders?
 #'
 #' @return ggplot2 object
@@ -35,12 +35,13 @@ cm_to_in <- function(cm, round = FALSE) {
 #' theme_e61()
 #'
 
-theme_e61 <- function(base_size = 10,
-                               base_family = "URWHelvetica",
+theme_e61 <- function(base_size = 14,
+                               base_family = "sans",
                                base_line_size = points_to_mm(0.75),
                                base_rect_size = points_to_mm(1),
                                background = "white",
                                legend = "none",
+                              legend_tiTle = FALSE,
                                panel_borders = FALSE) {
 
   half_line <- base_size / 2
@@ -113,6 +114,7 @@ theme_e61 <- function(base_size = 10,
         vjust = 0
       ),
       legend.background = element_rect(colour = NA),
+      legend.title = element_blank(),
       legend.spacing = unit(half_line, "pt"),
       legend.spacing.x = NULL,
       legend.spacing.y = NULL,
@@ -126,7 +128,6 @@ theme_e61 <- function(base_size = 10,
                                  margin = margin(l = 0,
                                                  r = base_size / 4, unit = "pt")),
       legend.text.align = 0,
-      legend.title = element_blank(),
       legend.title.align = NULL,
       legend.position = legend,
       legend.direction = "horizontal",
@@ -203,6 +204,14 @@ theme_e61 <- function(base_size = 10,
     )
 
   # add panel borders if the user requests them
+  if(legend_title){
+    ret <- ret %+replace%
+      theme(legend.title = element_text(size = rel(1),
+                           margin = margin(l = 0,
+                           r = base_size / 4, unit = "pt")))
+  }
+
+
   if (panel_borders) {
     ret <- ret %+replace%
       theme(panel.border = element_rect(

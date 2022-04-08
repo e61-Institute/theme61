@@ -1,5 +1,13 @@
 
 
+
+e61_y_continuous <- function(expand_bottom = 0, expand_top = 0.015, ...) {
+  scale_y_continuous(expand = ggplot2::expansion(mult = c(expand_bottom,
+                                                          expand_top)),
+                     ...)
+}
+
+
 #' Format axes e61-style
 #'
 #' @param expand_bottom How much to expand bottom axis line by
@@ -10,17 +18,6 @@
 #' @export
 #'
 #' @rdname e61_axes
-#' @examples
-e61_y_continuous <- function(expand_bottom = 0, expand_top = 0.015, ...) {
-  scale_y_continuous(expand = ggplot2::expansion(mult = c(expand_bottom,
-                                                          expand_top)),
-                     ...)
-}
-
-
-#' @rdname e61_axes
-#' @importFrom ggplot2 scale_y_continuous expand_scale
-#' @export
 
 scale_y_continuous_e61 <- function(expand_bottom = 0,
                                        expand_top = 0.015,
@@ -32,8 +29,6 @@ scale_y_continuous_e61 <- function(expand_bottom = 0,
 }
 
 
-#' @rdname e61_axes
-#' @export
 e61_x_continuous <- function(expand_left = 0,
                                  expand_right = 0.015,
                                  ...) {
