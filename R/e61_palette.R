@@ -129,7 +129,7 @@ e61_palette <- function(n, reverse = FALSE) {
 #' @examples
 e61_pal <- function(palette = "light", reverse = FALSE, ...) {
 
-  pal <- theme61::e61_palette_set[[palette]]
+  pal <- e61_palette_set[[palette]]
 
   if (reverse) pal <- rev(pal)
 
