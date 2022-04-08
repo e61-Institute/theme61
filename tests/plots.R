@@ -23,5 +23,14 @@ p1 <- ggplot(mtcars2) +
 
 sysfonts::font_add_google("Quattrocento Sans", "Quattrocento Sans")
 showtext::showtext_auto()
-p1 +theme_e61()+e61_colour_manual(n=3)+add_e61_logo(x1=5,x2=5.5,y1=30,y2=35)
-p1 + facet_grid(vs ~ am) +theme_e61(panel_borders = TRUE,legend = "bottom")+e61_colour_manual(n=3)+scale_y_continuous_e61()+scale_x_continuous_e61()
+p1 +
+  theme_e61() +
+  e61_colour_manual(n = 3) +
+  add_e61_logo(x1 = 5, x2 = 5.5, y1 = 30, y2 = 35)
+
+p1 +
+  facet_grid(vs ~ am) +
+  theme_e61(panel_borders = TRUE, legend = "bottom") +
+  e61_colour_manual(n = 3) +
+  scale_y_continuous_e61() +
+  scale_x_continuous_e61()
