@@ -25,6 +25,6 @@ g <- grid::rasterGrob(img, interpolate=TRUE)
 #'
 add_e61_logo<-function(x1=-Inf, x2=Inf, y1=-Inf, y2=Inf){
 
-  return(ggplot2::annotation_custom(g, xmin=x1, xmax=x2, ymin=y1, ymax=y2)+ggplot2::coord_cartesian(clip = "off"))
+  return(ggplot2::annotation_custom(g, xmin=x1, xmax=x2, ymin=y1, ymax=y2))
 
 }
