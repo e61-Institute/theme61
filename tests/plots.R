@@ -34,3 +34,4 @@ p1 +
   e61_colour_manual(n = 3) +
   scale_y_continuous_e61() +
   scale_x_continuous_e61()
+
