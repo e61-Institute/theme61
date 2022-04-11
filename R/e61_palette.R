@@ -15,7 +15,7 @@ get_palette <- function(n) {
     palette <- theme61::e61_bluedark
   } else if (n == 2) {
     palette <- c(theme61::e61_bluedark,
-                 theme61::e61_tealdark)
+                 theme61::e61_skylight)
   } else if (n == 3) {
     palette <- c(theme61::e61_skylight,
                  theme61::e61_bluedark,

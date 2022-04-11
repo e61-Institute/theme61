@@ -13,10 +13,11 @@ cm_to_in <- function(cm, round = FALSE) {
 }
 
 
+
 #' e61 themed graph options
 #'
 #' @param base_size Numeric. Chart font size. Default 10.
-#' @param base_family Character. Chart font family. Default URW Helvetica
+#' @param base_family Character. Chart font family. Default Quattrocento Sans
 #' @param base_line_size Numeric. Default line width.
 #' @param base_rect_size Numeric. Default rect width.
 #' @param background Character. Default chart background colour.
@@ -36,7 +37,7 @@ cm_to_in <- function(cm, round = FALSE) {
 #'
 
 theme_e61 <- function(base_size = 14,
-                      base_family = "sans",
+                      base_family = "Quattrocento Sans",
                       base_line_size = points_to_mm(0.75),
                       base_rect_size = points_to_mm(1),
                       background = "white",
@@ -44,19 +45,22 @@ theme_e61 <- function(base_size = 14,
                       legend_title = FALSE,
                       panel_borders = FALSE) {
 
+  sysfonts::font_add_google("Quattrocento Sans", "Quattrocento Sans")
+  showtext::showtext_auto()
+
   half_line <- base_size / 2
 
   ret <-
     theme(
       line = element_line(
-        colour = theme61::e61_greylight4,
+        colour = theme61::e61_greylight6,
         size = base_line_size,
         linetype = 1,
         lineend = "butt"
       ),
       rect = element_rect(
         fill = background,
-        colour = theme61::e61_greylight4,
+        colour = theme61::e61_greylight6,
         size = base_rect_size,
         linetype = 0
       ),
@@ -139,7 +143,7 @@ theme_e61 <- function(base_size = 14,
       legend.box.spacing = unit(half_line, "pt"),
       panel.background = element_rect(colour = NA),
       panel.border = element_blank(),
-      panel.grid = element_line(colour = theme61::e61_greylight4,
+      panel.grid = element_line(colour = theme61::e61_greylight6,
                                 size = points_to_mm(0.5)),
       panel.grid.minor = element_blank(),
       panel.spacing = unit(1,
@@ -170,7 +174,7 @@ theme_e61 <- function(base_size = 14,
         size = rel(1),
         hjust = 0,
         vjust = 1,
-        colour = theme61::e61_greydark4,
+        colour = theme61::e61_greydark2,
         face = "bold",
         margin = margin(b = half_line)
       ),
