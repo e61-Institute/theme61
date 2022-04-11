@@ -4,16 +4,7 @@
 \alias{add_e61_logo}
 \title{Add e61 Logo to graph}
 \usage{
-add_e61_logo(x1 = -Inf, x2 = Inf, y1 = -Inf, y2 = Inf)
-}
-\arguments{
-\item{x1}{Minimum x co-ordinates of image on plot}
-
-\item{x2}{Maximum x co-ordinates of image on plot}
-
-\item{y1}{Minimum y co-ordinates of image on plot}
-
-\item{y2}{Maximum y co-ordinates of image on plot}
+add_e61_logo()
 }
 \value{
 ggplot2 object

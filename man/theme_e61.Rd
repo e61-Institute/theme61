@@ -6,19 +6,19 @@
 \usage{
 theme_e61(
   base_size = 14,
-  base_family = "sans",
+  base_family = "Quattrocento Sans",
   base_line_size = points_to_mm(0.75),
   base_rect_size = points_to_mm(1),
   background = "white",
   legend = "none",
-  legend_tiTle = FALSE,
+  legend_title = FALSE,
   panel_borders = FALSE
 )
 }
 \arguments{
 \item{base_size}{Numeric. Chart font size. Default 10.}
 
-\item{base_family}{Character. Chart font family. Default URW Helvetica}
+\item{base_family}{Character. Chart font family. Default Quattrocento Sans}
 
 \item{base_line_size}{Numeric. Default line width.}
 
@@ -28,9 +28,9 @@ theme_e61(
 
 \item{legend}{Character. Legend position.}
 
-\item{panel_borders}{Logical. Add panel borders?}
-
 \item{legend_title}{Logical. Include Legend Title?}
+
+\item{panel_borders}{Logical. Add panel borders?}
 }
 \value{
 ggplot2 object
