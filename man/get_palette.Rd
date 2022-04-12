@@ -2,7 +2,7 @@
 % Please edit documentation in R/e61_palette.R
 \name{get_palette}
 \alias{get_palette}
-\title{Get Colours for palette functions}
+\title{Get colours for palette functions}
 \usage{
 get_palette(n)
 }
@@ -13,5 +13,5 @@ get_palette(n)
 HEX Codes of colour palette
 }
 \description{
-Get Colours for palette functions
+Get colours for palette functions
 }

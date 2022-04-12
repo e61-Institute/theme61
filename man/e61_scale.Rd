@@ -3,7 +3,7 @@
 \name{e61_colour_manual}
 \alias{e61_colour_manual}
 \alias{e61_fill_manual}
-\title{Set e61 Colour Palettes in scale_*_manual/gradient}
+\title{Set e61 colour palettes in scale_*_manual/gradient}
 \usage{
 e61_colour_manual(
   n = 0,
@@ -36,7 +36,7 @@ e61_fill_manual(
 ggplot2 object
 }
 \description{
-Set e61 Colour Palettes in scale_*_manual/gradient
+Set e61 colour palettes in scale_*_manual/gradient
 }
 \examples{
 

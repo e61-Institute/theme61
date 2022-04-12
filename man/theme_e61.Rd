@@ -41,7 +41,7 @@ e61 themed graph options
 \examples{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 geom_point() +
-grattan_colour_manual(n = 3) +
+e61_colour_manual(n = 3) +
 theme_e61()
 
 }
