@@ -30,12 +30,12 @@ e61_colour_manual <- function(n = 0,
   if (discrete) {
     return(
       ggplot2::scale_colour_manual(...,
-                                   values = theme61::e61_palette(n = n,reverse = reverse))
+                                   values = e61_palette(n = n,reverse = reverse))
     )
   }
 
   if (!discrete) {
-    pal <- theme61::e61_pal(palette = palette, reverse = reverse)
+    pal <- e61_pal(palette = palette, reverse = reverse)
     return(ggplot2::scale_color_gradientn(colours = pal(256), ...))
   }
 
@@ -50,12 +50,12 @@ e61_fill_manual <- function(n = 0, reverse = FALSE,
   if (discrete) {
     return(
       ggplot2::scale_fill_manual(...,
-                                 values = theme61::e61_palette(n = n,reverse = reverse))
+                                 values = e61_palette(n = n,reverse = reverse))
     )
   }
 
   if (!discrete) {
-    pal <- theme61::e61_pal(palette = palette, reverse = reverse)
+    pal <- e61_pal(palette = palette, reverse = reverse)
     return(ggplot2::scale_fill_gradientn(colours = pal(256), ...))
   }
 
