@@ -38,9 +38,9 @@ To format continuous scales nicely, use `scale_y_continuous_e61()` and
 To add the e61 logo to the top-right corner of your plot use
 `add_e61_logo()`.
 
-### Example charts
+### Graph examples
 
-**Scatter chart**
+**Scatter graph**
 
 ``` r
 # Set up data
@@ -66,14 +66,15 @@ p1 <- ggplot(mtcars2) +
 
 
 p1 +
-  theme_e61(legend = "bottom", legend_title = TRUE) + scale_y_continuous_e61() +
+  theme_e61(legend = "bottom", legend_title = TRUE) + 
+  scale_y_continuous_e61() +
   e61_colour_manual(n = 3) +
   add_e61_logo()
 ```
 
 ![](readme_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
-**Faceted scatter chart**
+**Faceted scatter graph**
 
 ``` r
 p1 +
@@ -86,7 +87,7 @@ p1 +
 
 ![](readme_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
-**Density chart**
+**Density graph**
 
 ``` r
 g <- ggplot(mpg, aes(cty))
@@ -108,7 +109,7 @@ g + geom_density(aes(fill=factor(cyl)),linetype="blank", alpha=0.8) +
 
 ![](readme_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
-**Line chart**
+**Line graph**
 
 ``` r
 df <- economics_long[economics_long$variable %in% c("psavert", "uempmed"),]
@@ -138,3 +139,23 @@ ggplot(df, aes(x = date)) +
 ```
 
 ![](readme_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+**Column graph**
+
+``` r
+col_data <- head(mtcars2, 8)
+col_data$names <- rownames(col_data)
+col_data$index <- 1:nrow(col_data)
+
+ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
+  geom_col() +
+  labs(
+    title = "Frivolous filled column chart", 
+    subtitle = "For the purpose of showing off the continuous colour palette",
+    caption = "Source: e61 Institute",
+    x = NULL, y = NULL) +
+  theme_e61(legend = "bottom") +
+  e61_fill_manual(discrete = FALSE)
+```
+
+![](readme_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
