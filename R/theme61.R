@@ -32,7 +32,7 @@ cm_to_in <- function(cm, round = FALSE) {
 #' @examples
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 #' geom_point() +
-#' grattan_colour_manual(n = 3) +
+#' e61_colour_manual(n = 3) +
 #' theme_e61()
 #'
 
@@ -53,14 +53,14 @@ theme_e61 <- function(base_size = 14,
   ret <-
     theme(
       line = element_line(
-        colour = theme61::e61_greylight6,
+        colour = e61_greylight6,
         size = base_line_size,
         linetype = 1,
         lineend = "butt"
       ),
       rect = element_rect(
         fill = background,
-        colour = theme61::e61_greylight6,
+        colour = e61_greylight6,
         size = base_rect_size,
         linetype = 0
       ),
@@ -143,7 +143,7 @@ theme_e61 <- function(base_size = 14,
       legend.box.spacing = unit(half_line, "pt"),
       panel.background = element_rect(colour = NA),
       panel.border = element_blank(),
-      panel.grid = element_line(colour = theme61::e61_greylight6,
+      panel.grid = element_line(colour = e61_greylight6,
                                 size = points_to_mm(0.5)),
       panel.grid.minor = element_blank(),
       panel.spacing = unit(1,
@@ -174,12 +174,12 @@ theme_e61 <- function(base_size = 14,
         size = rel(1),
         hjust = 0,
         vjust = 1,
-        colour = theme61::e61_greydark2,
+        colour = e61_greydark2,
         face = "bold",
         margin = margin(b = half_line)
       ),
       plot.subtitle = element_text(
-        colour = theme61::e61_greydark4,
+        colour = e61_greydark4,
         hjust = 0,
         vjust = 1,
         margin = margin(t = 0,

@@ -1,6 +1,6 @@
 
 
-#' Set e61 Colour Palettes in scale_*_manual/gradient
+#' Set e61 colour palettes in scale_*_manual/gradient
 #'
 #' @param n Numeric. The number of colours in your colour scale.
 #' @param reverse Logical. Whether to reverse the colour order.
@@ -41,6 +41,7 @@ e61_colour_manual <- function(n = 0,
 
 
 }
+
 #' @rdname e61_scale
 #' @export
 e61_fill_manual <- function(n = 0, reverse = FALSE,
