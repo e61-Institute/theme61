@@ -11,7 +11,7 @@ applications.
 
 ### Installing theme61
 
-If you havent’t already, install the `devtools` package:
+If you haven’t already, install the `devtools` package:
 
 `install.packages::devtools()`
 
@@ -25,47 +25,116 @@ Then load into R:
 
 ### Making the best use of the features
 
-For more plotting options, see the vignette.
+For more plotting options, see the vignette (yet to be written).
 
-Use `theme_e61()` to format the plotting options e61-style.
+Use `theme_e61()` to format your graphs in the e61 style.
 
-To use auto colour palettes, use `e61_colour_manual(n=N)` and
-`e61_fill_manual(n=N)`.
-
-To add the e61 logo to the top-right corner of your plot use
-`add_e61_logo()`
+To use the colour palettes for your graph scales, use
+`e61_colour_manual(n=N)` and `e61_fill_manual(n=N)`.
 
 To format continuous scales nicely, use `scale_y_continuous_e61()` and
-`scale_x_continuous_e61()`
+`scale_x_continuous_e61()`.
 
-### Quick Example with time series plot
+To add the e61 logo to the top-right corner of your plot use
+`add_e61_logo()`.
+
+### Example charts
+
+**Scatter chart**
 
 ``` r
-library(theme61)
-library(ggplot2)
-library(lubridate)
+# Set up data
+mtcars2 <- within(mtcars, {
+  vs <- factor(vs, labels = c("V-shaped", "Straight"))
+  am <- factor(am, labels = c("Automatic", "Manual"))
+  cyl  <- factor(cyl)
+  gear <- factor(gear)
+})
 
-df <- economics_long[economics_long$variable %in% c("psavert", "uempmed"), ]
+# Graph
+p1 <- ggplot(mtcars2) +
+  geom_point(aes(x = wt, y = mpg, colour = gear)) +
+  labs(
+    title = "Fuel economy declines as weight increases",
+    subtitle = "(1973-74)",
+    caption = "Data from the 1974 Motor Trend US magazine.",
+    tag = "Figure 1",
+    x = "Weight (1000 lbs)",
+    y = "Fuel economy (mpg)",
+    colour = "Gears"
+  )
 
-df <- df[lubridate::year(df$date) %in% c(1967:1981), ]
+
+p1 +
+  theme_e61(legend = "bottom", legend_title = TRUE) + scale_y_continuous_e61() +
+  e61_colour_manual(n = 3) +
+  add_e61_logo()
+```
+
+![](readme_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+**Faceted scatter chart**
+
+``` r
+p1 +
+  facet_grid(vs ~ am) +
+  theme_e61(panel_borders = TRUE, legend = "bottom",base_family = "Quattrocento Sans", legend_title = TRUE) +
+  e61_colour_manual(n = 3) +
+  scale_y_continuous_e61() +
+  scale_x_continuous_e61()
+```
+
+![](readme_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+**Density chart**
+
+``` r
+g <- ggplot(mpg, aes(cty))
+g + geom_density(aes(fill=factor(cyl)),linetype="blank", alpha=0.8) +
+  labs(title="Density plot",
+       subtitle="City Mileage Grouped by Number of cylinders",
+       caption="Source: mpg",
+       x="City Mileage",
+       tag = "Figure 1",
+       y="Density",
+       fill="# Cylinders")+
+  theme_e61(base_family = "Quattrocento Sans",legend = "bottom")+
+  scale_y_continuous_e61() +
+  scale_x_continuous_e61() +
+  e61_fill_manual(n = 4) +
+  e61_colour_manual(n = 4) +
+  add_e61_logo()
+```
+
+![](readme_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+**Line chart**
+
+``` r
+df <- economics_long[economics_long$variable %in% c("psavert", "uempmed"),]
+
+df <- df[lubridate::year(df$date) %in% c(1967:1981),]
 
 # labels and breaks for X axis text
 brks <- df$date[seq(1, length(df$date), 12)]
 lbls <- lubridate::year(brks)
 
 # plot
-ggplot(df, aes(x=date)) +
-  geom_line(aes(y=value, col=variable),size=1) +
-  labs(title="Time Series of Returns Percentage",
-       subtitle="Drawn from Long Data format",
-       caption="Source: Economics",
-       tag = "Figure 1",
-       y="Percent %",
-       color=NULL) +  # title and caption
-  scale_x_date(date_breaks = "3 years",date_labels = "%Y")+
-  theme_e61(legend = "bottom")+
-    e61_colour_manual(n = 2,labels = c("Market Returns", "Unemployment")) +
-    add_e61_logo()
+ggplot(df, aes(x = date)) +
+  geom_line(aes(y = value, col = variable), size = 1) +
+  labs(
+    title = "Time Series of Returns Percentage",
+    subtitle = "Drawn from Long Data format",
+    caption = "Source: Economics",
+    tag = "Figure 1",
+    y = "Percent %",
+    color = NULL
+  ) +  # title and caption
+  scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+  theme_e61(legend = "bottom") +
+  e61_colour_manual(n = 2,
+                    labels = c("Market Returns", "Unemployment")) +
+  add_e61_logo()
 ```
 
-![](readme_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+![](readme_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
