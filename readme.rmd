@@ -38,7 +38,7 @@ To format continuous scales nicely, use `scale_y_continuous_e61()` and `scale_x_
 
 To add the e61 logo to the top-right corner of your plot use `add_e61_logo()`.
 
-### Example charts
+### Graph examples
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 devtools::load_all()
@@ -47,7 +47,7 @@ library(ggplot2)
 library(lubridate)
 ```
 
-**Scatter chart**
+**Scatter graph**
 
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
 
@@ -74,12 +74,13 @@ p1 <- ggplot(mtcars2) +
 
 
 p1 +
-  theme_e61(legend = "bottom", legend_title = TRUE) + scale_y_continuous_e61() +
+  theme_e61(legend = "bottom", legend_title = TRUE) + 
+  scale_y_continuous_e61() +
   e61_colour_manual(n = 3) +
   add_e61_logo()
 ```
 
-**Faceted scatter chart**
+**Faceted scatter graph**
 
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
 p1 +
@@ -90,7 +91,7 @@ p1 +
   scale_x_continuous_e61()
 ```
 
-**Density chart**
+**Density graph**
 
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
 g <- ggplot(mpg, aes(cty))
@@ -110,7 +111,7 @@ g + geom_density(aes(fill=factor(cyl)),linetype="blank", alpha=0.8) +
   add_e61_logo()
 ```
 
-**Line chart**
+**Line graph**
 
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
 df <- economics_long[economics_long$variable %in% c("psavert", "uempmed"),]
@@ -138,4 +139,23 @@ ggplot(df, aes(x = date)) +
                     labels = c("Market Returns", "Unemployment")) +
   add_e61_logo()
 
+```
+
+**Column graph**
+
+
+```{r echo = TRUE, message = FALSE, warning = FALSE}
+col_data <- head(mtcars2, 8)
+col_data$names <- rownames(col_data)
+col_data$index <- 1:nrow(col_data)
+
+ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
+  geom_col() +
+  labs(
+    title = "Frivolous filled column chart", 
+    subtitle = "For the purpose of showing off the continuous colour palette",
+    caption = "Source: e61 Institute",
+    x = NULL, y = NULL) +
+  theme_e61(legend = "bottom") +
+  e61_fill_manual(discrete = FALSE)
 ```
