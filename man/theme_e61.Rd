@@ -12,25 +12,27 @@ theme_e61(
   background = "white",
   legend = "none",
   legend_title = FALSE,
-  panel_borders = FALSE
+  panel_borders = TRUE
 )
 }
 \arguments{
-\item{base_size}{Numeric. Chart font size. Default 10.}
+\item{base_size}{Numeric. Chart font size. Default is 14.}
 
-\item{base_family}{Character. Chart font family. Default Quattrocento Sans}
+\item{base_family}{Character. Chart font family. Default is Quattrocento
+Sans.}
 
 \item{base_line_size}{Numeric. Default line width.}
 
 \item{base_rect_size}{Numeric. Default rect width.}
 
-\item{background}{Character. Default chart background colour.}
+\item{background}{Character. Options are "white" (default) or "grey".}
 
-\item{legend}{Character. Legend position.}
+\item{legend}{Character. Legend position, use "none" (default) to hide the
+legend.}
 
-\item{legend_title}{Logical. Include Legend Title?}
+\item{legend_title}{Logical. Include Legend Title? Defaults to FALSE.}
 
-\item{panel_borders}{Logical. Add panel borders?}
+\item{panel_borders}{Logical. Show panel borders? Defaults to TRUE.}
 }
 \value{
 ggplot2 object

@@ -79,7 +79,7 @@ p1 +
 ``` r
 p1 +
   facet_grid(vs ~ am) +
-  theme_e61(panel_borders = TRUE, legend = "bottom",base_family = "Quattrocento Sans", legend_title = TRUE) +
+  theme_e61(panel_borders = TRUE, legend = "bottom", base_family = "Quattrocento Sans", legend_title = TRUE) +
   e61_colour_manual(n = 3) +
   scale_y_continuous_e61() +
   scale_x_continuous_e61()
@@ -154,6 +154,7 @@ ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
     subtitle = "For the purpose of showing off the continuous colour palette",
     caption = "Source: e61 Institute",
     x = NULL, y = NULL) +
+  scale_y_continuous_e61() +
   theme_e61(legend = "bottom") +
   e61_fill_manual(discrete = FALSE)
 ```
