@@ -101,7 +101,6 @@ get_palette <- function(n) {
 #'   make it difficult to distinguish between colours.
 #' @param reverse Logical. Reverse the standard colour order, defaults to FALSE.
 #' @return Returns a vector of HEX codes.
-#' @examples
 #' @export
 
 e61_palette <- function(n, reverse = FALSE) {
@@ -128,8 +127,7 @@ e61_palette <- function(n, reverse = FALSE) {
 #'
 #' @return
 #' @export
-#'
-#' @examples
+
 e61_pal <- function(palette = "light", reverse = FALSE, ...) {
 
   pal <- e61_palette_set[[palette]]
