@@ -82,6 +82,7 @@ theme_e61 <- function(base_size = 14,
                                colour = "black"),
       axis.line.x = NULL,
       axis.line.y = NULL,
+      axis.line.y.right = element_blank(),
       axis.text = element_text(size = rel(1)),
       axis.text.x = element_text(
         margin = margin(t = base_size / 4,
