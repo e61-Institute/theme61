@@ -226,18 +226,13 @@ theme_e61 <- function(base_size = 14,
   }
 
 
-  if (panel_borders) {
+  if (!panel_borders) {
     ret <- ret %+replace%
-      theme(panel.border = element_rect(
-        linetype = 1,
-        size = points_to_mm(2),
-        colour = "black",
-        fill = NA
-      ))
+      theme(panel.border = element_blank())
   }
 
 
-  if (background == "orange" |  background == "box") {
+  if (background == "grey" |  background == "box") {
     ret <- ret +
       ggplot2::theme(rect = element_rect(fill = e61_greylight6))
   }
