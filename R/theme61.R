@@ -110,14 +110,12 @@ theme_e61 <- function(base_size = 14,
                                       vjust = 0),
       axis.title.y = element_text(
         angle = 90,
-        margin = margin(r = half_line /
-                          2),
+        margin = margin(r = half_line / 2),
         vjust = 1
       ),
       axis.title.y.right = element_text(
         angle = -90,
-        margin = margin(l = half_line /
-                          2),
+        margin = margin(l = half_line / 2),
         vjust = 0
       ),
       legend.background = element_rect(colour = NA),
