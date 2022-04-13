@@ -130,10 +130,11 @@ ggplot(df, aes(x = date)) +
     subtitle = "Drawn from Long Data format",
     caption = "Source: Economics",
     tag = "Figure 1",
-    y = "Percent %",
+    y = "%",
     color = NULL
-  ) +  # title and caption
+  ) + 
   scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
+  scale_y_continuous_e61() +
   theme_e61(legend = "bottom") +
   e61_colour_manual(n = 2,
                     labels = c("Market Returns", "Unemployment")) +
