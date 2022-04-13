@@ -85,7 +85,7 @@ p1 +
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
 p1 +
   facet_grid(vs ~ am) +
-  theme_e61(panel_borders = TRUE, legend = "bottom",base_family = "Quattrocento Sans", legend_title = TRUE) +
+  theme_e61(panel_borders = TRUE, legend = "bottom", base_family = "Quattrocento Sans", legend_title = TRUE) +
   e61_colour_manual(n = 3) +
   scale_y_continuous_e61() +
   scale_x_continuous_e61()
