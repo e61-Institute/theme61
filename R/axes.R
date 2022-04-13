@@ -5,9 +5,6 @@
 #' @param ...
 #'
 #' @return
-#' @export
-#'
-#' @rdname e61_axes
 
 e61_y_continuous <- function(expand_bottom = 0,
                              expand_top = 0.015,
@@ -18,7 +15,8 @@ e61_y_continuous <- function(expand_bottom = 0,
                        ...)
   }
 
-
+#' @rdname e61_axes
+#' @export
 scale_y_continuous_e61 <- function(expand_bottom = 0,
                                    expand_top = 0.015,
                                    ...) {
@@ -32,8 +30,6 @@ scale_y_continuous_e61 <- function(expand_bottom = 0,
 e61_x_continuous <- function(expand_left = 0,
                              expand_right = 0.015,
                              ...) {
-
-
 
   scale_x_continuous(expand = ggplot2::expansion(mult = c(expand_left,
                                                           expand_right)),
