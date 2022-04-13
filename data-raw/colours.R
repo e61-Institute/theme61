@@ -214,10 +214,9 @@ usethis::use_data(e61_greydark8, overwrite = TRUE)
 
 
 e61_palette_set <- list(
-  `dark`  = c(e61_bluedark,e61_tealdark,e61_skydark,e61_orangedark),
+  `dark`  = c(e61_bluedark, e61_tealdark, e61_skydark, e61_orangedark),
 
-  `light` = c(e61_bluelight,e61_teallight,e61_skylight,e61_orangelight),
-
+  `light` = c(e61_bluelight, e61_teallight, e61_skylight, e61_orangelight),
 
   `diverging` = c(e61_teallight,
                   "white",
