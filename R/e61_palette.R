@@ -1,3 +1,97 @@
+
+
+
+#' Get colours for palette functions
+#'
+#' @param n Numeric.
+#'
+#' @return HEX Codes of colour palette
+#' @export
+#'
+
+get_palette <- function(n) {
+  if (n == 1) {
+    palette <- e61_bluedark
+  } else if (n == 2) {
+    palette <- c(e61_bluedark,
+                 e61_skylight)
+  } else if (n == 3) {
+    palette <- c(e61_skylight,
+                 e61_bluedark,
+                 e61_tealdark)
+  } else if (n == 4) {
+    palette <- c(e61_skylight,
+                 e61_bluedark,
+                 e61_skydark,
+                 e61_tealdark)
+  } else if (n == 5) {
+    palette <- c(e61_skylight,
+                 e61_bluedark,
+                 e61_skydark,
+                 e61_tealdark,
+                 e61_teallight)
+  } else if (n == 6) {
+    palette <- c(
+      e61_bluelight,
+      e61_skylight,
+      e61_bluedark,
+      e61_skydark,
+      e61_tealdark,
+      e61_teallight
+    )
+  } else if (n == 7) {
+    palette <- c(
+      e61_bluelight,
+      e61_skylight,
+      e61_bluedark,
+      e61_skydark,
+      e61_tealdark,
+      e61_teallight,
+      e61_orangelight
+    )
+  } else if (n == 8) {
+    palette <- c(
+      e61_bluelight,
+      e61_skylight,
+      e61_bluedark,
+      e61_skydark,
+      e61_tealdark,
+      e61_teallight,
+      e61_orangelight,
+      e61_orangedark
+    )
+  } else if (n == 9) {
+    palette <- c(
+      e61_bluelight,
+      e61_skylight,
+      e61_bluedark,
+      e61_skydark,
+      e61_tealdark,
+      e61_teallight,
+      e61_orangelight,
+      e61_orangedark,
+      e61_greylight
+    )
+  } else if (n == 10) {
+    palette <- c(
+      e61_bluelight,
+      e61_skylight,
+      e61_bluedark,
+      e61_skydark,
+      e61_tealdark,
+      e61_teallight,
+      e61_orangelight,
+      e61_orangedark,
+      e61_greylight,
+      e61_greydark
+    )
+  }
+
+  return(palette)
+
+}
+
+
 #' Create e61 colour palette
 #'
 #' Creates an e61 themes colour palette.
@@ -7,7 +101,6 @@
 #'   make it difficult to distinguish between colours.
 #' @param reverse Logical. Reverse the standard colour order, defaults to FALSE.
 #' @return Returns a vector of HEX codes.
-#' @examples
 #' @export
 
 e61_palette <- function(n, reverse = FALSE) {
@@ -25,92 +118,19 @@ e61_palette <- function(n, reverse = FALSE) {
 
 }
 
-get_palette <- function(n) {
 
-  if (n == 1) {
-    palette <- "bluedark"
-  } else if (n == 2) {
-    palette <- c("bluedark",
-                 "tealdark")
-  } else if (n == 3) {
-    palette <- c("skylight",
-                 "bluedark",
-                 "tealdark")
-  } else if (n == 4) {
-    palette <- c("skylight",
-                 "bluedark",
-                 "skydark",
-                 "tealdark")
-  } else if (n == 5) {
-    palette <- c("skylight",
-                 "bluedark",
-                 "skydark",
-                 "tealdark",
-                 "teallight")
-  } else if (n == 6) {
-    palette <- c("bluelight",
-                 "skylight",
-                 "bluedark",
-                 "skydark",
-                 "tealdark",
-                 "teallight")
-  } else if (n == 7) {
-    palette <- c("bluelight",
-                 "skylight",
-                 "lightbluedark",
-                 "skydark",
-                 "tealdark",
-                 "teallight",
-                 "orangelight")
-  } else if (n == 8) {
-    palette <- c(
-      "bluelight",
-      "skylight",
-      "lightbluedark",
-      "skydark",
-      "tealdark",
-      "teallight",
-      "orangelight",
-      "orangedark"
-    )
-  } else if (n == 9) {
-    palette <- c(
-      "bluelight",
-      "skylight",
-      "lightbluedark",
-      "skydark",
-      "tealdark",
-      "teallight",
-      "orangelight",
-      "orangedark",
-      "greylight"
-    )
-  } else if (n == 10) {
-    palette <- c(
-      "bluelight",
-      "skylight",
-      "lightbluedark",
-      "skydark",
-      "tealdark",
-      "teallight",
-      "orangelight",
-      "orangedark",
-      "greylight",
-      "greydark"
-    )
-  }
+#' Create Continuous Palette
+#'
+#' @param palette Character. e61 colour palette
+#' @param reverse Logical. Reverse colour order.
+#' @param ...
+#'
+#' @return
+#' @export
 
-  # Prepends e61_ to match the data object names
-  palette <- sapply(palette, function(x) get(paste0("e61_", x)))
+e61_pal <- function(palette = "light", reverse = FALSE, ...) {
 
-  return(palette)
-
-}
-
-
-e61_pal <- function(palette = "full", reverse = FALSE, ...) {
-
-  pal <- theme61::e61_palette_set[[palette]]
+  pal <- e61_palette_set[[palette]]
 
   if (reverse) pal <- rev(pal)
 

@@ -1,6 +1,6 @@
 
 
-#' Set e61 Colour Palettes in scale_*_manual/gradient
+#' Set e61 colour palettes in scale_*_manual/gradient
 #'
 #' @param n Numeric. The number of colours in your colour scale.
 #' @param reverse Logical. Whether to reverse the colour order.
@@ -10,6 +10,7 @@
 #'
 #' @return ggplot2 object
 #' @rdname e61_scale
+#' @export
 #' @import ggplot2
 #'
 #' @examples
@@ -29,30 +30,32 @@ e61_colour_manual <- function(n = 0,
   if (discrete) {
     return(
       ggplot2::scale_colour_manual(...,
-                                   values = theme61::e61_palette(n = n,reverse = reverse,))
+                                   values = e61_palette(n = n,reverse = reverse))
     )
   }
 
   if (!discrete) {
-    pal <- theme61::e61_pal(palette = palette, reverse = reverse)
+    pal <- e61_pal(palette = palette, reverse = reverse)
     return(ggplot2::scale_color_gradientn(colours = pal(256), ...))
   }
 
 
 }
 
+#' @rdname e61_scale
+#' @export
 e61_fill_manual <- function(n = 0, reverse = FALSE,
                             discrete = TRUE,
                             palette = "light", ...) {
   if (discrete) {
     return(
       ggplot2::scale_fill_manual(...,
-                                 values = theme61::e61_palette(n = n,reverse = reverse))
+                                 values = e61_palette(n = n,reverse = reverse))
     )
   }
 
   if (!discrete) {
-    pal <- theme61::e61_pal(palette = palette, reverse = reverse)
+    pal <- e61_pal(palette = palette, reverse = reverse)
     return(ggplot2::scale_fill_gradientn(colours = pal(256), ...))
   }
 

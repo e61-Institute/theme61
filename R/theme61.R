@@ -16,45 +16,53 @@ cm_to_in <- function(cm, round = FALSE) {
 
 #' e61 themed graph options
 #'
-#' @param base_size Numeric. Chart font size. Default 10.
-#' @param base_family Character. Chart font family. Default URW Helvetica
+#' @param base_size Numeric. Chart font size. Default is 14.
+#' @param base_family Character. Chart font family. Default is Quattrocento
+#'   Sans.
 #' @param base_line_size Numeric. Default line width.
 #' @param base_rect_size Numeric. Default rect width.
-#' @param background Character. Default chart background colour.
-#' @param legend Character. Legend position.
-#' @param panel_borders Logical. Add panel borders?
+#' @param background Character. Options are "white" (default) or "grey".
+#' @param legend Character. Legend position, use "none" (default) to hide the
+#'   legend.
+#' @param legend_title Logical. Include Legend Title? Defaults to FALSE.
+#' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #'
 #' @return ggplot2 object
 #' @import ggplot2
+#' @export
 #'
 #' @examples
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 #' geom_point() +
-#' grattan_colour_manual(n = 3) +
+#' e61_colour_manual(n = 3) +
 #' theme_e61()
 #'
 
-theme_e61 <- function(base_size = 10,
-                               base_family = "URWHelvetica",
-                               base_line_size = points_to_mm(0.75),
-                               base_rect_size = points_to_mm(1),
-                               background = "white",
-                               legend = "none",
-                               panel_borders = FALSE) {
+theme_e61 <- function(base_size = 14,
+                      base_family = "Quattrocento Sans",
+                      base_line_size = points_to_mm(0.75),
+                      base_rect_size = points_to_mm(1),
+                      background = "white",
+                      legend = "none",
+                      legend_title = FALSE,
+                      panel_borders = TRUE) {
+
+  sysfonts::font_add_google("Quattrocento Sans", "Quattrocento Sans")
+  showtext::showtext_auto()
 
   half_line <- base_size / 2
 
   ret <-
     theme(
       line = element_line(
-        colour = theme61::e61_greylight4,
+        colour = e61_greylight6,
         size = base_line_size,
         linetype = 1,
         lineend = "butt"
       ),
       rect = element_rect(
         fill = background,
-        colour = theme61::e61_greylight4,
+        colour = e61_greylight6,
         size = base_rect_size,
         linetype = 0
       ),
@@ -70,16 +78,17 @@ theme_e61 <- function(base_size = 10,
         margin = margin(),
         size = base_size
       ),
-      axis.line = element_line(
-        size = points_to_mm(1),
-        colour = "black"
-      ),
+      axis.line = element_line(size = points_to_mm(1),
+                               colour = "black"),
       axis.line.x = NULL,
       axis.line.y = NULL,
+      axis.line.y.right = element_blank(),
       axis.text = element_text(size = rel(1)),
-      axis.text.x = element_text(margin = margin(t = base_size / 5,
-                                                 unit = "pt"),
-                                 vjust = 1),
+      axis.text.x = element_text(
+        margin = margin(t = base_size / 4,
+                        unit = "pt"),
+        vjust = 1
+      ),
       axis.text.x.top = element_text(margin = margin(b = base_size / 5),
                                      vjust = 0),
       axis.text.y = element_text(margin = margin(r = base_size / 5),
@@ -87,8 +96,9 @@ theme_e61 <- function(base_size = 10,
       axis.text.y.right = element_text(margin = margin(l = base_size / 5),
                                        hjust = 0),
       axis.ticks = element_line(colour = "black"),
+      axis.ticks.y = element_blank(),
       axis.ticks.length = unit(half_line / 2, "pt"),
-      axis.ticks.length.x = NULL,
+      axis.ticks.length.x = unit(-1*half_line / 2, "pt"), # Puts ticks inside graph
       axis.ticks.length.x.top = NULL,
       axis.ticks.length.x.bottom = NULL,
       axis.ticks.length.y = NULL,
@@ -101,17 +111,16 @@ theme_e61 <- function(base_size = 10,
                                       vjust = 0),
       axis.title.y = element_text(
         angle = 90,
-        margin = margin(r = half_line /
-                          2),
+        margin = margin(r = half_line / 2),
         vjust = 1
       ),
       axis.title.y.right = element_text(
         angle = -90,
-        margin = margin(l = half_line /
-                          2),
+        margin = margin(l = half_line / 2),
         vjust = 0
       ),
       legend.background = element_rect(colour = NA),
+      legend.title = element_blank(),
       legend.spacing = unit(half_line, "pt"),
       legend.spacing.x = NULL,
       legend.spacing.y = NULL,
@@ -121,11 +130,12 @@ theme_e61 <- function(base_size = 10,
       legend.key.size = unit(1, "lines"),
       legend.key.height = NULL,
       legend.key.width = NULL,
-      legend.text = element_text(size = rel(1),
-                                 margin = margin(l = 0,
-                                                 r = base_size / 4, unit = "pt")),
+      legend.text = element_text(
+        size = rel(1),
+        margin = margin(l = 0,
+                        r = base_size / 4, unit = "pt")
+      ),
       legend.text.align = 0,
-      legend.title = element_blank(),
       legend.title.align = NULL,
       legend.position = legend,
       legend.direction = "horizontal",
@@ -136,18 +146,23 @@ theme_e61 <- function(base_size = 10,
       legend.box.background = element_blank(),
       legend.box.spacing = unit(half_line, "pt"),
       panel.background = element_rect(colour = NA),
-      panel.border = element_blank(),
-      panel.grid = element_line(colour = theme61::e61_greylight4,
-                                size = points_to_mm(0.5)),
+      panel.border = element_rect(
+        linetype = 1,
+        size = points_to_mm(2),
+        colour = "black",
+        fill = NA
+      ),
+      panel.grid.major.x = element_blank(),
+      panel.grid.major.y = element_line(colour = e61_greylight6,
+                                  size = points_to_mm(0.5)),
       panel.grid.minor = element_blank(),
-      panel.spacing = unit(1,
-                           "lines"),
+      panel.spacing = unit(1, "lines"),
       panel.spacing.x = NULL,
       panel.spacing.y = NULL,
       panel.ontop = FALSE,
-      strip.background = element_rect(fill="black"),
+      strip.background = element_blank(),
       strip.text = element_text(
-        colour = "white",
+        colour = "black",
         size = rel(1),
         margin = margin(0.8 * half_line,
                         0.8 * half_line, 0.8 * half_line, 0.8 * half_line)
@@ -162,29 +177,31 @@ theme_e61 <- function(base_size = 10,
       strip.switch.pad.wrap = unit(half_line / 2,
                                    "pt"),
       plot.background = element_rect(),
-      plot.title.position = "plot",
-      plot.caption.position = "plot",
+      plot.title.position = "panel",
+      plot.caption.position = "panel",
       plot.title = element_text(
         size = rel(1),
-        hjust = 0,
+        hjust = 0.5,
         vjust = 1,
-        colour = theme61::e61_greydark4,
+        colour = "black",
         face = "bold",
         margin = margin(b = half_line)
       ),
       plot.subtitle = element_text(
-        colour = theme61::e61_greydark4,
-        hjust = 0,
+        colour = "black",
+        hjust = 0.5,
         vjust = 1,
-        margin = margin(t = 0,
-                        r = 0,
-                        b = base_size * .75,
-                        l = 0,
-                        unit = "pt")
+        margin = margin(
+          t = 0,
+          r = 0,
+          b = base_size * .75,
+          l = 0,
+          unit = "pt"
+        )
       ),
       plot.caption = element_text(
         family = base_family,
-        size = rel(0.555),
+        size = rel(0.7),
         hjust = 0,
         vjust = 1,
         colour = "black",
@@ -202,21 +219,23 @@ theme_e61 <- function(base_size = 10,
     )
 
   # add panel borders if the user requests them
-  if (panel_borders) {
+  if(legend_title){
     ret <- ret %+replace%
-      theme(panel.border = element_rect(
-        linetype = 1,
-        size = points_to_mm(2),
-        colour = "black",
-        fill = NA
-      ))
+      theme(legend.title = element_text(size = rel(1),
+                           margin = margin(l = 0,
+                           r = base_size / 4, unit = "pt")))
   }
 
 
-  if (background == "orange" |  background == "box") {
+  if (!panel_borders) {
+    ret <- ret %+replace%
+      theme(panel.border = element_blank())
+  }
+
+
+  if (background == "grey" |  background == "box") {
     ret <- ret +
-      ggplot2::theme(rect = element_rect(
-        fill = theme61::e61_greylight6)
+      ggplot2::theme(rect = element_rect(fill = e61_greylight6))
   }
 
   ret
