@@ -176,29 +176,31 @@ theme_e61 <- function(base_size = 14,
       strip.switch.pad.wrap = unit(half_line / 2,
                                    "pt"),
       plot.background = element_rect(),
-      plot.title.position = "plot",
-      plot.caption.position = "plot",
+      plot.title.position = "panel",
+      plot.caption.position = "panel",
       plot.title = element_text(
         size = rel(1),
-        hjust = 0,
+        hjust = 0.5,
         vjust = 1,
-        colour = e61_greydark2,
+        colour = "black",
         face = "bold",
         margin = margin(b = half_line)
       ),
       plot.subtitle = element_text(
-        colour = e61_greydark4,
-        hjust = 0,
+        colour = "black",
+        hjust = 0.5,
         vjust = 1,
-        margin = margin(t = 0,
-                        r = 0,
-                        b = base_size * .75,
-                        l = 0,
-                        unit = "pt")
+        margin = margin(
+          t = 0,
+          r = 0,
+          b = base_size * .75,
+          l = 0,
+          unit = "pt"
+        )
       ),
       plot.caption = element_text(
         family = base_family,
-        size = rel(0.555),
+        size = rel(0.7),
         hjust = 0,
         vjust = 1,
         colour = "black",
