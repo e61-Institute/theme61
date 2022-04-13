@@ -156,6 +156,7 @@ ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
     subtitle = "For the purpose of showing off the continuous colour palette",
     caption = "Source: e61 Institute",
     x = NULL, y = NULL) +
+  scale_y_continuous_e61() +
   theme_e61(legend = "bottom") +
   e61_fill_manual(discrete = FALSE)
 ```
