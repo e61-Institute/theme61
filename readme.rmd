@@ -8,10 +8,8 @@ output: github_document
 
 This package contains functions and colour palettes that enable you to create e61 Institute themed graphs and know what colours to use in other applications.
 
-## Quick Start Guide
 
 ### Installing theme61
-
 
 If you haven't already, install the `devtools` package:
 
@@ -38,6 +36,7 @@ To format continuous scales nicely, use `scale_y_continuous_e61()` and `scale_x_
 
 To add the e61 logo to the top-right corner of your plot use `add_e61_logo()`.
 
+
 ### Graph examples
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
@@ -63,9 +62,9 @@ mtcars2 <- within(mtcars, {
 p1 <- ggplot(mtcars2) +
   geom_point(aes(x = wt, y = mpg, colour = gear)) +
   labs(
-    title = "Fuel economy declines as weight increases",
-    subtitle = "(1973-74)",
-    caption = "Data from the 1974 Motor Trend US magazine.",
+    title = "Fuel Economy Declines as Weight Increases",
+    subtitle = "1973-74",
+    caption = "Source: 1974 Motor Trend US magazine.",
     tag = "Figure 1",
     x = "Weight (1000 lbs)",
     y = "Fuel economy (mpg)",
@@ -95,15 +94,17 @@ p1 +
 
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
 g <- ggplot(mpg, aes(cty))
-g + geom_density(aes(fill=factor(cyl)),linetype="blank", alpha=0.8) +
-  labs(title="Density plot",
-       subtitle="City Mileage Grouped by Number of cylinders",
-       caption="Source: mpg",
-       x="City Mileage",
-       tag = "Figure 1",
-       y="Density",
-       fill="# Cylinders")+
-  theme_e61(base_family = "Quattrocento Sans",legend = "bottom")+
+g + geom_density(aes(fill = factor(cyl)), linetype = "blank", alpha = 0.8) +
+  labs(
+    title = "City Mileage Density",
+    subtitle = "By number of cylinders",
+    caption = "Source: mpg dataset",
+    x = "City mileage",
+    tag = "Figure 1",
+    y = "Density",
+    fill = "No. cylinders"
+  ) +
+  theme_e61(base_family = "Quattrocento Sans", legend = "bottom", legend_title = TRUE) +
   scale_y_continuous_e61() +
   scale_x_continuous_e61() +
   e61_fill_manual(n = 4) +
@@ -114,9 +115,9 @@ g + geom_density(aes(fill=factor(cyl)),linetype="blank", alpha=0.8) +
 **Line graph**
 
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
-df <- economics_long[economics_long$variable %in% c("psavert", "uempmed"),]
+df <- economics_long[economics_long$variable %in% c("psavert", "uempmed"), ]
 
-df <- df[lubridate::year(df$date) %in% c(1967:1981),]
+df <- df[lubridate::year(df$date) %in% c(1967:1981), ]
 
 # labels and breaks for X axis text
 brks <- df$date[seq(1, length(df$date), 12)]
@@ -127,10 +128,10 @@ ggplot(df, aes(x = date)) +
   geom_line(aes(y = value, col = variable), size = 1) +
   labs(
     title = "Time Series of Returns Percentage",
-    subtitle = "Drawn from Long Data format",
+    subtitle = "Drawn from long data format",
     caption = "Source: Economics",
     tag = "Figure 1",
-    y = "%",
+    x = NULL, y = "%",
     color = NULL
   ) + 
   scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
@@ -153,7 +154,7 @@ col_data$index <- 1:nrow(col_data)
 ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
   geom_col() +
   labs(
-    title = "Frivolous filled column chart", 
+    title = "Frivolous Filled Column Chart", 
     subtitle = "For the purpose of showing off the continuous colour palette",
     caption = "Source: e61 Institute",
     x = NULL, y = NULL) +
