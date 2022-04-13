@@ -45,7 +45,7 @@ theme_e61 <- function(base_size = 14,
                       background = "white",
                       legend = "none",
                       legend_title = FALSE,
-                      panel_borders = FALSE) {
+                      panel_borders = TRUE) {
 
   sysfonts::font_add_google("Quattrocento Sans", "Quattrocento Sans")
   showtext::showtext_auto()
