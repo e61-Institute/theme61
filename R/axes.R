@@ -9,7 +9,7 @@
 #'
 #' @rdname e61_axes
 #' @return
-
+#' @export
 
 scale_y_continuous_e61 <- function(expand_bottom = 0,
                                    expand_top = 0.015,
