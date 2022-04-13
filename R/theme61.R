@@ -16,14 +16,16 @@ cm_to_in <- function(cm, round = FALSE) {
 
 #' e61 themed graph options
 #'
-#' @param base_size Numeric. Chart font size. Default 10.
-#' @param base_family Character. Chart font family. Default Quattrocento Sans
+#' @param base_size Numeric. Chart font size. Default is 14.
+#' @param base_family Character. Chart font family. Default is Quattrocento
+#'   Sans.
 #' @param base_line_size Numeric. Default line width.
 #' @param base_rect_size Numeric. Default rect width.
-#' @param background Character. Default chart background colour.
-#' @param legend Character. Legend position.
-#' @param legend_title Logical. Include Legend Title?
-#' @param panel_borders Logical. Add panel borders?
+#' @param background Character. Options are "white" (default) or "grey".
+#' @param legend Character. Legend position, use "none" (default) to hide the
+#'   legend.
+#' @param legend_title Logical. Include Legend Title? Defaults to FALSE.
+#' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #'
 #' @return ggplot2 object
 #' @import ggplot2
