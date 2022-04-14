@@ -181,7 +181,7 @@ theme_e61 <- function(base_size = 14,
       plot.title.position = "panel",
       plot.caption.position = "panel",
       plot.title = element_text(
-        size = rel(1),
+        size = rel(1.15),
         hjust = 0.5,
         vjust = 1,
         colour = "black",
@@ -189,24 +189,21 @@ theme_e61 <- function(base_size = 14,
         margin = margin(b = half_line)
       ),
       plot.subtitle = element_text(
+        size = rel(1),
         colour = "black",
         hjust = 0.5,
         vjust = 1,
         margin = margin(
-          t = 0,
-          r = 0,
-          b = base_size * .75,
-          l = 0,
+          t = 0, r = 0, b = base_size * .5, l = 0,
           unit = "pt"
-        )
+          )
       ),
       plot.caption = element_text(
         family = base_family,
-        size = rel(0.7),
+        size = rel(0.8),
         hjust = 0,
         vjust = 1,
         colour = "black",
-        face = "italic",
         margin = ggplot2::margin(t = 15)
       ),
       plot.tag = element_text(
