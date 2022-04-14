@@ -6,7 +6,7 @@
 \usage{
 theme_e61(
   base_size = 14,
-  base_family = "Quattrocento Sans",
+  base_family = "Arial",
   base_line_size = points_to_mm(0.75),
   base_rect_size = points_to_mm(1),
   background = "white",
@@ -18,8 +18,7 @@ theme_e61(
 \arguments{
 \item{base_size}{Numeric. Chart font size. Default is 14.}
 
-\item{base_family}{Character. Chart font family. Default is Quattrocento
-Sans.}
+\item{base_family}{Character. Chart font family. Default is Arial.}
 
 \item{base_line_size}{Numeric. Default line width.}
 
