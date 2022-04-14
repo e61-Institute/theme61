@@ -17,8 +17,7 @@ cm_to_in <- function(cm, round = FALSE) {
 #' e61 themed graph options
 #'
 #' @param base_size Numeric. Chart font size. Default is 14.
-#' @param base_family Character. Chart font family. Default is Quattrocento
-#'   Sans.
+#' @param base_family Character. Chart font family. Default is Arial.
 #' @param base_line_size Numeric. Default line width.
 #' @param base_rect_size Numeric. Default rect width.
 #' @param background Character. Options are "white" (default) or "grey".
@@ -39,7 +38,7 @@ cm_to_in <- function(cm, round = FALSE) {
 #'
 
 theme_e61 <- function(base_size = 14,
-                      base_family = "Quattrocento Sans",
+                      base_family = "Arial",
                       base_line_size = points_to_mm(0.75),
                       base_rect_size = points_to_mm(1),
                       background = "white",
@@ -47,8 +46,10 @@ theme_e61 <- function(base_size = 14,
                       legend_title = FALSE,
                       panel_borders = TRUE) {
 
-  sysfonts::font_add_google("Quattrocento Sans", "Quattrocento Sans")
-  showtext::showtext_auto()
+  # Consider restoring this as a standalone font installation function for
+  # first time running at a later date if we choose to go with a custom font.
+  # sysfonts::font_add_google("Quattrocento Sans", "Quattrocento Sans")
+  # showtext::showtext_auto()
 
   half_line <- base_size / 2
 
