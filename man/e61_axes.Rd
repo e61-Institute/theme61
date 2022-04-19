@@ -7,7 +7,7 @@
 \usage{
 scale_y_continuous_e61(
   expand_bottom = 0,
-  expand_top = 0.015,
+  expand_top = 0,
   sec_axis = dup_axis(),
   ...
 )
