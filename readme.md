@@ -58,16 +58,18 @@ p1 <- ggplot(mtcars2) +
     caption = "Source: 1974 Motor Trend US magazine.",
     tag = "Figure 1",
     x = "Weight (1000 lbs)",
-    y = "Fuel economy (mpg)",
+    y = "mpg",
     colour = "Gears"
   )
 
 
 p1 +
   theme_e61(legend = "bottom", legend_title = TRUE) + 
-  scale_y_continuous_e61() +
+  scale_y_continuous_e61(limits = c(0, 39)) +
   e61_colour_manual(n = 3) +
-  add_e61_logo()
+  add_e61_logo() + 
+  e61_y_title_top(-16) +
+  square_legend_symbols()
 ```
 
 ![](readme_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
@@ -77,9 +79,10 @@ p1 +
 ``` r
 p1 +
   facet_grid(vs ~ am) +
-  theme_e61(panel_borders = TRUE, legend = "bottom", base_family = "Quattrocento Sans", legend_title = TRUE) +
+  theme_e61(panel_borders = TRUE, legend = "bottom", legend_title = TRUE) +
+  e61_y_title_top() +
   e61_colour_manual(n = 3) +
-  scale_y_continuous_e61() +
+  scale_y_continuous_e61(limits = c(10, 39)) +
   scale_x_continuous_e61()
 ```
 
@@ -96,12 +99,13 @@ g + geom_density(aes(fill = factor(cyl)), linetype = "blank", alpha = 0.8) +
     caption = "Source: mpg dataset",
     x = "City mileage",
     tag = "Figure 1",
-    y = "Density",
+    y = "density",
     fill = "No. cylinders"
   ) +
-  theme_e61(base_family = "Quattrocento Sans", legend = "bottom", legend_title = TRUE) +
-  scale_y_continuous_e61() +
+  theme_e61(legend = "bottom", legend_title = TRUE) +
+  scale_y_continuous_e61(limits = c(0, 0.6)) +
   scale_x_continuous_e61() +
+  e61_y_title_top(-18) +
   e61_fill_manual(n = 4) +
   e61_colour_manual(n = 4) +
   add_e61_logo()
@@ -122,21 +126,23 @@ lbls <- lubridate::year(brks)
 
 # plot
 ggplot(df, aes(x = date)) +
-  geom_line(aes(y = value, col = variable), size = 1) +
+  geom_line(aes(y = value, colour = variable), size = 1) +
   labs(
     title = "Time Series of Returns Percentage",
     subtitle = "Drawn from long data format",
     caption = "Source: Economics",
     tag = "Figure 1",
     x = NULL, y = "%",
-    color = NULL
+    colour = NULL
   ) + 
   scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-  scale_y_continuous_e61() +
+  scale_y_continuous_e61(limits = c(2.5, 17.5), breaks = seq(2.5, 15, 2.5)) +
   theme_e61(legend = "bottom") +
+  e61_y_title_top(-25) +
   e61_colour_manual(n = 2,
                     labels = c("Market Returns", "Unemployment")) +
-  add_e61_logo()
+  add_e61_logo() + 
+  square_legend_symbols()
 ```
 
 ![](readme_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
@@ -154,9 +160,10 @@ ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
     title = "Frivolous Filled Column Chart", 
     subtitle = "For the purpose of showing off the continuous colour palette",
     caption = "Source: e61 Institute",
-    x = NULL, y = NULL) +
+    x = NULL, y = "hp") +
   scale_y_continuous_e61() +
   theme_e61(legend = "bottom") +
+  e61_y_title_top(-23, fix_left = 5) +
   e61_fill_manual(discrete = FALSE)
 ```
 
