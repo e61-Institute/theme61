@@ -6,7 +6,7 @@
 \usage{
 e61_save(
   filename,
-  resize = 1,
+  resize = NULL,
   width = 8,
   height = 6,
   units = "in",
@@ -18,7 +18,8 @@ e61_save(
 \arguments{
 \item{resize}{Rescales the graph and text. Useful when you need a very large
 or small graph and cannot use a vector graphics format. This only works
-when saving to the PNG file format.}
+when saving to the PNG file format. A value of 2 doubles the graph
+dimensions.}
 
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:ggsave]{ggplot2::ggsave}}
@@ -55,8 +56,9 @@ Designed to save ggplot graphs made with the e61 theme with
   See \link{ggplot2::ggsave} for details on custom function arguments.
 }
 \details{
-Currently the file formats supported are `.svg` (preferred) and
-  `.png`. SVG is a modern vector graphics file format which means it can be
-  scaled up and down in size without blurring or becoming pixelated. Use the
-  PNG file format when vector graphics are not supported.
+Currently the only file formats supported are \code{.svg}
+  (preferred) and \code{.png}. SVG is a modern vector graphics file format
+  which means it can be scaled up and down in size without blurring or
+  becoming pixelated. Use the PNG file format when vector graphics are not
+  supported.
 }
