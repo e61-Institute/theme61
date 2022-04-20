@@ -72,7 +72,7 @@ p1 +
   square_legend_symbols()
 ```
 
-![](readme_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-2-1.png)<!-- -->
 
 **Faceted scatter graph**
 
@@ -86,7 +86,7 @@ p1 +
   scale_x_continuous_e61()
 ```
 
-![](readme_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
 
 **Density graph**
 
@@ -111,7 +111,7 @@ g + geom_density(aes(fill = factor(cyl)), linetype = "blank", alpha = 0.8) +
   add_e61_logo()
 ```
 
-![](readme_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
 **Line graph**
 
@@ -145,7 +145,7 @@ ggplot(df, aes(x = date)) +
   square_legend_symbols()
 ```
 
-![](readme_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
 
 **Column graph**
 
@@ -167,4 +167,4 @@ ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
   e61_fill_manual(discrete = FALSE)
 ```
 
-![](readme_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->

@@ -44,6 +44,12 @@ devtools::load_all()
 library(theme61)
 library(ggplot2)
 library(lubridate)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-"
+)
 ```
 
 **Scatter graph**
