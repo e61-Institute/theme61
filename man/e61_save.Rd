@@ -2,7 +2,7 @@
 % Please edit documentation in R/e61_save.R
 \name{e61_save}
 \alias{e61_save}
-\title{Function to save ggplot graphs with sensible defaults}
+\title{Saves ggplot graphs with sensible defaults}
 \usage{
 e61_save(
   filename,
@@ -53,7 +53,7 @@ Designed to save ggplot graphs made with the e61 theme with
   sensible defaults that ensure the text size is appropriately proportioned
   given default sizing.
 
-  See \link{ggplot2::ggsave} for details on custom function arguments.
+  See \link[ggplot2]{ggsave} for details on custom function arguments.
 }
 \details{
 Currently the only file formats supported are \code{.svg}

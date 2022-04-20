@@ -10,7 +10,7 @@ get_palette(n)
 \item{n}{Numeric.}
 }
 \value{
-HEX Codes of colour palette
+Vector of hex codes of the colour palette
 }
 \description{
 Get colours for palette functions

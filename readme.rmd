@@ -8,7 +8,6 @@ output: github_document
 
 This package contains functions and colour palettes that enable you to create e61 Institute themed graphs and know what colours to use in other applications.
 
-
 ### Installing theme61
 
 If you haven't already, install the `devtools` package:
@@ -23,7 +22,6 @@ Then load into R:
 
 `library(theme61)`
 
-
 ### Making the best use of the features
 
 For more plotting options, see the vignette (yet to be written).
@@ -35,7 +33,6 @@ To use the colour palettes for your graph scales, use `e61_colour_manual(n=N)` a
 To format continuous scales nicely, use `scale_y_continuous_e61()` and `scale_x_continuous_e61()`.
 
 To add the e61 logo to the top-right corner of your plot use `add_e61_logo()`.
-
 
 ### Graph examples
 
@@ -80,7 +77,7 @@ p1 <- ggplot(mtcars2) +
 
 p1 +
   theme_e61(legend = "bottom", legend_title = TRUE) + 
-  scale_y_continuous_e61(limits = c(0, 39)) +
+  scale_y_continuous_e61(limits = c(0, 40)) +
   e61_colour_manual(n = 3) +
   add_e61_logo() + 
   e61_y_title_top(-16) +
@@ -95,7 +92,7 @@ p1 +
   theme_e61(panel_borders = TRUE, legend = "bottom", legend_title = TRUE) +
   e61_y_title_top() +
   e61_colour_manual(n = 3) +
-  scale_y_continuous_e61(limits = c(10, 39)) +
+  scale_y_continuous_e61(limits = c(10, 40)) +
   scale_x_continuous_e61()
 ```
 
@@ -157,7 +154,6 @@ ggplot(df, aes(x = date)) +
 
 **Column graph**
 
-
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
 col_data <- head(mtcars2, 8)
 col_data$names <- rownames(col_data)
@@ -170,7 +166,7 @@ ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
     subtitle = "For the purpose of showing off the continuous colour palette",
     caption = "Source: e61 Institute",
     x = NULL, y = "hp") +
-  scale_y_continuous_e61() +
+  scale_y_continuous_e61(limits = c(0, 250)) +
   theme_e61(legend = "bottom") +
   e61_y_title_top(-23, fix_left = 5) +
   e61_fill_manual(discrete = FALSE)

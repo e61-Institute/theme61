@@ -14,8 +14,8 @@ make it difficult to distinguish between colours.}
 \item{reverse}{Logical. Reverse the standard colour order, defaults to FALSE.}
 }
 \value{
-Returns a vector of HEX codes.
+A vector of hex codes.
 }
 \description{
-Creates an e61 themes colour palette.
+Creates a discrete e61 themed colour palette.
 }

@@ -10,7 +10,7 @@ theme_e61(
   base_line_size = points_to_mm(0.75),
   base_rect_size = points_to_mm(1),
   background = "white",
-  legend = "none",
+  legend = c("none", "bottom", "top", "left", "right"),
   legend_title = FALSE,
   panel_borders = TRUE
 )

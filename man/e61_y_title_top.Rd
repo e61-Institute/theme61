@@ -10,12 +10,12 @@ e61_y_title_top(adj = -18, fix_left = 0)
 \item{adj}{Either a single numeric to adjust left and right axis titles
 simultaneously or a vector of 2 numerics to adjust each axis title
 separately. More negative values move the text closer to the graph panel.
-Defaults to -18 which seems to work well for y-axis with 3 character-wide
+Defaults to -18 which seems to work well for y-axis with 1-3 character-wide
 values.}
 
-\item{fix_left}{Optional. Sometimes if the value of the `adj` argument is too
-negative, the margins on the left side of the graph start to cut off some
-of the text. Add a small positive value of `fix_left` to correct this.}
+\item{fix_left}{Optional. Sometimes if the value of the \code{adj} argument
+is too negative, the margins on the left side of the graph start to cut off
+some of the text. Provide a small positive value (5?) to correct this.}
 }
 \value{
 ggplot object

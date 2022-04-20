@@ -65,7 +65,7 @@ p1 <- ggplot(mtcars2) +
 
 p1 +
   theme_e61(legend = "bottom", legend_title = TRUE) + 
-  scale_y_continuous_e61(limits = c(0, 39)) +
+  scale_y_continuous_e61(limits = c(0, 40)) +
   e61_colour_manual(n = 3) +
   add_e61_logo() + 
   e61_y_title_top(-16) +
@@ -82,7 +82,7 @@ p1 +
   theme_e61(panel_borders = TRUE, legend = "bottom", legend_title = TRUE) +
   e61_y_title_top() +
   e61_colour_manual(n = 3) +
-  scale_y_continuous_e61(limits = c(10, 39)) +
+  scale_y_continuous_e61(limits = c(10, 40)) +
   scale_x_continuous_e61()
 ```
 
@@ -161,7 +161,7 @@ ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
     subtitle = "For the purpose of showing off the continuous colour palette",
     caption = "Source: e61 Institute",
     x = NULL, y = "hp") +
-  scale_y_continuous_e61() +
+  scale_y_continuous_e61(limits = c(0, 250)) +
   theme_e61(legend = "bottom") +
   e61_y_title_top(-23, fix_left = 5) +
   e61_fill_manual(discrete = FALSE)

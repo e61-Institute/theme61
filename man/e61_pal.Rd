@@ -2,20 +2,29 @@
 % Please edit documentation in R/e61_palette.R
 \name{e61_pal}
 \alias{e61_pal}
-\title{Create Continuous Palette}
+\title{Create a continuous palette}
 \usage{
-e61_pal(palette = "light", reverse = FALSE, ...)
+e61_pal(
+  palette = c("light", "dark", "diverging", "grey"),
+  reverse = FALSE,
+  ...
+)
 }
 \arguments{
 \item{palette}{Character. e61 colour palette}
 
 \item{reverse}{Logical. Reverse colour order.}
 
-\item{...}{}
+\item{...}{
+  Arguments passed on to \code{\link[grDevices:colorRamp]{grDevices::colorRampPalette}}
+  \describe{
+    \item{\code{colors}}{colors to interpolate; must be a valid argument to
+    \code{\link[grDevices]{col2rgb}()}.}
+  }}
 }
 \value{
 
 }
 \description{
-Create Continuous Palette
+Create a continuous palette
 }
