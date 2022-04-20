@@ -1,10 +1,10 @@
-#' Function to save ggplot graphs with sensible defaults
+#' Saves ggplot graphs with sensible defaults
 #'
 #' @description Designed to save ggplot graphs made with the e61 theme with
 #'   sensible defaults that ensure the text size is appropriately proportioned
 #'   given default sizing.
 #'
-#'   See \link{ggplot2::ggsave} for details on custom function arguments.
+#'   See \link[ggplot2]{ggsave} for details on custom function arguments.
 #'
 #' @details Currently the only file formats supported are \code{.svg}
 #'   (preferred) and \code{.png}. SVG is a modern vector graphics file format
@@ -17,7 +17,6 @@
 #'   when saving to the PNG file format. A value of 2 doubles the graph
 #'   dimensions.
 #' @inheritDotParams ggplot2::ggsave
-#' @import ggplot2
 #' @export
 
 e61_save <- function(filename, resize = NULL, width = 8, height = 6, units = "in", scale = 1, dpi = 100, ...) {
@@ -37,5 +36,5 @@ e61_save <- function(filename, resize = NULL, width = 8, height = 6, units = "in
 
   }
 
-  ggsave(filename, width = width, height = height, units = units, scale = scale, dpi = dpi, ...)
+  ggplot2::ggsave(filename, width = width, height = height, units = units, scale = scale, dpi = dpi, ...)
 }

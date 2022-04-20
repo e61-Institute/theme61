@@ -5,7 +5,7 @@
 #'
 #' @param n Numeric.
 #'
-#' @return HEX Codes of colour palette
+#' @return Vector of hex codes of the colour palette
 #' @export
 #'
 
@@ -94,13 +94,13 @@ get_palette <- function(n) {
 
 #' Create e61 colour palette
 #'
-#' Creates an e61 themes colour palette.
+#' Creates a discrete e61 themed colour palette.
 #'
 #' @param n Numeric. The number of levels in your colour scale. Minimum value is
 #'   1, maximum is 10. Using more than 6 colours is not recommended as it may
 #'   make it difficult to distinguish between colours.
 #' @param reverse Logical. Reverse the standard colour order, defaults to FALSE.
-#' @return Returns a vector of HEX codes.
+#' @return A vector of hex codes.
 #' @export
 
 e61_palette <- function(n, reverse = FALSE) {
@@ -119,16 +119,19 @@ e61_palette <- function(n, reverse = FALSE) {
 }
 
 
-#' Create Continuous Palette
+#' Create a continuous palette
 #'
 #' @param palette Character. e61 colour palette
 #' @param reverse Logical. Reverse colour order.
-#' @param ...
+#' @inheritDotParams grDevices::colorRampPalette
 #'
 #' @return
 #' @export
 
-e61_pal <- function(palette = "light", reverse = FALSE, ...) {
+e61_pal <- function(
+    palette = c("light", "dark", "diverging", "grey"),
+    reverse = FALSE,
+    ...) {
 
   pal <- e61_palette_set[[palette]]
 
