@@ -3,13 +3,15 @@
 \name{e61_colour_manual}
 \alias{e61_colour_manual}
 \alias{e61_fill_manual}
+\alias{e61_colour_aus}
+\alias{e61_fill_aus}
 \title{Set e61 colour palettes in scale_*_manual/gradient}
 \usage{
 e61_colour_manual(
   n = 0,
   reverse = FALSE,
   discrete = TRUE,
-  palette = "light",
+  palette = c("light", "dark", "diverging", "grey"),
   ...
 )
 
@@ -17,21 +19,25 @@ e61_fill_manual(
   n = 0,
   reverse = FALSE,
   discrete = TRUE,
-  palette = "light",
+  palette = c("light", "dark", "diverging", "grey"),
   ...
 )
+
+e61_colour_aus(...)
+
+e61_fill_aus(...)
 }
 \arguments{
 \item{n}{Numeric. The number of colours in your colour scale.}
 
-\item{reverse}{Logical. Whether to reverse the colour order.}
+\item{reverse}{Logical. TRUE reverses the colour order.}
 
-\item{discrete}{Logical. Indicates whether Discrete scale is TRUE.}
+\item{discrete}{Logical. Indicate whether to use a discrete scale.}
 
 \item{palette}{Character. The specific e61 palette for continuous scales.}
 
 \item{...}{
-  Arguments passed on to \code{\link[ggplot2:scale_manual]{ggplot2::scale_colour_manual}}
+  Arguments passed on to \code{\link[ggplot2:scale_manual]{ggplot2::scale_colour_manual}}, \code{\link[ggplot2:scale_manual]{ggplot2::scale_colour_manual}}, \code{\link[ggplot2:scale_manual]{ggplot2::scale_fill_manual}}
   \describe{
     \item{\code{values}}{a set of aesthetic values to map data values to. The values
 will be matched in order (usually alphabetical) with the limits of the
@@ -55,9 +61,14 @@ as output
 }
 \value{
 ggplot2 object
+
+ggplot2 object
 }
 \description{
 Set e61 colour palettes in scale_*_manual/gradient
+
+A consistent set of colours for Australian states and territories for
+graphing
 }
 \examples{
 

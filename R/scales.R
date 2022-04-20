@@ -1,17 +1,14 @@
-
-
 #' Set e61 colour palettes in scale_*_manual/gradient
 #'
 #' @param n Numeric. The number of colours in your colour scale.
-#' @param reverse Logical. Whether to reverse the colour order.
-#' @param discrete Logical. Indicates whether Discrete scale is TRUE.
+#' @param reverse Logical. TRUE reverses the colour order.
+#' @param discrete Logical. Indicate whether to use a discrete scale.
 #' @param palette Character. The specific e61 palette for continuous scales.
 #' @inheritDotParams ggplot2::scale_colour_manual
 #'
 #' @return ggplot2 object
 #' @rdname e61_scale
 #' @export
-#' @import ggplot2
 #'
 #' @examples
 #'
@@ -26,13 +23,13 @@
 e61_colour_manual <- function(n = 0,
                               reverse = FALSE,
                               discrete = TRUE,
-                              palette = "light",
+                              palette = c("light", "dark", "diverging", "grey"),
                               ...) {
   if (discrete) {
-    return(
-      ggplot2::scale_colour_manual(...,
-                                   values = e61_palette(n = n,reverse = reverse))
-    )
+    return(ggplot2::scale_colour_manual(
+      ...,
+      values = e61_palette(n = n, reverse = reverse))
+      )
   }
 
   if (!discrete) {
@@ -47,7 +44,7 @@ e61_colour_manual <- function(n = 0,
 #' @export
 e61_fill_manual <- function(n = 0, reverse = FALSE,
                             discrete = TRUE,
-                            palette = "light",
+                            palette = c("light", "dark", "diverging", "grey"),
                             ...) {
   if (discrete) {
     return(
@@ -63,3 +60,41 @@ e61_fill_manual <- function(n = 0, reverse = FALSE,
 
 }
 
+#' A consistent set of colours for Australian states and territories for
+#' graphing
+#'
+#' @inheritDotParams ggplot2::scale_colour_manual
+#'
+#' @return ggplot2 object
+#' @rdname e61_scale
+#' @export
+#'
+#' @examples
+#'
+#' library(ggplot2)
+#'
+#' graph_data <- data.frame(
+#'   state = c("AUS", "ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"),
+#'   value = runif(9)
+#'   )
+#'
+#' ggplot(graph_data, aes(x = state, y = value, fill = state)) +
+#'   geom_col() +
+#'   e61_fill_aus()
+
+e61_colour_aus <- function(...) {
+
+  ggplot2::scale_colour_manual(values = e61_aus_colours, limits = force, ...)
+
+}
+
+#' @inheritDotParams ggplot2::scale_fill_manual
+#'
+#' @rdname e61_scale
+#' @export
+
+e61_fill_aus <- function(...) {
+
+  ggplot2::scale_fill_manual(values = e61_aus_colours, limits = force, ...)
+
+}

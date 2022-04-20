@@ -231,3 +231,20 @@ e61_palette_set <- list(
 
 
 usethis::use_data(e61_palette_set, overwrite = TRUE)
+
+
+# State and territory colours ---------------------------------------------
+
+e61_aus_colours <- c(
+  `AUS` = "#000000",
+  `ACT` = "#999999",
+  `NSW` = "#E69F00",
+  `NT` = "#56B4E9",
+  `QLD` = "#009E73",
+  `SA` = "#F0E442",
+  `TAS` = "#0072B2",
+  `VIC` = "#D55E00",
+  `WA` = "#CC79A7"
+)
+
+usethis::use_data(e61_aus_colours, overwrite = TRUE)
