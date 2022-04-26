@@ -6,7 +6,7 @@
 #' @param reverse Logical. Whether to reverse the colour order.
 #' @param discrete Logical. Indicates whether Discrete scale is TRUE.
 #' @param palette Character. The specific e61 palette for continuous scales.
-#' @param ...
+#' @inheritDotParams ggplot2::scale_colour_manual
 #'
 #' @return ggplot2 object
 #' @rdname e61_scale
@@ -26,7 +26,8 @@
 e61_colour_manual <- function(n = 0,
                               reverse = FALSE,
                               discrete = TRUE,
-                              palette = "light", ...) {
+                              palette = "light",
+                              ...) {
   if (discrete) {
     return(
       ggplot2::scale_colour_manual(...,
@@ -46,7 +47,8 @@ e61_colour_manual <- function(n = 0,
 #' @export
 e61_fill_manual <- function(n = 0, reverse = FALSE,
                             discrete = TRUE,
-                            palette = "light", ...) {
+                            palette = "light",
+                            ...) {
   if (discrete) {
     return(
       ggplot2::scale_fill_manual(...,

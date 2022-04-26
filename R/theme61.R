@@ -42,7 +42,7 @@ theme_e61 <- function(base_size = 14,
                       base_line_size = points_to_mm(0.75),
                       base_rect_size = points_to_mm(1),
                       background = "white",
-                      legend = "none",
+                      legend = c("none", "bottom", "top", "left", "right"),
                       legend_title = FALSE,
                       panel_borders = TRUE) {
 
@@ -217,7 +217,7 @@ theme_e61 <- function(base_size = 14,
     )
 
   # add panel borders if the user requests them
-  if(legend_title){
+  if (legend_title) {
     ret <- ret %+replace%
       theme(legend.title = element_text(size = rel(1),
                            margin = margin(l = 0,
@@ -225,18 +225,20 @@ theme_e61 <- function(base_size = 14,
   }
 
 
+  # Remove panel borders if requested
   if (!panel_borders) {
     ret <- ret %+replace%
       theme(panel.border = element_blank())
   }
 
 
+  # Adds a grey background option
   if (background == "grey" |  background == "box") {
     ret <- ret +
       ggplot2::theme(rect = element_rect(fill = e61_greylight6))
   }
 
-  ret
+  return(ret)
 
 }
 
@@ -248,11 +250,11 @@ theme_e61 <- function(base_size = 14,
 #' @param adj Either a single numeric to adjust left and right axis titles
 #'   simultaneously or a vector of 2 numerics to adjust each axis title
 #'   separately. More negative values move the text closer to the graph panel.
-#'   Defaults to -18 which seems to work well for y-axis with 3 character-wide
+#'   Defaults to -18 which seems to work well for y-axis with 1-3 character-wide
 #'   values.
-#' @param fix_left Optional. Sometimes if the value of the `adj` argument is too
-#'   negative, the margins on the left side of the graph start to cut off some
-#'   of the text. Add a small positive value of `fix_left` to correct this.
+#' @param fix_left Optional. Sometimes if the value of the \code{adj} argument
+#'   is too negative, the margins on the left side of the graph start to cut off
+#'   some of the text. Provide a small positive value (5?) to correct this.
 #' @return ggplot object
 #' @import ggplot2
 #' @export
