@@ -49,7 +49,7 @@ e61_fill_manual <- function(n = 0, reverse = FALSE,
   if (discrete) {
     return(
       ggplot2::scale_fill_manual(...,
-                                 values = e61_palette(n = n,reverse = reverse))
+                                 values = e61_palette(n = n, reverse = reverse))
     )
   }
 
