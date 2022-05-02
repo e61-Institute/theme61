@@ -22,13 +22,16 @@ e61_fill_manual(
 )
 }
 \arguments{
-\item{n}{Numeric. The number of colours in your colour scale.}
+\item{n}{Numeric. The number of colours in your colour scale, required for
+discrete scales.}
 
-\item{reverse}{Logical. TRUE reverses the colour order.}
+\item{reverse}{Logical. TRUE reverses the colour order. Defaults to FALSE.}
 
-\item{discrete}{Logical. Indicate whether to use a discrete scale.}
+\item{discrete}{Logical. Indicate whether to use a discrete scale. Defaults
+to TRUE.}
 
-\item{palette}{Character. The specific e61 palette for continuous scales.}
+\item{palette}{Character. The specific e61 palette for continuous scales.
+Must be supplied if a continuous scale is used.}
 
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:scale_manual]{ggplot2::scale_colour_manual}}

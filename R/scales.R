@@ -1,9 +1,12 @@
 #' Set e61 colour palettes in scale_*_manual/gradient
 #'
-#' @param n Numeric. The number of colours in your colour scale.
-#' @param reverse Logical. TRUE reverses the colour order.
-#' @param discrete Logical. Indicate whether to use a discrete scale.
+#' @param n Numeric. The number of colours in your colour scale, required for
+#'   discrete scales.
+#' @param reverse Logical. TRUE reverses the colour order. Defaults to FALSE.
+#' @param discrete Logical. Indicate whether to use a discrete scale. Defaults
+#'   to TRUE.
 #' @param palette Character. The specific e61 palette for continuous scales.
+#'   Must be supplied if a continuous scale is used.
 #' @inheritDotParams ggplot2::scale_colour_manual
 #'
 #' @return ggplot2 object
