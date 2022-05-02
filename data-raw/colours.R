@@ -270,8 +270,6 @@ e61_palette_set <- list(
              e61_greydark7,
              e61_greylight1)
 )
-
-
 usethis::use_data(e61_palette_set, overwrite = TRUE)
 
 

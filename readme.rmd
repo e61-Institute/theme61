@@ -169,5 +169,5 @@ ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
   scale_y_continuous_e61(limits = c(0, 250)) +
   theme_e61(legend = "bottom") +
   e61_y_title_top(-23, fix_left = 5) +
-  e61_fill_manual(discrete = FALSE)
+  e61_fill_manual(discrete = FALSE, palette = "light")
 ```
