@@ -170,6 +170,48 @@ usethis::use_data(e61_orangedark7, overwrite = TRUE)
 e61_orangedark8 <- "#f8ece2"
 usethis::use_data(e61_orangedark8, overwrite = TRUE)
 
+## Maroon
+
+# Dark
+e61_maroondark <- "#850000"
+usethis::use_data(e61_maroondark, overwrite = TRUE)
+e61_maroondark1 <- "#850000"
+usethis::use_data(e61_maroondark1, overwrite = TRUE)
+e61_maroondark2 <- "#942020"
+usethis::use_data(e61_maroondark2, overwrite = TRUE)
+e61_maroondark3 <- "#a44040"
+usethis::use_data(e61_maroondark3, overwrite = TRUE)
+e61_maroondark4 <- "#b36060"
+usethis::use_data(e61_maroondark4, overwrite = TRUE)
+e61_maroondark5 <- "#c28080"
+usethis::use_data(e61_maroondark5, overwrite = TRUE)
+e61_maroondark6 <- "#d19f9f"
+usethis::use_data(e61_maroondark6, overwrite = TRUE)
+e61_maroondark7 <- "#e1bfbf"
+usethis::use_data(e61_maroondark7, overwrite = TRUE)
+e61_maroondark8 <- "#f0dfdf"
+usethis::use_data(e61_maroondark8, overwrite = TRUE)
+
+# Light
+e61_maroonlight <- "#b40000"
+usethis::use_data(e61_maroonlight, overwrite = TRUE)
+e61_maroonlight1 <- "#b40000"
+usethis::use_data(e61_maroonlight1, overwrite = TRUE)
+e61_maroonlight2 <- "#bd2020"
+usethis::use_data(e61_maroonlight2, overwrite = TRUE)
+e61_maroonlight3 <- "#c74040"
+usethis::use_data(e61_maroonlight3, overwrite = TRUE)
+e61_maroonlight4 <- "#d06060"
+usethis::use_data(e61_maroonlight4, overwrite = TRUE)
+e61_maroonlight5 <- "#da8080"
+usethis::use_data(e61_maroonlight5, overwrite = TRUE)
+e61_maroonlight6 <- "#e39f9f"
+usethis::use_data(e61_maroonlight6, overwrite = TRUE)
+e61_maroonlight7 <- "#ecbfbf"
+usethis::use_data(e61_maroonlight7, overwrite = TRUE)
+e61_maroonlight8 <- "#f6dfdf"
+usethis::use_data(e61_maroonlight8, overwrite = TRUE)
+
 ## Grey
 
 # Light

@@ -508,6 +508,131 @@
 #'
 'e61_orangedark8'
 
+#' Hex code for the colour: e61 Maroon Dark
+#'
+#' #850000
+#'
+'e61_maroondark'
+
+
+#' Hex code for the colour: e61 Maroon Dark 1
+#'
+#' #850000
+#'
+'e61_maroondark1'
+
+
+#' Hex code for the colour: e61 Maroon Dark 2
+#'
+#' #942020
+#'
+'e61_maroondark2'
+
+
+#' Hex code for the colour: e61 Maroon Dark 3
+#'
+#' #a44040
+#'
+'e61_maroondark3'
+
+
+#' Hex code for the colour: e61 Maroon Dark 4
+#'
+#' #b36060
+#'
+'e61_maroondark4'
+
+
+#' Hex code for the colour: e61 Maroon Dark 5
+#'
+#' #c28080
+#'
+'e61_maroondark5'
+
+
+#' Hex code for the colour: e61 Maroon Dark 6
+#'
+#' #d19f9f
+#'
+'e61_maroondark6'
+
+
+#' Hex code for the colour: e61 Maroon Dark 7
+#'
+#' #e1bfbf
+#'
+'e61_maroondark7'
+
+
+#' Hex code for the colour: e61 Maroon Dark 8
+#'
+#' #f0dfdf
+#'
+'e61_maroondark8'
+
+
+#' Hex code for the colour: e61 Maroon Light
+#'
+#' #b40000
+#'
+'e61_maroonlight'
+
+
+#' Hex code for the colour: e61 Maroon Light 1
+#'
+#' #b40000
+#'
+'e61_maroonlight1'
+
+
+#' Hex code for the colour: e61 Maroon Light 2
+#'
+#' #bd2020
+#'
+'e61_maroonlight2'
+
+
+#' Hex code for the colour: e61 Maroon Light 3
+#'
+#' #c74040
+#'
+'e61_maroonlight3'
+
+
+#' Hex code for the colour: e61 Maroon Light 4
+#'
+#' #d06060
+#'
+'e61_maroonlight4'
+
+
+#' Hex code for the colour: e61 Maroon Light 5
+#'
+#' #da8080
+#'
+'e61_maroonlight5'
+
+
+#' Hex code for the colour: e61 Maroon Light 6
+#'
+#' #e39f9f
+#'
+'e61_maroonlight6'
+
+
+#' Hex code for the colour: e61 Maroon Light 7
+#'
+#' #ecbfbf
+#'
+'e61_maroonlight7'
+
+
+#' Hex code for the colour: e61 Maroon Light 8
+#'
+#' #f6dfdf
+#'
+'e61_maroonlight8'
+
 
 #' Hex code for the colour: e61 Grey Light
 #'
