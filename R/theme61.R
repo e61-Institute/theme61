@@ -51,6 +51,8 @@ theme_e61 <- function(base_size = 14,
   # sysfonts::font_add_google("Quattrocento Sans", "Quattrocento Sans")
   # showtext::showtext_auto()
 
+  legend <- match.arg(legend)
+
   half_line <- base_size / 2
 
   ret <-

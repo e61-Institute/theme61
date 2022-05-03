@@ -133,6 +133,8 @@ e61_pal <- function(
     reverse = FALSE,
     ...) {
 
+  palette <- match.arg(palette)
+
   pal <- e61_palette_set[[palette]]
 
   if (reverse) pal <- rev(pal)

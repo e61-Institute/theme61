@@ -28,6 +28,9 @@ e61_colour_manual <- function(n = 0,
                               discrete = TRUE,
                               palette = c("light", "dark", "diverging", "grey"),
                               ...) {
+
+  palette <- match.arg(palette)
+
   if (discrete) {
     return(ggplot2::scale_colour_manual(
       ...,
@@ -49,6 +52,9 @@ e61_fill_manual <- function(n = 0, reverse = FALSE,
                             discrete = TRUE,
                             palette = c("light", "dark", "diverging", "grey"),
                             ...) {
+
+  palette <- match.arg(palette)
+
   if (discrete) {
     return(
       ggplot2::scale_fill_manual(...,
