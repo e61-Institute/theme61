@@ -212,6 +212,51 @@ usethis::use_data(e61_maroonlight7, overwrite = TRUE)
 e61_maroonlight8 <- "#f6dfdf"
 usethis::use_data(e61_maroonlight8, overwrite = TRUE)
 
+
+## Coral
+
+# Dark
+e61_coraldark <- "#df766d"
+usethis::use_data(e61_coraldark, overwrite = TRUE)
+e61_coraldark1 <- "#df766d"
+usethis::use_data(e61_coraldark1, overwrite = TRUE)
+e61_coraldark2 <- "#c96a62"
+usethis::use_data(e61_coraldark2, overwrite = TRUE)
+e61_coraldark3 <- "#b25e57"
+usethis::use_data(e61_coraldark3, overwrite = TRUE)
+e61_coraldark4 <- "#9c534c"
+usethis::use_data(e61_coraldark4, overwrite = TRUE)
+e61_coraldark5 <- "#864741"
+usethis::use_data(e61_coraldark5, overwrite = TRUE)
+e61_coraldark6 <- "#703b37"
+usethis::use_data(e61_coraldark6, overwrite = TRUE)
+e61_coraldark7 <- "#592f2c"
+usethis::use_data(e61_coraldark7, overwrite = TRUE)
+e61_coraldark8 <- "#432321"
+usethis::use_data(e61_coraldark8, overwrite = TRUE)
+
+# Light
+e61_corallight <- "#f88379"
+usethis::use_data(e61_corallight, overwrite = TRUE)
+e61_corallight1 <- "#f88379"
+usethis::use_data(e61_corallight1, overwrite = TRUE)
+e61_corallight2 <- "#f98f86"
+usethis::use_data(e61_corallight2, overwrite = TRUE)
+e61_corallight3 <- "#f99c94"
+usethis::use_data(e61_corallight3, overwrite = TRUE)
+e61_corallight4 <- "#faa8a1"
+usethis::use_data(e61_corallight4, overwrite = TRUE)
+e61_corallight5 <- "#fbb5af"
+usethis::use_data(e61_corallight5, overwrite = TRUE)
+e61_corallight6 <- "#fcc1bc"
+usethis::use_data(e61_corallight6, overwrite = TRUE)
+e61_corallight7 <- "#fccdc9"
+usethis::use_data(e61_corallight7, overwrite = TRUE)
+e61_corallight8 <- "#fddad7"
+usethis::use_data(e61_corallight8, overwrite = TRUE)
+
+
+
 ## Grey
 
 # Light

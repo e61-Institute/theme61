@@ -760,4 +760,130 @@
 'e61_greydark8'
 
 
+#' Hex code for the colour: e61 coral Dark
+#'
+#' #df766d
+#'
+'e61_coraldark'
+
+
+#' Hex code for the colour: e61 coral Dark 1
+#'
+#' #df766d
+#'
+'e61_coraldark1'
+
+
+#' Hex code for the colour: e61 coral Dark 2
+#'
+#' #b25e57
+#'
+'e61_coraldark2'
+
+
+#' Hex code for the colour: e61 coral Dark 3
+#'
+#' #b25e57
+#'
+'e61_coraldark3'
+
+
+#' Hex code for the colour: e61 coral Dark 4
+#'
+#' #9c534c
+#'
+'e61_coraldark4'
+
+
+#' Hex code for the colour: e61 coral Dark 5
+#'
+#' #864741
+#'
+'e61_coraldark5'
+
+
+#' Hex code for the colour: e61 coral Dark 6
+#'
+#' #703b37
+#'
+'e61_coraldark6'
+
+
+#' Hex code for the colour: e61 coral Dark 7
+#'
+#' #592f2c
+#'
+'e61_coraldark7'
+
+
+#' Hex code for the colour: e61 coral Dark 8
+#'
+#' #432321
+#'
+'e61_coraldark8'
+
+
+#' Hex code for the colour: e61 coral Light
+#'
+#' #f88379
+#'
+'e61_corallight'
+
+
+#' Hex code for the colour: e61 coral Light 1
+#'
+#' #f88379
+#'
+'e61_corallight1'
+
+
+#' Hex code for the colour: e61 coral Light 2
+#'
+#' #f98f86
+#'
+'e61_corallight2'
+
+
+#' Hex code for the colour: e61 coral Light 3
+#'
+#' #f99c94
+#'
+'e61_corallight3'
+
+
+#' Hex code for the colour: e61 coral Light 4
+#'
+#' #faa8a1
+#'
+'e61_corallight4'
+
+
+#' Hex code for the colour: e61 coral Light 5
+#'
+#' #fbb5af
+#'
+'e61_corallight5'
+
+
+#' Hex code for the colour: e61 coral Light 6
+#'
+#' #fcc1bc
+#'
+'e61_corallight6'
+
+
+#' Hex code for the colour: e61 coral Light 7
+#'
+#' #fccdc9
+#'
+'e61_corallight7'
+
+
+#' Hex code for the colour: e61 coral Light 8
+#'
+#' #fddad7
+#'
+'e61_corallight8'
+
+
 
