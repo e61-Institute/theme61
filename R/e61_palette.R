@@ -70,7 +70,7 @@ get_palette <- function(n) {
       e61_teallight,
       e61_orangelight,
       e61_orangedark,
-      e61_greylight
+      e61_maroondark
     )
   } else if (n == 10) {
     palette <- c(
@@ -82,8 +82,8 @@ get_palette <- function(n) {
       e61_teallight,
       e61_orangelight,
       e61_orangedark,
-      e61_greylight,
-      e61_greydark
+      e61_maroondark,
+      e61_maroonlight
     )
   }
 
@@ -132,6 +132,8 @@ e61_pal <- function(
     palette = c("light", "dark", "diverging", "grey"),
     reverse = FALSE,
     ...) {
+
+  palette <- match.arg(palette)
 
   pal <- e61_palette_set[[palette]]
 
