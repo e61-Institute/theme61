@@ -3,7 +3,7 @@
 \docType{data}
 \name{e61_corallight2}
 \alias{e61_corallight2}
-\title{Hex code for the colour: e61 coral Light 2}
+\title{Hex code for the colour: e61 Coral Light 2}
 \format{
 An object of class \code{character} of length 1.
 }
