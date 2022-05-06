@@ -19,6 +19,9 @@ test_that("Functionality in e61_labs works", {
   lab <- e61_labs(title = "Test", sources = c("Source A", "Source B"))
   expect_equal(lab$caption, "Sources: Source A; Source B")
 
+  lab <- e61_labs(title = "Test", sources = c("Test", "Alphabeticalisation"))
+  expect_equal(lab$caption, "Sources: Alphabeticalisation; Test")
+
   # Test that both footnotes and sources can be provided together
   lab <- e61_labs(title = "Test", footnotes = "Footnote 1", sources = "Source A")
   expect_equal(lab$caption, "* Footnote 1\nSource: Source A")
@@ -40,5 +43,15 @@ test_that("Functionality in e61_labs works", {
   lab <- e61_labs(title = "Test", footnote_max_width = 10L, footnotes = "A really really footnote", sources = "A really really long source")
 
   expect_equal(lab$caption, "* A really\nreally\nfootnote\nSource: A\nreally\nreally\nlong\nsource")
+
+  # Test wrapping functionality for titles
+  lab <- e61_labs(
+    title = "A really really really really really really really really really really really really long title",
+    subtitle = "A really really really really really really really really really really really really long title",
+    title_max_width = 65L,
+    subtitle_max_char = 75L)
+
+  expect_equal(lab$title, "A really really really really really really really really really\nreally really really long title")
+  expect_equal(lab$subtitle, "A really really really really really really really really really really really really long title")
 
 })

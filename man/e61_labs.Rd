@@ -9,7 +9,9 @@ e61_labs(
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
-  footnote_max_width = 90L,
+  title_max_char = 65L,
+  subtitle_max_char = 75L,
+  footnote_max_char = 90L,
   ...
 )
 }
@@ -20,9 +22,17 @@ separate points you include in the graph.}
 
 \item{sources}{A vector of providing the names of sources for the graph.}
 
-\item{footnote_max_width}{Set the maximum number of characters per line in
-the footer, the default (90) is appropriate for the default graph
-dimensions in \code{e61_save}.}
+\item{title_max_char}{Set the maximum number of characters per line in the
+title, the default is appropriate for the default graph dimensions in
+\code{e61_save}.}
+
+\item{subtitle_max_char}{Set the maximum number of characters per line in the
+subtitle, the default is appropriate for the default graph dimensions in
+\code{e61_save}.}
+
+\item{footnote_max_char}{Set the maximum number of characters per line in the
+footer, the default is appropriate for the default graph dimensions in
+\code{e61_save}.}
 
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:labs]{ggplot2::labs}}
