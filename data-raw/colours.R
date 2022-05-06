@@ -130,23 +130,23 @@ usethis::use_data(e61_skydark8, overwrite = TRUE)
 ## Coral
 
 # Dark
-e61_coraldark <- "#df766d"
+e61_coraldark <- "#E35D4F"
 usethis::use_data(e61_coraldark, overwrite = TRUE)
-e61_coraldark1 <- "#df766d"
+e61_coraldark1 <- "#E35D4F"
 usethis::use_data(e61_coraldark1, overwrite = TRUE)
-e61_coraldark2 <- "#c96a62"
+e61_coraldark2 <- "#e66d61"
 usethis::use_data(e61_coraldark2, overwrite = TRUE)
-e61_coraldark3 <- "#b25e57"
+e61_coraldark3 <- "#e97d72"
 usethis::use_data(e61_coraldark3, overwrite = TRUE)
-e61_coraldark4 <- "#9c534c"
+e61_coraldark4 <- "#eb8e84"
 usethis::use_data(e61_coraldark4, overwrite = TRUE)
-e61_coraldark5 <- "#864741"
+e61_coraldark5 <- "#ee9e95"
 usethis::use_data(e61_coraldark5, overwrite = TRUE)
-e61_coraldark6 <- "#703b37"
+e61_coraldark6 <- "#f1aea7"
 usethis::use_data(e61_coraldark6, overwrite = TRUE)
-e61_coraldark7 <- "#592f2c"
+e61_coraldark7 <- "#f4beb9"
 usethis::use_data(e61_coraldark7, overwrite = TRUE)
-e61_coraldark8 <- "#432321"
+e61_coraldark8 <- "#f7ceca"
 usethis::use_data(e61_coraldark8, overwrite = TRUE)
 
 # Light

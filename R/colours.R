@@ -762,63 +762,63 @@
 
 #' Hex code for the colour: e61 Coral Dark
 #'
-#' #df766d
+#' #e35d4f
 #'
 'e61_coraldark'
 
 
 #' Hex code for the colour: e61 Coral Dark 1
 #'
-#' #df766d
+#' #e35d4f
 #'
 'e61_coraldark1'
 
 
 #' Hex code for the colour: e61 Coral Dark 2
 #'
-#' #b25e57
+#' #e66d61
 #'
 'e61_coraldark2'
 
 
 #' Hex code for the colour: e61 Coral Dark 3
 #'
-#' #b25e57
+#' #e97d72
 #'
 'e61_coraldark3'
 
 
 #' Hex code for the colour: e61 Coral Dark 4
 #'
-#' #9c534c
+#' #eb8e84
 #'
 'e61_coraldark4'
 
 
 #' Hex code for the colour: e61 Coral Dark 5
 #'
-#' #864741
+#' #ee9e95
 #'
 'e61_coraldark5'
 
 
 #' Hex code for the colour: e61 Coral Dark 6
 #'
-#' #703b37
+#' #f1aea7
 #'
 'e61_coraldark6'
 
 
 #' Hex code for the colour: e61 Coral Dark 7
 #'
-#' #592f2c
+#' #f4beb9
 #'
 'e61_coraldark7'
 
 
 #' Hex code for the colour: e61 Coral Dark 8
 #'
-#' #432321
+#' #f7ceca
 #'
 'e61_coraldark8'
 
