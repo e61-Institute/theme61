@@ -3,7 +3,7 @@
 \docType{data}
 \name{e61_coraldark6}
 \alias{e61_coraldark6}
-\title{Hex code for the colour: e61 coral Dark 6}
+\title{Hex code for the colour: e61 Coral Dark 6}
 \format{
 An object of class \code{character} of length 1.
 }
@@ -11,6 +11,6 @@ An object of class \code{character} of length 1.
 e61_coraldark6
 }
 \description{
-#703b37
+#f1aea7
 }
 \keyword{datasets}
