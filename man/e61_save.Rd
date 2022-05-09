@@ -53,7 +53,7 @@ Designed to save ggplot graphs made with the e61 theme with
   sensible defaults that ensure the text size is appropriately proportioned
   given default sizing.
 
-  See \link[ggplot2]{ggsave} for details on custom function arguments.
+  See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 }
 \details{
 Currently the only file formats supported are \code{.svg}
