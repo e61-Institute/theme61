@@ -21,9 +21,9 @@ Suggests:
     testthat (>= 3.0.0),
     withr (>= 2.5.0)
 Config/testthat/edition: 3
-URL: https://github.com/aaronw22/theme61,
-    https://aaronw22.github.io/theme61/
-BugReports: https://github.com/aaronw22/theme61/issues
+URL: https://github.com/e61-institute/theme61,
+    https://e61-institute.github.io/theme61/
+BugReports: https://github.com/e61-institute/theme61/issues
 RoxygenNote: 7.1.2
 Depends: 
     R (>= 2.10)
