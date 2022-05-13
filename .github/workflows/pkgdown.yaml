@@ -25,10 +25,17 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
-          extra-packages: pkgdown, devtools, ggplot2, lubridate, data.table
+          extra-packages: pkgdown
           needs: website
 
-      - name: Install
+      - name: Install dependencies
+        run: |
+          install.packages(c("devtools", "lubridate", "data.table"))
+          remotes::install_deps(dependencies = TRUE)
+        shell: Rscript {0}
+
+      - name: Install package
+        run: R CMD INSTALL .
 
       - name: Deploy package
         run: |
