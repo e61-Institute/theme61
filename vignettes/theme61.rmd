@@ -21,9 +21,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-### Graph examples
+## Introduction
 
-**Scatter graph**
+`theme61` acts as an extension to `ggplot2`. It is made up of a custom theme and a variety of functions that change the appearance of a standard `ggplot2` graph. Thus, the correct usage of this package is to create your normal `ggplot2` graph, then add `theme61`-specific elements. This article provides some examples to help you figure out what elements you can change. Refer to these examples and the function reference page to see the full scope of this package.
+
+## Graph examples
+
+### Scatter graph
 
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
 
@@ -58,7 +62,7 @@ p1 +
   square_legend_symbols()
 ```
 
-**Faceted scatter graph**
+### Faceted scatter graph
 
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
 p1 +
@@ -70,7 +74,7 @@ p1 +
   scale_x_continuous_e61()
 ```
 
-**Density graph**
+### Density graph
 
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
 g <- ggplot(mpg, aes(cty))
@@ -93,7 +97,7 @@ g + geom_density(aes(fill = factor(cyl)), linetype = "blank", alpha = 0.8) +
   add_e61_logo()
 ```
 
-**Line graph**
+### Line graph
 
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
 df <- economics_long[economics_long$variable %in% c("psavert", "uempmed"), ]
@@ -127,7 +131,7 @@ ggplot(df, aes(x = date)) +
 
 ```
 
-**Column graph**
+### Column graph
 
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
 col_data <- head(mtcars2, 8)
