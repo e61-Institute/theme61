@@ -4,7 +4,7 @@
 #'   sensible defaults that ensure the text size is appropriately proportioned
 #'   given default sizing.
 #'
-#'   See \link[ggplot2]{ggsave} for details on custom function arguments.
+#'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 #'
 #' @details Currently the only file formats supported are \code{.svg}
 #'   (preferred) and \code{.png}. SVG is a modern vector graphics file format
@@ -19,22 +19,41 @@
 #' @inheritDotParams ggplot2::ggsave
 #' @export
 
-e61_save <- function(filename, resize = NULL, width = 8, height = 6, units = "in", scale = 1, dpi = 100, ...) {
+e61_save <-
+  function(filename,
+           resize = NULL,
+           width = 8,
+           height = 6,
+           units = "in",
+           scale = 1,
+           dpi = 100,
+           ...) {
 
-  if (!grepl("(\\.png|\\.svg)", filename)) stop("Only .svg and .png file formats are currently supported.")
+    if (!grepl("(\\.png|\\.svg)", filename))
+      stop("Only .svg and .png file formats are currently supported.")
 
-  if (!is.null(resize)) {
+    if (!is.null(resize)) {
+      if (!grepl("\\.png", filename))
+        stop("The file format must be .png")
+      if (!is.numeric(resize))
+        stop("resize must be numeric.")
 
-    if (!grepl("\\.png", filename)) stop("The file format must be .png")
-    if (!is.numeric(resize)) stop("resize must be numeric.")
+      # Rescale elements as required
+      width <- width * resize
+      height <- height * resize
+      dpi <- dpi * resize
+      scale <-
+        scale / resize # scale works inversely to size for reasons
 
-    # Rescale elements as required
-    width <- width * resize
-    height <- height * resize
-    dpi <- dpi * resize
-    scale <- scale / resize # scale works inversely to size for reasons
+    }
 
+    ggplot2::ggsave(
+      filename,
+      width = width,
+      height = height,
+      units = units,
+      scale = scale,
+      dpi = dpi,
+      ...
+    )
   }
-
-  ggplot2::ggsave(filename, width = width, height = height, units = units, scale = scale, dpi = dpi, ...)
-}
