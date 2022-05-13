@@ -2,6 +2,9 @@ url: https://e61-institute.github.io/theme61/
 template:
   bootstrap: 5
 
+toc:
+  depth: 2
+
 reference:
 - title: Graph components
   contents:
