@@ -127,6 +127,48 @@ usethis::use_data(e61_skydark7, overwrite = TRUE)
 e61_skydark8 <- "#e7f0f0"
 usethis::use_data(e61_skydark8, overwrite = TRUE)
 
+## Coral
+
+# Dark
+e61_coraldark <- "#E35D4F"
+usethis::use_data(e61_coraldark, overwrite = TRUE)
+e61_coraldark1 <- "#E35D4F"
+usethis::use_data(e61_coraldark1, overwrite = TRUE)
+e61_coraldark2 <- "#e66d61"
+usethis::use_data(e61_coraldark2, overwrite = TRUE)
+e61_coraldark3 <- "#e97d72"
+usethis::use_data(e61_coraldark3, overwrite = TRUE)
+e61_coraldark4 <- "#eb8e84"
+usethis::use_data(e61_coraldark4, overwrite = TRUE)
+e61_coraldark5 <- "#ee9e95"
+usethis::use_data(e61_coraldark5, overwrite = TRUE)
+e61_coraldark6 <- "#f1aea7"
+usethis::use_data(e61_coraldark6, overwrite = TRUE)
+e61_coraldark7 <- "#f4beb9"
+usethis::use_data(e61_coraldark7, overwrite = TRUE)
+e61_coraldark8 <- "#f7ceca"
+usethis::use_data(e61_coraldark8, overwrite = TRUE)
+
+# Light
+e61_corallight <- "#f88379"
+usethis::use_data(e61_corallight, overwrite = TRUE)
+e61_corallight1 <- "#f88379"
+usethis::use_data(e61_corallight1, overwrite = TRUE)
+e61_corallight2 <- "#f98f86"
+usethis::use_data(e61_corallight2, overwrite = TRUE)
+e61_corallight3 <- "#f99c94"
+usethis::use_data(e61_corallight3, overwrite = TRUE)
+e61_corallight4 <- "#faa8a1"
+usethis::use_data(e61_corallight4, overwrite = TRUE)
+e61_corallight5 <- "#fbb5af"
+usethis::use_data(e61_corallight5, overwrite = TRUE)
+e61_corallight6 <- "#fcc1bc"
+usethis::use_data(e61_corallight6, overwrite = TRUE)
+e61_corallight7 <- "#fccdc9"
+usethis::use_data(e61_corallight7, overwrite = TRUE)
+e61_corallight8 <- "#fddad7"
+usethis::use_data(e61_corallight8, overwrite = TRUE)
+
 
 ## Orange
 
@@ -170,6 +212,48 @@ usethis::use_data(e61_orangedark7, overwrite = TRUE)
 e61_orangedark8 <- "#f8ece2"
 usethis::use_data(e61_orangedark8, overwrite = TRUE)
 
+## Maroon
+
+# Dark
+e61_maroondark <- "#850000"
+usethis::use_data(e61_maroondark, overwrite = TRUE)
+e61_maroondark1 <- "#850000"
+usethis::use_data(e61_maroondark1, overwrite = TRUE)
+e61_maroondark2 <- "#942020"
+usethis::use_data(e61_maroondark2, overwrite = TRUE)
+e61_maroondark3 <- "#a44040"
+usethis::use_data(e61_maroondark3, overwrite = TRUE)
+e61_maroondark4 <- "#b36060"
+usethis::use_data(e61_maroondark4, overwrite = TRUE)
+e61_maroondark5 <- "#c28080"
+usethis::use_data(e61_maroondark5, overwrite = TRUE)
+e61_maroondark6 <- "#d19f9f"
+usethis::use_data(e61_maroondark6, overwrite = TRUE)
+e61_maroondark7 <- "#e1bfbf"
+usethis::use_data(e61_maroondark7, overwrite = TRUE)
+e61_maroondark8 <- "#f0dfdf"
+usethis::use_data(e61_maroondark8, overwrite = TRUE)
+
+# Light
+e61_maroonlight <- "#b40000"
+usethis::use_data(e61_maroonlight, overwrite = TRUE)
+e61_maroonlight1 <- "#b40000"
+usethis::use_data(e61_maroonlight1, overwrite = TRUE)
+e61_maroonlight2 <- "#bd2020"
+usethis::use_data(e61_maroonlight2, overwrite = TRUE)
+e61_maroonlight3 <- "#c74040"
+usethis::use_data(e61_maroonlight3, overwrite = TRUE)
+e61_maroonlight4 <- "#d06060"
+usethis::use_data(e61_maroonlight4, overwrite = TRUE)
+e61_maroonlight5 <- "#da8080"
+usethis::use_data(e61_maroonlight5, overwrite = TRUE)
+e61_maroonlight6 <- "#e39f9f"
+usethis::use_data(e61_maroonlight6, overwrite = TRUE)
+e61_maroonlight7 <- "#ecbfbf"
+usethis::use_data(e61_maroonlight7, overwrite = TRUE)
+e61_maroonlight8 <- "#f6dfdf"
+usethis::use_data(e61_maroonlight8, overwrite = TRUE)
+
 ## Grey
 
 # Light
@@ -211,3 +295,79 @@ e61_greydark7 <- "#CDCDCD"
 usethis::use_data(e61_greydark7, overwrite = TRUE)
 e61_greydark8 <- "#DDDDDD"
 usethis::use_data(e61_greydark8, overwrite = TRUE)
+
+
+e61_palette_set <- list(
+  `dark` = c(e61_bluedark, e61_tealdark, e61_skydark, e61_orangedark),
+
+  `light` = c(e61_bluelight, e61_teallight, e61_skylight, e61_orangelight),
+
+  `diverging` = c(e61_teallight,
+                  "white",
+                  e61_orangelight),
+
+  `grey` = c(e61_greydark,
+             e61_greydark3,
+             e61_greydark5,
+             e61_greydark7,
+             e61_greylight1)
+)
+usethis::use_data(e61_palette_set, overwrite = TRUE)
+
+
+# State and territory colours ---------------------------------------------
+
+e61_aus_colours <- c(
+  # Australia and aliases
+  `AUS` = "#000000",
+  `Australia` = "#000000",
+  `Aus` = "#000000",
+  # ACT and aliases
+  `ACT` = "#999999",
+  `Australian Capital Territory` = "#999999",
+  `Canberra` = "#999999",
+  `Can` = "#999999",
+  # NSW and aliases
+  `NSW` = "#E69F00",
+  `New South Wales` = "#E69F00",
+  `Sydney` = "#E69F00",
+  `Syd` = "#E69F00",
+  # NT and aliases
+  `NT` = "#56B4E9",
+  `Northern Territory` = "#56B4E9",
+  `Darwin` = "#56B4E9",
+  `Dar` = "#56B4E9",
+  # QLD and aliases
+  `QLD` = "#009E73",
+  `Queensland` = "#009E73",
+  `Qld` = "#009E73",
+  `Qld.` = "#009E73",
+  `Brisbane` = "#009E73",
+  `Bri` = "#009E73",
+  # SA and aliases
+  `SA` = "#F0E442",
+  `South Australia` = "#F0E442",
+  `Adelaide` = "#F0E442",
+  `Ade` = "#F0E442",
+  # TAS and aliases
+  `TAS` = "#0072B2",
+  `Tasmania` = "#0072B2",
+  `Tas` = "#0072B2",
+  `Tas.` = "#0072B2",
+  `Hobart` = "#0072B2",
+  `Hob` = "#0072B2",
+  # VIC and aliases
+  `VIC` = "#D55E00",
+  `Victoria` = "#D55E00",
+  `Vic` = "#D55E00",
+  `Vic.` = "#D55E00",
+  `Melbourne` = "#D55E00",
+  `Mel` = "#D55E00",
+  # WA and aliases
+  `WA` = "#CC79A7",
+  `Western Australia` = "#CC79A7",
+  `Perth` = "#CC79A7",
+  `Per` = "#CC79A7"
+)
+
+usethis::use_data(e61_aus_colours, overwrite = TRUE)

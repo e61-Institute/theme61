@@ -1,0 +1,43 @@
+url: https://e61-institute.github.io/theme61/
+template:
+  bootstrap: 5
+
+reference:
+- title: Graph components
+  contents:
+  - add_e61_logo
+  - e61_labs
+  - e61_y_title_top
+  - square_legend_symbols
+  - theme_e61
+
+- title: Palette
+  contents:
+  - e61_pal
+  - e61_palette
+  - get_palette
+
+- title: Scale colours
+  contents:
+  - matches("^e61_(colour|fill)")
+
+- title: Scale formatting
+  contents:
+  - scale_x_continuous_e61
+  - scale_y_continuous_e61
+
+- title: Miscellaneous
+  contents:
+  - e61_save
+  - crop_aus_coord
+
+- title: Colours
+  contents:
+  - e61_aus_colours
+  - matches("^e61_(blue|coral|grey|maroon|orange|sky|teal)")
+
+articles:
+- title: Get started
+  navbar: ~
+  contents:
+  - theme61
