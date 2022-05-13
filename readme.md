@@ -15,7 +15,7 @@ If you haven’t already, install the `devtools` package:
 
 Then install from GitHub:
 
-`devtools::install_github("aaronw22/theme61", dependencies = TRUE, upgrade = "always")`
+`devtools::install_github("e61-institute/theme61", dependencies = TRUE, upgrade = "always")`
 
 Then load into R:
 
@@ -25,7 +25,3 @@ Then load into R:
 
 See the [package website](https://e61-institute.github.io/theme61/) to
 learn how to use the package features.
-
-### Full colour palette
-
-![](man/figures/README-unnamed-chunk-2-1.png)<!-- -->
