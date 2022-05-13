@@ -35,3 +35,9 @@ reference:
   contents:
   - e61_aus_colours
   - matches("^e61_(blue|coral|grey|maroon|orange|sky|teal)")
+
+articles:
+- title: Get started
+  navbar: ~
+  contents:
+  - theme61
