@@ -3,7 +3,7 @@ pkgdown: 2.0.3
 pkgdown_sha: ~
 articles:
   theme61: theme61.html
-last_built: 2022-05-13T06:12Z
+last_built: 2022-05-13T06:23Z
 urls:
   reference: https://e61-institute.github.io/theme61/reference
   article: https://e61-institute.github.io/theme61/articles
