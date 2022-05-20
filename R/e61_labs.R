@@ -12,7 +12,7 @@
 #'   \code{sources}, do not supply a \code{caption} argument as well.
 #'
 #' @param footnotes A vector of footnote text strings. Each new string will be
-#'   prepended with \*, \*\*, \*\*\*, etc. Please be sensible with the number of
+#'   prepended with *, **, ***, etc. Please be sensible with the number of
 #'   separate points you include in the graph.
 #' @param sources A vector of providing the names of sources for the graph.
 #' @param title_max_char Set the maximum number of characters per line in the
@@ -32,9 +32,9 @@ e61_labs <- function(title,
                      subtitle = NULL,
                      footnotes = NULL,
                      sources = NULL,
-                     title_max_char = 65L,
-                     subtitle_max_char = 75L,
-                     footnote_max_char = 90L,
+                     title_max_char = 65,
+                     subtitle_max_char = 75,
+                     footnote_max_char = 90,
                      ...) {
 
   # We need this to check for the presence of caption in the passed-through
@@ -44,10 +44,13 @@ e61_labs <- function(title,
   if ((!is.null(footnotes) || !is.null(sources)) && !is.null(dots$caption))
     stop("Do not use the caption argument if you use the footnotes or sources arguments.")
 
-  if (!is.integer(title_max_char) || title_max_char < 0)
+  if (!is.numeric(title_max_char) || title_max_char < 0)
     stop("title_max_char must be a positive integer.")
 
-  if (!is.integer(footnote_max_char) || footnote_max_char < 0)
+  if (!is.numeric(subtitle_max_char) || subtitle_max_char < 0)
+    stop("subtitle_max_char must be a positive integer.")
+
+  if (!is.numeric(footnote_max_char) || footnote_max_char < 0)
     stop("footnote_max_char must be a positive integer.")
 
   if (!is.character(title))

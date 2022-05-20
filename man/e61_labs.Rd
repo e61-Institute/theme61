@@ -9,15 +9,15 @@ e61_labs(
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
-  title_max_char = 65L,
-  subtitle_max_char = 75L,
-  footnote_max_char = 90L,
+  title_max_char = 65,
+  subtitle_max_char = 75,
+  footnote_max_char = 90,
   ...
 )
 }
 \arguments{
 \item{footnotes}{A vector of footnote text strings. Each new string will be
-prepended with \*, \*\*, \*\*\*, etc. Please be sensible with the number of
+prepended with *, **, ***, etc. Please be sensible with the number of
 separate points you include in the graph.}
 
 \item{sources}{A vector of providing the names of sources for the graph.}
