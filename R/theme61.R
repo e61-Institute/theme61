@@ -244,6 +244,57 @@ theme_e61 <- function(base_size = 14,
 
 }
 
+
+#' e61 themed graph options in a 'clean' style
+#'
+#' @param base_size Numeric. Chart font size. Default is 14.
+#' @param base_family Character. Chart font family. Default is Arial.
+#'
+#' @return ggplot2 object
+#' @import ggplot2 ggthemes
+#' @export
+#'
+#' @examples
+#' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
+#' geom_point() +
+#' e61_colour_manual(n = 3) +
+#' theme_e61_clean()
+
+theme_e61_clean <- function(
+    base_family = "Arial",
+    base_size = 14
+  ){
+  ggthemes::theme_clean() +
+    theme(
+      text = element_text(
+        colour = "black",
+        family = base_family,
+        face = "plain",
+        hjust = 0.5,
+        vjust = 0.5,
+        angle = 0,
+        lineheight = 0.9,
+        debug = FALSE,
+        margin = margin(),
+        size = base_size
+      ),
+      legend.title = element_blank(),
+      legend.background = element_rect(color = NA),
+      legend.position = "bottom",
+      plot.background = element_rect(color = NA),
+      panel.grid.major.y = element_line(colour = "grey90", linetype = 1),
+      axis.text = element_text(size = 14),
+      axis.title = element_text(size = 16),
+      plot.title.position = "plot",
+      plot.caption.position = "plot",
+      plot.title = element_text(size = 20, hjust = 0, color = "grey20"),
+      plot.subtitle = element_text(size = 16, hjust = 0, vjust = 0.5, colour = "grey50"),
+      plot.caption =  element_text(size = 12, hjust = 0, vjust = 1, colour = "grey50")
+    )
+}
+
+
+
 #' Reposition y-axis titles to the top
 #'
 #' Moves the y-axis titles from the side (ggplot default) to the top of the
