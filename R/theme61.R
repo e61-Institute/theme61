@@ -63,6 +63,7 @@ theme_e61 <- function(base_size = 14,
         linetype = 1,
         lineend = "butt"
       ),
+      aspect.ratio = 0.75,
       rect = element_rect(
         fill = background,
         colour = e61_greylight6,
