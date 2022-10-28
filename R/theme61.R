@@ -141,7 +141,6 @@ theme_e61 <- function(base_size = 14,
       legend.text.align = 0,
       legend.title.align = NULL,
       legend.position = legend,
-      legend.direction = "horizontal",
       legend.justification = "center",
       legend.box = "vertical",
       legend.box.margin = margin(0, 0,
@@ -226,6 +225,10 @@ theme_e61 <- function(base_size = 14,
                            r = base_size / 4, unit = "pt")))
   }
 
+  # add panel borders if the user requests them
+  if (like(legend, "bottom|top", ignore.case = T)) {
+    ret <- ret + theme(legend.direction = "horizontal")
+  }
 
   # Remove panel borders if requested
   if (!panel_borders) {
