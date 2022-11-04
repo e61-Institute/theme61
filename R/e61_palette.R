@@ -11,80 +11,95 @@
 
 get_palette <- function(n) {
   if (n == 1) {
-    palette <- e61_bluedark
+    palette <- e61_tealdark1
   } else if (n == 2) {
-    palette <- c(e61_bluedark,
-                 e61_skylight)
+    palette <- c(e61_skylight1,
+                 e61_tealdark1)
   } else if (n == 3) {
-    palette <- c(e61_skylight,
-                 e61_bluedark,
-                 e61_tealdark)
+    palette <- c(e61_skylight1,
+                 e61_tealdark1,
+                 "grey50")
   } else if (n == 4) {
-    palette <- c(e61_skylight,
-                 e61_bluedark,
-                 e61_skydark,
-                 e61_tealdark)
+    palette <- c(e61_skylight1,
+                 e61_tealdark1,
+                 "grey50",
+                 e61_orangedark1)
   } else if (n == 5) {
-    palette <- c(e61_skylight,
-                 e61_bluedark,
-                 e61_skydark,
-                 e61_tealdark,
-                 e61_teallight)
+    palette <- c(e61_skylight1,
+                 e61_tealdark1,
+                 "grey50",
+                 e61_orangelight1,
+                 e61_orangedark1)
   } else if (n == 6) {
-    palette <- c(
-      e61_bluelight,
-      e61_skylight,
-      e61_bluedark,
-      e61_skydark,
-      e61_tealdark,
-      e61_teallight
-    )
+    palette <- c(e61_skylight1,
+                 e61_tealdark1,
+                 "grey50",
+                 e61_orangelight1,
+                 e61_orangedark1,
+                 e61_maroonlight1)
   } else if (n == 7) {
-    palette <- c(
-      e61_bluelight,
-      e61_skylight,
-      e61_bluedark,
-      e61_skydark,
-      e61_tealdark,
-      e61_teallight,
-      e61_orangelight
-    )
+    palette <- c(e61_skylight1,
+                 e61_tealdark1,
+                 "grey50",
+                 e61_orangelight1,
+                 e61_orangedark1,
+                 e61_coraldark1,
+                 e61_maroonlight1)
   } else if (n == 8) {
-    palette <- c(
-      e61_bluelight,
-      e61_skylight,
-      e61_bluedark,
-      e61_skydark,
-      e61_tealdark,
-      e61_teallight,
-      e61_orangelight,
-      e61_orangedark
-    )
+    palette <- c(e61_skylight1,
+                 e61_tealdark1,
+                 e61_bluedark1,
+                 "grey50",
+                 e61_orangelight1,
+                 e61_orangedark1,
+                 e61_coraldark1,
+                 e61_maroonlight1)
   } else if (n == 9) {
-    palette <- c(
-      e61_bluelight,
-      e61_skylight,
-      e61_bluedark,
-      e61_skydark,
-      e61_tealdark,
-      e61_teallight,
-      e61_orangelight,
-      e61_orangedark,
-      e61_maroondark
-    )
+    palette <- c(e61_skylight1,
+                 e61_tealdark1,
+                 e61_bluedark1,
+                 "grey50",
+                 e61_orangelight1,
+                 e61_orangedark1,
+                 e61_coraldark1,
+                 e61_maroonlight1,
+                 e61_maroondark1)
   } else if (n == 10) {
-    palette <- c(
-      e61_bluelight,
-      e61_skylight,
-      e61_bluedark,
-      e61_skydark,
-      e61_tealdark,
-      e61_teallight,
-      e61_orangelight,
-      e61_orangedark,
-      e61_maroondark,
-      e61_maroonlight
-    )
+    palette <- c(e61_skylight1,
+                 e61_teallight1,
+                 e61_tealdark1,
+                 e61_bluedark1,
+                 "grey50",
+                 e61_orangelight1,
+                 e61_orangedark1,
+                 e61_coraldark1,
+                 e61_maroonlight1,
+                 e61_maroondark1)
+  } else if (n == 11) {
+    palette <- c(e61_skylight1,
+                 e61_teallight1,
+                 e61_tealdark1,
+                 e61_bluedark1,
+                 "grey50",
+                 "grey30",
+                 e61_orangelight1,
+                 e61_orangedark1,
+                 e61_coraldark1,
+                 e61_maroonlight1,
+                 e61_maroondark1)
+  } else if (n == 12) {
+    palette <- c(e61_skylight1,
+                 e61_teallight1,
+                 e61_tealdark1,
+                 e61_bluedark1,
+                 "grey70",
+                 "grey50",
+                 "grey30",
+                 e61_orangelight1,
+                 e61_orangedark1,
+                 e61_coraldark1,
+                 e61_maroonlight1,
+                 e61_maroondark1)
   }
 
   return(palette)
@@ -106,7 +121,7 @@ get_palette <- function(n) {
 e61_palette <- function(n, reverse = FALSE) {
 
   if (n == 0) stop("You need to specify at least one n.")
-  if (n > 10) stop("You cannot request more than 10 colours.")
+  if (n > 12) stop("You cannot request more than 12 colours.")
 
   palette <- get_palette(n)
 

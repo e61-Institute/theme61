@@ -32,35 +32,9 @@ e61_colour_manual <- function(n = 0,
 
   if (discrete) {
 
-      if(n == 1) {
-        ret_vals <- e61_tealdark1
-      } else if(n == 2){
-        ret_vals <- c(e61_skylight1, e61_tealdark1)
-      } else if(n == 3) {
-        ret_vals <- c(e61_skylight1, e61_tealdark1, "grey50")
-      } else if(n == 4) {
-        ret_vals <- c(e61_skylight1, e61_tealdark1, "grey50", e61_orangedark1)
-      } else if(n == 5) {
-        ret_vals <- c(e61_skylight1, e61_tealdark1, "grey50", e61_orangelight1, e61_orangedark1)
-      } else if(n == 6) {
-        ret_vals <- c(e61_skylight1, e61_tealdark1, "grey50", e61_orangelight1, e61_orangedark1, e61_maroonlight1)
-      } else if(n == 7) {
-        ret_vals <- c(e61_skylight1, e61_tealdark1, "grey50", e61_orangelight1, e61_orangedark1, e61_coraldark1, e61_maroonlight1)
-      } else if(n == 8) {
-        ret_vals <- c(e61_skylight1, e61_tealdark1, e61_bluedark1, "grey50", e61_orangelight1, e61_orangedark1, e61_coraldark1, e61_maroonlight1)
-      } else if(n == 9) {
-        ret_vals <- c(e61_skylight1, e61_tealdark1, e61_bluedark1, "grey50", e61_orangelight1, e61_orangedark1, e61_coraldark1, e61_maroonlight1, e61_maroondark1)
-      } else if(n == 10) {
-        ret_vals <- c(e61_skylight1, e61_teallight1, e61_tealdark1, e61_bluedark1, "grey50", e61_orangelight1, e61_orangedark1, e61_coraldark1, e61_maroonlight1, e61_maroondark1)
-      } else if(n == 11) {
-        ret_vals <- c(e61_skylight1, e61_teallight1, e61_tealdark1, e61_bluedark1, "grey50", "grey30", e61_orangelight1, e61_orangedark1, e61_coraldark1, e61_maroonlight1, e61_maroondark1)
-      } else if(n == 12) {
-        ret_vals <- c(e61_skylight1, e61_teallight1, e61_tealdark1, e61_bluedark1, "grey70", "grey50", "grey30", e61_orangelight1, e61_orangedark1, e61_coraldark1, e61_maroonlight1, e61_maroondark1)
-      } else {
-        ret_vals <- e61_palette(n = n, reverse = reverse)
-      }
+    pal <- get_palette(n)
 
-    return(ggplot2::scale_fill_manual(values = ret_vals))
+    return(ggplot2::scale_fill_manual(values = pal))
   }
 
   if (!discrete) {
@@ -80,35 +54,9 @@ e61_fill_manual <- function(n = 0, reverse = FALSE,
 
   if (discrete) {
 
-    if(n == 1) {
-      ret_vals <- e61_tealdark1
-    } else if(n == 2){
-      ret_vals <- c(e61_skylight1, e61_tealdark1)
-    } else if(n == 3) {
-      ret_vals <- c(e61_skylight1, e61_tealdark1, "grey50")
-    } else if(n == 4) {
-      ret_vals <- c(e61_skylight1, e61_tealdark1, "grey50", e61_orangedark1)
-    } else if(n == 5) {
-      ret_vals <- c(e61_skylight1, e61_tealdark1, "grey50", e61_orangelight1, e61_orangedark1)
-    } else if(n == 6) {
-      ret_vals <- c(e61_skylight1, e61_tealdark1, "grey50", e61_orangelight1, e61_orangedark1, e61_maroonlight1)
-    } else if(n == 7) {
-      ret_vals <- c(e61_skylight1, e61_tealdark1, "grey50", e61_orangelight1, e61_orangedark1, e61_coraldark1, e61_maroonlight1)
-    } else if(n == 8) {
-      ret_vals <- c(e61_skylight1, e61_tealdark1, e61_bluedark1, "grey50", e61_orangelight1, e61_orangedark1, e61_coraldark1, e61_maroonlight1)
-    } else if(n == 9) {
-      ret_vals <- c(e61_skylight1, e61_tealdark1, e61_bluedark1, "grey50", e61_orangelight1, e61_orangedark1, e61_coraldark1, e61_maroonlight1, e61_maroondark1)
-    } else if(n == 10) {
-      ret_vals <- c(e61_skylight1, e61_teallight1, e61_tealdark1, e61_bluedark1, "grey50", e61_orangelight1, e61_orangedark1, e61_coraldark1, e61_maroonlight1, e61_maroondark1)
-    } else if(n == 11) {
-      ret_vals <- c(e61_skylight1, e61_teallight1, e61_tealdark1, e61_bluedark1, "grey50", "grey30", e61_orangelight1, e61_orangedark1, e61_coraldark1, e61_maroonlight1, e61_maroondark1)
-    } else if(n == 12) {
-      ret_vals <- c(e61_skylight1, e61_teallight1, e61_tealdark1, e61_bluedark1, "grey70", "grey50", "grey30", e61_orangelight1, e61_orangedark1, e61_coraldark1, e61_maroonlight1, e61_maroondark1)
-    } else {
-      ret_vals <- e61_palette(n = n, reverse = reverse)
-    }
+    pal <- get_palette(n)
 
-    return(ggplot2::scale_fill_manual(values = ret_vals))
+    return(ggplot2::scale_fill_manual(values = pal))
   }
 
   if (!discrete) {

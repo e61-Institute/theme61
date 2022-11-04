@@ -16,7 +16,11 @@ Imports:
     grDevices (>= 4.1.3),
     grid (>= 4.1.3),
     gridExtra (>= 2.3),
-    magick (>= 2.7.3)
+    magick (>= 2.7.3),
+    esquisse,
+    data.table
+Remotes: 
+    JackBuckley/esquisse
 Suggests: 
     testthat (>= 3.0.0),
     withr (>= 2.5.0)

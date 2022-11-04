@@ -226,8 +226,8 @@ theme_e61 <- function(base_size = 14,
                            r = base_size / 4, unit = "pt")))
   }
 
-  # add panel borders if the user requests them
-  if (like(legend, "bottom|top", ignore.case = T)) {
+  # adjust legend direction based on legend position
+  if (data.table::like(legend, "bottom|top", ignore.case = T)) {
     ret <- ret + theme(legend.direction = "horizontal")
   }
 
@@ -245,7 +245,6 @@ theme_e61 <- function(base_size = 14,
   }
 
   return(ret)
-
 }
 
 
