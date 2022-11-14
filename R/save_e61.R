@@ -21,6 +21,7 @@
 
 save_e61 <-
   function(filename,
+           plot = ggplot2::last_plot(),
            resize = NULL,
            width = 8,
            height = 6,
@@ -49,6 +50,7 @@ save_e61 <-
 
     ggplot2::ggsave(
       filename,
+      plot = plot,
       width = width,
       height = height,
       units = units,
