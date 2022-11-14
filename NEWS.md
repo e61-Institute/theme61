@@ -1,7 +1,8 @@
 # theme61 0.2.0
 
 * *Jack please add your changes here.*
-* Many functions have been renamed to more closely align with existing ggplot2 function names, with `_e61` appended to them, for example `e61_colour_manual` now becomes `scale_colour_e61`.
+* Updated `save_e61()` to allow you to save plots other than the most recently generated one.
+* Many functions have been renamed to more closely align with existing ggplot2 function names, with `_e61` appended to them, for example `e61_colour_manual` now becomes `scale_colour_e61`. The old functions have now been deprecated and will be made defunct in future versions. Please stop using them and use the new functions instead.
 
 # theme61 0.1.0
 
