@@ -6,10 +6,11 @@ reference:
 - title: Graph components
   contents:
   - add_e61_logo
-  - e61_labs
-  - e61_y_title_top
+  - labs_e61
+  - y_title_top_e61
   - square_legend_symbols
   - theme_e61
+  - theme_e61_clean
 
 - title: Palette
   contents:
@@ -17,19 +18,15 @@ reference:
   - e61_palette
   - get_palette
 
-- title: Scale colours
-  contents:
-  - matches("^e61_(colour|fill)")
-
 - title: Scale formatting
   contents:
-  - scale_x_continuous_e61
-  - scale_y_continuous_e61
+  - starts_with("scale_")
 
 - title: Miscellaneous
   contents:
-  - e61_save
+  - save_e61
   - crop_aus_coord
+  - e61_chart_maker
 
 - title: Colours
   contents:

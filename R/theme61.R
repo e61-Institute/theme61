@@ -315,7 +315,7 @@ theme_e61_clean <- function(
 #' @import ggplot2
 #' @export
 
-e61_y_title_top <- function(adj = -18, fix_left = 0) {
+y_title_top_e61 <- function(adj = -18, fix_left = 0) {
 
   if (class(adj) != "numeric") stop("adj must be a number.")
   if (!length(adj) %in% c(1, 2)) stop("adj must be a single value or a vector of 2 values.")

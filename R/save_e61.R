@@ -19,7 +19,7 @@
 #' @inheritDotParams ggplot2::ggsave
 #' @export
 
-e61_save <-
+save_e61 <-
   function(filename,
            resize = NULL,
            width = 8,
