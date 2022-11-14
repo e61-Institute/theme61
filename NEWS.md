@@ -1,3 +1,8 @@
+# theme61 0.2.0
+
+* *Jack please add your changes here.*
+* Many functions have been renamed to more closely align with existing ggplot2 function names, with `_e61` appended to them, for example `e61_colour_manual` now becomes `scale_colour_e61`.
+
 # theme61 0.1.0
 
 This is the first functional release of theme61 containing everything you need to make a graph in the e61 style.
