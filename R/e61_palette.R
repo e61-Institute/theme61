@@ -140,7 +140,6 @@ e61_palette <- function(n, reverse = FALSE) {
 #' @param reverse Logical. Reverse colour order.
 #' @inheritDotParams grDevices::colorRampPalette
 #'
-#' @return
 #' @export
 
 e61_pal <- function(
