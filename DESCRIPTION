@@ -4,7 +4,7 @@ Title: Create Graphs in the e61 Institute Style
 Version: 0.2.0
 Authors@R: c(
     person("Aaron", "Wong", email = "aaron.wong@e61.in", role = c("aut", "cre")),
-    person("Elyse", "Dwyer", email = "elyse.dwyer@e61.in", role = c("aut"))),
+    person("Elyse", "Dwyer", email = "elyse.dwyer@e61.in", role = c("aut")),
     person("Jack", "Buckley", email = "jack.buckley@e61.in", role = c("aut")))
 Description: Provides functions and colour palettes to allow users to create
     ggplot2 charts that conform to the e61 Institute style guide (which is yet
@@ -30,6 +30,6 @@ Config/testthat/edition: 3
 URL: https://github.com/e61-institute/theme61,
     https://e61-institute.github.io/theme61/
 BugReports: https://github.com/e61-institute/theme61/issues
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Depends: 
     R (>= 2.10)
