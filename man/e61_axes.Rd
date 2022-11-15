@@ -119,9 +119,6 @@ of the graph.}
 \item{expand_right}{Numeric. Add extra space between data points and the
 right of the graph.}
 }
-\value{
-
-}
 \description{
 Format axes in the e61 Institute style
 }

@@ -44,9 +44,7 @@ displayed below the title.}
 bottom-right of the plot by default.}
     \item{\code{tag}}{The text for the tag label which will be displayed at the
 top-left of the plot by default.}
-    \item{\code{alt}}{Text used for the generation of alt-text for the plot.
-See \link[ggplot2]{get_alt_text} for examples.}
-    \item{\code{alt_insight}}{Text used for the generation of alt-text for the plot.
+    \item{\code{alt,alt_insight}}{Text used for the generation of alt-text for the plot.
 See \link[ggplot2]{get_alt_text} for examples.}
   }}
 }
