@@ -17,7 +17,7 @@ Imports:
     grid (>= 4.1.3),
     gridExtra (>= 2.3),
     magick (>= 2.7.3),
-    ggmap (>=3.0.0)
+    ggmap (>= 3.0.0)
 Suggests: 
     testthat (>= 3.0.0),
     withr (>= 2.5.0)
