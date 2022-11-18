@@ -26,7 +26,7 @@ This package contains functions and colour palettes that enable you to create e6
 
 If you haven't already, install the `devtools` package:
 
-`install.packages::devtools()`
+`install.packages("devtools")`
 
 Then install from GitHub:
 
