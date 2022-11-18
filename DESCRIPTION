@@ -20,7 +20,8 @@ Imports:
     gridExtra (>= 2.3),
     magick (>= 2.7.3),
     esquisse (>= 1.1.2),
-    data.table (>= 1.14.2)
+    data.table (>= 1.14.2),
+    lifecycle (>= 1.0.3)
 Remotes: 
     JackBuckley/esquisse
 Suggests: 
