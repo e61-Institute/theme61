@@ -355,3 +355,5 @@ y_title_top_e61 <- function(adj = -18, fix_left = 0) {
 square_legend_symbols <- function() {
   guides(colour = guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))
 }
+
+

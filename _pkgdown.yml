@@ -26,6 +26,7 @@ reference:
   contents:
   - save_e61
   - crop_aus_coord
+  - e61_map
   - e61_chart_maker
 
 - title: Colours

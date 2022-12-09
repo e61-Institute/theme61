@@ -3,6 +3,7 @@
 export(add_e61_logo)
 export(crop_aus_coord)
 export(e61_chart_maker)
+export(e61_map)
 export(e61_pal)
 export(e61_palette)
 export(get_palette)
