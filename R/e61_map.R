@@ -34,6 +34,12 @@ e61_map <-
   adjust = 0,
   maptype = "toner-lite") {
 
+    # Some guards for common mistakes
+    if (top > 0 || bottom > 0) warning("Your latitude coordinates are >0, are you sure you aren't missing a negative sign somewhere? Australia is south of the equator so latitude is negative.")
+    if (top < bottom) stop("Your top coordinate must be greater than your bottom coordinate.")
+    if (right < left) stop("Your right coordinate must be greater than your left coordinate.")
+    if (top == bottom || right == left) stop("Your bounding box coordinates can't be equal.")
+
     lon_range <- bbox[c("left", "right")]
     lat_range <- bbox[c("bottom", "top")]
     lonlength <- diff(lon_range)
