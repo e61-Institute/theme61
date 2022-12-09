@@ -9,13 +9,13 @@ applications.
 
 ### Installing theme61
 
-If you haven’t already, install the `devtools` package:
+If you haven’t already, install the `remotes` package:
 
-`install.packages::devtools()`
+`install.packages("remotes")`
 
 Then install from GitHub:
 
-`devtools::install_github("e61-institute/theme61", dependencies = TRUE, upgrade = "always")`
+`remotes::install_github("e61-institute/theme61", dependencies = TRUE, upgrade = "always")`
 
 Then load into R:
 
