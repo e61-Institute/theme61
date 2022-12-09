@@ -1,5 +1,6 @@
 # theme61 0.2.0
 
+* Adds a base map function `e61_map()` with sensible defaults for mapping.
 * Improvements to the automatic discrete colour palette selection.
 * Changes to the theme to fix graphs at a 0.75 aspect ratio.
 * Added an alternate minimal theme called `theme_e61_clean()`.
