@@ -22,9 +22,6 @@ e61_pal(
     \code{\link[grDevices]{col2rgb}()}.}
   }}
 }
-\value{
-
-}
 \description{
 Create a continuous palette
 }

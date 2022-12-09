@@ -21,9 +21,8 @@
 #'    geom_point() +
 #'    e61_colour_manual(n = 3) +
 #'    theme_e61()
-#'
-#'
-e61_colour_manual <- function(n = 0,
+
+scale_colour_e61 <- function(n = 0,
                               reverse = FALSE,
                               discrete = TRUE,
                               palette = c("light", "dark", "diverging", "grey"),
@@ -32,23 +31,21 @@ e61_colour_manual <- function(n = 0,
   palette <- match.arg(palette)
 
   if (discrete) {
-    return(ggplot2::scale_colour_manual(
-      ...,
-      values = e61_palette(n = n, reverse = reverse))
-      )
+
+    pal <- get_palette(n)
+
+    return(ggplot2::scale_fill_manual(values = pal))
   }
 
   if (!discrete) {
     pal <- e61_pal(palette = palette, reverse = reverse)
     return(ggplot2::scale_color_gradientn(colours = pal(256), ...))
   }
-
-
 }
 
 #' @rdname e61_scale
 #' @export
-e61_fill_manual <- function(n = 0, reverse = FALSE,
+scale_fill_e61 <- function(n = 0, reverse = FALSE,
                             discrete = TRUE,
                             palette = c("light", "dark", "diverging", "grey"),
                             ...) {
@@ -56,10 +53,10 @@ e61_fill_manual <- function(n = 0, reverse = FALSE,
   palette <- match.arg(palette)
 
   if (discrete) {
-    return(
-      ggplot2::scale_fill_manual(...,
-                                 values = e61_palette(n = n, reverse = reverse))
-    )
+
+    pal <- get_palette(n)
+
+    return(ggplot2::scale_fill_manual(values = pal))
   }
 
   if (!discrete) {
@@ -91,7 +88,7 @@ e61_fill_manual <- function(n = 0, reverse = FALSE,
 #'   geom_col() +
 #'   e61_fill_aus()
 
-e61_colour_aus <- function(...) {
+scale_colour_e61_aus <- function(...) {
 
   ggplot2::scale_colour_manual(values = e61_aus_colours, limits = force, ...)
 
@@ -102,7 +99,7 @@ e61_colour_aus <- function(...) {
 #' @rdname e61_scale_aus
 #' @export
 
-e61_fill_aus <- function(...) {
+scale_fill_e61_aus <- function(...) {
 
   ggplot2::scale_fill_manual(values = e61_aus_colours, limits = force, ...)
 

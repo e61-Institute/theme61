@@ -63,6 +63,7 @@ theme_e61 <- function(base_size = 14,
         linetype = 1,
         lineend = "butt"
       ),
+      aspect.ratio = 0.75,
       rect = element_rect(
         fill = background,
         colour = e61_greylight6,
@@ -141,7 +142,6 @@ theme_e61 <- function(base_size = 14,
       legend.text.align = 0,
       legend.title.align = NULL,
       legend.position = legend,
-      legend.direction = "horizontal",
       legend.justification = "center",
       legend.box = "vertical",
       legend.box.margin = margin(0, 0,
@@ -226,6 +226,10 @@ theme_e61 <- function(base_size = 14,
                            r = base_size / 4, unit = "pt")))
   }
 
+  # adjust legend direction based on legend position
+  if (data.table::like(legend, "bottom|top", ignore.case = T)) {
+    ret <- ret + theme(legend.direction = "horizontal")
+  }
 
   # Remove panel borders if requested
   if (!panel_borders) {
@@ -241,8 +245,58 @@ theme_e61 <- function(base_size = 14,
   }
 
   return(ret)
-
 }
+
+
+#' e61 themed graph options in a 'clean' style
+#'
+#' @param base_size Numeric. Chart font size. Default is 14.
+#' @param base_family Character. Chart font family. Default is Arial.
+#'
+#' @return ggplot2 object
+#' @import ggplot2 ggthemes
+#' @export
+#'
+#' @examples
+#' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
+#' geom_point() +
+#' e61_colour_manual(n = 3) +
+#' theme_e61_clean()
+
+theme_e61_clean <- function(
+    base_family = "Arial",
+    base_size = 14
+  ){
+  ggthemes::theme_clean() +
+    theme(
+      text = element_text(
+        colour = "black",
+        family = base_family,
+        face = "plain",
+        hjust = 0.5,
+        vjust = 0.5,
+        angle = 0,
+        lineheight = 0.9,
+        debug = FALSE,
+        margin = margin(),
+        size = base_size
+      ),
+      legend.title = element_blank(),
+      legend.background = element_rect(color = NA),
+      legend.position = "bottom",
+      plot.background = element_rect(color = NA),
+      panel.grid.major.y = element_line(colour = "grey90", linetype = 1),
+      axis.text = element_text(size = 14),
+      axis.title = element_text(size = 16),
+      plot.title.position = "plot",
+      plot.caption.position = "plot",
+      plot.title = element_text(size = 20, hjust = 0, color = "grey20"),
+      plot.subtitle = element_text(size = 16, hjust = 0, vjust = 0.5, colour = "grey50"),
+      plot.caption =  element_text(size = 12, hjust = 0, vjust = 1, colour = "grey50")
+    )
+}
+
+
 
 #' Reposition y-axis titles to the top
 #'
@@ -261,7 +315,7 @@ theme_e61 <- function(base_size = 14,
 #' @import ggplot2
 #' @export
 
-e61_y_title_top <- function(adj = -18, fix_left = 0) {
+y_title_top_e61 <- function(adj = -18, fix_left = 0) {
 
   if (class(adj) != "numeric") stop("adj must be a number.")
   if (!length(adj) %in% c(1, 2)) stop("adj must be a single value or a vector of 2 values.")

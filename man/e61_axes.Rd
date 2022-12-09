@@ -62,6 +62,7 @@ number of breaks given by the transformation.}
 \item \code{waiver()} for the default labels computed by the
 transformation object
 \item A character vector giving labels (must be same length as \code{breaks})
+\item An expression vector (must be the same length as breaks). See ?plotmath for details.
 \item A function that takes the breaks as input and returns labels
 as output. Also accepts rlang \link[rlang:as_function]{lambda} function
 notation.
@@ -118,9 +119,6 @@ of the graph.}
 
 \item{expand_right}{Numeric. Add extra space between data points and the
 right of the graph.}
-}
-\value{
-
 }
 \description{
 Format axes in the e61 Institute style

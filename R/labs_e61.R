@@ -28,7 +28,7 @@
 #'
 #' @export
 
-e61_labs <- function(title,
+labs_e61 <- function(title,
                      subtitle = NULL,
                      footnotes = NULL,
                      sources = NULL,
