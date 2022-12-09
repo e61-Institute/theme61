@@ -19,8 +19,9 @@
 #' @inheritDotParams ggplot2::ggsave
 #' @export
 
-e61_save <-
+save_e61 <-
   function(filename,
+           plot = ggplot2::last_plot(),
            resize = NULL,
            width = 8,
            height = 6,
@@ -49,6 +50,7 @@ e61_save <-
 
     ggplot2::ggsave(
       filename,
+      plot = plot,
       width = width,
       height = height,
       units = units,

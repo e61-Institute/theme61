@@ -14,7 +14,6 @@
 #' @inheritDotParams ggplot2::scale_y_continuous
 #'
 #' @rdname e61_axes
-#' @return
 #' @export
 
 scale_y_continuous_e61 <- function(expand_bottom = 0,
@@ -60,7 +59,7 @@ e61_y_continuous <- function(expand_bottom = 0,
                              limits = limits,
                              ...) {
 
-  scale_y_continuous(expand = ggplot2::expansion(mult = c(expand_bottom,
+  ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(expand_bottom,
                                                           expand_top)),
                      sec.axis = sec_axis,
                      limits = limits,
@@ -73,7 +72,7 @@ e61_x_continuous <- function(expand_left = 0,
                              expand_right = 0.015,
                              ...) {
 
-  scale_x_continuous(expand = ggplot2::expansion(mult = c(expand_left,
+  ggplot2::scale_x_continuous(expand = ggplot2::expansion(mult = c(expand_left,
                                                           expand_right)),
                      ...)
 

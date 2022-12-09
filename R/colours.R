@@ -11,7 +11,6 @@
 #'
 'e61_bluedark'
 
-
 #' Hex code for the colour: e61 Blue Dark 1
 #'
 #' #003039
