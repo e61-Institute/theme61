@@ -66,7 +66,7 @@ mtcars2 <- within(mtcars, {
 # Graph
 p1 <- ggplot(mtcars2) +
   geom_point(aes(x = wt, y = mpg, colour = gear)) +
-  e61_labs(
+  labs_e61(
     title = "Fuel Economy Declines as Weight Increases",
     subtitle = "1973-74",
     sources = "1974 Motor Trend US magazine.",
@@ -80,9 +80,9 @@ p1 <- ggplot(mtcars2) +
 p1 +
   theme_e61(legend = "bottom", legend_title = TRUE) + 
   scale_y_continuous_e61(limits = c(0, 40)) +
-  e61_colour_manual(n = 3) +
+  scale_colour_e61(n = 3) +
   add_e61_logo() + 
-  e61_y_title_top(-16) +
+  y_title_top_e61(-16) +
   square_legend_symbols()
 ```
 
@@ -92,8 +92,8 @@ p1 +
 p1 +
   facet_grid(vs ~ am) +
   theme_e61(panel_borders = TRUE, legend = "bottom", legend_title = TRUE) +
-  e61_y_title_top() +
-  e61_colour_manual(n = 3) +
+  y_title_top_e61() +
+  scale_colour_e61(n = 3) +
   scale_y_continuous_e61(limits = c(10, 40)) +
   scale_x_continuous_e61()
 ```
@@ -103,7 +103,7 @@ p1 +
 ```{r echo = TRUE, message = FALSE, warning = FALSE}
 g <- ggplot(mpg, aes(cty))
 g + geom_density(aes(fill = factor(cyl)), linetype = "blank", alpha = 0.8) +
-  e61_labs(
+  labs_e61(
     title = "City Mileage Density",
     subtitle = "By number of cylinders",
     sources = "mpg dataset",
@@ -115,9 +115,9 @@ g + geom_density(aes(fill = factor(cyl)), linetype = "blank", alpha = 0.8) +
   theme_e61(legend = "bottom", legend_title = TRUE) +
   scale_y_continuous_e61(limits = c(0, 0.6)) +
   scale_x_continuous_e61() +
-  e61_y_title_top(-18) +
-  e61_fill_manual(n = 4) +
-  e61_colour_manual(n = 4) +
+  y_title_top_e61(-18) +
+  scale_fill_e61(n = 4) +
+  scale_colour_e61(n = 4) +
   add_e61_logo()
 ```
 
@@ -135,7 +135,7 @@ lbls <- lubridate::year(brks)
 # plot
 ggplot(df, aes(x = date)) +
   geom_line(aes(y = value, colour = variable), size = 1) +
-  e61_labs(
+  labs_e61(
     title = "Time Series of Returns Percentage*",
     subtitle = "Drawn from long data format",
     footnotes = "Some pointless footnote",
@@ -147,8 +147,8 @@ ggplot(df, aes(x = date)) +
   scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
   scale_y_continuous_e61(limits = c(2.5, 17.5), breaks = seq(2.5, 15, 2.5)) +
   theme_e61(legend = "bottom") +
-  e61_y_title_top(-25) +
-  e61_colour_manual(n = 2,
+  y_title_top_e61(-25) +
+  scale_colour_e61(n = 2,
                     labels = c("Market Returns", "Unemployment")) +
   add_e61_logo() + 
   square_legend_symbols()
@@ -164,13 +164,13 @@ col_data$index <- 1:nrow(col_data)
 
 ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
   geom_col() +
-  e61_labs(
+  labs_e61(
     title = "Frivolous Filled Column Chart", 
     subtitle = "For the purpose of showing off the continuous colour palette",
     sources = c("e61 Institute", "Another source"),
     x = NULL, y = "hp") +
   scale_y_continuous_e61(limits = c(0, 250)) +
   theme_e61(legend = "bottom") +
-  e61_y_title_top(-23, fix_left = 5) +
-  e61_fill_manual(discrete = FALSE, palette = "light")
+  y_title_top_e61(-23, fix_left = 5) +
+  scale_fill_e61(discrete = FALSE, palette = "light")
 ```
