@@ -7,7 +7,7 @@ test_that("Test resizing feature for PNGs", {
     temp_file <- "test.png"
 
     # Test PNG with default scaling
-    e61_save(temp_file)
+    save_e61(temp_file)
 
     disk_file <- magick::image_read(temp_file)
     deets <- magick::image_info(disk_file)
@@ -24,7 +24,7 @@ test_that("Test resizing feature for PNGs", {
     })
 
     # Test resized PNG
-    e61_save(temp_file, resize = 2)
+    save_e61(temp_file, resize = 2)
 
     disk_file <- magick::image_read(temp_file)
     deets <- magick::image_info(disk_file)
@@ -52,7 +52,7 @@ test_that("Test support for different file formats", {
   withr::with_tempdir({
     temp_file <- "test.svg"
 
-    e61_save(temp_file)
+    save_e61(temp_file)
 
     disk_file <- magick::image_read(temp_file)
     deets <- magick::image_info(disk_file)
@@ -71,13 +71,13 @@ test_that("Test support for different file formats", {
     ## These should fail
 
     # SVGs should fail if user tries to resize them
-    expect_error(e61_save(temp_file, resize = 2))
+    expect_error(save_e61(temp_file, resize = 2))
 
     # No support for non-SVG/PNG files
-    expect_error(e61_save(paste0(tempdir(), "\\text.jpg")))
+    expect_error(save_e61(paste0(tempdir(), "\\text.jpg")))
 
     # Having png or svg in the name should still trip the file format error
-    expect_error(e61_save(paste0(tempdir(), "\\png-text.jpg")))
+    expect_error(save_e61(paste0(tempdir(), "\\png-text.jpg")))
 
   })
 
