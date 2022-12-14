@@ -25,7 +25,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::.
+          extra-packages: pkgdown
           needs: website
 
       - name: Install dependencies
@@ -37,10 +37,6 @@ jobs:
       - name: Install package
         run: R CMD INSTALL .
         
-      - name: Build site
-        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
-        shell: Rscript {0}
-
       - name: Deploy package
         run: |
           git config --local user.name "$GITHUB_ACTOR"
