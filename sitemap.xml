@@ -28,9 +28,6 @@
     <loc>https://e61-institute.github.io/theme61/pull_request_template.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/readme.html</loc>
-  </url>
-  <url>
     <loc>https://e61-institute.github.io/theme61/reference/add_e61_logo.html</loc>
   </url>
   <url>
@@ -95,6 +92,9 @@
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/e61_bluelight8.html</loc>
+  </url>
+  <url>
+    <loc>https://e61-institute.github.io/theme61/reference/e61_chart_maker.html</loc>
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/e61_coraldark.html</loc>
@@ -205,7 +205,7 @@
     <loc>https://e61-institute.github.io/theme61/reference/e61_greylight8.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/reference/e61_labs.html</loc>
+    <loc>https://e61-institute.github.io/theme61/reference/e61_map.html</loc>
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/e61_maroondark.html</loc>
@@ -322,9 +322,6 @@
     <loc>https://e61-institute.github.io/theme61/reference/e61_palette.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/reference/e61_save.html</loc>
-  </url>
-  <url>
     <loc>https://e61-institute.github.io/theme61/reference/e61_scale.html</loc>
   </url>
   <url>
@@ -439,18 +436,27 @@
     <loc>https://e61-institute.github.io/theme61/reference/e61_teallight8.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/reference/e61_y_title_top.html</loc>
-  </url>
-  <url>
     <loc>https://e61-institute.github.io/theme61/reference/get_palette.html</loc>
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://e61-institute.github.io/theme61/reference/labs_e61.html</loc>
+  </url>
+  <url>
+    <loc>https://e61-institute.github.io/theme61/reference/save_e61.html</loc>
+  </url>
+  <url>
     <loc>https://e61-institute.github.io/theme61/reference/square_legend_symbols.html</loc>
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/theme_e61.html</loc>
+  </url>
+  <url>
+    <loc>https://e61-institute.github.io/theme61/reference/theme_e61_clean.html</loc>
+  </url>
+  <url>
+    <loc>https://e61-institute.github.io/theme61/reference/y_title_top_e61.html</loc>
   </url>
 </urlset>
