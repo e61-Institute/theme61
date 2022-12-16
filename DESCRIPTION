@@ -23,8 +23,6 @@ Imports:
     esquisse (>= 1.1.2),
     data.table (>= 1.14.2),
     lifecycle (>= 1.0.3)
-Remotes: 
-    JackBuckley/esquisse
 Suggests: 
     testthat (>= 3.0.0),
     withr (>= 2.5.0)
