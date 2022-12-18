@@ -34,7 +34,7 @@ labs_e61 <- function(title,
                      sources = NULL,
                      title_max_char = 45L,
                      subtitle_max_char = 55L,
-                     footnote_max_char = 65L,
+                     footnote_max_char = 70L,
                      ...) {
 
   # We need this to check for the presence of caption in the passed-through

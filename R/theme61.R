@@ -37,7 +37,7 @@ cm_to_in <- function(cm, round = FALSE) {
 #' theme_e61()
 #'
 
-theme_e61 <- function(base_size = 14,
+theme_e61 <- function(base_size = 12,
                       base_family = "Arial",
                       base_line_size = points_to_mm(0.75),
                       base_rect_size = points_to_mm(1),
@@ -209,7 +209,7 @@ theme_e61 <- function(base_size = 14,
         margin = ggplot2::margin(t = 15)
       ),
       plot.tag = element_text(
-        size = rel(1.2),
+        size = rel(1),
         hjust = 0.5,
         vjust = 0.5
       ),
@@ -265,7 +265,7 @@ theme_e61 <- function(base_size = 14,
 
 theme_e61_clean <- function(
     base_family = "Arial",
-    base_size = 14
+    base_size = 12
   ){
   ggthemes::theme_clean() +
     theme(
@@ -286,13 +286,13 @@ theme_e61_clean <- function(
       legend.position = "bottom",
       plot.background = element_rect(color = NA),
       panel.grid.major.y = element_line(colour = "grey90", linetype = 1),
-      axis.text = element_text(size = 14),
-      axis.title = element_text(size = 16),
+      axis.text = element_text(size = 12),
+      axis.title = element_text(size = 14),
       plot.title.position = "plot",
       plot.caption.position = "plot",
       plot.title = element_text(size = 20, hjust = 0, color = "grey20"),
-      plot.subtitle = element_text(size = 16, hjust = 0, vjust = 0.5, colour = "grey50"),
-      plot.caption =  element_text(size = 12, hjust = 0, vjust = 1, colour = "grey50")
+      plot.subtitle = element_text(size = 14, hjust = 0, vjust = 0.5, colour = "grey50"),
+      plot.caption =  element_text(size = 10, hjust = 0, vjust = 1, colour = "grey50")
     )
 }
 
