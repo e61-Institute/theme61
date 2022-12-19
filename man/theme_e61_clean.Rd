@@ -4,7 +4,7 @@
 \alias{theme_e61_clean}
 \title{e61 themed graph options in a 'clean' style}
 \usage{
-theme_e61_clean(base_family = "Arial", base_size = 14)
+theme_e61_clean(base_family = "Arial", base_size = 12)
 }
 \arguments{
 \item{base_family}{Character. Chart font family. Default is Arial.}
