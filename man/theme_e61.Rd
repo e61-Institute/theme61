@@ -5,7 +5,7 @@
 \title{e61 themed graph options}
 \usage{
 theme_e61(
-  base_size = 14,
+  base_size = 12,
   base_family = "Arial",
   base_line_size = points_to_mm(0.75),
   base_rect_size = points_to_mm(1),

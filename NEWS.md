@@ -1,3 +1,7 @@
+# theme61 0.2.1
+
+* Minor adjustments to title/footnote font size and default max character width to account for new fixed aspect ratio.
+
 # theme61 0.2.0
 
 * Adds a base map function `e61_map()` with sensible defaults for mapping.

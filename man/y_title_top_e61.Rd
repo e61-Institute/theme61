@@ -24,3 +24,7 @@ ggplot object
 Moves the y-axis titles from the side (ggplot default) to the top of the
 y-axis and rotates the text to be horizontal.
 }
+\details{
+This function must go after \code{theme_e61()} as it works by changing the
+underlying \code{theme()} after it has been generated.
+}
