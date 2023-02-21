@@ -379,11 +379,37 @@ y_title_top_e61 <- function(adj = -12, fix_left = 0) {
 #' to squares.
 #'
 #' @return ggplot object
-#' @import ggplot2
 #' @export
 
 square_legend_symbols <- function() {
-  guides(colour = guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))
+  ggplot2::guides(colour = ggplot2::guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))
 }
 
+#' Applies changes to the theme for horizontal bar graphs
+#'
+#' Horizontal bar graphs made with \code{coord_flip()} require some changes to
+#' the \code{theme()} in order to look proper. This function wraps those changes
+#' up in a convenient function that should be appended at the end of the graph
+#' code, after theming functions such as \code{theme_e61()} have been called.
+#'
+#' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
+#' the default (-14) works for most graphs.
+#'
+#' @return ggplot object
+#' @export
 
+format_flip_bar_charts <- function(x_adj = -14) {
+  ggplot2::theme(
+    panel.grid.major.x = element_line(colour = e61_greylight6, size = points_to_mm(0.5)),
+    panel.grid.major.y = element_blank(),
+    axis.text.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    axis.title.x.top = element_blank(),
+    axis.title.x.bottom = element_text(
+      margin = margin(t = x_adj, b = 5),
+      hjust = 1,
+      angle = 0
+    )
+  )
+
+}
