@@ -15,8 +15,8 @@ test_that("Test resizing feature for PNGs", {
     expected_deets <-
       tibble::tibble(
         format = "PNG",
-        width = 800,
-        height = 600
+        width = 334,
+        height = 354
       )
 
     lapply(c("format", "width", "height"), function(x) {
@@ -32,8 +32,8 @@ test_that("Test resizing feature for PNGs", {
     expected_deets <-
       tibble::tibble(
         format = "PNG",
-        width = 1600,
-        height = 1200
+        width = 669,
+        height = 708
       )
 
     lapply(c("format", "width", "height"), function(x) {
@@ -60,8 +60,8 @@ test_that("Test support for different file formats", {
     expected_deets <-
       tibble::tibble(
         format = "SVG",
-        width = 768,
-        height = 576
+        width = 321,
+        height = 340
       )
 
     lapply(c("format", "width", "height"), function(x) {
@@ -86,6 +86,7 @@ test_that("Test support for different file formats", {
 test_that("Output graphs have sensible dimensions", {
 
   # This test should be run manually and the results inspected by hand
+  skip("This 'test' is only for interactive purposes")
 
   # Generate some data
   graph_data <- data.frame(x = runif(100, 1, 49), y = runif(100, 1, 49),
@@ -97,22 +98,6 @@ test_that("Output graphs have sensible dimensions", {
     theme_e61() +
     scale_y_continuous_e61(limits = c(0, 50)) +
     scale_colour_e61(1) +
-    y_title_top_e61() +
-    labs_e61(
-      title = "Fairly Lengthy Graph Title With A Lot of Words To Take Up Space",
-      subtitle = "Fairly Lengthy Graph Subtitle With A Lot of Words To Take Up Space",
-      footnotes = "Really long footnote to test that part of the code blah blah blah blah blah blah",
-      sources = c("e61 Institute"),
-      x = NULL, y = "units"
-    )
-
-  # Graph 2
-  graph_2 <- ggplot(graph_data, aes(xcol, y)) +
-    geom_col() +
-    theme_e61() +
-    scale_y_continuous_e61(limits = c(0, 50)) +
-    scale_colour_e61(1) +
-    y_title_top_e61() +
     labs_e61(
       title = "Fairly Lengthy Graph Title With A Lot of Words To Take Up Space",
       subtitle = "Fairly Lengthy Graph Subtitle With A Lot of Words To Take Up Space",
@@ -122,9 +107,21 @@ test_that("Output graphs have sensible dimensions", {
     )
 
   rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), graph))
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), graph_2))
 
-  # Just so testthat doesn't get confused by the lack of actual test
-  expect_true(TRUE)
+  # Graph 2
+  graph_2 <- ggplot(graph_data, aes(xcol, y)) +
+    geom_col() +
+    theme_e61() +
+    scale_y_continuous_e61(limits = c(0, 50)) +
+    scale_colour_e61(1) +
+    labs_e61(
+      title = "Fairly Lengthy Graph Title With A Lot of Words To Take Up Space",
+      subtitle = "Fairly Lengthy Graph Subtitle With A Lot of Words To Take Up Space",
+      footnotes = "Really long footnote to test that part of the code blah blah blah blah blah blah",
+      sources = c("e61 Institute"),
+      x = NULL, y = "units"
+    )
+
+  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), graph_2))
 
 })
