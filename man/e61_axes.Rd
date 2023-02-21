@@ -26,6 +26,16 @@ the graph.}
 duplicates the axis), see \link[ggplot2]{sec_axis} for more details. Set to
 FALSE to hide a secondary axis.}
 
+\item{limits}{One of:
+\itemize{
+  \item{\code{NULL} to use the default scale range.}
+  \item{A numeric vector of length two providing the minimum and maximum
+  limits of the scale.}
+  \item{A numeric vector of length three providing the limits of the scale
+  and the increment between each axis tick, e.g. \code{c(0, 25, 5)} will
+  set the axis to range from 0 to 25, with increments of 5 per tick.}
+  }}
+
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous}}, \code{\link[ggplot2:scale_continuous]{ggplot2::scale_x_continuous}}
   \describe{
@@ -66,18 +76,6 @@ transformation object
 \item A function that takes the breaks as input and returns labels
 as output. Also accepts rlang \link[rlang:as_function]{lambda} function
 notation.
-}}
-    \item{\code{limits}}{One of:
-\itemize{
-\item \code{NULL} to use the default scale range
-\item A numeric vector of length two providing limits of the scale.
-Use \code{NA} to refer to the existing minimum or maximum
-\item A function that accepts the existing (automatic) limits and returns
-new limits. Also accepts rlang \link[rlang:as_function]{lambda} function
-notation.
-Note that setting limits on positional scales will \strong{remove} data outside of the limits.
-If the purpose is to zoom, use the limit argument in the coordinate system
-(see \code{\link[ggplot2:coord_cartesian]{coord_cartesian()}}).
 }}
     \item{\code{expand}}{For position scales, a vector of range expansion constants used to add some
 padding around the data to ensure that they are placed some distance
@@ -123,6 +121,5 @@ right of the graph.}
 \description{
 These functions format the x and y axes to be consistent with
   e61 styling. This includes removing white space at the beginning and end of
-  each axis, and moving the y-axis label to the top of the axis instead of
-  being sideways.
+  each axis.
 }

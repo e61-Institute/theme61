@@ -11,6 +11,15 @@
 #'   of the graph.
 #' @param expand_right Numeric. Add extra space between data points and the
 #'   right of the graph.
+#' @param limits One of:
+#'   \itemize{
+#'     \item{\code{NULL} to use the default scale range.}
+#'     \item{A numeric vector of length two providing the minimum and maximum
+#'     limits of the scale.}
+#'     \item{A numeric vector of length three providing the limits of the scale
+#'     and the increment between each axis tick, e.g. \code{c(0, 25, 5)} will
+#'     set the axis to range from 0 to 25, with increments of 5 per tick.}
+#'     }
 #' @inheritDotParams ggplot2::scale_y_continuous
 #'
 #' @description These functions format the x and y axes to be consistent with
@@ -55,8 +64,8 @@ scale_x_continuous_e61 <- function(expand_left = 0,
                                    ...) {
 
   e61_x_continuous(expand_left = expand_left,
-                       expand_right = expand_right,
-                       ...)
+                   expand_right = expand_right,
+                   ...)
 }
 
 # These functions go in the above functions
@@ -66,11 +75,21 @@ e61_y_continuous <- function(expand_bottom = 0,
                              limits = limits,
                              ...) {
 
-  ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(expand_bottom,
-                                                          expand_top)),
-                     sec.axis = sec_axis,
-                     limits = limits,
-                     ...)
+  if (length(limits) == 3) {
+    custom_breaks <- seq(limits[[1]], limits[[2]], limits[[3]])
+
+  } else {
+    custom_breaks <- ggplot2::waiver()
+  }
+
+  ggplot2::scale_y_continuous(
+    expand = ggplot2::expansion(mult = c(expand_bottom,
+                                         expand_top)),
+    sec.axis = sec_axis,
+    limits = limits,
+    breaks = custom_breaks,
+    ...
+  )
 }
 
 
@@ -80,7 +99,7 @@ e61_x_continuous <- function(expand_left = 0,
                              ...) {
 
   ggplot2::scale_x_continuous(expand = ggplot2::expansion(mult = c(expand_left,
-                                                          expand_right)),
-                     ...)
+                                                                   expand_right)),
+                              ...)
 
 }

@@ -96,7 +96,7 @@ test_that("Output graphs have sensible dimensions", {
   graph <- ggplot(graph_data, aes(x, y)) +
     geom_point() +
     theme_e61() +
-    scale_y_continuous_e61(limits = c(0, 50)) +
+    scale_y_continuous_e61(limits = c(0, 50, 10)) +
     scale_colour_e61(1) +
     labs_e61(
       title = "Fairly Lengthy Graph Title With A Lot of Words To Take Up Space",
@@ -112,7 +112,7 @@ test_that("Output graphs have sensible dimensions", {
   graph_2 <- ggplot(graph_data, aes(xcol, y)) +
     geom_col() +
     theme_e61() +
-    scale_y_continuous_e61(limits = c(0, 50)) +
+    scale_y_continuous_e61(limits = c(0, 50, 10)) +
     scale_colour_e61(1) +
     labs_e61(
       title = "Fairly Lengthy Graph Title With A Lot of Words To Take Up Space",
