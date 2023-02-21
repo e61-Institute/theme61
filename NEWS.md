@@ -1,3 +1,11 @@
+# theme61 0.3
+
+* Change default dimension behaviour in `save_e61` to make graphs look sensible at 8.5cm widths.
+* Change `base_size` of graphs so the font size is readable at 8.5cm widths.
+* Remove `y_title_top_e61` and incorporate functionality directly into `theme_e61` as the default. Users can choose to disable this behaviour by setting `y_top = FALSE`.
+* Add the ability to specify break interval directly in the `limits` argument of `scale_y_continuous_e61`.
+* Update the Getting Started vignette to showcase new functionality.
+
 # theme61 0.2.1
 
 * Minor adjustments to title/footnote font size and default max character width to account for new fixed aspect ratio.
