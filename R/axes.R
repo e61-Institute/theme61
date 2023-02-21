@@ -13,6 +13,10 @@
 #'   right of the graph.
 #' @inheritDotParams ggplot2::scale_y_continuous
 #'
+#' @description These functions format the x and y axes to be consistent with
+#'   e61 styling. This includes removing white space at the beginning and end of
+#'   each axis.
+#'
 #' @rdname e61_axes
 #' @export
 
@@ -32,11 +36,14 @@ scale_y_continuous_e61 <- function(expand_bottom = 0,
     limits[[2]] <- limits[[2]] - 0.0001
   }
 
-  e61_y_continuous(expand_bottom = expand_bottom,
-                   expand_top = expand_top,
-                   sec_axis = sec_axis,
-                   limits = limits,
-                   ...)
+  e61_y_continuous(
+    expand_bottom = expand_bottom,
+    expand_top = expand_top,
+    sec_axis = sec_axis,
+    limits = limits,
+    ...
+  )
+
 }
 
 #' @inheritDotParams ggplot2::scale_x_continuous

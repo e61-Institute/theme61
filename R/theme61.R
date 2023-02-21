@@ -12,8 +12,6 @@ cm_to_in <- function(cm, round = FALSE) {
   }
 }
 
-
-
 #' e61 themed graph options
 #'
 #' @param base_size Numeric. Chart font size. Default is 14.
@@ -25,6 +23,18 @@ cm_to_in <- function(cm, round = FALSE) {
 #'   legend.
 #' @param legend_title Logical. Include Legend Title? Defaults to FALSE.
 #' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
+#' @param y_top Defaults to TRUE. Moves the y-axis title to the top.
+#' @param adj Either a single numeric to adjust left and right axis titles
+#'   simultaneously or a vector of 2 numerics to adjust each axis title
+#'   separately. More negative values move the text closer to the graph panel.
+#'   Defaults to -12 which seems to work well for y-axis with 1-3 character-wide
+#'   values.
+#' @param fix_left Optional. Sometimes if the value of the \code{adj} argument
+#'   is too negative, the margins on the left side of the graph start to cut off
+#'   some of the text. Provide a small positive value (5?) to correct this.
+#'
+#' @description \code{scale_y_continuous_e61()} should be used in conjunction
+#'   with this function to ensure that theming and axes are applied correctly.
 #'
 #' @return ggplot2 object
 #' @import ggplot2
@@ -33,8 +43,8 @@ cm_to_in <- function(cm, round = FALSE) {
 #' @examples
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 #' geom_point() +
-#' e61_colour_manual(n = 3) +
-#' theme_e61()
+#' theme_e61() +
+#' e61_colour_manual(n = 3)
 #'
 
 theme_e61 <- function(base_size = 10,
@@ -44,12 +54,28 @@ theme_e61 <- function(base_size = 10,
                       background = "white",
                       legend = c("none", "bottom", "top", "left", "right"),
                       legend_title = FALSE,
-                      panel_borders = TRUE) {
+                      panel_borders = TRUE,
+                      y_top = TRUE,
+                      adj = -12,
+                      fix_left = 0) {
 
   # Consider restoring this as a standalone font installation function for
   # first time running at a later date if we choose to go with a custom font.
   # sysfonts::font_add_google("Quattrocento Sans", "Quattrocento Sans")
   # showtext::showtext_auto()
+
+  # Add a message for the user reminding them to use scale_y_continuous_e61
+  if(getOption("scale_e61.message", TRUE)) {
+
+    message(paste(
+      "Please remember to use", sQuote("scale_y_continuous_e61()"),
+      "in conjunction with", sQuote("theme_e61()"), "to ensure the graph axes",
+      "render correctly.",
+      'This message is shown once per session and may be disabled by setting',
+      "options('save_e61.message' = FALSE). See ?theme_e61 for more details."))
+    options("scale_e61.message" = FALSE)
+  }
+
 
   legend <- match.arg(legend)
 
@@ -244,6 +270,11 @@ theme_e61 <- function(base_size = 10,
       ggplot2::theme(rect = element_rect(fill = e61_greylight6))
   }
 
+  # Moves y-axis title to the top
+  if (y_top) {
+    ret <- ret + y_title_top_e61(adj = adj, fix_left = fix_left)
+  }
+
   return(ret)
 }
 
@@ -303,9 +334,6 @@ theme_e61_clean <- function(
 #' Moves the y-axis titles from the side (ggplot default) to the top of the
 #' y-axis and rotates the text to be horizontal.
 #'
-#' This function must go after \code{theme_e61()} as it works by changing the
-#' underlying \code{theme()} after it has been generated.
-#'
 #' @param adj Either a single numeric to adjust left and right axis titles
 #'   simultaneously or a vector of 2 numerics to adjust each axis title
 #'   separately. More negative values move the text closer to the graph panel.
@@ -316,7 +344,7 @@ theme_e61_clean <- function(
 #'   some of the text. Provide a small positive value (5?) to correct this.
 #' @return ggplot object
 #' @import ggplot2
-#' @export
+#' @keywords Internal
 
 y_title_top_e61 <- function(adj = -12, fix_left = 0) {
 
