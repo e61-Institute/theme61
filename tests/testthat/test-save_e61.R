@@ -82,3 +82,49 @@ test_that("Test support for different file formats", {
   })
 
 })
+
+test_that("Output graphs have sensible dimensions", {
+
+  # This test should be run manually and the results inspected by hand
+
+  # Generate some data
+  graph_data <- data.frame(x = runif(100, 1, 49), y = runif(100, 1, 49),
+                           xcol = 1:100)
+
+  # Graph
+  graph <- ggplot(graph_data, aes(x, y)) +
+    geom_point() +
+    theme_e61() +
+    scale_y_continuous_e61(limits = c(0, 50)) +
+    scale_colour_e61(1) +
+    y_title_top_e61() +
+    labs_e61(
+      title = "Fairly Lengthy Graph Title With A Lot of Words To Take Up Space",
+      subtitle = "Fairly Lengthy Graph Subtitle With A Lot of Words To Take Up Space",
+      footnotes = "Really long footnote to test that part of the code blah blah blah blah blah blah",
+      sources = c("e61 Institute"),
+      x = NULL, y = "units"
+    )
+
+  # Graph 2
+  graph_2 <- ggplot(graph_data, aes(xcol, y)) +
+    geom_col() +
+    theme_e61() +
+    scale_y_continuous_e61(limits = c(0, 50)) +
+    scale_colour_e61(1) +
+    y_title_top_e61() +
+    labs_e61(
+      title = "Fairly Lengthy Graph Title With A Lot of Words To Take Up Space",
+      subtitle = "Fairly Lengthy Graph Subtitle With A Lot of Words To Take Up Space",
+      footnotes = "Really long footnote to test that part of the code blah blah blah blah blah blah",
+      sources = c("e61 Institute"),
+      x = NULL, y = "units"
+    )
+
+  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), graph))
+  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), graph_2))
+
+  # Just so testthat doesn't get confused by the lack of actual test
+  expect_true(TRUE)
+
+})
