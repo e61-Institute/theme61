@@ -5,14 +5,17 @@
 \title{e61 themed graph options}
 \usage{
 theme_e61(
-  base_size = 12,
+  base_size = 10,
   base_family = "Arial",
   base_line_size = points_to_mm(0.75),
   base_rect_size = points_to_mm(1),
   background = "white",
   legend = c("none", "bottom", "top", "left", "right"),
   legend_title = FALSE,
-  panel_borders = TRUE
+  panel_borders = TRUE,
+  y_top = TRUE,
+  adj = -12,
+  fix_left = 0
 )
 }
 \arguments{
@@ -32,17 +35,30 @@ legend.}
 \item{legend_title}{Logical. Include Legend Title? Defaults to FALSE.}
 
 \item{panel_borders}{Logical. Show panel borders? Defaults to TRUE.}
+
+\item{y_top}{Defaults to TRUE. Moves the y-axis title to the top.}
+
+\item{adj}{Either a single numeric to adjust left and right axis titles
+simultaneously or a vector of 2 numerics to adjust each axis title
+separately. More negative values move the text closer to the graph panel.
+Defaults to -12 which seems to work well for y-axis with 1-3 character-wide
+values.}
+
+\item{fix_left}{Optional. Sometimes if the value of the \code{adj} argument
+is too negative, the margins on the left side of the graph start to cut off
+some of the text. Provide a small positive value (5?) to correct this.}
 }
 \value{
 ggplot2 object
 }
 \description{
-e61 themed graph options
+\code{scale_y_continuous_e61()} should be used in conjunction
+  with this function to ensure that theming and axes are applied correctly.
 }
 \examples{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 geom_point() +
-e61_colour_manual(n = 3) +
-theme_e61()
+theme_e61() +
+e61_colour_manual(n = 3)
 
 }

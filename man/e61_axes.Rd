@@ -121,5 +121,8 @@ of the graph.}
 right of the graph.}
 }
 \description{
-Format axes in the e61 Institute style
+These functions format the x and y axes to be consistent with
+  e61 styling. This includes removing white space at the beginning and end of
+  each axis, and moving the y-axis label to the top of the axis instead of
+  being sideways.
 }

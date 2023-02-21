@@ -8,9 +8,9 @@ save_e61(
   filename,
   plot = ggplot2::last_plot(),
   resize = NULL,
-  width = 8,
-  height = 6,
-  units = "in",
+  width = 8.5,
+  height = 9,
+  units = "cm",
   scale = 1,
   dpi = 100,
   ...
@@ -53,6 +53,11 @@ Designed to save ggplot graphs made with the e61 theme with
   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 }
 \details{
+Note that you will need to change the \code{height} argument to
+  ensure that the graph displays without excess white space above and below
+  the panel (if the value is too high), or weirdly shrinking the graph (if
+  the value is too low).
+
 Currently the only file formats supported are \code{.svg}
   (preferred) and \code{.png}. SVG is a modern vector graphics file format
   which means it can be scaled up and down in size without blurring or

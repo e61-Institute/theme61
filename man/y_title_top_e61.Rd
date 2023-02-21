@@ -4,7 +4,7 @@
 \alias{y_title_top_e61}
 \title{Reposition y-axis titles to the top}
 \usage{
-y_title_top_e61(adj = -18, fix_left = 0)
+y_title_top_e61(adj = -12, fix_left = 0)
 }
 \arguments{
 \item{adj}{Either a single numeric to adjust left and right axis titles
@@ -24,7 +24,4 @@ ggplot object
 Moves the y-axis titles from the side (ggplot default) to the top of the
 y-axis and rotates the text to be horizontal.
 }
-\details{
-This function must go after \code{theme_e61()} as it works by changing the
-underlying \code{theme()} after it has been generated.
-}
+\keyword{Internal}
