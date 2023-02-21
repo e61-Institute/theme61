@@ -37,7 +37,7 @@ cm_to_in <- function(cm, round = FALSE) {
 #' theme_e61()
 #'
 
-theme_e61 <- function(base_size = 12,
+theme_e61 <- function(base_size = 10,
                       base_family = "Arial",
                       base_line_size = points_to_mm(0.75),
                       base_rect_size = points_to_mm(1),
@@ -318,7 +318,7 @@ theme_e61_clean <- function(
 #' @import ggplot2
 #' @export
 
-y_title_top_e61 <- function(adj = -18, fix_left = 0) {
+y_title_top_e61 <- function(adj = -12, fix_left = 0) {
 
   if (class(adj) != "numeric") stop("adj must be a number.")
   if (!length(adj) %in% c(1, 2)) stop("adj must be a single value or a vector of 2 values.")

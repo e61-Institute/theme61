@@ -6,6 +6,11 @@
 #'
 #'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 #'
+#' @details Note that you will need to change the \code{height} argument to
+#'   ensure that the graph displays without excess white space above and below
+#'   the panel (if the value is too high), or weirdly shrinking the graph (if
+#'   the value is too low).
+#'
 #' @details Currently the only file formats supported are \code{.svg}
 #'   (preferred) and \code{.png}. SVG is a modern vector graphics file format
 #'   which means it can be scaled up and down in size without blurring or
@@ -23,12 +28,25 @@ save_e61 <-
   function(filename,
            plot = ggplot2::last_plot(),
            resize = NULL,
-           width = 8,
-           height = 6,
-           units = "in",
+           width = 8.5,
+           height = 9,
+           units = "cm",
            scale = 1,
            dpi = 100,
            ...) {
+
+    # Add a message for the user to specify their own height to dimension graphs correctly
+    if(getOption("save_e61.message", TRUE)) {
+
+      message(paste(
+        "When you use", sQuote("save_e61()"), "to save images with sensible",
+        "defaults, note that you may have to set the", sQuote("height"),
+        "argument manually to a sensible value.",
+        'This message is shown once per session and may be disabled by setting',
+        "options('save_e61.message' = FALSE). See ?save_e61 for more details."))
+      options("save_e61.message" = FALSE)
+    }
+
 
     if (!grepl("(\\.png|\\.svg)", filename))
       stop("Only .svg and .png file formats are currently supported.")
