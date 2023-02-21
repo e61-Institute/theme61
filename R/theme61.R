@@ -267,7 +267,7 @@ theme_e61 <- function(base_size = 10,
   # Adds a grey background option
   if (background == "grey" |  background == "box") {
     ret <- ret +
-      ggplot2::theme(rect = element_rect(fill = e61_greylight6))
+      theme(rect = element_rect(fill = e61_greylight6))
   }
 
   # Moves y-axis title to the top
@@ -343,7 +343,6 @@ theme_e61_clean <- function(
 #'   is too negative, the margins on the left side of the graph start to cut off
 #'   some of the text. Provide a small positive value (5?) to correct this.
 #' @return ggplot object
-#' @import ggplot2
 #' @keywords Internal
 
 y_title_top_e61 <- function(adj = -12, fix_left = 0) {
@@ -364,9 +363,9 @@ y_title_top_e61 <- function(adj = -12, fix_left = 0) {
   }
 
   ret <-
-    theme(
-      axis.title.y.left = element_text(margin = margin(l = 5 + fix_left, r = adj_left), vjust = 1, angle = 0),
-      axis.title.y.right = element_text(margin = margin(l = adj_right, r = 5), vjust = 1, angle = 0)
+    ggplot2::theme(
+      axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 5 + fix_left, r = adj_left), vjust = 1, angle = 0),
+      axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = adj_right, r = 5), vjust = 1, angle = 0)
     )
 
   return(ret)
