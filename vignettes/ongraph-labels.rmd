@@ -1,0 +1,207 @@
+---
+title: "Adding on-graph labels"
+output: rmarkdown::html_vignette
+description: Some example code showing how to put labels on graphs
+vignette: >
+  %\VignetteIndexEntry{Adding on-graph labels}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+devtools::load_all()
+library(ggplot2)
+library(ggrepel)
+library(lubridate)
+library(data.table)
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Why labels?
+
+Coloured labels placed directly on the plot are better than graph legends when you are making the final, polished version of a graph for presentations, notes and papers for three key reasons.
+
+Labels make it much easier for the reader to identify what group each colour corresponds to, without having to do the rapid eye twitch from the graph to the legend and back again. Repeat this for every group present on the graph and soon you have a recipe for eyestrain.
+
+Labels make more efficient use of the available space on a graph by removing the need to make room for a legend. Legends create unused white space around the legend element and force the plot to be shorter or narrower than it otherwise would be.
+
+Finally, labels are more aesthetic than legends.
+
+## How-to guide
+
+### Simple cases using `plot_label()`
+
+The simplest way to add plot labels is to use the `plot_label()` function in `theme61`. The following code provides an example. Most of the code is to set up the mock data and create a graph, the only two lines that are important are the `plot_label()` lines.
+
+`plot_label()` requires you to provide the text of the label (`label`), the `x` and `y` positioning, the total number of different colours/labels to plot (`n_labs`), and which number element you are currently plotting (`n`). For more information, see the documentation (`?plot_label`).
+
+```{r}
+# Mock data
+graph_data <- CJ(
+  x = 2000:2020,
+  source = c("Source A", "Source B")
+)
+
+graph_data[source == "Source A", y := seq(0, by = 0.25, length = 21)]
+graph_data[source == "Source B", y := seq(0, by = 1, length = 21)]
+
+# Graph
+graph <- ggplot(graph_data, aes(x, y, colour = source)) +
+  geom_line(linewidth = 1) +
+  plot_label(label = "Source A", x = 2017, y = 6, n_labs = 2, n = 1) +
+  plot_label(label = "Source B", x = 2017, y = 13, n_labs = 2, n = 2) +
+  theme_e61() +
+  scale_y_continuous_e61(limits = c(0, 20, 5)) +
+  scale_colour_e61(2) +
+  labs_e61(
+    title = "Simple Case Using Annotate Function",
+    sources = c("e61 Institute"),
+    x = NULL, y = "n"
+  )
+
+save_e61(here::here("man/figures/label-fig-1.svg"), graph)
+knitr::include_graphics(here::here("man/figures/label-fig-1.svg"))
+
+```
+
+### Simple cases using a helper `data.frame`
+
+An alternative way to add plot labels is to set up a `data.frame` that contains all the information needed to plot the text, and then use `geom_text()` to add the text to the graph. This can be particularly helpful if you have a lot of labels to add, which would make it repetitive to use `plot_label()`.
+
+When using this method, make sure the names of the labels in the label `data.frame` are exactly the same as the colour/fill aesthetic being plotted, and the order of the label vector matches the order of the colour/fill aesthetic for the ordering of the colours to be the same. One way to ensure this is by setting both to be ordered factors.
+
+```{r}
+# Mock data
+graph_data <- CJ(
+  x = 2000:2020,
+  source = factor(c("Source A", "Source B"))
+)
+
+graph_data[source == "Source A", y := seq(0, by = 0.25, length = 21)]
+graph_data[source == "Source B", y := seq(0, by = 1, length = 21)]
+
+# You can set up the graph labels as a separate data.frame if you have a lot of
+# labels to put on, which can get repetitive/messy if you use plot_label
+graph_labels <- data.frame(
+  x = 2017,
+  y = c(6, 13),
+  label = factor(c("Source A", "Source B"))
+)
+
+# Graph
+graph <- ggplot(graph_data, aes(x, y, colour = source)) +
+  geom_line(linewidth = 1) +
+  # This geom_text adds the labels
+  # The label arg adds the text, the colour arg ensures the text colour is the
+  # same as the lines they are identifying
+  geom_text(data = graph_labels, aes(x, y, label = label, colour = label)) +
+  theme_e61() +
+  scale_y_continuous_e61(limits = c(0, 20, 5)) +
+  scale_colour_e61(2) +
+  labs_e61(
+    title = "Simple Case Using a Helper data.frame",
+    sources = c("e61 Institute"),
+    x = NULL, y = "n"
+  )
+
+save_e61(here::here("man/figures/label-fig-2.svg"), graph)
+knitr::include_graphics(here::here("man/figures/label-fig-2.svg"))
+
+```
+
+### Dealing with facets
+
+When you have a faceted graph, using `plot_label()` does not work properly. This is because the annotations will appear in the same position on all the facets and there is no way to prevent this. This is problematic because the labels are unnecessarily repeating themselves, and the correct position of the text on one facet may be different on each facet (e.g. if the height of the columns differs across facets).
+
+There is a way to get around this problem using the `data.frame` approach to labelling the graph.
+
+As shown below, the set up of the `data.frame` is similar to the previous section. There is one extra addition, which is a `facet` column in the `data.frame`. Note that we only provide one of the facets, in this case "A". Notice that we also set this column to be a factor column with **two** levels, "A" and "B". This step is important, as what it does internally is plot the graph label on facet "A", and then when it goes to plot the labels on facet "B" they are missing and hence nothing is plotted.
+
+As an aside, if you want to put one label on the first facet and the second label on another facet, then in the `facet` column, simply allocate the first label to "A" and the second to "B".
+
+```{r}
+# Mock data
+graph_data <- data.frame(
+  facet = c("A", "A", "B", "B"),
+  x = 1,
+  y = c(10, 15, 10, 15),
+  group = c("P", "Q", "P", "Q")
+)
+
+graph_labels <- data.frame(
+  x = c(0.75, 1.25),
+  y = c(12, 17),
+  group = c("P", "Q"),
+  facet = factor("A", c("A", "B"))
+)
+
+# Graph
+graph <- ggplot(graph_data, aes(x, y, fill = group)) +
+  facet_wrap(~facet) +
+  geom_col(position = "dodge") +
+  # This geom_text adds the labels
+  geom_text(data = graph_labels, aes(x, y, label = group, colour = group)) +
+  theme_e61() +
+  scale_y_continuous_e61(limits = c(0, 20, 5)) +
+  scale_colour_e61(2) +
+  scale_fill_e61(2) +
+  labs_e61(
+    title = "Simple Case Using a Helper data.frame",
+    sources = c("e61 Institute"),
+    x = NULL, y = "n"
+  )
+
+save_e61(here::here("man/figures/label-fig-3.svg"), graph)
+knitr::include_graphics(here::here("man/figures/label-fig-3.svg"))
+
+```
+
+### Dealing with many categories
+
+Sometimes you have many categories, far too many to want to plot manually even with the `data.frame` approach. If you are willing to sacrifice the ability to specify the exact location of each label, you could use `geom_text_repel()` to add appropriately coloured text labels for each colour/fill aesthetic. 
+
+```{r}
+# Mock data
+graph_data <- CJ(
+  year = 2000:2020,
+  source = paste("Source", LETTERS[1:5])
+)
+graph_data[, value := sample(5, nrow(graph_data), replace = TRUE)]
+
+# Graph
+graph <- ggplot(graph_data, aes(x = year, y = value, fill = source)) +
+  geom_area(linewidth = 1) +
+                  # We only need one label for each group, ideally on the far 
+                  # right of the graph, so we keep the last year only
+  geom_text_repel(data = graph_data[year == max(year)],
+                  aes(x = year, y = value, label = source, colour = source),
+                  # This forces the text to appear further right than 2020
+                  xlim = c(2020, NA),
+                  # This moves the vertical position of the label downwards
+                  position = position_stack(vjust = 0.5),
+                  # This hides the line that joins the label to the graph element
+                  segment.color = NA,
+                  size = 4) +
+  theme_e61(fix_left = 3) +
+  # Extends the right-side of the graph to create room for the labels
+  scale_x_continuous(limits = c(NA, 2026)) +
+  scale_y_continuous_e61(limits = c(0, 25, 5)) +
+  scale_fill_e61(5) +
+  scale_colour_e61(5) +
+  labs_e61(
+    title = "Use geom_text_repel to Show Many Labels Automatically",
+    sources = c("e61 Institute"),
+    x = NULL, y = "n"
+  )
+
+save_e61(here::here("man/figures/label-fig-4.svg"), graph)
+knitr::include_graphics(here::here("man/figures/label-fig-4.svg"))
+
+```
