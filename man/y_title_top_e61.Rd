@@ -24,4 +24,4 @@ ggplot object
 Moves the y-axis titles from the side (ggplot default) to the top of the
 y-axis and rotates the text to be horizontal.
 }
-\keyword{Internal}
+\keyword{internal}

@@ -343,7 +343,7 @@ theme_e61_clean <- function(
 #'   is too negative, the margins on the left side of the graph start to cut off
 #'   some of the text. Provide a small positive value (5?) to correct this.
 #' @return ggplot object
-#' @keywords Internal
+#' @keywords internal
 
 y_title_top_e61 <- function(adj = -12, fix_left = 0) {
 
@@ -393,12 +393,13 @@ square_legend_symbols <- function() {
 #' code, after theming functions such as \code{theme_e61()} have been called.
 #'
 #' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
-#' the default (-14) works for most graphs.
+#' the default (-12) works for most graphs. A more negative value moves the
+#' title up, a less negative value moves the title down.
 #'
 #' @return ggplot object
 #' @export
 
-format_flip_bar_charts <- function(x_adj = -14) {
+format_flip_bar_charts <- function(x_adj = -12) {
   ggplot2::theme(
     panel.grid.major.x = element_line(colour = e61_greylight6, size = points_to_mm(0.5)),
     panel.grid.major.y = element_blank(),

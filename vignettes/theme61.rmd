@@ -10,12 +10,14 @@ vignette: >
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 devtools::load_all()
-library(theme61)
 library(ggplot2)
 library(lubridate)
 library(data.table)
 
 knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
   collapse = TRUE,
   comment = "#>"
 )
@@ -27,7 +29,7 @@ knitr::opts_chunk$set(
 
 ## The colour palette
 
-```{r echo = FALSE, message = FALSE, warning = FALSE}
+```{r echo = FALSE}
 inputs <- CJ(row = seq(1, 12), col = seq(0, 8))
 inputs[, value := .I][, value := as.factor(value)]
 inputs[, row := factor(row, labels = rev(c("Blue dark", "Blue light", "Teal dark", "Teal light", "Sky light", "Sky dark", "Coral dark", "Coral light", "Orange light", "Orange dark", "Maroon dark", "Maroon light")))]
@@ -53,7 +55,7 @@ ggplot(inputs, aes(x = col, y = row, fill = value)) +
 
 ### Scatter graph
 
-```{r echo = TRUE, message = FALSE, warning = FALSE}
+```{r}
 
 # Set up data
 mtcars2 <- within(mtcars, {
@@ -70,60 +72,71 @@ p1 <- ggplot(mtcars2) +
     title = "Fuel Economy Declines as Weight Increases",
     subtitle = "1973-74",
     sources = "1974 Motor Trend US magazine.",
-    tag = "Figure 1",
     x = "Weight (1000 lbs)",
     y = "mpg",
     colour = "Gears"
   )
 
 
-p1 +
-  theme_e61(legend = "bottom", legend_title = TRUE) + 
+graph <- p1 +
+  theme_e61(legend = "bottom", legend_title = TRUE, adj = -12) + 
   scale_y_continuous_e61(limits = c(0, 40)) +
   scale_colour_e61(n = 3) +
   add_e61_logo() + 
-  y_title_top_e61(-16) +
   square_legend_symbols()
+
+save_e61(here::here("man/figures/fig-1.svg"), graph)
+
+knitr::include_graphics(here::here("man/figures/fig-1.svg"))
+
 ```
 
 ### Faceted scatter graph
 
-```{r echo = TRUE, message = FALSE, warning = FALSE}
-p1 +
+```{r}
+graph <- p1 +
   facet_grid(vs ~ am) +
   theme_e61(panel_borders = TRUE, legend = "bottom", legend_title = TRUE) +
-  y_title_top_e61() +
   scale_colour_e61(n = 3) +
   scale_y_continuous_e61(limits = c(10, 40)) +
   scale_x_continuous_e61()
+
+save_e61(here::here("man/figures/fig-2.svg"), graph)
+
+knitr::include_graphics(here::here("man/figures/fig-2.svg"))
+
+
 ```
 
 ### Density graph
 
-```{r echo = TRUE, message = FALSE, warning = FALSE}
-g <- ggplot(mpg, aes(cty))
-g + geom_density(aes(fill = factor(cyl)), linetype = "blank", alpha = 0.8) +
+```{r}
+g <- ggplot(mpg, aes(cty)) + 
+  geom_density(aes(fill = factor(cyl)), linetype = "blank", alpha = 0.8) +
   labs_e61(
     title = "City Mileage Density",
-    subtitle = "By number of cylinders",
+    subtitle = "City mileage, by number of cylinders",
     sources = "mpg dataset",
-    x = "City mileage",
-    tag = "Figure 1",
-    y = "density",
+    x = NULL,
+    y = "dens",
     fill = "No. cylinders"
   ) +
   theme_e61(legend = "bottom", legend_title = TRUE) +
-  scale_y_continuous_e61(limits = c(0, 0.6)) +
+  scale_y_continuous_e61(limits = c(0, 0.6, 0.2)) +
   scale_x_continuous_e61() +
-  y_title_top_e61(-18) +
   scale_fill_e61(n = 4) +
   scale_colour_e61(n = 4) +
   add_e61_logo()
+
+save_e61(here::here("man/figures/fig-3.svg"), g)
+
+knitr::include_graphics(here::here("man/figures/fig-3.svg"))
+
 ```
 
 ### Line graph
 
-```{r echo = TRUE, message = FALSE, warning = FALSE}
+```{r}
 df <- economics_long[economics_long$variable %in% c("psavert", "uempmed"), ]
 
 df <- df[lubridate::year(df$date) %in% c(1967:1981), ]
@@ -133,36 +146,39 @@ brks <- df$date[seq(1, length(df$date), 12)]
 lbls <- lubridate::year(brks)
 
 # plot
-ggplot(df, aes(x = date)) +
+graph <- ggplot(df, aes(x = date)) +
   geom_line(aes(y = value, colour = variable), size = 1) +
   labs_e61(
     title = "Time Series of Returns Percentage*",
     subtitle = "Drawn from long data format",
     footnotes = "Some pointless footnote",
     sources = "Economics",
-    tag = "Figure 1",
     x = NULL, y = "%",
     colour = NULL
   ) + 
   scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-  scale_y_continuous_e61(limits = c(2.5, 17.5), breaks = seq(2.5, 15, 2.5)) +
+  scale_y_continuous_e61(limits = c(0, 20, 5)) +
   theme_e61(legend = "bottom") +
-  y_title_top_e61(-25) +
   scale_colour_e61(n = 2,
                     labels = c("Market Returns", "Unemployment")) +
   add_e61_logo() + 
   square_legend_symbols()
 
+save_e61(here::here("man/figures/fig-4.svg"), graph)
+
+knitr::include_graphics(here::here("man/figures/fig-4.svg"))
+
+
 ```
 
 ### Column graph
 
-```{r echo = TRUE, message = FALSE, warning = FALSE}
+```{r}
 col_data <- head(mtcars2, 8)
 col_data$names <- rownames(col_data)
 col_data$index <- 1:nrow(col_data)
 
-ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
+graph <- ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
   geom_col() +
   labs_e61(
     title = "Frivolous Filled Column Chart", 
@@ -170,7 +186,38 @@ ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
     sources = c("e61 Institute", "Another source"),
     x = NULL, y = "hp") +
   scale_y_continuous_e61(limits = c(0, 250)) +
-  theme_e61(legend = "bottom") +
-  y_title_top_e61(-23, fix_left = 5) +
+  theme_e61(legend = "bottom", adj = -15) +
   scale_fill_e61(discrete = FALSE, palette = "light")
+
+save_e61(here::here("man/figures/fig-5.svg"), graph)
+
+knitr::include_graphics(here::here("man/figures/fig-5.svg"))
+
+```
+
+### Horizontal bar chart
+
+```{r}
+col_data <- head(mtcars2, 8)
+col_data$names <- rownames(col_data)
+col_data$index <- 1:nrow(col_data)
+
+graph <- ggplot(col_data, aes(x = factor(index), y = hp, fill = hp)) +
+  geom_col() +
+  coord_flip() +
+  labs_e61(
+    title = "Frivolous Filled Horizontal Bar Chart", 
+    subtitle = "For the purpose of showing off the continuous colour palette",
+    sources = c("e61 Institute", "Another source"),
+    x = NULL, y = "hp") +
+  scale_x_discrete(breaks = 1:8) +
+  scale_y_continuous_e61(limits = c(0, 250)) +
+  theme_e61(legend = "bottom", adj = -15) +
+  scale_fill_e61(discrete = FALSE, palette = "light") + 
+  format_flip_bar_charts()
+
+save_e61(here::here("man/figures/fig-6.svg"), graph)
+
+knitr::include_graphics(here::here("man/figures/fig-6.svg"))
+
 ```
