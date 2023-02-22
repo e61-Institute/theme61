@@ -14,7 +14,7 @@ cm_to_in <- function(cm, round = FALSE) {
 
 #' e61 themed graph options
 #'
-#' @param base_size Numeric. Chart font size. Default is 14.
+#' @param base_size Numeric. Chart font size. Default is 10.
 #' @param base_family Character. Chart font family. Default is Arial.
 #' @param base_line_size Numeric. Default line width.
 #' @param base_rect_size Numeric. Default rect width.
@@ -42,9 +42,9 @@ cm_to_in <- function(cm, round = FALSE) {
 #'
 #' @examples
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
-#' geom_point() +
-#' theme_e61() +
-#' e61_colour_manual(n = 3)
+#'   geom_point() +
+#'   theme_e61() +
+#'   scale_colour_e61(n = 3)
 #'
 
 theme_e61 <- function(base_size = 10,

@@ -8,6 +8,7 @@ reference:
   - add_e61_logo
   - format_flip_bar_charts
   - labs_e61
+  - plot_label
   - square_legend_symbols
   - theme_e61
   - theme_e61_clean

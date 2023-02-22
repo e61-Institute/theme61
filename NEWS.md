@@ -1,11 +1,13 @@
 # theme61 0.3.0
 
+* Add the ability to specify break interval directly in the `limits` argument of `scale_y_continuous_e61`.
+* Add new function `format_flip_bar_charts()` that applies most of the formatting needed to make horizontal bar graphs pretty.
+* Add new function `plot_label()` that makes it easier to add on-graph plot labels.
+* Wrote a new vignette that explains how and why to use on-graph labelling over legends.
 * Change default dimension behaviour in `save_e61` to make graphs look sensible at 8.5cm widths.
 * Change `base_size` of graphs so the font size is readable at 8.5cm widths.
 * Remove `y_title_top_e61` and incorporate functionality directly into `theme_e61` as the default. Users can choose to disable this behaviour by setting `y_top = FALSE`.
-* Add the ability to specify break interval directly in the `limits` argument of `scale_y_continuous_e61`.
 * Update the Getting Started vignette to showcase new functionality.
-* Add new function `format_flip_bar_charts()` that applies most of the formatting needed to make horizontal bar graphs pretty.
 
 # theme61 0.2.1
 

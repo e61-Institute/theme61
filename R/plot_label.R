@@ -25,16 +25,7 @@ plot_label <- function(label, x, y, n_labs, n, size = 4) {
     x <- as.Date(x)
   }
 
-  retval <-
-    annotate(
-      "text",
-      label = label,
-      x = x,
-      y = y,
-      colour = e61_palette(n_labs)[[n]],
-      size = size
-    )
-
-  return(retval)
+  annotate("text", label = label, x = x, y = y, size = size,
+           colour = e61_palette(n_labs)[[n]])
 
 }

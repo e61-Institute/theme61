@@ -19,7 +19,7 @@ theme_e61(
 )
 }
 \arguments{
-\item{base_size}{Numeric. Chart font size. Default is 14.}
+\item{base_size}{Numeric. Chart font size. Default is 10.}
 
 \item{base_family}{Character. Chart font family. Default is Arial.}
 
@@ -57,8 +57,8 @@ ggplot2 object
 }
 \examples{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
-geom_point() +
-theme_e61() +
-e61_colour_manual(n = 3)
+  geom_point() +
+  theme_e61() +
+  scale_colour_e61(n = 3)
 
 }
