@@ -271,7 +271,8 @@ theme_e61 <- function(base_size = 10,
 
   # Reduce spacing between facets if facets used
   if (!inherits(ret$facet, "FacetNull")) {
-    ret <- ret %+replace% theme(panel.spacing.x = unit(0, "lines"))
+    ret <- ret %+replace% theme(panel.spacing.x = unit(0, "lines"),
+                                panel.spacing.y = unit(0, "lines"))
   }
 
   # Moves y-axis title to the top
