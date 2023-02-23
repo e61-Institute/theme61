@@ -29,7 +29,7 @@ knitr::opts_chunk$set(
 
 ## The colour palette
 
-```{r echo = FALSE}
+```{r colour-palette-chart echo = FALSE}
 inputs <- CJ(row = seq(1, 12), col = seq(0, 8))
 inputs[, value := .I][, value := as.factor(value)]
 inputs[, row := factor(row, labels = rev(c("Blue dark", "Blue light", "Teal dark", "Teal light", "Sky light", "Sky dark", "Coral dark", "Coral light", "Orange light", "Orange dark", "Maroon dark", "Maroon light")))]
