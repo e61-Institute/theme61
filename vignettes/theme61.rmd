@@ -96,7 +96,7 @@ knitr::include_graphics(here::here("man/figures/fig-1.svg"))
 ```{r}
 graph <- p1 +
   facet_grid(vs ~ am) +
-  theme_e61(panel_borders = TRUE, legend = "bottom", legend_title = TRUE) +
+  theme_e61(legend = "bottom", legend_title = TRUE) +
   scale_colour_e61(n = 3) +
   scale_y_continuous_e61(limits = c(10, 40)) +
   scale_x_continuous_e61()
