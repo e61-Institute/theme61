@@ -266,8 +266,12 @@ theme_e61 <- function(base_size = 10,
 
   # Adds a grey background option
   if (background == "grey" |  background == "box") {
-    ret <- ret +
-      theme(rect = element_rect(fill = e61_greylight6))
+    ret <- ret + theme(rect = element_rect(fill = e61_greylight6))
+  }
+
+  # Reduce spacing between facets if facets used
+  if (!inherits(ret$facet, "FacetNull")) {
+    ret <- ret %+replace% theme(panel.spacing.x = unit(0, "lines"))
   }
 
   # Moves y-axis title to the top
