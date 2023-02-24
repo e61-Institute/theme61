@@ -29,25 +29,27 @@ save_e61 <-
            plot = ggplot2::last_plot(),
            resize = NULL,
            width = 8.5,
-           height = 9,
+           height = NULL,
            units = "cm",
            scale = 1,
            dpi = 100,
            ...) {
 
-
-
     # Add a message for the user to specify their own height to dimension graphs correctly
-    if(getOption("save_e61.message", TRUE) | height == 9) {
+    if(getOption("save_e61.message", TRUE) | is.null(height)) {
 
       message(paste(
-        "When you use", sQuote("save_e61()"), "to save images with sensible",
-        "defaults, note that you may have to set the", sQuote("height"),
-        "argument manually to a sensible value.",
+        "Note: When you use", sQuote("save_e61()"), "to save images with",
+        "defaults, you should set the", sQuote("height"),
+        "argument manually to your own value to avoid excess/insufficient",
+        "whitespace on the rendered image. Unfortunately, you will have to open",
+        "the rendered graphic and inspect it visually.\n",
         'This message is shown if you use the default height value of 9 and may be disabled by setting',
         "options('save_e61.message' = FALSE). See ?save_e61 for more details."))
     }
 
+    # Set the default height to 9 if not otherwise specified
+    if (is.null(height)) height <- 9
 
     if (!grepl("(\\.png|\\.svg)", filename))
       stop("Only .svg and .png file formats are currently supported.")
