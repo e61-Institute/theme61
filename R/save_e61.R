@@ -35,16 +35,17 @@ save_e61 <-
            dpi = 100,
            ...) {
 
+
+
     # Add a message for the user to specify their own height to dimension graphs correctly
-    if(getOption("save_e61.message", TRUE)) {
+    if(getOption("save_e61.message", TRUE) | height == 9) {
 
       message(paste(
         "When you use", sQuote("save_e61()"), "to save images with sensible",
         "defaults, note that you may have to set the", sQuote("height"),
         "argument manually to a sensible value.",
-        'This message is shown once per session and may be disabled by setting',
+        'This message is shown if you use the default height value of 9 and may be disabled by setting',
         "options('save_e61.message' = FALSE). See ?save_e61 for more details."))
-      options("save_e61.message" = FALSE)
     }
 
 
