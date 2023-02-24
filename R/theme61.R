@@ -402,20 +402,20 @@ square_legend_symbols <- function() {
 #' title up, a less negative value moves the title down.
 #'
 #' @return ggplot object
+#' @import ggplot2
 #' @export
 
 format_flip_bar_charts <- function(x_adj = -12) {
-  ggplot2::theme(
+  theme(
     panel.grid.major.x = element_line(colour = e61_greylight6, size = points_to_mm(0.5)),
     panel.grid.major.y = element_blank(),
     axis.text.x.top = element_blank(),
     axis.ticks.x.top = element_blank(),
     axis.title.x.top = element_blank(),
-    axis.title.x.bottom = element_text(
-      margin = margin(t = x_adj, b = 5),
-      hjust = 1,
-      angle = 0
-    )
+    axis.title.x.bottom = element_text(margin = margin(t = x_adj, b = 5),
+                                       hjust = 1, angle = 0),
+    plot.caption = element_text(size = rel(1))
+
   )
 
 }
