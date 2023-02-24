@@ -32,9 +32,9 @@ labs_e61 <- function(title,
                      subtitle = NULL,
                      footnotes = NULL,
                      sources = NULL,
-                     title_max_char = 35L,
-                     subtitle_max_char = 45L,
-                     footnote_max_char = 55L,
+                     title_max_char = 35,
+                     subtitle_max_char = 45,
+                     footnote_max_char = 55,
                      ...) {
 
   # We need this to check for the presence of caption in the passed-through
@@ -44,10 +44,10 @@ labs_e61 <- function(title,
   if ((!is.null(footnotes) || !is.null(sources)) && !is.null(dots$caption))
     stop("Do not use the caption argument if you use the footnotes or sources arguments.")
 
-  if (!is.integer(title_max_char) || title_max_char < 0)
+  if (!is.numeric(title_max_char) || title_max_char < 0)
     stop("title_max_char must be a positive integer.")
 
-  if (!is.integer(footnote_max_char) || footnote_max_char < 0)
+  if (!is.numeric(footnote_max_char) || footnote_max_char < 0)
     stop("footnote_max_char must be a positive integer.")
 
   if (!is.character(title))
