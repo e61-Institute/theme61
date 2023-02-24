@@ -69,6 +69,11 @@ save_e61 <-
 
     }
 
+    # When coord_flip() is used to make a plot horizontal, default parameters stuff with the scaling
+    if ("CoordFlip" %in% ggplot_build(plot)$layout$coord) {
+      scale <- scale * 2
+    }
+
     ggplot2::ggsave(
       filename,
       plot = plot,
