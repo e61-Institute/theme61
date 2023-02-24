@@ -398,14 +398,14 @@ square_legend_symbols <- function() {
 #' code, after theming functions such as \code{theme_e61()} have been called.
 #'
 #' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
-#' the default (-12) works for most graphs. A more negative value moves the
+#' the default (-9) works for most graphs. A more negative value moves the
 #' title up, a less negative value moves the title down.
 #'
 #' @return ggplot object
 #' @import ggplot2
 #' @export
 
-format_flip_bar_charts <- function(x_adj = -12) {
+format_flip_bar_charts <- function(x_adj = -9) {
   theme(
     panel.grid.major.x = element_line(colour = e61_greylight6, size = points_to_mm(0.5)),
     panel.grid.major.y = element_blank(),
