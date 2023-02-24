@@ -413,8 +413,7 @@ format_flip_bar_charts <- function(x_adj = -12) {
     axis.ticks.x.top = element_blank(),
     axis.title.x.top = element_blank(),
     axis.title.x.bottom = element_text(margin = margin(t = x_adj, b = 5),
-                                       hjust = 1, angle = 0),
-    plot.caption = element_text(size = rel(1))
+                                       hjust = 1, angle = 0)
 
   )
 
