@@ -36,7 +36,7 @@ save_e61 <-
            ...) {
 
     # Add a message for the user to specify their own height to dimension graphs correctly
-    if(getOption("save_e61.message", TRUE) | is.null(height)) {
+    if(getOption("save_e61.message", TRUE) || is.null(height)) {
 
       message(paste(
         "Note: When you use", sQuote("save_e61()"), "to save images with",
