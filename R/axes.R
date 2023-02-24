@@ -32,7 +32,7 @@
 scale_y_continuous_e61 <- function(expand_bottom = 0,
                                    expand_top = 0,
                                    sec_axis = dup_axis(),
-                                   limits = NULL,
+                                   limits,
                                    ...) {
 
   if (is.logical(sec_axis) && !sec_axis) {
