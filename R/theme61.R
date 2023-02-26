@@ -14,15 +14,6 @@ cm_to_in <- function(cm, round = FALSE) {
 
 #' e61 themed graph options
 #'
-#' @param base_size Numeric. Chart font size. Default is 10.
-#' @param base_family Character. Chart font family. Default is Arial.
-#' @param base_line_size Numeric. Default line width.
-#' @param base_rect_size Numeric. Default rect width.
-#' @param background Character. Options are "white" (default) or "grey".
-#' @param legend Character. Legend position, use "none" (default) to hide the
-#'   legend.
-#' @param legend_title Logical. Include Legend Title? Defaults to FALSE.
-#' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #' @param y_top Defaults to TRUE. Moves the y-axis title to the top.
 #' @param adj Either a single numeric to adjust left and right axis titles
 #'   simultaneously or a vector of 2 numerics to adjust each axis title
@@ -32,6 +23,15 @@ cm_to_in <- function(cm, round = FALSE) {
 #' @param fix_left Optional. Sometimes if the value of the \code{adj} argument
 #'   is too negative, the margins on the left side of the graph start to cut off
 #'   some of the text. Provide a small positive value (5?) to correct this.
+#' @param legend Character. Legend position, use "none" (default) to hide the
+#'   legend.
+#' @param legend_title Logical. Include Legend Title? Defaults to FALSE.
+#' @param background Character. Options are "white" (default) or "grey".
+#' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
+#' @param base_size Numeric. Chart font size. Default is 10.
+#' @param base_family Character. Chart font family. Default is Arial.
+#' @param base_line_size Numeric. Default line width.
+#' @param base_rect_size Numeric. Default rect width.
 #'
 #' @description \code{scale_y_continuous_e61()} should be used in conjunction
 #'   with this function to ensure that theming and axes are applied correctly.
@@ -47,17 +47,18 @@ cm_to_in <- function(cm, round = FALSE) {
 #'   scale_colour_e61(n = 3)
 #'
 
-theme_e61 <- function(base_size = 10,
-                      base_family = "Arial",
-                      base_line_size = points_to_mm(0.75),
-                      base_rect_size = points_to_mm(1),
-                      background = "white",
+theme_e61 <- function(y_top = TRUE,
+                      adj = -12,
+                      fix_left = 0,
                       legend = c("none", "bottom", "top", "left", "right"),
                       legend_title = FALSE,
                       panel_borders = TRUE,
-                      y_top = TRUE,
-                      adj = -12,
-                      fix_left = 0) {
+                      background = "white",
+                      base_size = 10,
+                      base_family = "Arial",
+                      base_line_size = points_to_mm(0.75),
+                      base_rect_size = points_to_mm(1)
+                      ) {
 
   # Consider restoring this as a standalone font installation function for
   # first time running at a later date if we choose to go with a custom font.
