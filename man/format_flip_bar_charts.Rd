@@ -4,11 +4,11 @@
 \alias{format_flip_bar_charts}
 \title{Applies changes to the theme for horizontal bar graphs}
 \usage{
-format_flip_bar_charts(x_adj = -12)
+format_flip_bar_charts(x_adj = -9)
 }
 \arguments{
 \item{x_adj}{Numeric. Adjusts the vertical position of the x-axis title,
-the default (-12) works for most graphs. A more negative value moves the
+the default (-9) works for most graphs. A more negative value moves the
 title up, a less negative value moves the title down.}
 }
 \value{

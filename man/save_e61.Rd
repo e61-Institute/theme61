@@ -9,7 +9,7 @@ save_e61(
   plot = ggplot2::last_plot(),
   resize = NULL,
   width = 8.5,
-  height = 9,
+  height = NULL,
   units = "cm",
   scale = 1,
   dpi = 100,

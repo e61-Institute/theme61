@@ -9,9 +9,9 @@ labs_e61(
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
-  title_max_char = 35L,
-  subtitle_max_char = 45L,
-  footnote_max_char = 55L,
+  title_max_char = 35,
+  subtitle_max_char = 45,
+  footnote_max_char = 55,
   ...
 )
 }

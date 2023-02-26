@@ -5,37 +5,20 @@
 \title{e61 themed graph options}
 \usage{
 theme_e61(
-  base_size = 10,
-  base_family = "Arial",
-  base_line_size = points_to_mm(0.75),
-  base_rect_size = points_to_mm(1),
-  background = "white",
+  y_top = TRUE,
+  adj = -12,
+  fix_left = 0,
   legend = c("none", "bottom", "top", "left", "right"),
   legend_title = FALSE,
   panel_borders = TRUE,
-  y_top = TRUE,
-  adj = -12,
-  fix_left = 0
+  background = "white",
+  base_size = 10,
+  base_family = "Arial",
+  base_line_size = points_to_mm(0.75),
+  base_rect_size = points_to_mm(1)
 )
 }
 \arguments{
-\item{base_size}{Numeric. Chart font size. Default is 10.}
-
-\item{base_family}{Character. Chart font family. Default is Arial.}
-
-\item{base_line_size}{Numeric. Default line width.}
-
-\item{base_rect_size}{Numeric. Default rect width.}
-
-\item{background}{Character. Options are "white" (default) or "grey".}
-
-\item{legend}{Character. Legend position, use "none" (default) to hide the
-legend.}
-
-\item{legend_title}{Logical. Include Legend Title? Defaults to FALSE.}
-
-\item{panel_borders}{Logical. Show panel borders? Defaults to TRUE.}
-
 \item{y_top}{Defaults to TRUE. Moves the y-axis title to the top.}
 
 \item{adj}{Either a single numeric to adjust left and right axis titles
@@ -47,6 +30,23 @@ values.}
 \item{fix_left}{Optional. Sometimes if the value of the \code{adj} argument
 is too negative, the margins on the left side of the graph start to cut off
 some of the text. Provide a small positive value (5?) to correct this.}
+
+\item{legend}{Character. Legend position, use "none" (default) to hide the
+legend.}
+
+\item{legend_title}{Logical. Include Legend Title? Defaults to FALSE.}
+
+\item{panel_borders}{Logical. Show panel borders? Defaults to TRUE.}
+
+\item{background}{Character. Options are "white" (default) or "grey".}
+
+\item{base_size}{Numeric. Chart font size. Default is 10.}
+
+\item{base_family}{Character. Chart font family. Default is Arial.}
+
+\item{base_line_size}{Numeric. Default line width.}
+
+\item{base_rect_size}{Numeric. Default rect width.}
 }
 \value{
 ggplot2 object
