@@ -79,7 +79,10 @@ p1 <- ggplot(mtcars2) +
 
 
 graph <- p1 +
-  theme_e61(legend = "bottom", legend_title = TRUE, adj = -12) + 
+  theme_e61(adj = -12) + 
+  plot_label("3 gears", 4, 23, 3, 1) +
+  plot_label("4 gears", 2.7, 35, 3, 2) +
+  plot_label("5 gears", 2.5, 15, 3, 3) +
   scale_y_continuous_e61(limits = c(0, 40)) +
   scale_colour_e61(n = 3) +
   add_e61_logo() + 
@@ -114,14 +117,18 @@ knitr::include_graphics(here::here("man/figures/fig-2.svg"))
 g <- ggplot(mpg, aes(cty)) + 
   geom_density(aes(fill = factor(cyl)), linetype = "blank", alpha = 0.8) +
   labs_e61(
-    title = "City Mileage Density",
-    subtitle = "City mileage, by number of cylinders",
+    title = "Distribution of Car City Mileage",
+    subtitle = "In miles per gallon, by number of cylinders",
     sources = "mpg dataset",
     x = NULL,
     y = "dens",
     fill = "No. cylinders"
   ) +
-  theme_e61(legend = "bottom", legend_title = TRUE) +
+  plot_label("3", 25, 0.1, 4, 1) +
+  plot_label("5", 23, 0.35, 4, 2) +
+  plot_label("6", 16, 0.25, 4, 3) +
+  plot_label("8", 12, 0.25, 4, 4) +
+  theme_e61() +
   scale_y_continuous_e61(limits = c(0, 0.6, 0.2)) +
   scale_x_continuous_e61() +
   scale_fill_e61(n = 4) +
@@ -216,3 +223,4 @@ save_e61(here::here("man/figures/fig-6.svg"), graph)
 knitr::include_graphics(here::here("man/figures/fig-6.svg"))
 
 ```
+
