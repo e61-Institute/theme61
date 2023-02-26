@@ -42,10 +42,14 @@ save_e61 <-
         "Note: When you use", sQuote("save_e61()"), "to save images with",
         "defaults, you should set the", sQuote("height"),
         "argument manually to your own value to avoid excess/insufficient",
-        "whitespace on the rendered image. Unfortunately, you will have to open",
-        "the rendered graphic and inspect it visually.\n",
-        'This message is shown if you use the default height value of 9 and may be disabled by setting',
+        "whitespace on the rendered image.\n",
+        "Unfortunately the only way to check this is to open the rendered",
+        "graphic and inspect it visually.\n",
+        "This message is shown if you use the default height value of 9 and may",
+        "be disabled by setting",
         "options('save_e61.message' = FALSE). See ?save_e61 for more details."))
+
+      options('save_e61.message' = FALSE)
     }
 
     # Set the default height to 9 if not otherwise specified
