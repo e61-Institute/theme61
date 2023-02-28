@@ -12,12 +12,12 @@
 #' @param y Numeric or string. Y-axis position of the label text.
 #' @param n_labs Integer. Total number of labels on the graph.
 #' @param n Integer. Indicate which (*n*th) element this label corresponds to.
-#' @param size Integer. Size of the text, default (3.5) should be appropriate in
-#'   most cases.
+#' @param size Integer. Size of the text, the default size should be appropriate
+#'   in most cases.
 #'
 #' @return ggplot2 object
 #' @export
-plot_label <- function(label, x, y, n_labs, n, size = 3.5) {
+plot_label <- function(label, x, y, n_labs, n, size = 3) {
 
   # Automatically convert dates to dates if specified, so the user doesn't have
   # to wrap dates in as.Date() which saves some room.
