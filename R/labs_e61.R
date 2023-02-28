@@ -16,14 +16,14 @@
 #'   separate points you include in the graph.
 #' @param sources A vector of providing the names of sources for the graph.
 #' @param title_max_char Set the maximum number of characters per line in the
-#'   title, the default is appropriate for the default graph dimensions in
-#'   \code{e61_save}.
+#'   title, the default is roughly appropriate for the default graph dimensions
+#'   in \code{e61_save}.
 #' @param subtitle_max_char Set the maximum number of characters per line in the
-#'   subtitle, the default is appropriate for the default graph dimensions in
-#'   \code{e61_save}.
+#'   subtitle, the default is roughly appropriate for the default graph
+#'   dimensions in \code{e61_save}.
 #' @param footnote_max_char Set the maximum number of characters per line in the
-#'   footer, the default is appropriate for the default graph dimensions in
-#'   \code{e61_save}.
+#'   footer, the default is roughly appropriate for the default graph dimensions
+#'   in \code{e61_save}.
 #' @inheritDotParams ggplot2::labs
 #'
 #' @export

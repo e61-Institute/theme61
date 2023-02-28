@@ -287,7 +287,7 @@ theme_e61 <- function(y_top = TRUE,
 
 #' e61 themed graph options in a 'clean' style
 #'
-#' @param base_size Numeric. Chart font size. Default is 14.
+#' @param base_size Numeric. Chart font size. Default is 12.
 #' @param base_family Character. Chart font family. Default is Arial.
 #'
 #' @return ggplot2 object

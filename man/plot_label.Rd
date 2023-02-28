@@ -4,7 +4,7 @@
 \alias{plot_label}
 \title{Add On-graph Labels to Graphs}
 \usage{
-plot_label(label, x, y, n_labs, n, size = 3.5)
+plot_label(label, x, y, n_labs, n, size = 3)
 }
 \arguments{
 \item{label}{String. Label text to be displayed.}
@@ -17,8 +17,8 @@ plot_label(label, x, y, n_labs, n, size = 3.5)
 
 \item{n}{Integer. Indicate which (*n*th) element this label corresponds to.}
 
-\item{size}{Integer. Size of the text, default (3.5) should be appropriate in
-most cases.}
+\item{size}{Integer. Size of the text, the default size should be appropriate
+in most cases.}
 }
 \value{
 ggplot2 object

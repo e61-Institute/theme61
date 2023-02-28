@@ -9,7 +9,7 @@ theme_e61_clean(base_family = "Arial", base_size = 12)
 \arguments{
 \item{base_family}{Character. Chart font family. Default is Arial.}
 
-\item{base_size}{Numeric. Chart font size. Default is 14.}
+\item{base_size}{Numeric. Chart font size. Default is 12.}
 }
 \value{
 ggplot2 object

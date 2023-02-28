@@ -23,16 +23,16 @@ separate points you include in the graph.}
 \item{sources}{A vector of providing the names of sources for the graph.}
 
 \item{title_max_char}{Set the maximum number of characters per line in the
-title, the default is appropriate for the default graph dimensions in
-\code{e61_save}.}
+title, the default is roughly appropriate for the default graph dimensions
+in \code{e61_save}.}
 
 \item{subtitle_max_char}{Set the maximum number of characters per line in the
-subtitle, the default is appropriate for the default graph dimensions in
-\code{e61_save}.}
+subtitle, the default is roughly appropriate for the default graph
+dimensions in \code{e61_save}.}
 
 \item{footnote_max_char}{Set the maximum number of characters per line in the
-footer, the default is appropriate for the default graph dimensions in
-\code{e61_save}.}
+footer, the default is roughly appropriate for the default graph dimensions
+in \code{e61_save}.}
 
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:labs]{ggplot2::labs}}
