@@ -7,9 +7,9 @@
 save_e61(
   filename,
   plot = ggplot2::last_plot(),
-  resize = NULL,
-  width = 8.5,
+  width = NULL,
   height = NULL,
+  resize = NULL,
   units = "cm",
   scale = 1,
   dpi = 100,
@@ -17,6 +17,12 @@ save_e61(
 )
 }
 \arguments{
+\item{filename}{File name to create on disk. Remember you must provide the
+file extension (e.g. \code{.svg})!}
+
+\item{plot}{Plot object to save. Defaults to the last plot displayed so
+usually you do not need to provide this explicitly.}
+
 \item{resize}{Rescales the graph and text. Useful when you need a very large
 or small graph and cannot use a vector graphics format. This only works
 when saving to the PNG file format. A value of 2 doubles the graph
@@ -25,24 +31,11 @@ dimensions.}
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:ggsave]{ggplot2::ggsave}}
   \describe{
-    \item{\code{filename}}{File name to create on disk.}
-    \item{\code{plot}}{Plot to save, defaults to last plot displayed.}
-    \item{\code{device}}{Device to use. Can either be a device function
-(e.g. \link{png}), or one of "eps", "ps", "tex" (pictex),
-"pdf", "jpeg", "tiff", "png", "bmp", "svg" or "wmf" (windows only).}
-    \item{\code{path}}{Path of the directory to save plot to: \code{path} and \code{filename}
-are combined to create the fully qualified file name. Defaults to the
-working directory.}
     \item{\code{scale}}{Multiplicative scaling factor.}
     \item{\code{width,height,units}}{Plot size in \code{units} ("in", "cm", "mm", or "px").
 If not supplied, uses the size of current graphics device.}
     \item{\code{dpi}}{Plot resolution. Also accepts a string input: "retina" (320),
 "print" (300), or "screen" (72). Applies only to raster output types.}
-    \item{\code{limitsize}}{When \code{TRUE} (the default), \code{ggsave()} will not
-save images larger than 50x50 inches, to prevent the common error of
-specifying dimensions in pixels.}
-    \item{\code{bg}}{Background colour. If \code{NULL}, uses the \code{plot.background} fill value
-from the plot theme.}
   }}
 }
 \description{
@@ -50,17 +43,26 @@ Designed to save ggplot graphs made with the e61 theme with
   sensible defaults that ensure the text size is appropriately proportioned
   given default sizing.
 
+  Currently the only file formats supported are \code{.svg} (preferred) and
+  \code{.png}. SVG is a modern vector graphics file format which means it can
+  be scaled up and down in size without blurring or becoming pixelated. Use
+  the PNG file format in the rare case that vector graphics are not
+  supported.
+
   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 }
 \details{
-Note that you will need to change the \code{height} argument to
-  ensure that the graph displays without excess white space above and below
-  the panel (if the value is too high), or weirdly shrinking the graph (if
-  the value is too low).
+Setting the correct height and width parameters is quite difficult
+  due to the way that ggplot translates ggplot objects from pixels into
+  physical dimensions (inches or centimetres). Font sizes are also
+  transformed differently to other graph elements which adds another
+  dimension of difficulty. This is why \code{save_e61} generally requires you
+  to provide your own height and width arguments after some trial and error,
+  and produces loud messages if you stick to the defaults, which I have tried
+  to make not terrible.
 
-Currently the only file formats supported are \code{.svg}
-  (preferred) and \code{.png}. SVG is a modern vector graphics file format
-  which means it can be scaled up and down in size without blurring or
-  becoming pixelated. Use the PNG file format when vector graphics are not
-  supported.
+  If the width/height arguments are off, then the file you output will have
+  excess space on the left/right or top/bottom (if the values are too high),
+  or the graph itself will be shrunk and look weird (if the values are too
+  low).
 }

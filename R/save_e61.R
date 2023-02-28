@@ -4,39 +4,53 @@
 #'   sensible defaults that ensure the text size is appropriately proportioned
 #'   given default sizing.
 #'
+#'   Currently the only file formats supported are \code{.svg} (preferred) and
+#'   \code{.png}. SVG is a modern vector graphics file format which means it can
+#'   be scaled up and down in size without blurring or becoming pixelated. Use
+#'   the PNG file format in the rare case that vector graphics are not
+#'   supported.
+#'
 #'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 #'
-#' @details Note that you will need to change the \code{height} argument to
-#'   ensure that the graph displays without excess white space above and below
-#'   the panel (if the value is too high), or weirdly shrinking the graph (if
-#'   the value is too low).
+#' @details Setting the correct height and width parameters is quite difficult
+#'   due to the way that ggplot translates ggplot objects from pixels into
+#'   physical dimensions (inches or centimetres). Font sizes are also
+#'   transformed differently to other graph elements which adds another
+#'   dimension of difficulty. This is why \code{save_e61} generally requires you
+#'   to provide your own height and width arguments after some trial and error,
+#'   and produces loud messages if you stick to the defaults, which I have tried
+#'   to make not terrible.
 #'
-#' @details Currently the only file formats supported are \code{.svg}
-#'   (preferred) and \code{.png}. SVG is a modern vector graphics file format
-#'   which means it can be scaled up and down in size without blurring or
-#'   becoming pixelated. Use the PNG file format when vector graphics are not
-#'   supported.
+#'   If the width/height arguments are off, then the file you output will have
+#'   excess space on the left/right or top/bottom (if the values are too high),
+#'   or the graph itself will be shrunk and look weird (if the values are too
+#'   low).
 #'
 #' @param resize Rescales the graph and text. Useful when you need a very large
 #'   or small graph and cannot use a vector graphics format. This only works
 #'   when saving to the PNG file format. A value of 2 doubles the graph
 #'   dimensions.
-#' @inheritDotParams ggplot2::ggsave
+#' @param filename File name to create on disk. Remember you must provide the
+#'   file extension (e.g. \code{.svg})!
+#' @param plot Plot object to save. Defaults to the last plot displayed so
+#'   usually you do not need to provide this explicitly.
+#' @inheritDotParams ggplot2::ggsave scale width height units dpi
 #' @export
 
 save_e61 <-
   function(filename,
            plot = ggplot2::last_plot(),
-           resize = NULL,
-           width = 8.5,
+           width = NULL,
            height = NULL,
+           resize = NULL,
            units = "cm",
            scale = 1,
            dpi = 100,
            ...) {
 
-    # Add a message for the user to specify their own height to dimension graphs correctly
-    if(is.null(height) || getOption("save_e61.message", TRUE)) {
+    # Message for the user to specify their own height to dimension graphs
+    # correctly
+    if (is.null(height) || isTRUE(getOption("save_e61.message"))) {
 
       message(paste(
         "Note: When you use", sQuote("save_e61()"), "to save images with",
@@ -45,24 +59,33 @@ save_e61 <-
         "whitespace on the rendered image.\n",
         "Unfortunately the only way to check this is to open the rendered",
         "graphic and inspect it visually.\n",
-        "This message is shown if you use the default height value of 9 and may",
+        "This message is shown if you leave 'height = NULL' and may",
         "be disabled by setting",
         "options('save_e61.message' = FALSE). See ?save_e61 for more details."))
 
       options('save_e61.message' = FALSE)
     }
 
-    # Set the default height to 9 if not otherwise specified
-    if (is.null(height)) height <- 9
-
     if (!grepl("(\\.png|\\.svg)", filename))
-      stop("Only .svg and .png file formats are currently supported.")
+      stop("You must provide a file extension. Only .svg and .png file formats are currently supported.")
+
+    # Check if graph is horizontal
+    flip <- isTRUE("CoordFlip" %in% class(ggplot2::ggplot_build(plot)$layout$coord))
+
+    # Set default dimensions if not otherwise specified
+    if (is.null(width) && !flip) width <- 8.5
+    if (is.null(height) && !flip) height <- 9
+
+    # When coord_flip() is used to make a plot horizontal, the default dims are
+    # too small
+    if (is.null(width) && flip) width <- 17
+    if (is.null(height) && flip) height <- 12
 
     if (!is.null(resize)) {
       if (!grepl("\\.png", filename))
-        stop("The file format must be .png")
+        stop("The 'resize' argument is not supported unless the file format is .png")
       if (!is.numeric(resize))
-        stop("resize must be numeric.")
+        stop("'resize' must be numeric.")
 
       # Rescale elements as required
       width <- width * resize
