@@ -12,9 +12,11 @@
 #'   \code{sources}, do not supply a \code{caption} argument as well.
 #'
 #' @param footnotes A vector of footnote text strings. Each new string will be
-#'   prepended with \*, \*\*, \*\*\*, etc. Please be sensible with the number of
+#'   prepended with *, **, ***, etc. Note you'll need to include the asterisks
+#'   in the title/subtitle yourself. Please be sensible with the number of
 #'   separate points you include in the graph.
-#' @param sources A vector of providing the names of sources for the graph.
+#' @param sources A vector of strings providing the names of sources for the
+#'   graph.
 #' @param title_max_char Set the maximum number of characters per line in the
 #'   title, the default is roughly appropriate for the default graph dimensions
 #'   in \code{e61_save}.
@@ -27,6 +29,15 @@
 #' @inheritDotParams ggplot2::labs
 #'
 #' @export
+#' @examples
+#'   ggplot() +
+#'   theme_e61() +
+#'   labs_e61(
+#'     title = "Graph title*",
+#'     subtitle = "Graph subtitle**",
+#'     sources = c("A source", "Company name", "Better source"),
+#'     footnotes = c("Footnote 1", "Footnote 2")
+#'     )
 
 labs_e61 <- function(title,
                      subtitle = NULL,

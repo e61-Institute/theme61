@@ -1,6 +1,6 @@
 # theme61 0.3.0
 
-XX Feb 2023
+XX Mar 2023
 
 * New functionality in `scale_y_continuous_e61` to specify break intervals directly in the `limits` argument.
 * Add new function `format_flip_bar_charts()` that applies most of the formatting needed to make horizontal bar graphs pretty.
@@ -11,6 +11,7 @@ XX Feb 2023
 * Remove `y_title_top_e61` and incorporate functionality directly into `theme_e61` as the default. Users can choose to disable this behaviour with the `y_top = FALSE` argument.
 * Update the Getting Started vignette to showcase new functionality.
 * Fix issue with `labels` argument in `scale_colour/fill_e61` not working.
+* Other minor improvements to messages and documentation.
 
 # theme61 0.2.1
 
