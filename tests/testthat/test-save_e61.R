@@ -1,3 +1,33 @@
+test_that("Test dimensioning functions", {
+
+  # Test default height messages
+  withr::with_tempdir({
+
+    temp_file <- "default-height.png"
+
+    expect_message(save_e61(temp_file, ggplot()))
+
+  })
+
+  # Test custom dimensions work
+  withr::with_tempdir({
+    expect_snapshot_file(save_e61("custom-dim-1.svg", ggplot(), width = 10, height = 10))
+    expect_snapshot_file(save_e61("custom-dim-2.svg", ggplot(), width = 10, height = 5))
+    expect_snapshot_file(save_e61("custom-dim-3.svg", ggplot(), width = 5, height = 10))
+  })
+
+  # Test horizontal graph detection code
+  withr::with_tempdir({
+    plot <- ggplot()
+    plot_h <- ggplot() + coord_flip()
+
+    expect_snapshot_file(suppressMessages(save_e61("plot-norm.svg", plot)))
+    expect_snapshot_file(suppressMessages(save_e61("plot-flip.svg", plot_h)))
+
+  })
+
+})
+
 test_that("Test resizing feature for PNGs", {
 
   # Create a graph that will be written to disk (and deleted afterwards)
@@ -7,7 +37,7 @@ test_that("Test resizing feature for PNGs", {
     temp_file <- "test.png"
 
     # Test PNG with default scaling
-    save_e61(temp_file)
+    suppressMessages(save_e61(temp_file))
 
     disk_file <- magick::image_read(temp_file)
     deets <- magick::image_info(disk_file)
@@ -24,7 +54,7 @@ test_that("Test resizing feature for PNGs", {
     })
 
     # Test resized PNG
-    save_e61(temp_file, resize = 2)
+    suppressMessages(save_e61(temp_file, resize = 2))
 
     disk_file <- magick::image_read(temp_file)
     deets <- magick::image_info(disk_file)
@@ -52,7 +82,7 @@ test_that("Test support for different file formats", {
   withr::with_tempdir({
     temp_file <- "test.svg"
 
-    save_e61(temp_file)
+    suppressMessages(save_e61(temp_file))
 
     disk_file <- magick::image_read(temp_file)
     deets <- magick::image_info(disk_file)
@@ -71,13 +101,13 @@ test_that("Test support for different file formats", {
     ## These should fail
 
     # SVGs should fail if user tries to resize them
-    expect_error(save_e61(temp_file, resize = 2))
+    expect_error(suppressMessages(save_e61(temp_file, resize = 2)))
 
     # No support for non-SVG/PNG files
-    expect_error(save_e61(paste0(tempdir(), "\\text.jpg")))
+    expect_error(suppressMessages(save_e61(paste0(tempdir(), "\\text.jpg"))))
 
     # Having png or svg in the name should still trip the file format error
-    expect_error(save_e61(paste0(tempdir(), "\\png-text.jpg")))
+    expect_error(suppressMessages(save_e61(paste0(tempdir(), "\\png-text.jpg"))))
 
   })
 
