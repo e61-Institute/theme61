@@ -6,26 +6,17 @@
 \title{Format axes in the e61 Institute style}
 \usage{
 scale_y_continuous_e61(
+  limits,
+  sec_axis = dup_axis(),
+  y_top = TRUE,
   expand_bottom = 0,
   expand_top = 0,
-  sec_axis = dup_axis(),
-  limits,
   ...
 )
 
 scale_x_continuous_e61(expand_left = 0, expand_right = 0.015, ...)
 }
 \arguments{
-\item{expand_bottom}{Numeric. Add extra space between data points and the
-bottom of the graph. See \link[ggplot2]{expansion} for details.}
-
-\item{expand_top}{Numeric. Add extra space between data points and the top of
-the graph.}
-
-\item{sec_axis}{Adds a secondary axis (defaults to \code{dup_axis()}, which
-duplicates the axis), see \link[ggplot2]{sec_axis} for more details. Set to
-FALSE to hide a secondary axis.}
-
 \item{limits}{One of:
 \itemize{
   \item{\code{NULL} to use the default scale range.}
@@ -35,6 +26,20 @@ FALSE to hide a secondary axis.}
   and the increment between each axis tick, e.g. \code{c(0, 25, 5)} will
   set the axis to range from 0 to 25, with increments of 5 per tick.}
   }}
+
+\item{sec_axis}{Adds a secondary axis (defaults to \code{dup_axis()}, which
+duplicates the axis), see \link[ggplot2]{sec_axis} for more details. Set to
+FALSE to hide a secondary axis.}
+
+\item{y_top}{Logical. Ensures there is space at the top of the y-axis for the
+axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
+elsewhere.}
+
+\item{expand_bottom}{Numeric. Add extra space between data points and the
+bottom of the graph. See \link[ggplot2]{expansion} for details.}
+
+\item{expand_top}{Numeric. Add extra space between data points and the top of
+the graph.}
 
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous}}, \code{\link[ggplot2:scale_continuous]{ggplot2::scale_x_continuous}}

@@ -7,6 +7,9 @@
 #' @param sec_axis Adds a secondary axis (defaults to \code{dup_axis()}, which
 #'   duplicates the axis), see \link[ggplot2]{sec_axis} for more details. Set to
 #'   FALSE to hide a secondary axis.
+#' @param y_top Logical. Ensures there is space at the top of the y-axis for the
+#'   axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
+#'   elsewhere.
 #' @param expand_left Numeric. Add extra space between data points and the left
 #'   of the graph.
 #' @param expand_right Numeric. Add extra space between data points and the
@@ -29,10 +32,11 @@
 #' @rdname e61_axes
 #' @export
 
-scale_y_continuous_e61 <- function(expand_bottom = 0,
-                                   expand_top = 0,
+scale_y_continuous_e61 <- function(limits,
                                    sec_axis = dup_axis(),
-                                   limits,
+                                   y_top = TRUE,
+                                   expand_bottom = 0,
+                                   expand_top = 0,
                                    ...) {
 
   if (!is.null(limits) && is.numeric(limits)) {
@@ -41,10 +45,11 @@ scale_y_continuous_e61 <- function(expand_bottom = 0,
     limits[[2]] <- limits[[2]] - 0.0001
   }
 
-  if (is.logical(sec_axis) && !sec_axis) {
-    sec_axis <- waiver()
-    limits[[2]] <- limits[[2]] + 0.0001 # Put the little bit of y-axis back in
-  }
+  # Set sec_axis to default behaviour if we don't want it
+  if (isFALSE(sec_axis)) sec_axis <- waiver()
+
+  # Put the little bit of y-axis back in
+  if (isFALSE(y_top)) limits[[2]] <- limits[[2]] + 0.0001
 
   e61_y_continuous(
     expand_bottom = expand_bottom,
