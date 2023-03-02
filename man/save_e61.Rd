@@ -18,7 +18,7 @@ save_e61(
 }
 \arguments{
 \item{filename}{File name to create on disk. Remember you must provide the
-file extension (e.g. \code{.svg})!}
+file extension, e.g. \code{.svg}.}
 
 \item{plot}{Plot object to save. Defaults to the last plot displayed so
 usually you do not need to provide this explicitly.}

@@ -23,7 +23,8 @@
 #'     and the increment between each axis tick, e.g. \code{c(0, 25, 5)} will
 #'     set the axis to range from 0 to 25, with increments of 5 per tick.}
 #'     }
-#' @inheritDotParams ggplot2::scale_y_continuous
+#' @inheritDotParams ggplot2::scale_y_continuous -breaks -minor_breaks -n.breaks
+#'   -expand -sec.axis
 #'
 #' @description These functions format the x and y axes to be consistent with
 #'   e61 styling. This includes removing white space at the beginning and end of

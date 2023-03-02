@@ -48,29 +48,6 @@ the graph.}
 \code{waiver()}, the default, the name of the scale is taken from the first
 mapping used for that aesthetic. If \code{NULL}, the legend title will be
 omitted.}
-    \item{\code{breaks}}{One of:
-\itemize{
-\item \code{NULL} for no breaks
-\item \code{waiver()} for the default breaks computed by the
-\link[scales:trans_new]{transformation object}
-\item A numeric vector of positions
-\item A function that takes the limits as input and returns breaks
-as output (e.g., a function returned by \code{\link[scales:breaks_extended]{scales::extended_breaks()}}).
-Also accepts rlang \link[rlang:as_function]{lambda} function notation.
-}}
-    \item{\code{minor_breaks}}{One of:
-\itemize{
-\item \code{NULL} for no minor breaks
-\item \code{waiver()} for the default breaks (one minor break between
-each major break)
-\item A numeric vector of positions
-\item A function that given the limits returns a vector of minor breaks. Also
-accepts rlang \link[rlang:as_function]{lambda} function notation.
-}}
-    \item{\code{n.breaks}}{An integer guiding the number of major breaks. The algorithm
-may choose a slightly different number to ensure nice break labels. Will
-only have an effect if \code{breaks = waiver()}. Use \code{NULL} to use the default
-number of breaks given by the transformation.}
     \item{\code{labels}}{One of:
 \itemize{
 \item \code{NULL} for no labels
@@ -114,6 +91,29 @@ transformation with \code{\link[scales:trans_new]{scales::trans_new()}}.}
 \code{\link[ggplot2:guides]{guides()}} for more information.}
     \item{\code{position}}{For position scales, The position of the axis.
 \code{left} or \code{right} for y axes, \code{top} or \code{bottom} for x axes.}
+    \item{\code{breaks}}{One of:
+\itemize{
+\item \code{NULL} for no breaks
+\item \code{waiver()} for the default breaks computed by the
+\link[scales:trans_new]{transformation object}
+\item A numeric vector of positions
+\item A function that takes the limits as input and returns breaks
+as output (e.g., a function returned by \code{\link[scales:breaks_extended]{scales::extended_breaks()}}).
+Also accepts rlang \link[rlang:as_function]{lambda} function notation.
+}}
+    \item{\code{minor_breaks}}{One of:
+\itemize{
+\item \code{NULL} for no minor breaks
+\item \code{waiver()} for the default breaks (one minor break between
+each major break)
+\item A numeric vector of positions
+\item A function that given the limits returns a vector of minor breaks. Also
+accepts rlang \link[rlang:as_function]{lambda} function notation.
+}}
+    \item{\code{n.breaks}}{An integer guiding the number of major breaks. The algorithm
+may choose a slightly different number to ensure nice break labels. Will
+only have an effect if \code{breaks = waiver()}. Use \code{NULL} to use the default
+number of breaks given by the transformation.}
     \item{\code{sec.axis}}{\code{\link[ggplot2:sec_axis]{sec_axis()}} is used to specify a secondary axis.}
   }}
 

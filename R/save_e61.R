@@ -31,7 +31,7 @@
 #'   when saving to the PNG file format. A value of 2 doubles the graph
 #'   dimensions.
 #' @param filename File name to create on disk. Remember you must provide the
-#'   file extension (e.g. \code{.svg})!
+#'   file extension, e.g. \code{.svg}.
 #' @param plot Plot object to save. Defaults to the last plot displayed so
 #'   usually you do not need to provide this explicitly.
 #' @inheritDotParams ggplot2::ggsave scale width height units dpi

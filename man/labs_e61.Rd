@@ -42,10 +42,6 @@ in \code{e61_save}.}
     \item{\code{title}}{The text for the title.}
     \item{\code{subtitle}}{The text for the subtitle for the plot which will be
 displayed below the title.}
-    \item{\code{caption}}{The text for the caption which will be displayed in the
-bottom-right of the plot by default.}
-    \item{\code{tag}}{The text for the tag label which will be displayed at the
-top-left of the plot by default.}
     \item{\code{alt,alt_insight}}{Text used for the generation of alt-text for the plot.
 See \link[ggplot2]{get_alt_text} for examples.}
   }}
