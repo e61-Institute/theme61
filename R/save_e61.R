@@ -52,16 +52,9 @@ save_e61 <-
     # correctly
     if (is.null(height) || isTRUE(getOption("save_e61.message"))) {
 
-      message(paste(
-        "Note: When you use", sQuote("save_e61()"), "to save images with",
-        "defaults, you should set the", sQuote("height"),
-        "argument manually to your own value to avoid excess/insufficient",
-        "whitespace on the rendered image.\n",
-        "Unfortunately the only way to check this is to open the rendered",
-        "graphic and inspect it visually.\n",
-        "This message is shown if you leave 'height = NULL' and may",
-        "be disabled by setting",
-        "options('save_e61.message' = FALSE). See ?save_e61 for more details."))
+      cli::cli_text(cli::col_red("Note: When you use ", sQuote("save_e61()"), " to save images with defaults, you should set the ", sQuote("height"), " argument manually to your own value to avoid excess/insufficient whitespace on the rendered image."))
+      cli::cli_text("Unfortunately the only way to check this is to open the rendered graphic and inspect it visually.")
+      cli::cli_text("This message is shown if you leave 'height = NULL' and may be disabled by setting options('save_e61.message' = FALSE). See ?save_e61 for more details.")
 
       options('save_e61.message' = FALSE)
     }

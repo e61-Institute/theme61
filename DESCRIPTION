@@ -12,6 +12,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
+    cli (>= 3.6.0),
     data.table (>= 1.14.8),
     esquisse (>= 1.1.2),
     ggmap (>= 3.0.0),
