@@ -278,7 +278,7 @@ theme_e61 <- function(y_top = TRUE,
 
   # Moves y-axis title to the top
   if (y_top) {
-    ret <- ret + y_title_top_e61(adj = adj, fix_left = fix_left)
+    ret <- ret + y_title_top(adj = adj, fix_left = fix_left)
   }
 
   return(ret)
@@ -351,7 +351,7 @@ theme_e61_clean <- function(
 #' @return ggplot object
 #' @keywords internal
 
-y_title_top_e61 <- function(adj = -12, fix_left = 0) {
+y_title_top <- function(adj = -12, fix_left = 0) {
 
   if (class(adj) != "numeric") stop("adj must be a number.")
   if (!length(adj) %in% c(1, 2)) stop("adj must be a single value or a vector of 2 values.")
