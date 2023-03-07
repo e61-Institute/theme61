@@ -1,6 +1,6 @@
 # theme61 0.3.0
 
-XX Mar 2023
+09 Mar 2023
 
 * Add new function `format_flip_bar_charts()` that applies most of the formatting needed to make horizontal bar graphs pretty.
 * Add new functions `plot_label()` and `mplot_label()` that make it easier to add on-graph plot labels. `mplot_label()` is the vectorised version that lets you do multiple labels in one function.
