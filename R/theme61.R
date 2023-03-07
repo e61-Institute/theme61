@@ -16,8 +16,8 @@ cm_to_in <- function(cm, round = FALSE) {
 #'
 #' Applies the e61 theme to ggplot graphs.
 #'
-#' \code{scale_y_continuous_e61()} should be used in conjunction
-#' with this function to ensure that theming and axes are applied correctly.
+#' \code{scale_y_continuous_e61()} should be used in conjunction with this
+#' function to ensure that theming and axes are applied correctly.
 #'
 #' @param y_top Defaults to TRUE. Moves the y-axis title to the top.
 #' @param adj Either a single numeric to adjust left and right axis titles
@@ -31,6 +31,7 @@ cm_to_in <- function(cm, round = FALSE) {
 #' @param legend Character. Legend position, use "none" (default) to hide the
 #'   legend.
 #' @param legend_title Logical. Include Legend title? Defaults to FALSE.
+#' @param aspect_ratio Numeric. Sets the aspect ratio of the graph panel.
 #' @param background Character. Options are "white" (default) or "grey".
 #' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #' @param base_size Numeric. Chart font size. Default is 10.
@@ -54,6 +55,7 @@ theme_e61 <- function(y_top = TRUE,
                       fix_left = 0,
                       legend = c("none", "bottom", "top", "left", "right"),
                       legend_title = FALSE,
+                      aspect_ratio = 0.75,
                       panel_borders = TRUE,
                       background = "white",
                       base_size = 10,
@@ -61,11 +63,6 @@ theme_e61 <- function(y_top = TRUE,
                       base_line_size = points_to_mm(0.75),
                       base_rect_size = points_to_mm(1)
                       ) {
-
-  # Consider restoring this as a standalone font installation function for
-  # first time running at a later date if we choose to go with a custom font.
-  # sysfonts::font_add_google("Quattrocento Sans", "Quattrocento Sans")
-  # showtext::showtext_auto()
 
   # Add a message for the user reminding them to use scale_y_continuous_e61
   if(getOption("scale_e61.message", TRUE)) {
@@ -92,7 +89,7 @@ theme_e61 <- function(y_top = TRUE,
         linetype = 1,
         lineend = "butt"
       ),
-      aspect.ratio = 0.75,
+      aspect.ratio = aspect_ratio,
       rect = element_rect(
         fill = background,
         colour = e61_greylight6,

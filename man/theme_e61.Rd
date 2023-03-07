@@ -10,6 +10,7 @@ theme_e61(
   fix_left = 0,
   legend = c("none", "bottom", "top", "left", "right"),
   legend_title = FALSE,
+  aspect_ratio = 0.75,
   panel_borders = TRUE,
   background = "white",
   base_size = 10,
@@ -36,6 +37,8 @@ legend.}
 
 \item{legend_title}{Logical. Include Legend title? Defaults to FALSE.}
 
+\item{aspect_ratio}{Numeric. Sets the aspect ratio of the graph panel.}
+
 \item{panel_borders}{Logical. Show panel borders? Defaults to TRUE.}
 
 \item{background}{Character. Options are "white" (default) or "grey".}
@@ -55,8 +58,8 @@ ggplot2 object
 Applies the e61 theme to ggplot graphs.
 }
 \details{
-\code{scale_y_continuous_e61()} should be used in conjunction
-with this function to ensure that theming and axes are applied correctly.
+\code{scale_y_continuous_e61()} should be used in conjunction with this
+function to ensure that theming and axes are applied correctly.
 }
 \examples{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
