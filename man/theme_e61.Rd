@@ -34,7 +34,7 @@ some of the text. Provide a small positive value (5?) to correct this.}
 \item{legend}{Character. Legend position, use "none" (default) to hide the
 legend.}
 
-\item{legend_title}{Logical. Include Legend Title? Defaults to FALSE.}
+\item{legend_title}{Logical. Include Legend title? Defaults to FALSE.}
 
 \item{panel_borders}{Logical. Show panel borders? Defaults to TRUE.}
 
@@ -52,8 +52,11 @@ legend.}
 ggplot2 object
 }
 \description{
+Applies the e61 theme to ggplot graphs.
+}
+\details{
 \code{scale_y_continuous_e61()} should be used in conjunction
-  with this function to ensure that theming and axes are applied correctly.
+with this function to ensure that theming and axes are applied correctly.
 }
 \examples{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +

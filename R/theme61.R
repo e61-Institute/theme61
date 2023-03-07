@@ -14,6 +14,11 @@ cm_to_in <- function(cm, round = FALSE) {
 
 #' e61 themed graph options
 #'
+#' Applies the e61 theme to ggplot graphs.
+#'
+#' \code{scale_y_continuous_e61()} should be used in conjunction
+#' with this function to ensure that theming and axes are applied correctly.
+#'
 #' @param y_top Defaults to TRUE. Moves the y-axis title to the top.
 #' @param adj Either a single numeric to adjust left and right axis titles
 #'   simultaneously or a vector of 2 numerics to adjust each axis title
@@ -25,16 +30,13 @@ cm_to_in <- function(cm, round = FALSE) {
 #'   some of the text. Provide a small positive value (5?) to correct this.
 #' @param legend Character. Legend position, use "none" (default) to hide the
 #'   legend.
-#' @param legend_title Logical. Include Legend Title? Defaults to FALSE.
+#' @param legend_title Logical. Include Legend title? Defaults to FALSE.
 #' @param background Character. Options are "white" (default) or "grey".
 #' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #' @param base_size Numeric. Chart font size. Default is 10.
 #' @param base_family Character. Chart font family. Default is Arial.
 #' @param base_line_size Numeric. Default line width.
 #' @param base_rect_size Numeric. Default rect width.
-#'
-#' @description \code{scale_y_continuous_e61()} should be used in conjunction
-#'   with this function to ensure that theming and axes are applied correctly.
 #'
 #' @return ggplot2 object
 #' @import ggplot2

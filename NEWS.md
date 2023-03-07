@@ -3,16 +3,17 @@
 XX Mar 2023
 
 * Add new function `format_flip_bar_charts()` that applies most of the formatting needed to make horizontal bar graphs pretty.
-* Add new function `plot_label()` that makes it easier to add on-graph plot labels.
+* Add new functions `plot_label()` and `mplot_label()` that make it easier to add on-graph plot labels. `mplot_label()` is the vectorised version that lets you do multiple labels in one function.
 * New functionality in `scale_y_continuous_e61()` to specify break intervals directly in the `limits` argument.
 * New vignette explaining how and why to use on-graph labelling over legends.
 * Add new messages and information to `save_e61()` to try and explain why users need to set their own dimensions to get good graph aesthetics.
+* Add argument to turn off text wrapping in `labs_e61()`.
 * Change default dimension behaviour in `save_e61()` to make graphs look sensible at 8.5 cm widths (corresponds to half width of a Word document).
 * Change `base_size` of graph text so the font size is readable at 8.5 cm widths.
 * Remove `y_title_top_e61()` and incorporate functionality directly into `theme_e61()` as the default. Users can choose to disable this behaviour with the `y_top = FALSE` argument.
 * Update the Getting Started vignette to showcase new functionality.
 * Fix issue with `labels` argument in `scale_colour/fill_e61()` not working.
-* Other minor improvements to messages and documentation.
+* Other minor improvements to functions, messages and documentation.
 
 # theme61 0.2.1
 
