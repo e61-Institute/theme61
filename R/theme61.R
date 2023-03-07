@@ -1,17 +1,3 @@
-points_to_mm <- function(points) {
-  as.numeric(grid::convertX(ggplot2::unit(points, "points"), "mm"))[1]
-}
-
-cm_to_in <- function(cm, round = FALSE) {
-  inches <- cm / 2.54
-
-  if (isTRUE(round)) {
-    round(inches, 2)
-  } else {
-    inches
-  }
-}
-
 #' e61 themed graph options
 #'
 #' Applies the e61 theme to ggplot graphs.
@@ -332,51 +318,6 @@ theme_e61_clean <- function(
     )
 }
 
-
-
-#' Reposition y-axis titles to the top
-#'
-#' Moves the y-axis titles from the side (ggplot default) to the top of the
-#' y-axis and rotates the text to be horizontal.
-#'
-#' @param adj Either a single numeric to adjust left and right axis titles
-#'   simultaneously or a vector of 2 numerics to adjust each axis title
-#'   separately. More negative values move the text closer to the graph panel.
-#'   Defaults to -18 which seems to work well for y-axis with 1-3 character-wide
-#'   values.
-#' @param fix_left Optional. Sometimes if the value of the \code{adj} argument
-#'   is too negative, the margins on the left side of the graph start to cut off
-#'   some of the text. Provide a small positive value (5?) to correct this.
-#' @return ggplot object
-#' @keywords internal
-
-y_title_top <- function(adj = -12, fix_left = 0) {
-
-  if (class(adj) != "numeric") stop("adj must be a number.")
-  if (!length(adj) %in% c(1, 2)) stop("adj must be a single value or a vector of 2 values.")
-
-  if (length(adj) == 1) {
-
-    adj_left <- adj
-    adj_right <- adj
-
-  } else {
-
-    adj_left <- adj[[1]]
-    adj_right <- adj[[2]]
-
-  }
-
-  ret <-
-    ggplot2::theme(
-      axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 5 + fix_left, r = adj_left), vjust = 1, angle = 0),
-      axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = adj_right, r = 5), vjust = 1, angle = 0)
-    )
-
-  return(ret)
-
-}
-
 #' Converts all legend colours to squares
 #'
 #' Legend symbols for line graphs default to coloured lines, which can sometimes
@@ -416,5 +357,51 @@ format_flip_bar_charts <- function(x_adj = -9) {
                                        hjust = 1, angle = 0)
 
   )
+
+}
+
+
+# Internal helper functions ----
+
+# Dimensioning functions
+points_to_mm <- function(points) {
+  as.numeric(grid::convertX(ggplot2::unit(points, "points"), "mm"))[1]
+}
+
+cm_to_in <- function(cm, round = FALSE) {
+  inches <- cm / 2.54
+
+  if (isTRUE(round)) {
+    round(inches, 2)
+  } else {
+    inches
+  }
+}
+
+# Reposition y-axis titles to the top
+y_title_top <- function(adj, fix_left) {
+
+  if (class(adj) != "numeric") stop("adj must be a number.")
+  if (!length(adj) %in% c(1, 2)) stop("adj must be a single value or a vector of 2 values.")
+
+  if (length(adj) == 1) {
+
+    adj_left <- adj
+    adj_right <- adj
+
+  } else {
+
+    adj_left <- adj[[1]]
+    adj_right <- adj[[2]]
+
+  }
+
+  ret <-
+    ggplot2::theme(
+      axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 5 + fix_left, r = adj_left), vjust = 1, angle = 0),
+      axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = adj_right, r = 5), vjust = 1, angle = 0)
+    )
+
+  return(ret)
 
 }
