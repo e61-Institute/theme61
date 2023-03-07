@@ -12,36 +12,35 @@ labs_e61(
   title_max_char = 35,
   subtitle_max_char = 45,
   footnote_max_char = 55,
+  title_wrap = TRUE,
+  subtitle_wrap = TRUE,
+  footnote_wrap = TRUE,
   ...
 )
 }
 \arguments{
+\item{title}{The text for the title.}
+
+\item{subtitle}{The text for the subtitle.}
+
 \item{footnotes}{A vector of footnote text strings. Each new string will be
 prepended with *, **, ***, etc. Note you'll need to include the asterisks
 in the title/subtitle yourself. Please be sensible with the number of
 separate points you include in the graph.}
 
-\item{sources}{A vector of strings providing the names of sources for the
-graph.}
+\item{sources}{String vector providing the names of sources for the graph.}
 
-\item{title_max_char}{Set the maximum number of characters per line in the
-title, the default is roughly appropriate for the default graph dimensions
-in \code{e61_save}.}
-
-\item{subtitle_max_char}{Set the maximum number of characters per line in the
-subtitle, the default is roughly appropriate for the default graph
+\item{title_max_char, subtitle_max_char, footnote_max_char}{Numeric. Set the
+maximum number of characters per line in the title, subtitle, sources or
+footnotes. The default is roughly appropriate for the default graph
 dimensions in \code{e61_save}.}
 
-\item{footnote_max_char}{Set the maximum number of characters per line in the
-footer, the default is roughly appropriate for the default graph dimensions
-in \code{e61_save}.}
+\item{title_wrap, subtitle_wrap, footnote_wrap}{Logical. Enables text wrapping
+for the title, subtitle, sources or footnotes. Defaults to TRUE.}
 
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:labs]{ggplot2::labs}}
   \describe{
-    \item{\code{title}}{The text for the title.}
-    \item{\code{subtitle}}{The text for the subtitle for the plot which will be
-displayed below the title.}
     \item{\code{alt,alt_insight}}{Text used for the generation of alt-text for the plot.
 See \link[ggplot2]{get_alt_text} for examples.}
   }}

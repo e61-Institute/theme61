@@ -11,21 +11,19 @@
 #'   \code{labs()} function. Thus, if you are using \code{footnotes} or
 #'   \code{sources}, do not supply a \code{caption} argument as well.
 #'
+#' @param title The text for the title.
+#' @param subtitle The text for the subtitle.
 #' @param footnotes A vector of footnote text strings. Each new string will be
 #'   prepended with *, **, ***, etc. Note you'll need to include the asterisks
 #'   in the title/subtitle yourself. Please be sensible with the number of
 #'   separate points you include in the graph.
-#' @param sources A vector of strings providing the names of sources for the
-#'   graph.
-#' @param title_max_char Set the maximum number of characters per line in the
-#'   title, the default is roughly appropriate for the default graph dimensions
-#'   in \code{e61_save}.
-#' @param subtitle_max_char Set the maximum number of characters per line in the
-#'   subtitle, the default is roughly appropriate for the default graph
+#' @param sources String vector providing the names of sources for the graph.
+#' @param title_max_char,subtitle_max_char,footnote_max_char Numeric. Set the
+#'   maximum number of characters per line in the title, subtitle, sources or
+#'   footnotes. The default is roughly appropriate for the default graph
 #'   dimensions in \code{e61_save}.
-#' @param footnote_max_char Set the maximum number of characters per line in the
-#'   footer, the default is roughly appropriate for the default graph dimensions
-#'   in \code{e61_save}.
+#' @param title_wrap,subtitle_wrap,footnote_wrap Logical. Enables text wrapping
+#'   for the title, subtitle, sources or footnotes. Defaults to TRUE.
 #' @inheritDotParams ggplot2::labs -caption -tag
 #'
 #' @export
@@ -46,6 +44,9 @@ labs_e61 <- function(title,
                      title_max_char = 35,
                      subtitle_max_char = 45,
                      footnote_max_char = 55,
+                     title_wrap = TRUE,
+                     subtitle_wrap = TRUE,
+                     footnote_wrap = TRUE,
                      ...) {
 
   # We need this to check for the presence of caption in the passed-through
@@ -65,14 +66,18 @@ labs_e61 <- function(title,
     stop("title must be a string.")
 
   # Stop titles from being too long by wrapping it to multiple lines
-  title <- paste(strwrap(title, width = title_max_char), collapse = "\n")
+  if (title_wrap) {
+    title <- paste(strwrap(title, width = title_max_char), collapse = "\n")
+  }
 
   if (!is.null(subtitle)) {
 
     if (!is.character(subtitle))
       stop("subtitle must be a string.")
 
-    subtitle <- paste(strwrap(subtitle, width = subtitle_max_char), collapse = "\n")
+    if (subtitle_wrap) {
+      subtitle <- paste(strwrap(subtitle, width = subtitle_max_char), collapse = "\n")
+    }
   }
 
   # Footnotes
@@ -83,9 +88,11 @@ labs_e61 <- function(title,
       stop("footnotes must be a vector of strings.")
 
     # Stops footnote text from spilling over the RHS of graphs if they are lengthy
-    footnotes <-
-      sapply(footnotes, function(x)
-        paste(strwrap(x, width = footnote_max_char), collapse = "\n"))
+    if (footnote_wrap) {
+      footnotes <-
+        sapply(footnotes, function(x)
+          paste(strwrap(x, width = footnote_max_char), collapse = "\n"))
+    }
 
     # Creates the correct number of asterisks
     footnotes <- data.frame(n = seq(1, length(footnotes)), text = footnotes)
@@ -109,10 +116,13 @@ labs_e61 <- function(title,
     sources <-
       paste0(ifelse(length(sources) > 1, "Sources: ", "Source: "), source_list)
 
-    # Unlikely, but stops sources text from spilling over the RHS of graphs if
-    # they are lengthy
-    sources <-
-      paste(strwrap(sources, width = footnote_max_char), collapse = "\n")
+    # Stops sources text from spilling over the RHS of graphs if they are
+    # lengthy
+    if (footnote_wrap) {
+      sources <-
+        paste(strwrap(sources, width = footnote_max_char), collapse = "\n")
+      }
+
 
   }
 
