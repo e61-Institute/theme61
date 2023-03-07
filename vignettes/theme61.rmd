@@ -80,9 +80,9 @@ p1 <- ggplot(mtcars2) +
 
 graph <- p1 +
   theme_e61(adj = -12) + 
-  plot_label("3 gears", 4, 23, 3, 1) +
-  plot_label("4 gears", 2.7, 35, 3, 2) +
-  plot_label("5 gears", 2.5, 15, 3, 3) +
+  mplot_label(label = c("3", "4", "5"),
+              x = c(4, 2.7, 2.5),
+              y = c(23, 35, 15)) +
   scale_y_continuous_e61(limits = c(0, 40)) +
   scale_colour_e61(n = 3) +
   add_e61_logo() + 
@@ -124,10 +124,9 @@ g <- ggplot(mpg, aes(cty)) +
     y = "dens",
     fill = "No. cylinders"
   ) +
-  plot_label("3 cyl", 25, 0.1, 4, 1) +
-  plot_label("5 cyl", 24, 0.35, 4, 2) +
-  plot_label("6 cyl", 16, 0.25, 4, 3) +
-  plot_label("8 cyl", 12, 0.25, 4, 4) +
+  mplot_label(label = c("3 cyl", "5 cyl", "6 cyl", "8 cyl"),
+              x = c(25, 24, 16, 12),
+              y = c(0.1, 0.35, 0.25, 0.25)) +
   theme_e61() +
   scale_y_continuous_e61(limits = c(0, 0.6, 0.2)) +
   scale_x_continuous_e61() +
@@ -151,6 +150,7 @@ df <- df[lubridate::year(df$date) %in% c(1967:1981), ]
 # plot
 graph <- ggplot(df, aes(x = date)) +
   geom_line(aes(y = value, colour = variable), size = 1) +
+  # Not using mplot_label just to show how plot_label works
   plot_label("Market returns", "1972-01-01", 17, 2, 1) +
   plot_label("Unemployment", "1973-01-01", 3, 2, 2) +
   labs_e61(
