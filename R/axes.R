@@ -43,14 +43,14 @@ scale_y_continuous_e61 <- function(limits,
   if (!is.null(limits) && is.numeric(limits)) {
     # Very slightly reduce the upper limit so the break label does not appear
     # This is needed so that the axis title does not overlap with the break label
-    limits[[2]] <- limits[[2]] - 1e-10
+    limits[[2]] <- limits[[2]] - 0.0001
   }
 
   # Set sec_axis to default behaviour if we don't want it
   if (isFALSE(sec_axis)) sec_axis <- waiver()
 
   # Put the little bit of y-axis back in
-  if (isFALSE(y_top)) limits[[2]] <- limits[[2]] + 1e-10
+  if (isFALSE(y_top)) limits[[2]] <- limits[[2]] + 0.0001
 
   e61_y_continuous(
     expand_bottom = expand_bottom,
