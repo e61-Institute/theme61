@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='141.73pt' height='283.46pt' viewBox='0 0 141.73 283.46'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHwxNDEuNzN8MC4wMHwyODMuNDY='>
+    <rect x='0.00' y='0.00' width='141.73' height='283.46' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHwxNDEuNzN8MC4wMHwyODMuNDY=)'>
+<rect x='0.00' y='0.00' width='141.73' height='283.46' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
+</g>
+<defs>
+  <clipPath id='cpNS40OHwxMzYuMjV8NS40OHwyNzcuOTk='>
+    <rect x='5.48' y='5.48' width='130.77' height='272.51' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS40OHwxMzYuMjV8NS40OHwyNzcuOTk=)'>
+<rect x='5.48' y='5.48' width='130.77' height='272.51' style='stroke-width: 1.07; stroke: none; fill: #EBEBEB;' />
+</g>
+<g clip-path='url(#cpMC4wMHwxNDEuNzN8MC4wMHwyODMuNDY=)'>
+</g>
+</svg>

@@ -8,7 +8,7 @@ e61_palette(n, reverse = FALSE)
 }
 \arguments{
 \item{n}{Numeric. The number of levels in your colour scale. Minimum value is
-1, maximum is 10. Using more than 6 colours is not recommended as it may
+1, maximum is 12. Using more than 6 colours is not recommended as it may
 make it difficult to distinguish between colours.}
 
 \item{reverse}{Logical. Reverse the standard colour order, defaults to FALSE.}

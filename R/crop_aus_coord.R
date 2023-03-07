@@ -7,9 +7,11 @@
 #'
 #' @export
 #' @examples
-#'   ggplot(absmapsdata::aus2021) +
+#'   \dontrun{
+#'     ggplot(absmapsdata::aus2021) +
 #'     geom_sf() +
 #'     crop_aus_coord()
+#'   }
 #'
 crop_aus_coord <- function() {
 
