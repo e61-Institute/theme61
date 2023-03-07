@@ -44,7 +44,6 @@ plot_label <- function(label, x, y, n_labs = NULL, n = NULL, colour = NULL, size
 #' @param label String vector. Label text to be displayed.
 #' @param x Numeric or string vector. X-axis positions of the label text.
 #' @param y Numeric or string vector. Y-axis positions of the label text.
-#' @param colour String vector. Manually specify the colours of the label text.
 #' @param size Integer. Size of the text, the default size should be appropriate
 #'   in most cases.
 #'
@@ -55,12 +54,6 @@ mplot_label <- function(label, x, y, colour = NULL, size = 3) {
   if (!all.equal(length(label), length(x), length(y)))
     stop("The number of x and y positions must equal the number of labels.")
 
-  if (!is.null(colour)) {
-    if (length(colour) != length(label)) stop("The number of colours must equal the number of labels.")
-  } else {
-    colour <- label
-  }
-
   plot_lab <- data.table(
     lab = label,
     x = x,
@@ -69,7 +62,7 @@ mplot_label <- function(label, x, y, colour = NULL, size = 3) {
   )
 
   gg <-
-    geom_text(data = plot_lab, aes(x, y, label = lab, colour = colour), size = 3)
+    geom_text(data = plot_lab, aes(x, y, label = lab, colour = lab), size = 3)
 
   return(gg)
 
