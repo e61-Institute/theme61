@@ -13,6 +13,9 @@ you need another colour.}
 \item{linewidth}{Numeric. Set the thickness of the line. Default (0.25)
 should be appropriate for default graph scaling.}
 }
+\value{
+ggplot object
+}
 \description{
 Adds a black line at y = 0
 }

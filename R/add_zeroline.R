@@ -5,7 +5,8 @@
 #' @param linewidth Numeric. Set the thickness of the line. Default (0.25)
 #'   should be appropriate for default graph scaling.
 #'
+#' @return ggplot object
 #' @export
 add_zeroline <- function(colour = "black", linewidth = 0.25) {
-  geom_hline(yintercept = 0, linewidth = linewidth, colour = colour)
+  ggplot2::geom_hline(yintercept = 0, linewidth = linewidth, colour = colour)
 }
