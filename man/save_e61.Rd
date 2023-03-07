@@ -10,7 +10,6 @@ save_e61(
   width = NULL,
   height = NULL,
   resize = NULL,
-  units = "cm",
   scale = 1,
   dpi = 100,
   ...
@@ -23,6 +22,10 @@ file extension, e.g. \code{.svg}.}
 \item{plot}{Plot object to save. Defaults to the last plot displayed so
 usually you do not need to provide this explicitly.}
 
+\item{width}{Plot width in cm. Defaults to 8.5.}
+
+\item{height}{Plot height in cm. Defaults to 9 but you should specify your own.}
+
 \item{resize}{Rescales the graph and text. Useful when you need a very large
 or small graph and cannot use a vector graphics format. This only works
 when saving to the PNG file format. A value of 2 doubles the graph
@@ -32,8 +35,6 @@ dimensions.}
   Arguments passed on to \code{\link[ggplot2:ggsave]{ggplot2::ggsave}}
   \describe{
     \item{\code{scale}}{Multiplicative scaling factor.}
-    \item{\code{width,height,units}}{Plot size in \code{units} ("in", "cm", "mm", or "px").
-If not supplied, uses the size of current graphics device.}
     \item{\code{dpi}}{Plot resolution. Also accepts a string input: "retina" (320),
 "print" (300), or "screen" (72). Applies only to raster output types.}
   }}

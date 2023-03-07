@@ -34,7 +34,9 @@
 #'   file extension, e.g. \code{.svg}.
 #' @param plot Plot object to save. Defaults to the last plot displayed so
 #'   usually you do not need to provide this explicitly.
-#' @inheritDotParams ggplot2::ggsave scale width height units dpi
+#' @param width Plot width in cm. Defaults to 8.5.
+#' @param height Plot height in cm. Defaults to 9 but you should specify your own.
+#' @inheritDotParams ggplot2::ggsave scale dpi
 #' @export
 
 save_e61 <-
@@ -43,7 +45,6 @@ save_e61 <-
            width = NULL,
            height = NULL,
            resize = NULL,
-           units = "cm",
            scale = 1,
            dpi = 100,
            ...) {
@@ -94,7 +95,7 @@ save_e61 <-
       plot = plot,
       width = width,
       height = height,
-      units = units,
+      units = "cm",
       scale = scale,
       dpi = dpi,
       ...
