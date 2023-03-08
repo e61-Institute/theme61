@@ -13,6 +13,9 @@
     <loc>https://e61-institute.github.io/theme61/articles/index.html</loc>
   </url>
   <url>
+    <loc>https://e61-institute.github.io/theme61/articles/ongraph-labels.html</loc>
+  </url>
+  <url>
     <loc>https://e61-institute.github.io/theme61/articles/theme61.html</loc>
   </url>
   <url>
@@ -29,6 +32,9 @@
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/add_e61_logo.html</loc>
+  </url>
+  <url>
+    <loc>https://e61-institute.github.io/theme61/reference/add_zeroline.html</loc>
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/crop_aus_coord.html</loc>
@@ -92,9 +98,6 @@
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/e61_bluelight8.html</loc>
-  </url>
-  <url>
-    <loc>https://e61-institute.github.io/theme61/reference/e61_chart_maker.html</loc>
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/e61_coraldark.html</loc>
@@ -316,9 +319,6 @@
     <loc>https://e61-institute.github.io/theme61/reference/e61_orangelight8.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/reference/e61_pal.html</loc>
-  </url>
-  <url>
     <loc>https://e61-institute.github.io/theme61/reference/e61_palette.html</loc>
   </url>
   <url>
@@ -436,13 +436,19 @@
     <loc>https://e61-institute.github.io/theme61/reference/e61_teallight8.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/reference/get_palette.html</loc>
+    <loc>https://e61-institute.github.io/theme61/reference/format_flip_bar_charts.html</loc>
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/index.html</loc>
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/labs_e61.html</loc>
+  </url>
+  <url>
+    <loc>https://e61-institute.github.io/theme61/reference/mplot_label.html</loc>
+  </url>
+  <url>
+    <loc>https://e61-institute.github.io/theme61/reference/plot_label.html</loc>
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/save_e61.html</loc>
@@ -455,8 +461,5 @@
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/theme_e61_clean.html</loc>
-  </url>
-  <url>
-    <loc>https://e61-institute.github.io/theme61/reference/y_title_top_e61.html</loc>
   </url>
 </urlset>

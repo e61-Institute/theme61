@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,6 +40,12 @@
 </li>
 <li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/ongraph-labels.html">Adding on-graph labels</a>
+  </div>
 </li>
 <li class="nav-item">
   <a class="nav-link" href="../news/index.html">Changelog</a>
@@ -92,7 +98,7 @@ the full scope of this package.</p>
 <div class="section level2">
 <h2 id="the-colour-palette">The colour palette<a class="anchor" aria-label="anchor" href="#the-colour-palette"></a>
 </h2>
-<p><img src="theme61_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<p><img src="theme61_files/figure-html/colour-palette-chart-1.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="graph-examples">Graph examples<a class="anchor" aria-label="anchor" href="#graph-examples"></a>
@@ -117,58 +123,71 @@ the full scope of this package.</p>
 <span>    title <span class="op">=</span> <span class="st">"Fuel Economy Declines as Weight Increases"</span>,</span>
 <span>    subtitle <span class="op">=</span> <span class="st">"1973-74"</span>,</span>
 <span>    sources <span class="op">=</span> <span class="st">"1974 Motor Trend US magazine."</span>,</span>
-<span>    tag <span class="op">=</span> <span class="st">"Figure 1"</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"Weight (1000 lbs)"</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"mpg"</span>,</span>
 <span>    colour <span class="op">=</span> <span class="st">"Gears"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="va">p1</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span>legend <span class="op">=</span> <span class="st">"bottom"</span>, legend_title <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> </span>
+<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="va">p1</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span>adj <span class="op">=</span> <span class="op">-</span><span class="fl">12</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="../reference/mplot_label.html">mplot_label</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"3"</span>, <span class="st">"4"</span>, <span class="st">"5"</span><span class="op">)</span>,</span>
+<span>              x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">2.7</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
+<span>              y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">23</span>, <span class="fl">35</span>, <span class="fl">15</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/e61_scale.html">scale_colour_e61</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/add_e61_logo.html">add_e61_logo</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="../reference/y_title_top_e61.html">y_title_top_e61</a></span><span class="op">(</span><span class="op">-</span><span class="fl">16</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/square_legend_symbols.html">square_legend_symbols</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="theme61_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<span>  <span class="fu"><a href="../reference/square_legend_symbols.html">square_legend_symbols</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/fig-1.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/fig-1.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/fig-1.svg"><!-- --></p>
 </div>
 <div class="section level3">
 <h3 id="faceted-scatter-graph">Faceted scatter graph<a class="anchor" aria-label="anchor" href="#faceted-scatter-graph"></a>
 </h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p1</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="va">p1</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">vs</span> <span class="op">~</span> <span class="va">am</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span>panel_borders <span class="op">=</span> <span class="cn">TRUE</span>, legend <span class="op">=</span> <span class="st">"bottom"</span>, legend_title <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/y_title_top_e61.html">y_title_top_e61</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span>legend <span class="op">=</span> <span class="st">"bottom"</span>, legend_title <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/e61_scale.html">scale_colour_e61</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/e61_axes.html">scale_x_continuous_e61</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="theme61_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<span>  <span class="fu"><a href="../reference/e61_axes.html">scale_x_continuous_e61</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/fig-2.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/fig-2.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/fig-2.svg"><!-- --></p>
 </div>
 <div class="section level3">
 <h3 id="density-graph">Density graph<a class="anchor" aria-label="anchor" href="#density-graph"></a>
 </h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mpg</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">cty</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">g</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">cyl</span><span class="op">)</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"blank"</span>, alpha <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mpg</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">cty</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">cyl</span><span class="op">)</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"blank"</span>, alpha <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
-<span>    title <span class="op">=</span> <span class="st">"City Mileage Density"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"By number of cylinders"</span>,</span>
+<span>    title <span class="op">=</span> <span class="st">"Distribution of Car City Mileage"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"In miles per gallon, by number of cylinders"</span>,</span>
 <span>    sources <span class="op">=</span> <span class="st">"mpg dataset"</span>,</span>
-<span>    x <span class="op">=</span> <span class="st">"City mileage"</span>,</span>
-<span>    tag <span class="op">=</span> <span class="st">"Figure 1"</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"density"</span>,</span>
+<span>    x <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"dens"</span>,</span>
 <span>    fill <span class="op">=</span> <span class="st">"No. cylinders"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span>legend <span class="op">=</span> <span class="st">"bottom"</span>, legend_title <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.6</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/mplot_label.html">mplot_label</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"3 cyl"</span>, <span class="st">"5 cyl"</span>, <span class="st">"6 cyl"</span>, <span class="st">"8 cyl"</span><span class="op">)</span>,</span>
+<span>              x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">24</span>, <span class="fl">16</span>, <span class="fl">12</span><span class="op">)</span>,</span>
+<span>              y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.35</span>, <span class="fl">0.25</span>, <span class="fl">0.25</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.6</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/e61_axes.html">scale_x_continuous_e61</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/y_title_top_e61.html">y_title_top_e61</a></span><span class="op">(</span><span class="op">-</span><span class="fl">18</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/e61_scale.html">scale_fill_e61</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/e61_scale.html">scale_colour_e61</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/add_e61_logo.html">add_e61_logo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="theme61_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<span>  <span class="fu"><a href="../reference/add_e61_logo.html">add_e61_logo</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/fig-3.svg"</span><span class="op">)</span>, <span class="va">g</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/fig-3.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/fig-3.svg"><!-- --></p>
 </div>
 <div class="section level3">
 <h3 id="line-graph">Line graph<a class="anchor" aria-label="anchor" href="#line-graph"></a>
@@ -176,33 +195,31 @@ the full scope of this package.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">economics_long</span><span class="op">[</span><span class="va">economics_long</span><span class="op">$</span><span class="va">variable</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"psavert"</span>, <span class="st">"uempmed"</span><span class="op">)</span>, <span class="op">]</span></span>
 <span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html" class="external-link">year</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">date</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1967</span><span class="op">:</span><span class="fl">1981</span><span class="op">)</span>, <span class="op">]</span></span>
-<span></span>
-<span><span class="co"># labels and breaks for X axis text</span></span>
-<span><span class="va">brks</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">$</span><span class="va">date</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">date</span><span class="op">)</span>, <span class="fl">12</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="va">lbls</span> <span class="op">&lt;-</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html" class="external-link">year</a></span><span class="op">(</span><span class="va">brks</span><span class="op">)</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="fu">year</span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">date</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1967</span><span class="op">:</span><span class="fl">1981</span><span class="op">)</span>, <span class="op">]</span></span>
 <span></span>
 <span><span class="co"># plot</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">value</span>, colour <span class="op">=</span> <span class="va">variable</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># Not using mplot_label just to show how plot_label works</span></span>
+<span>  <span class="fu"><a href="../reference/plot_label.html">plot_label</a></span><span class="op">(</span><span class="st">"Market returns"</span>, <span class="st">"1972-01-01"</span>, <span class="fl">17</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/plot_label.html">plot_label</a></span><span class="op">(</span><span class="st">"Unemployment"</span>, <span class="st">"1973-01-01"</span>, <span class="fl">3</span>, <span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Time Series of Returns Percentage*"</span>,</span>
 <span>    subtitle <span class="op">=</span> <span class="st">"Drawn from long data format"</span>,</span>
 <span>    footnotes <span class="op">=</span> <span class="st">"Some pointless footnote"</span>,</span>
 <span>    sources <span class="op">=</span> <span class="st">"Economics"</span>,</span>
-<span>    tag <span class="op">=</span> <span class="st">"Figure 1"</span>,</span>
-<span>    x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"%"</span>,</span>
-<span>    colour <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>    x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"%"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html" class="external-link">scale_x_date</a></span><span class="op">(</span>date_breaks <span class="op">=</span> <span class="st">"3 years"</span>, date_labels <span class="op">=</span> <span class="st">"%Y"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">17.5</span><span class="op">)</span>, breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">15</span>, <span class="fl">2.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span>legend <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/y_title_top_e61.html">y_title_top_e61</a></span><span class="op">(</span><span class="op">-</span><span class="fl">25</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/e61_scale.html">scale_colour_e61</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>                    labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Market Returns"</span>, <span class="st">"Unemployment"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/add_e61_logo.html">add_e61_logo</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="../reference/square_legend_symbols.html">square_legend_symbols</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="theme61_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/e61_scale.html">scale_colour_e61</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/add_e61_logo.html">add_e61_logo</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/fig-4.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/fig-4.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/fig-4.svg"><!-- --></p>
 </div>
 <div class="section level3">
 <h3 id="column-graph">Column graph<a class="anchor" aria-label="anchor" href="#column-graph"></a>
@@ -212,7 +229,7 @@ the full scope of this package.</p>
 <span><span class="va">col_data</span><span class="op">$</span><span class="va">names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">col_data</span><span class="op">)</span></span>
 <span><span class="va">col_data</span><span class="op">$</span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">col_data</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">col_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">index</span>, y <span class="op">=</span> <span class="va">hp</span>, fill <span class="op">=</span> <span class="va">hp</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">col_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">index</span>, y <span class="op">=</span> <span class="va">hp</span>, fill <span class="op">=</span> <span class="va">hp</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Frivolous Filled Column Chart"</span>, </span>
@@ -220,10 +237,40 @@ the full scope of this package.</p>
 <span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span>, <span class="st">"Another source"</span><span class="op">)</span>,</span>
 <span>    x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"hp"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">250</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span>legend <span class="op">=</span> <span class="st">"bottom"</span>, adj <span class="op">=</span> <span class="op">-</span><span class="fl">15</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/e61_scale.html">scale_fill_e61</a></span><span class="op">(</span>discrete <span class="op">=</span> <span class="cn">FALSE</span>, palette <span class="op">=</span> <span class="st">"light"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/fig-5.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/fig-5.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/fig-5.svg"><!-- --></p>
+</div>
+<div class="section level3">
+<h3 id="horizontal-bar-chart">Horizontal bar chart<a class="anchor" aria-label="anchor" href="#horizontal-bar-chart"></a>
+</h3>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">col_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mtcars2</span>, <span class="fl">8</span><span class="op">)</span></span>
+<span><span class="va">col_data</span><span class="op">$</span><span class="va">names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">col_data</span><span class="op">)</span></span>
+<span><span class="va">col_data</span><span class="op">$</span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">col_data</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">col_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">index</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">hp</span>, fill <span class="op">=</span> <span class="va">hp</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html" class="external-link">coord_flip</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span>legend <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/y_title_top_e61.html">y_title_top_e61</a></span><span class="op">(</span><span class="op">-</span><span class="fl">23</span>, fix_left <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/e61_scale.html">scale_fill_e61</a></span><span class="op">(</span>discrete <span class="op">=</span> <span class="cn">FALSE</span>, palette <span class="op">=</span> <span class="st">"light"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="theme61_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="st">"Frivolous Filled Horizontal Bar Chart"</span>, </span>
+<span>    subtitle <span class="op">=</span> <span class="st">"For the purpose of showing off the continuous colour palette"</span>,</span>
+<span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span>, <span class="st">"Another source"</span><span class="op">)</span>,</span>
+<span>    x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"hp"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" class="external-link">scale_x_discrete</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">250</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/e61_scale.html">scale_fill_e61</a></span><span class="op">(</span>discrete <span class="op">=</span> <span class="cn">FALSE</span>, palette <span class="op">=</span> <span class="st">"light"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="../reference/format_flip_bar_charts.html">format_flip_bar_charts</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/fig-6.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/fig-6.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/fig-6.svg"><!-- --></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

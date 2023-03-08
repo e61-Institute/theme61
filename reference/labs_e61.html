@@ -12,7 +12,7 @@ produce good looking footer text when using footnotes and sources."><!-- mathjax
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,12 @@ produce good looking footer text when using footnotes and sources."><!-- mathjax
 </li>
 <li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/ongraph-labels.html">Adding on-graph labels</a>
+  </div>
 </li>
 <li class="nav-item">
   <a class="nav-link" href="../news/index.html">Changelog</a>
@@ -62,60 +68,51 @@ produce good looking footer text when using footnotes and sources.</p>
 <span>  subtitle <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  footnotes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sources <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  title_max_char <span class="op">=</span> <span class="fl">70L</span>,</span>
-<span>  subtitle_max_char <span class="op">=</span> <span class="fl">80L</span>,</span>
-<span>  footnote_max_char <span class="op">=</span> <span class="fl">85L</span>,</span>
+<span>  title_max_char <span class="op">=</span> <span class="fl">35</span>,</span>
+<span>  subtitle_max_char <span class="op">=</span> <span class="fl">45</span>,</span>
+<span>  footnote_max_char <span class="op">=</span> <span class="fl">55</span>,</span>
+<span>  title_wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  subtitle_wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  footnote_wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>footnotes</dt>
+    <dl><dt>title</dt>
+<dd><p>The text for the title.</p></dd>
+
+
+<dt>subtitle</dt>
+<dd><p>The text for the subtitle.</p></dd>
+
+
+<dt>footnotes</dt>
 <dd><p>A vector of footnote text strings. Each new string will be
-prepended with \*, \*\*, \*\*\*, etc. Please be sensible with the number of
+prepended with *, **, ***, etc. Note you'll need to include the asterisks
+in the title/subtitle yourself. Please be sensible with the number of
 separate points you include in the graph.</p></dd>
 
 
 <dt>sources</dt>
-<dd><p>A vector of providing the names of sources for the graph.</p></dd>
+<dd><p>String vector providing the names of sources for the graph.</p></dd>
 
 
-<dt>title_max_char</dt>
-<dd><p>Set the maximum number of characters per line in the
-title, the default is appropriate for the default graph dimensions in
-<code>e61_save</code>.</p></dd>
+<dt>title_max_char, subtitle_max_char, footnote_max_char</dt>
+<dd><p>Numeric. Set the
+maximum number of characters per line in the title, subtitle, sources or
+footnotes. The default is roughly appropriate for the default graph
+dimensions in <code>e61_save</code>.</p></dd>
 
 
-<dt>subtitle_max_char</dt>
-<dd><p>Set the maximum number of characters per line in the
-subtitle, the default is appropriate for the default graph dimensions in
-<code>e61_save</code>.</p></dd>
-
-
-<dt>footnote_max_char</dt>
-<dd><p>Set the maximum number of characters per line in the
-footer, the default is appropriate for the default graph dimensions in
-<code>e61_save</code>.</p></dd>
+<dt>title_wrap, subtitle_wrap, footnote_wrap</dt>
+<dd><p>Logical. Enables text wrapping
+for the title, subtitle, sources or footnotes. Defaults to TRUE.</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Arguments passed on to <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs</a></code></p><dl><dt><code>title</code></dt>
-<dd><p>The text for the title.</p></dd>
-
-    <dt><code>subtitle</code></dt>
-<dd><p>The text for the subtitle for the plot which will be
-displayed below the title.</p></dd>
-
-    <dt><code>caption</code></dt>
-<dd><p>The text for the caption which will be displayed in the
-bottom-right of the plot by default.</p></dd>
-
-    <dt><code>tag</code></dt>
-<dd><p>The text for the tag label which will be displayed at the
-top-left of the plot by default.</p></dd>
-
-    <dt><code>alt,alt_insight</code></dt>
+<dd><p>Arguments passed on to <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs</a></code></p><dl><dt><code>alt,alt_insight</code></dt>
 <dd><p>Text used for the generation of alt-text for the plot.
 See <a href="https://ggplot2.tidyverse.org/reference/get_alt_text.html" class="external-link">get_alt_text</a> for examples.</p></dd>
 
@@ -134,6 +131,20 @@ See <a href="https://ggplot2.tidyverse.org/reference/get_alt_text.html" class="e
   <code>sources</code>, do not supply a <code>caption</code> argument as well.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="theme_e61.html">theme_e61</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">labs_e61</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Graph title*"</span>,</span></span>
+<span class="r-in"><span>    subtitle <span class="op">=</span> <span class="st">"Graph subtitle**"</span>,</span></span>
+<span class="r-in"><span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A source"</span>, <span class="st">"Company name"</span>, <span class="st">"Better source"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    footnotes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Footnote 1"</span>, <span class="st">"Footnote 2"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Please remember to use ‘scale_y_continuous_e61()’ in conjunction with ‘theme_e61()’ to ensure the graph axes render correctly. This message is shown once per session and may be disabled by setting options('save_e61.message' = FALSE). See ?theme_e61 for more details.</span>
+<span class="r-plt img"><img src="labs_e61-1.png" alt="" width="700" height="433"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

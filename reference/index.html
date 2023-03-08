@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,6 +23,12 @@
 </li>
 <li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/ongraph-labels.html">Adding on-graph labels</a>
+  </div>
 </li>
 <li class="nav-item">
   <a class="nav-link" href="../news/index.html">Changelog</a>
@@ -64,14 +70,45 @@
         <dd>Add e61 Logo to graph</dd>
       </dl><dl><dt>
           
+          <code><a href="add_zeroline.html">add_zeroline()</a></code> 
+        </dt>
+        <dd>Adds a black line at y = 0</dd>
+      </dl><dl><dt>
+          
           <code><a href="labs_e61.html">labs_e61()</a></code> 
         </dt>
         <dd>Wrapper function to produce e61 style graph footers</dd>
       </dl><dl><dt>
           
-          <code><a href="y_title_top_e61.html">y_title_top_e61()</a></code> 
+          <code><a href="plot_label.html">plot_label()</a></code> 
         </dt>
-        <dd>Reposition y-axis titles to the top</dd>
+        <dd>Add On-graph Labels to Graphs</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mplot_label.html">mplot_label()</a></code> 
+        </dt>
+        <dd>Add Multiple On-graph Labels to Graphs</dd>
+      </dl></div><div class="section level2">
+      <h2 id="formatting">Formatting<a class="anchor" aria-label="anchor" href="#formatting"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="format_flip_bar_charts.html">format_flip_bar_charts()</a></code> 
+        </dt>
+        <dd>Applies changes to the theme for horizontal bar graphs</dd>
+      </dl><dl><dt>
+          
+          <code><a href="e61_palette.html">e61_palette()</a></code> 
+        </dt>
+        <dd>Create e61 colour palette</dd>
       </dl><dl><dt>
           
           <code><a href="square_legend_symbols.html">square_legend_symbols()</a></code> 
@@ -87,34 +124,13 @@
           <code><a href="theme_e61_clean.html">theme_e61_clean()</a></code> 
         </dt>
         <dd>e61 themed graph options in a 'clean' style</dd>
-      </dl></div><div class="section level2">
-      <h2 id="palette">Palette<a class="anchor" aria-label="anchor" href="#palette"></a></h2>
-      
-      
-
-      
-    </div><div id="" class="section level2">
-      
-      
-      
-
-      <dl><dt>
-          
-          <code><a href="e61_pal.html">e61_pal()</a></code> 
-        </dt>
-        <dd>Create a continuous palette</dd>
       </dl><dl><dt>
           
-          <code><a href="e61_palette.html">e61_palette()</a></code> 
+          <code><a href="save_e61.html">save_e61()</a></code> 
         </dt>
-        <dd>Create e61 colour palette</dd>
-      </dl><dl><dt>
-          
-          <code><a href="get_palette.html">get_palette()</a></code> 
-        </dt>
-        <dd>Get colours for palette functions</dd>
+        <dd>Saves ggplot graphs with sensible defaults</dd>
       </dl></div><div class="section level2">
-      <h2 id="scale-formatting">Scale formatting<a class="anchor" aria-label="anchor" href="#scale-formatting"></a></h2>
+      <h2 id="scales">Scales<a class="anchor" aria-label="anchor" href="#scales"></a></h2>
       
       
 
@@ -153,11 +169,6 @@ graphing</dd>
 
       <dl><dt>
           
-          <code><a href="save_e61.html">save_e61()</a></code> 
-        </dt>
-        <dd>Saves ggplot graphs with sensible defaults</dd>
-      </dl><dl><dt>
-          
           <code><a href="crop_aus_coord.html">crop_aus_coord()</a></code> 
         </dt>
         <dd>Crops maps of Australia to exclude outlying territories</dd>
@@ -166,11 +177,6 @@ graphing</dd>
           <code><a href="e61_map.html">e61_map()</a></code> 
         </dt>
         <dd>Wrapper function for ggmap to produce a map layer in e61 format</dd>
-      </dl><dl><dt>
-          
-          <code><a href="e61_chart_maker.html">e61_chart_maker()</a></code> 
-        </dt>
-        <dd>An add-in to easily create plots with ggplot2</dd>
       </dl></div><div class="section level2">
       <h2 id="colours">Colours<a class="anchor" aria-label="anchor" href="#colours"></a></h2>
       

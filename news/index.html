@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,6 +23,12 @@
 </li>
 <li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/ongraph-labels.html">Adding on-graph labels</a>
+  </div>
 </li>
 <li class="active nav-item">
   <a class="nav-link" href="../news/index.html">Changelog</a>
@@ -48,11 +54,31 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0" id="theme61-030">theme61 0.3.0<a class="anchor" aria-label="anchor" href="#theme61-030"></a></h2>
+<p>09 Mar 2023</p>
+<ul><li>Add new function <code><a href="../reference/format_flip_bar_charts.html">format_flip_bar_charts()</a></code> that applies most of the formatting needed to make horizontal bar graphs pretty.</li>
+<li>Add new functions <code><a href="../reference/plot_label.html">plot_label()</a></code> and <code><a href="../reference/mplot_label.html">mplot_label()</a></code> that make it easier to add on-graph plot labels. <code><a href="../reference/mplot_label.html">mplot_label()</a></code> is the vectorised version that lets you do multiple labels in one function.</li>
+<li>Add new function <code><a href="../reference/add_zeroline.html">add_zeroline()</a></code> to add an appropriately formatted black line along the zero y-axis.</li>
+<li>New functionality in <code><a href="../reference/e61_axes.html">scale_y_continuous_e61()</a></code> to specify break intervals directly in the <code>limits</code> argument.</li>
+<li>New vignette explaining how and why to use on-graph labelling over legends.</li>
+<li>Add new messages and information to <code><a href="../reference/save_e61.html">save_e61()</a></code> to try and explain why users need to set their own dimensions to get good graph aesthetics.</li>
+<li>Add argument to turn off text wrapping in <code><a href="../reference/labs_e61.html">labs_e61()</a></code>.</li>
+<li>Add argument to change the aspect ratio in <code><a href="../reference/theme_e61.html">theme_e61()</a></code>.</li>
+<li>Change default dimension behaviour in <code><a href="../reference/save_e61.html">save_e61()</a></code> to make graphs look sensible at 8.5 cm widths (corresponds to half width of a Word document).</li>
+<li>Change <code>base_size</code> of graph text so the font size is readable at 8.5 cm widths.</li>
+<li>Remove <code>y_title_top_e61()</code> and incorporate functionality directly into <code><a href="../reference/theme_e61.html">theme_e61()</a></code> as the default. Users can choose to disable this behaviour with the <code>y_top = FALSE</code> argument.</li>
+<li>Update the Getting Started vignette to showcase new functionality.</li>
+<li>Fix issue with <code>labels</code> argument in <code>scale_colour/fill_e61()</code> not working.</li>
+<li>Other minor improvements to functions, messages and documentation.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.1" id="theme61-021">theme61 0.2.1<a class="anchor" aria-label="anchor" href="#theme61-021"></a></h2>
+<p>20 Dec 2022</p>
 <ul><li>Minor adjustments to title/footnote font size and default max character width to account for new fixed aspect ratio.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="theme61-020">theme61 0.2.0<a class="anchor" aria-label="anchor" href="#theme61-020"></a></h2>
+<p>14 Dec 2022</p>
 <ul><li>Adds a base map function <code><a href="../reference/e61_map.html">e61_map()</a></code> with sensible defaults for mapping.</li>
 <li>Improvements to the automatic discrete colour palette selection.</li>
 <li>Changes to the theme to fix graphs at a 0.75 aspect ratio.</li>
@@ -63,6 +89,7 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="theme61-010">theme61 0.1.0<a class="anchor" aria-label="anchor" href="#theme61-010"></a></h2>
+<p>13 May 2022</p>
 <p>This is the first functional release of theme61 containing everything you need to make a graph in the e61 style.</p>
 <ul><li>This includes <code>ggplot</code> functions that customise the theme, axes and other graph elements.</li>
 <li>Implements the e61 Institute colour palette in <code>scale_colour/fill_*</code> function and provides the colour names as data files for manual access as required.</li>
