@@ -31,7 +31,6 @@ jobs:
             devtools
             pkgdown
             here
-            svglite
 
       - name: Install package
         run: R CMD INSTALL .
