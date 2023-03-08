@@ -12,7 +12,6 @@ vignette: >
 devtools::load_all()
 library(ggplot2)
 library(ggrepel)
-library(lubridate)
 library(data.table)
 
 knitr::opts_chunk$set(
