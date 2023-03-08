@@ -9,41 +9,38 @@ labs_e61(
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
-  title_max_char = 70L,
-  subtitle_max_char = 80L,
-  footnote_max_char = 85L,
+  title_max_char = 35,
+  subtitle_max_char = 45,
+  footnote_max_char = 55,
+  title_wrap = TRUE,
+  subtitle_wrap = TRUE,
+  footnote_wrap = TRUE,
   ...
 )
 }
 \arguments{
+\item{title}{The text for the title.}
+
+\item{subtitle}{The text for the subtitle.}
+
 \item{footnotes}{A vector of footnote text strings. Each new string will be
-prepended with \*, \*\*, \*\*\*, etc. Please be sensible with the number of
+prepended with *, **, ***, etc. Note you'll need to include the asterisks
+in the title/subtitle yourself. Please be sensible with the number of
 separate points you include in the graph.}
 
-\item{sources}{A vector of providing the names of sources for the graph.}
+\item{sources}{String vector providing the names of sources for the graph.}
 
-\item{title_max_char}{Set the maximum number of characters per line in the
-title, the default is appropriate for the default graph dimensions in
-\code{e61_save}.}
+\item{title_max_char, subtitle_max_char, footnote_max_char}{Numeric. Set the
+maximum number of characters per line in the title, subtitle, sources or
+footnotes. The default is roughly appropriate for the default graph
+dimensions in \code{e61_save}.}
 
-\item{subtitle_max_char}{Set the maximum number of characters per line in the
-subtitle, the default is appropriate for the default graph dimensions in
-\code{e61_save}.}
-
-\item{footnote_max_char}{Set the maximum number of characters per line in the
-footer, the default is appropriate for the default graph dimensions in
-\code{e61_save}.}
+\item{title_wrap, subtitle_wrap, footnote_wrap}{Logical. Enables text wrapping
+for the title, subtitle, sources or footnotes. Defaults to TRUE.}
 
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:labs]{ggplot2::labs}}
   \describe{
-    \item{\code{title}}{The text for the title.}
-    \item{\code{subtitle}}{The text for the subtitle for the plot which will be
-displayed below the title.}
-    \item{\code{caption}}{The text for the caption which will be displayed in the
-bottom-right of the plot by default.}
-    \item{\code{tag}}{The text for the tag label which will be displayed at the
-top-left of the plot by default.}
     \item{\code{alt,alt_insight}}{Text used for the generation of alt-text for the plot.
 See \link[ggplot2]{get_alt_text} for examples.}
   }}
@@ -60,4 +57,14 @@ The primary purpose of this function is to correctly format footer
   formatted text that goes into the \code{caption} argument in ggplot2's
   \code{labs()} function. Thus, if you are using \code{footnotes} or
   \code{sources}, do not supply a \code{caption} argument as well.
+}
+\examples{
+  ggplot() +
+  theme_e61() +
+  labs_e61(
+    title = "Graph title*",
+    subtitle = "Graph subtitle**",
+    sources = c("A source", "Company name", "Better source"),
+    footnotes = c("Footnote 1", "Footnote 2")
+    )
 }

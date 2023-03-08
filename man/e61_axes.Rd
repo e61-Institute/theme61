@@ -6,25 +6,40 @@
 \title{Format axes in the e61 Institute style}
 \usage{
 scale_y_continuous_e61(
+  limits,
+  sec_axis = dup_axis(),
+  y_top = TRUE,
   expand_bottom = 0,
   expand_top = 0,
-  sec_axis = dup_axis(),
-  limits = NULL,
   ...
 )
 
 scale_x_continuous_e61(expand_left = 0, expand_right = 0.015, ...)
 }
 \arguments{
+\item{limits}{One of:
+\itemize{
+  \item{\code{NULL} to use the default scale range.}
+  \item{A numeric vector of length two providing the minimum and maximum
+  limits of the scale.}
+  \item{A numeric vector of length three providing the limits of the scale
+  and the increment between each axis tick, e.g. \code{c(0, 25, 5)} will
+  set the axis to range from 0 to 25, with increments of 5 per tick.}
+  }}
+
+\item{sec_axis}{Adds a secondary axis (defaults to \code{dup_axis()}, which
+duplicates the axis), see \link[ggplot2]{sec_axis} for more details. Set to
+FALSE to hide a secondary axis.}
+
+\item{y_top}{Logical. Ensures there is space at the top of the y-axis for the
+axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
+elsewhere.}
+
 \item{expand_bottom}{Numeric. Add extra space between data points and the
 bottom of the graph. See \link[ggplot2]{expansion} for details.}
 
 \item{expand_top}{Numeric. Add extra space between data points and the top of
 the graph.}
-
-\item{sec_axis}{Adds a secondary axis (defaults to \code{dup_axis()}, which
-duplicates the axis), see \link[ggplot2]{sec_axis} for more details. Set to
-FALSE to hide a secondary axis.}
 
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous}}, \code{\link[ggplot2:scale_continuous]{ggplot2::scale_x_continuous}}
@@ -33,29 +48,6 @@ FALSE to hide a secondary axis.}
 \code{waiver()}, the default, the name of the scale is taken from the first
 mapping used for that aesthetic. If \code{NULL}, the legend title will be
 omitted.}
-    \item{\code{breaks}}{One of:
-\itemize{
-\item \code{NULL} for no breaks
-\item \code{waiver()} for the default breaks computed by the
-\link[scales:trans_new]{transformation object}
-\item A numeric vector of positions
-\item A function that takes the limits as input and returns breaks
-as output (e.g., a function returned by \code{\link[scales:breaks_extended]{scales::extended_breaks()}}).
-Also accepts rlang \link[rlang:as_function]{lambda} function notation.
-}}
-    \item{\code{minor_breaks}}{One of:
-\itemize{
-\item \code{NULL} for no minor breaks
-\item \code{waiver()} for the default breaks (one minor break between
-each major break)
-\item A numeric vector of positions
-\item A function that given the limits returns a vector of minor breaks. Also
-accepts rlang \link[rlang:as_function]{lambda} function notation.
-}}
-    \item{\code{n.breaks}}{An integer guiding the number of major breaks. The algorithm
-may choose a slightly different number to ensure nice break labels. Will
-only have an effect if \code{breaks = waiver()}. Use \code{NULL} to use the default
-number of breaks given by the transformation.}
     \item{\code{labels}}{One of:
 \itemize{
 \item \code{NULL} for no labels
@@ -66,18 +58,6 @@ transformation object
 \item A function that takes the breaks as input and returns labels
 as output. Also accepts rlang \link[rlang:as_function]{lambda} function
 notation.
-}}
-    \item{\code{limits}}{One of:
-\itemize{
-\item \code{NULL} to use the default scale range
-\item A numeric vector of length two providing limits of the scale.
-Use \code{NA} to refer to the existing minimum or maximum
-\item A function that accepts the existing (automatic) limits and returns
-new limits. Also accepts rlang \link[rlang:as_function]{lambda} function
-notation.
-Note that setting limits on positional scales will \strong{remove} data outside of the limits.
-If the purpose is to zoom, use the limit argument in the coordinate system
-(see \code{\link[ggplot2:coord_cartesian]{coord_cartesian()}}).
 }}
     \item{\code{expand}}{For position scales, a vector of range expansion constants used to add some
 padding around the data to ensure that they are placed some distance
@@ -111,6 +91,29 @@ transformation with \code{\link[scales:trans_new]{scales::trans_new()}}.}
 \code{\link[ggplot2:guides]{guides()}} for more information.}
     \item{\code{position}}{For position scales, The position of the axis.
 \code{left} or \code{right} for y axes, \code{top} or \code{bottom} for x axes.}
+    \item{\code{breaks}}{One of:
+\itemize{
+\item \code{NULL} for no breaks
+\item \code{waiver()} for the default breaks computed by the
+\link[scales:trans_new]{transformation object}
+\item A numeric vector of positions
+\item A function that takes the limits as input and returns breaks
+as output (e.g., a function returned by \code{\link[scales:breaks_extended]{scales::extended_breaks()}}).
+Also accepts rlang \link[rlang:as_function]{lambda} function notation.
+}}
+    \item{\code{minor_breaks}}{One of:
+\itemize{
+\item \code{NULL} for no minor breaks
+\item \code{waiver()} for the default breaks (one minor break between
+each major break)
+\item A numeric vector of positions
+\item A function that given the limits returns a vector of minor breaks. Also
+accepts rlang \link[rlang:as_function]{lambda} function notation.
+}}
+    \item{\code{n.breaks}}{An integer guiding the number of major breaks. The algorithm
+may choose a slightly different number to ensure nice break labels. Will
+only have an effect if \code{breaks = waiver()}. Use \code{NULL} to use the default
+number of breaks given by the transformation.}
     \item{\code{sec.axis}}{\code{\link[ggplot2:sec_axis]{sec_axis()}} is used to specify a secondary axis.}
   }}
 
@@ -121,5 +124,7 @@ of the graph.}
 right of the graph.}
 }
 \description{
-Format axes in the e61 Institute style
+These functions format the x and y axes to be consistent with
+  e61 styling. This includes removing white space at the beginning and end of
+  each axis.
 }

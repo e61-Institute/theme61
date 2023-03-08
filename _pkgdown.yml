@@ -6,28 +6,28 @@ reference:
 - title: Graph components
   contents:
   - add_e61_logo
+  - add_zeroline
   - labs_e61
-  - y_title_top_e61
+  - plot_label
+  - mplot_label
+
+- title: Formatting
+  contents:
+  - format_flip_bar_charts
+  - e61_palette
   - square_legend_symbols
   - theme_e61
   - theme_e61_clean
+  - save_e61
 
-- title: Palette
-  contents:
-  - e61_pal
-  - e61_palette
-  - get_palette
-
-- title: Scale formatting
+- title: Scales
   contents:
   - starts_with("scale_")
 
 - title: Miscellaneous
   contents:
-  - save_e61
   - crop_aus_coord
   - e61_map
-  - e61_chart_maker
 
 - title: Colours
   contents:
@@ -39,3 +39,4 @@ articles:
   navbar: ~
   contents:
   - theme61
+  - ongraph-labels

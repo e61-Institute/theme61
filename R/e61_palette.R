@@ -1,4 +1,28 @@
+#' Create e61 colour palette
+#'
+#' Creates a discrete e61 themed colour palette.
+#'
+#' @param n Numeric. The number of levels in your colour scale. Minimum value is
+#'   1, maximum is 12. Using more than 6 colours is not recommended as it may
+#'   make it difficult to distinguish between colours.
+#' @param reverse Logical. Reverse the standard colour order, defaults to FALSE.
+#' @return A vector of hex codes.
+#' @export
 
+e61_palette <- function(n, reverse = FALSE) {
+
+  if (n == 0) stop("You need to specify at least one n.")
+  if (n > 12) stop("You cannot request more than 12 colours.")
+
+  palette <- get_palette(n)
+
+  if (isTRUE(reverse)) {
+    palette <- rev(palette)
+  }
+
+  return(palette)
+
+}
 
 
 #' Get colours for palette functions
@@ -6,7 +30,7 @@
 #' @param n Numeric.
 #'
 #' @return Vector of hex codes of the colour palette
-#' @export
+#' @noRd
 #'
 
 get_palette <- function(n) {
@@ -107,40 +131,13 @@ get_palette <- function(n) {
 }
 
 
-#' Create e61 colour palette
-#'
-#' Creates a discrete e61 themed colour palette.
-#'
-#' @param n Numeric. The number of levels in your colour scale. Minimum value is
-#'   1, maximum is 10. Using more than 6 colours is not recommended as it may
-#'   make it difficult to distinguish between colours.
-#' @param reverse Logical. Reverse the standard colour order, defaults to FALSE.
-#' @return A vector of hex codes.
-#' @export
-
-e61_palette <- function(n, reverse = FALSE) {
-
-  if (n == 0) stop("You need to specify at least one n.")
-  if (n > 12) stop("You cannot request more than 12 colours.")
-
-  palette <- get_palette(n)
-
-  if (isTRUE(reverse)) {
-    palette <- rev(palette)
-  }
-
-  return(palette)
-
-}
-
-
 #' Create a continuous palette
 #'
 #' @param palette Character. e61 colour palette
 #' @param reverse Logical. Reverse colour order.
 #' @inheritDotParams grDevices::colorRampPalette
 #'
-#' @export
+#' @noRd
 
 e61_pal <- function(
     palette = c("light", "dark", "diverging", "grey"),

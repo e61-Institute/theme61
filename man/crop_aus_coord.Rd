@@ -13,8 +13,10 @@ co-ordinates via \code{\link[ggplot2]{coord_sf}} that crops out those islands
 in a map.
 }
 \examples{
-  ggplot(absmapsdata::aus2021) +
+  \dontrun{
+    ggplot(absmapsdata::aus2021) +
     geom_sf() +
     crop_aus_coord()
+  }
 
 }

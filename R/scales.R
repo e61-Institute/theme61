@@ -34,7 +34,7 @@ scale_colour_e61 <- function(n = 0,
 
     pal <- get_palette(n)
 
-    return(ggplot2::scale_colour_manual(values = pal))
+    return(ggplot2::scale_colour_manual(values = pal, ...))
   }
 
   if (!discrete) {
@@ -56,7 +56,7 @@ scale_fill_e61 <- function(n = 0, reverse = FALSE,
 
     pal <- get_palette(n)
 
-    return(ggplot2::scale_fill_manual(values = pal))
+    return(ggplot2::scale_fill_manual(values = pal, ...))
   }
 
   if (!discrete) {

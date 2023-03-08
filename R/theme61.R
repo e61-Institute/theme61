@@ -1,30 +1,29 @@
-points_to_mm <- function(points) {
-  as.numeric(grid::convertX(ggplot2::unit(points, "points"), "mm"))[1]
-}
-
-cm_to_in <- function(cm, round = FALSE) {
-  inches <- cm / 2.54
-
-  if (isTRUE(round)) {
-    round(inches, 2)
-  } else {
-    inches
-  }
-}
-
-
-
 #' e61 themed graph options
 #'
-#' @param base_size Numeric. Chart font size. Default is 14.
+#' Applies the e61 theme to ggplot graphs.
+#'
+#' \code{scale_y_continuous_e61()} should be used in conjunction with this
+#' function to ensure that theming and axes are applied correctly.
+#'
+#' @param y_top Defaults to TRUE. Moves the y-axis title to the top.
+#' @param adj Either a single numeric to adjust left and right axis titles
+#'   simultaneously or a vector of 2 numerics to adjust each axis title
+#'   separately. More negative values move the text closer to the graph panel.
+#'   Defaults to -12 which seems to work well for y-axis with 1-3 character-wide
+#'   values.
+#' @param fix_left Optional. Sometimes if the value of the \code{adj} argument
+#'   is too negative, the margins on the left side of the graph start to cut off
+#'   some of the text. Provide a small positive value (5?) to correct this.
+#' @param legend Character. Legend position, use "none" (default) to hide the
+#'   legend.
+#' @param legend_title Logical. Include Legend title? Defaults to FALSE.
+#' @param aspect_ratio Numeric. Sets the aspect ratio of the graph panel.
+#' @param background Character. Options are "white" (default) or "grey".
+#' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
+#' @param base_size Numeric. Chart font size. Default is 10.
 #' @param base_family Character. Chart font family. Default is Arial.
 #' @param base_line_size Numeric. Default line width.
 #' @param base_rect_size Numeric. Default rect width.
-#' @param background Character. Options are "white" (default) or "grey".
-#' @param legend Character. Legend position, use "none" (default) to hide the
-#'   legend.
-#' @param legend_title Logical. Include Legend Title? Defaults to FALSE.
-#' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #'
 #' @return ggplot2 object
 #' @import ggplot2
@@ -32,24 +31,37 @@ cm_to_in <- function(cm, round = FALSE) {
 #'
 #' @examples
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
-#' geom_point() +
-#' e61_colour_manual(n = 3) +
-#' theme_e61()
+#'   geom_point() +
+#'   theme_e61() +
+#'   scale_colour_e61(n = 3)
 #'
 
-theme_e61 <- function(base_size = 12,
-                      base_family = "Arial",
-                      base_line_size = points_to_mm(0.75),
-                      base_rect_size = points_to_mm(1),
-                      background = "white",
+theme_e61 <- function(y_top = TRUE,
+                      adj = -12,
+                      fix_left = 0,
                       legend = c("none", "bottom", "top", "left", "right"),
                       legend_title = FALSE,
-                      panel_borders = TRUE) {
+                      aspect_ratio = 0.75,
+                      panel_borders = TRUE,
+                      background = "white",
+                      base_size = 10,
+                      base_family = "Arial",
+                      base_line_size = points_to_mm(0.75),
+                      base_rect_size = points_to_mm(1)
+                      ) {
 
-  # Consider restoring this as a standalone font installation function for
-  # first time running at a later date if we choose to go with a custom font.
-  # sysfonts::font_add_google("Quattrocento Sans", "Quattrocento Sans")
-  # showtext::showtext_auto()
+  # Add a message for the user reminding them to use scale_y_continuous_e61
+  if(getOption("scale_e61.message", TRUE)) {
+
+    message(paste(
+      "Please remember to use", sQuote("scale_y_continuous_e61()"),
+      "in conjunction with", sQuote("theme_e61()"), "to ensure the graph axes",
+      "render correctly.",
+      'This message is shown once per session and may be disabled by setting',
+      "options('save_e61.message' = FALSE). See ?theme_e61 for more details."))
+    options("scale_e61.message" = FALSE)
+  }
+
 
   legend <- match.arg(legend)
 
@@ -63,7 +75,7 @@ theme_e61 <- function(base_size = 12,
         linetype = 1,
         lineend = "butt"
       ),
-      aspect.ratio = 0.75,
+      aspect.ratio = aspect_ratio,
       rect = element_rect(
         fill = background,
         colour = e61_greylight6,
@@ -240,8 +252,18 @@ theme_e61 <- function(base_size = 12,
 
   # Adds a grey background option
   if (background == "grey" |  background == "box") {
-    ret <- ret +
-      ggplot2::theme(rect = element_rect(fill = e61_greylight6))
+    ret <- ret + theme(rect = element_rect(fill = e61_greylight6))
+  }
+
+  # Reduce spacing between facets if facets used
+  if (!inherits(ret$facet, "FacetNull")) {
+    ret <- ret %+replace% theme(panel.spacing.x = unit(0, "lines"),
+                                panel.spacing.y = unit(0, "lines"))
+  }
+
+  # Moves y-axis title to the top
+  if (y_top) {
+    ret <- ret + y_title_top(adj = adj, fix_left = fix_left)
   }
 
   return(ret)
@@ -250,7 +272,7 @@ theme_e61 <- function(base_size = 12,
 
 #' e61 themed graph options in a 'clean' style
 #'
-#' @param base_size Numeric. Chart font size. Default is 14.
+#' @param base_size Numeric. Chart font size. Default is 12.
 #' @param base_family Character. Chart font family. Default is Arial.
 #'
 #' @return ggplot2 object
@@ -296,29 +318,68 @@ theme_e61_clean <- function(
     )
 }
 
+#' Converts all legend colours to squares
+#'
+#' Legend symbols for line graphs default to coloured lines, which can sometimes
+#' be hard to read. This function overrides the default and converts the colours
+#' to squares.
+#'
+#' @return ggplot object
+#' @export
 
+square_legend_symbols <- function() {
+  ggplot2::guides(colour = ggplot2::guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))
+}
 
-#' Reposition y-axis titles to the top
+#' Applies changes to the theme for horizontal bar graphs
 #'
-#' Moves the y-axis titles from the side (ggplot default) to the top of the
-#' y-axis and rotates the text to be horizontal.
+#' Horizontal bar graphs made with \code{coord_flip()} require some changes to
+#' the \code{theme()} in order to look proper. This function wraps those changes
+#' up in a convenient function that should be appended at the end of the graph
+#' code, after theming functions such as \code{theme_e61()} have been called.
 #'
-#' This function must go after \code{theme_e61()} as it works by changing the
-#' underlying \code{theme()} after it has been generated.
+#' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
+#' the default (-9) works for most graphs. A more negative value moves the
+#' title up, a less negative value moves the title down.
 #'
-#' @param adj Either a single numeric to adjust left and right axis titles
-#'   simultaneously or a vector of 2 numerics to adjust each axis title
-#'   separately. More negative values move the text closer to the graph panel.
-#'   Defaults to -18 which seems to work well for y-axis with 1-3 character-wide
-#'   values.
-#' @param fix_left Optional. Sometimes if the value of the \code{adj} argument
-#'   is too negative, the margins on the left side of the graph start to cut off
-#'   some of the text. Provide a small positive value (5?) to correct this.
 #' @return ggplot object
 #' @import ggplot2
 #' @export
 
-y_title_top_e61 <- function(adj = -18, fix_left = 0) {
+format_flip_bar_charts <- function(x_adj = -9) {
+  theme(
+    panel.grid.major.x = element_line(colour = e61_greylight6, size = points_to_mm(0.5)),
+    panel.grid.major.y = element_blank(),
+    axis.text.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    axis.title.x.top = element_blank(),
+    axis.title.x.bottom = element_text(margin = margin(t = x_adj, b = 5),
+                                       hjust = 1, angle = 0)
+
+  )
+
+}
+
+
+# Internal helper functions ----
+
+# Dimensioning functions
+points_to_mm <- function(points) {
+  as.numeric(grid::convertX(ggplot2::unit(points, "points"), "mm"))[1]
+}
+
+cm_to_in <- function(cm, round = FALSE) {
+  inches <- cm / 2.54
+
+  if (isTRUE(round)) {
+    round(inches, 2)
+  } else {
+    inches
+  }
+}
+
+# Reposition y-axis titles to the top
+y_title_top <- function(adj, fix_left) {
 
   if (class(adj) != "numeric") stop("adj must be a number.")
   if (!length(adj) %in% c(1, 2)) stop("adj must be a single value or a vector of 2 values.")
@@ -336,27 +397,11 @@ y_title_top_e61 <- function(adj = -18, fix_left = 0) {
   }
 
   ret <-
-    theme(
-      axis.title.y.left = element_text(margin = margin(l = 5 + fix_left, r = adj_left), vjust = 1, angle = 0),
-      axis.title.y.right = element_text(margin = margin(l = adj_right, r = 5), vjust = 1, angle = 0)
+    ggplot2::theme(
+      axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 5 + fix_left, r = adj_left), vjust = 1, angle = 0),
+      axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = adj_right, r = 5), vjust = 1, angle = 0)
     )
 
   return(ret)
 
 }
-
-#' Converts all legend colours to squares
-#'
-#' Legend symbols for line graphs default to coloured lines, which can sometimes
-#' be hard to read. This function overrides the default and converts the colours
-#' to squares.
-#'
-#' @return ggplot object
-#' @import ggplot2
-#' @export
-
-square_legend_symbols <- function() {
-  guides(colour = guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))
-}
-
-
