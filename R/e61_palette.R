@@ -11,8 +11,10 @@
 
 e61_palette <- function(n, reverse = FALSE) {
 
-  if (n == 0) stop("You need to specify at least one n.")
-  if (n > 12) stop("You cannot request more than 12 colours.")
+  if (n == 0) stop("You need to specify the number of colours/fills in your palette.")
+  if (n > 12) stop("You cannot request more than 12 colours, consider using a
+                   continuous colour scale or reducing the number of groups in
+                   your data.")
 
   palette <- get_palette(n)
 
