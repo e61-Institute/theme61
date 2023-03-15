@@ -2,7 +2,7 @@
 % Please edit documentation in R/theme61.R
 \name{theme_e61_clean}
 \alias{theme_e61_clean}
-\title{e61 themed graph options in a 'clean' style}
+\title{e61 themed graph options in an alternative style}
 \usage{
 theme_e61_clean(base_family = "Arial", base_size = 12)
 }
@@ -15,7 +15,7 @@ theme_e61_clean(base_family = "Arial", base_size = 12)
 ggplot2 object
 }
 \description{
-e61 themed graph options in a 'clean' style
+e61 themed graph options in an alternative style
 }
 \examples{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
