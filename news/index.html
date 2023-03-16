@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,12 @@
       <small>Source: <a href="https://github.com/e61-institute/theme61/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.1" id="theme61-031">theme61 0.3.1<a class="anchor" aria-label="anchor" href="#theme61-031"></a></h2>
+<p>15 Mar 2023</p>
+<ul><li>Refactored <code><a href="../reference/mplot_label.html">mplot_label()</a></code> to use <code><a href="../reference/plot_label.html">plot_label()</a></code> as the underlying function rather than a <code>data.frame</code> and <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text()</a></code>. This fixed two bugs where the function throws an error if <code>colour</code> is an aesthetic in <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code> <code>aes</code> and the <code>x</code> argument was not automatically converting dates.</li>
+<li>Changed the colour palette so the third colour is now dark blue rather than grey.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="theme61-030">theme61 0.3.0<a class="anchor" aria-label="anchor" href="#theme61-030"></a></h2>
 <p>09 Mar 2023</p>
