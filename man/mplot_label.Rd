@@ -4,7 +4,7 @@
 \alias{mplot_label}
 \title{Add Multiple On-graph Labels to Graphs}
 \usage{
-mplot_label(label, x, y, colour = NULL, size = 3)
+mplot_label(label, x, y, colour = NA, size = 3)
 }
 \arguments{
 \item{label}{String vector. Label text to be displayed.}

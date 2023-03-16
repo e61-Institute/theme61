@@ -2,7 +2,7 @@
 % Please edit documentation in R/labs_e61.R
 \name{labs_e61}
 \alias{labs_e61}
-\title{Wrapper function to produce e61 style graph footers}
+\title{Wrapper function to produce e61 style graph titles and footers}
 \usage{
 labs_e61(
   title,

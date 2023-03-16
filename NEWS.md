@@ -1,3 +1,10 @@
+# theme61 0.3.1
+
+15 Mar 2023
+
+* Refactored `mplot_label()` to use `plot_label()` as the underlying function rather than a `data.frame` and `geom_text()`. This fixed two bugs where the function throws an error if `colour` is an aesthetic in `ggplot()` `aes` and the `x` argument was not automatically converting dates.
+* Changed the colour palette so the third colour is now dark blue rather than grey.
+
 # theme61 0.3.0
 
 09 Mar 2023

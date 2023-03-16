@@ -4,7 +4,7 @@
 \alias{plot_label}
 \title{Add On-graph Labels to Graphs}
 \usage{
-plot_label(label, x, y, n_labs = NULL, n = NULL, colour = NULL, size = 3)
+plot_label(label, x, y, n_labs = NA, n = NA, colour = NA, size = 3)
 }
 \arguments{
 \item{label}{String. Label text to be displayed.}

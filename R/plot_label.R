@@ -19,12 +19,12 @@
 #'
 #' @return ggplot2 object
 #' @export
-plot_label <- function(label, x, y, n_labs = NULL, n = NULL, colour = NULL, size = 3) {
+plot_label <- function(label, x, y, n_labs = NA, n = NA, colour = NA, size = 3) {
 
-  if (is.null(colour) && (is.null(n_labs) || is.null(n)))
+  if (is.na(colour) && (is.na(n_labs) || is.na(n)))
     stop("If 'colour' is not provided then you must specify values for 'n_labs' and 'n'.")
 
-  if (is.null(colour)) colour <- e61_palette(n_labs)[[n]]
+  if (is.na(colour)) colour <- e61_palette(n_labs)[[n]]
 
   # Automatically convert dates to dates if specified, so the user doesn't have
   # to wrap dates in as.Date() which saves some room.
@@ -49,21 +49,45 @@ plot_label <- function(label, x, y, n_labs = NULL, n = NULL, colour = NULL, size
 #'
 #' @return ggplot2 object
 #' @export
-mplot_label <- function(label, x, y, colour = NULL, size = 3) {
+mplot_label <- function(label, x, y, colour = NA, size = 3) {
 
   if (!all.equal(length(label), length(x), length(y)))
     stop("The number of x and y positions must equal the number of labels.")
 
-  plot_lab <- data.table(
-    lab = label,
+  # df requires vectors to be equal lengths
+  if (is.na(colour)) colour <- rep(colour, length(label))
+
+  plot_lab <- data.frame(
+    label = label,
     x = x,
     y = y,
-    colour = colour
+    colour = colour,
+    size = rep(size, length(label))
   )
 
-  gg <-
-    geom_text(data = plot_lab, aes(x, y, label = lab, colour = lab), size = 3)
+  plot_lab$n_labs <- nrow(plot_lab)
+  plot_lab$n <- 1:nrow(plot_lab)
 
-  return(gg)
+  # This converts the data.frame into a list of lists, where the 1st level list
+  # corresponds to each label, and the elements of the 2nd level list are the
+  # components needed for plot_label()
+  plot_lab <- split(plot_lab, seq(nrow(plot_lab)))
+  plot_lab <- lapply(plot_lab, as.list)
+
+  # Runs through each list element and calls plot_label() to generate the labels
+  retval <-
+    lapply(plot_lab, function(x) {
+      plot_label(
+        label = x$label,
+        x = x$x,
+        y = x$y,
+        n_labs = x$n_labs,
+        n = x$n,
+        colour = x$colour,
+        size = x$size
+      )
+    })
+
+  return(retval)
 
 }

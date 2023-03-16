@@ -1,4 +1,4 @@
-#' Wrapper function to produce e61 style graph footers
+#' Wrapper function to produce e61 style graph titles and footers
 #'
 #' Simple wrapper around \code{\link[ggplot2]{labs}} that makes it easier to
 #' produce good looking footer text when using footnotes and sources.

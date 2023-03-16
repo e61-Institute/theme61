@@ -270,7 +270,7 @@ theme_e61 <- function(y_top = TRUE,
 }
 
 
-#' e61 themed graph options in a 'clean' style
+#' e61 themed graph options in an alternative style
 #'
 #' @param base_size Numeric. Chart font size. Default is 12.
 #' @param base_family Character. Chart font family. Default is Arial.

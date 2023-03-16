@@ -11,8 +11,10 @@
 
 e61_palette <- function(n, reverse = FALSE) {
 
-  if (n == 0) stop("You need to specify at least one n.")
-  if (n > 12) stop("You cannot request more than 12 colours.")
+  if (n == 0) stop("You need to specify the number of colours/fills in your palette.")
+  if (n > 12) stop("You cannot request more than 12 colours, consider using a
+                   continuous colour scale or reducing the number of groups in
+                   your data.")
 
   palette <- get_palette(n)
 
@@ -42,29 +44,29 @@ get_palette <- function(n) {
   } else if (n == 3) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
-                 "grey50")
+                 e61_bluedark1)
   } else if (n == 4) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
-                 "grey50",
+                 e61_bluedark1,
                  e61_orangedark1)
   } else if (n == 5) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
-                 "grey50",
+                 e61_bluedark1,
                  e61_orangelight1,
                  e61_orangedark1)
   } else if (n == 6) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
-                 "grey50",
+                 e61_bluedark1,
                  e61_orangelight1,
                  e61_orangedark1,
                  e61_maroonlight1)
   } else if (n == 7) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
-                 "grey50",
+                 e61_bluedark1,
                  e61_orangelight1,
                  e61_orangedark1,
                  e61_coraldark1,
@@ -73,7 +75,7 @@ get_palette <- function(n) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
                  e61_bluedark1,
-                 "grey50",
+                 e61_greylight1,
                  e61_orangelight1,
                  e61_orangedark1,
                  e61_coraldark1,
@@ -82,7 +84,7 @@ get_palette <- function(n) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
                  e61_bluedark1,
-                 "grey50",
+                 e61_greylight1,
                  e61_orangelight1,
                  e61_orangedark1,
                  e61_coraldark1,
@@ -93,7 +95,7 @@ get_palette <- function(n) {
                  e61_teallight1,
                  e61_tealdark1,
                  e61_bluedark1,
-                 "grey50",
+                 e61_greylight1,
                  e61_orangelight1,
                  e61_orangedark1,
                  e61_coraldark1,
@@ -104,8 +106,8 @@ get_palette <- function(n) {
                  e61_teallight1,
                  e61_tealdark1,
                  e61_bluedark1,
-                 "grey50",
-                 "grey30",
+                 e61_greylight1,
+                 e61_greydark1,
                  e61_orangelight1,
                  e61_orangedark1,
                  e61_coraldark1,
@@ -116,9 +118,9 @@ get_palette <- function(n) {
                  e61_teallight1,
                  e61_tealdark1,
                  e61_bluedark1,
-                 "grey70",
-                 "grey50",
-                 "grey30",
+                 e61_greylight4,
+                 e61_greylight1,
+                 e61_greydark1,
                  e61_orangelight1,
                  e61_orangedark1,
                  e61_coraldark1,

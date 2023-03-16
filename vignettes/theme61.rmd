@@ -143,7 +143,6 @@ knitr::include_graphics(here::here("man/figures/fig-3.svg"))
 
 ```{r}
 df <- economics_long[economics_long$variable %in% c("psavert", "uempmed"), ]
-
 df <- df[year(df$date) %in% c(1967:1981), ]
 
 # plot
