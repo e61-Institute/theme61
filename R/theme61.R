@@ -218,7 +218,7 @@ theme_e61 <- function(y_top = TRUE,
         hjust = 0,
         vjust = 1,
         colour = "black",
-        margin = ggplot2::margin(t = 15)
+        margin = margin(t = 15)
       ),
       plot.tag = element_text(
         size = rel(1),
@@ -226,7 +226,7 @@ theme_e61 <- function(y_top = TRUE,
         vjust = 0.5
       ),
       plot.tag.position = "topleft",
-      plot.margin = unit(c(0.5, 0.6, 0.1, 0.01), "lines"),
+      plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "lines"),
       complete = TRUE
     )
 
@@ -239,7 +239,7 @@ theme_e61 <- function(y_top = TRUE,
   }
 
   # adjust legend direction based on legend position
-  if (data.table::like(legend, "bottom|top", ignore.case = T)) {
+  if (data.table::like(legend, "bottom|top", ignore.case = TRUE)) {
     ret <- ret + theme(legend.direction = "horizontal")
   }
 
