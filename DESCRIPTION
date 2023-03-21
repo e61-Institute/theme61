@@ -1,7 +1,7 @@
 Package: theme61
 Type: Package
 Title: Create Graphs in the e61 Institute Style
-Version: 0.3.1
+Version: 0.3.1.9000
 Authors@R: c(
     person("Aaron", "Wong", email = "aaron.wong@e61.in", role = c("aut", "cre")),
     person("Elyse", "Dwyer", email = "elyse.dwyer@e61.in", role = c("aut")),
