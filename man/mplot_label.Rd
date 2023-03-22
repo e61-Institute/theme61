@@ -13,6 +13,9 @@ mplot_label(label, x, y, colour = NA, size = 3)
 
 \item{y}{Numeric or string vector. Y-axis positions of the label text.}
 
+\item{colour}{Optional vector of manually-selected colours. Default uses the
+order of colours in the e61 palette.}
+
 \item{size}{Integer. Size of the text, the default size should be appropriate
 in most cases.}
 }
