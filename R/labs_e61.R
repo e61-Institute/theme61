@@ -24,7 +24,6 @@
 #'   dimensions in \code{e61_save}.
 #' @param title_wrap,subtitle_wrap,footnote_wrap Logical. Enables text wrapping
 #'   for the title, subtitle, sources or footnotes. Defaults to TRUE.
-#' @inheritDotParams ggplot2::labs -caption -tag
 #'
 #' @export
 #' @examples
@@ -46,15 +45,8 @@ labs_e61 <- function(title,
                      footnote_max_char = 55,
                      title_wrap = TRUE,
                      subtitle_wrap = TRUE,
-                     footnote_wrap = TRUE,
-                     ...) {
-
-  # We need this to check for the presence of caption in the passed-through
-  # arguments, specifically the caption
-  dots <- list(...)
-
-  if ((!is.null(footnotes) || !is.null(sources)) && !is.null(dots$caption))
-    stop("Do not use the caption argument if you use the footnotes or sources arguments.")
+                     footnote_wrap = TRUE
+                     ) {
 
   if (!is.numeric(title_max_char) || title_max_char < 0)
     stop("title_max_char must be a positive integer.")
