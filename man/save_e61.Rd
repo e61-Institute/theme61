@@ -24,7 +24,12 @@ usually you do not need to provide this explicitly.}
 
 \item{width}{Plot width in cm. Defaults to 8.5.}
 
-\item{height}{Plot height in cm. Defaults to 9 but you should specify your own.}
+\item{height}{Plot height in cm. The function will attempt to calculate an
+appropriate height based on the labels you have provided, but this is
+sensitive to small changes in the graph text so you should check if the
+automatic value is aesthetically appropriate (no excess whitespace).
+Otherwise, the function will default a value of 9 but this is unlikely to
+be appropriate.}
 
 \item{resize}{Rescales the graph and text. Useful when you need a very large
 or small graph and cannot use a vector graphics format. This only works
