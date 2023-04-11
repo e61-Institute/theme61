@@ -93,7 +93,7 @@ save_e61 <-
 
     height <- h + t_adj + st_adj + cp_adj
 
-    cli::cli_text("Note: save_e61() has automatically set the height to ", height, ". Please check if this is actually appropriate for your graph.")
+    cli::cli_text(cli::col_green("Note: save_e61() has automatically set the height to ", height, ". Please check if this is actually appropriate for your graph."))
 
     }
 
