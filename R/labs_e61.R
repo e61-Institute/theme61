@@ -18,6 +18,8 @@
 #'   in the title/subtitle yourself. Please be sensible with the number of
 #'   separate points you include in the graph.
 #' @param sources String vector providing the names of sources for the graph.
+#' @param x,y String to set the x- and y-axis titles. Note that the x-axis title
+#'   is blank (NULL) by default.
 #' @param title_max_char,subtitle_max_char,footnote_max_char Numeric. Set the
 #'   maximum number of characters per line in the title, subtitle, sources or
 #'   footnotes. The default is roughly appropriate for the default graph
@@ -47,6 +49,8 @@ labs_e61 <- function(title,
                      title_wrap = TRUE,
                      subtitle_wrap = TRUE,
                      footnote_wrap = TRUE,
+                     x = NULL,
+                     y = waiver(),
                      ...
                      ) {
 
@@ -128,6 +132,8 @@ labs_e61 <- function(title,
     labs(title = title,
          subtitle = subtitle,
          caption = caption,
+         x = x,
+         y = y,
          ...)
 
   return(label)
