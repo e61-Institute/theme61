@@ -12,6 +12,11 @@
 #'
 #'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 #'
+#'   This function tries to support multi-panel graphs generated using
+#'   \code{mpanel_e61} by doubling the default width to 17, but you will need to
+#'   make adjustments to the dimensions to ensure the graph is sized
+#'   appropriately.
+#'
 #' @details Setting the correct height and width parameters is quite difficult
 #'   due to the way that ggplot translates ggplot objects from pixels into
 #'   physical dimensions (inches or centimetres). Font sizes are also
@@ -60,8 +65,19 @@ save_e61 <-
     # Check if graph is horizontal
     flip <- isTRUE("CoordFlip" %in% class(ggplot2::ggplot_build(plot)$layout$coord))
 
+    # Check if the graph is a multi-panel generated with mpanel_e61 by
+    # exploiting the fact that those graphs have zero-length labels, while
+    # labs_e61 forces the user to have at least a title (so length > 0 for
+    # single panels)
+    is_multi <- length(plot$labels) == 0
+
+    # For multi-panels: Double the width to fit the extra panels and send out user message to specify the height
+    if (is_multi && is.null(width)) width <- 17
+    if (is_multi && is.null(height))
+      cli::cli_text(cli::col_red("Note: You are saving a multi-panel graph, the default dimensions in save_e61() are designed for single-panel graphs so you must choose your own height value to ensure the graph looks appropriate when saved."))
+
     # Calculate graph height based on the graph labels for normal orientation graphs
-    if (is.null(height) && !flip) {
+    if (is.null(height) && !flip && !is_multi) {
 
       h <- 6.5
 
@@ -93,7 +109,7 @@ save_e61 <-
 
     height <- h + t_adj + st_adj + cp_adj
 
-    cli::cli_text(cli::col_green("Note: save_e61() has automatically set the height to ", height, ". Please check if this is actually appropriate for your graph."))
+    cli::cli_text(cli::col_green("Note: save_e61() has automatically set the height to ", height, ". Please check if this is actually appropriate for your graph. You may have to adjust the value if the y-axis is particularly wide."))
 
     }
 
