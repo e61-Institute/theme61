@@ -56,6 +56,11 @@ Designed to save ggplot graphs made with the e61 theme with
   supported.
 
   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
+
+  This function tries to support multi-panel graphs generated using
+  \code{mpanel_e61} by doubling the default width to 17, but you will need to
+  make adjustments to the dimensions to ensure the graph is sized
+  appropriately.
 }
 \details{
 Setting the correct height and width parameters is quite difficult

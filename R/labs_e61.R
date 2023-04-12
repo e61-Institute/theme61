@@ -121,7 +121,6 @@ labs_e61 <- function(title,
         paste(strwrap(sources, width = footnote_max_char), collapse = "\n")
       }
 
-
   }
 
   # Put it all together

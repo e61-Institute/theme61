@@ -77,7 +77,7 @@ scale_fill_e61 <- function(n = 0, reverse = FALSE,
 #' @inheritDotParams ggplot2::scale_colour_manual
 #'
 #' @return ggplot2 object
-#' @rdname scale_colour_e61_aus
+#' @rdname scale_e61_aus
 #' @export
 #'
 #' @examples
@@ -101,7 +101,7 @@ scale_colour_e61_aus <- function(...) {
 
 #' @inheritDotParams ggplot2::scale_fill_manual
 #'
-#' @rdname e61_scale_aus
+#' @rdname scale_e61_aus
 #' @export
 
 scale_fill_e61_aus <- function(...) {

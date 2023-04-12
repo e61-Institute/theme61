@@ -2,14 +2,17 @@
 % Please edit documentation in R/scales.R
 \name{scale_colour_e61_aus}
 \alias{scale_colour_e61_aus}
+\alias{scale_fill_e61_aus}
 \title{A consistent set of colours for Australian states and territories for
 graphing}
 \usage{
 scale_colour_e61_aus(...)
+
+scale_fill_e61_aus(...)
 }
 \arguments{
 \item{...}{
-  Arguments passed on to \code{\link[ggplot2:scale_manual]{ggplot2::scale_colour_manual}}
+  Arguments passed on to \code{\link[ggplot2:scale_manual]{ggplot2::scale_colour_manual}}, \code{\link[ggplot2:scale_manual]{ggplot2::scale_fill_manual}}
   \describe{
     \item{\code{values}}{a set of aesthetic values to map data values to. The values
 will be matched in order (usually alphabetical) with the limits of the

@@ -7,14 +7,11 @@
 mpanel_e61(
   ...,
   title,
-  subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
   title_max_char = 35,
-  subtitle_max_char = 45,
   footnote_max_char = 55,
   title_wrap = TRUE,
-  subtitle_wrap = TRUE,
   footnote_wrap = TRUE
 )
 }
@@ -62,27 +59,38 @@ legend.}
 
 \item{title}{The text for the title.}
 
-\item{subtitle}{The text for the subtitle.}
-
 \item{footnotes}{A vector of footnote text strings. Each new string will be
 prepended with *, **, ***, etc. Note you'll need to include the asterisks
 in the title/subtitle yourself. Please be sensible with the number of
 separate points you include in the graph.}
 
 \item{sources}{String vector providing the names of sources for the graph.}
-
-\item{title_max_char, subtitle_max_char, footnote_max_char}{Numeric. Set the
-maximum number of characters per line in the title, subtitle, sources or
-footnotes. The default is roughly appropriate for the default graph
-dimensions in \code{e61_save}.}
-
-\item{title_wrap, subtitle_wrap, footnote_wrap}{Logical. Enables text wrapping
-for the title, subtitle, sources or footnotes. Defaults to TRUE.}
 }
 \value{
 ggplot2 object
 }
 \description{
-Wrapper around \link[ggpubr]{ggarrange} and \code{labs_e61} to create
-multi-panel graphs with appropriate title and footer formatting.
+Wrapper around \link[ggpubr]{ggarrange} and \code{labs_e61} to
+  create multi-panel graphs with appropriate title and footer formatting.
+
+  This function is designed for creating 2x2 panel graphs, although it should
+  work for any arrangement of panels (e.g. 2x1, 3x2, etc.). Your mileage may
+  vary.
+
+  Subtitles are currently not supported in the multi-panel header.
+
+  When saving multi-panel graphs using \code{save_e61()} you will need to
+  change (increase) the width and height arguments to reflect the larger size
+  of multi-panel graphs.
+}
+\examples{
+ gg <- ggplot2::ggplot() +
+   labs_e61(title = "Figure", y = "\%") +
+   scale_y_continuous_e61(limits = c(0, 10, 2.5)) +
+   theme_e61()
+
+ mpanel_e61(gg, gg, gg, gg,
+   title = "Multi-panel graph title",
+   footnotes = c("Footnote 1", "Footnote 2"),
+   sources = c("Source 1", "Source 2"))
 }
