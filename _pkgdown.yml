@@ -15,6 +15,7 @@ reference:
   contents:
   - format_flip_bar_charts
   - e61_palette
+  - mpanel_e61
   - square_legend_symbols
   - theme_e61
   - theme_e61_clean
@@ -23,6 +24,7 @@ reference:
 - title: Scales
   contents:
   - starts_with("scale_")
+  - starts_with("sec_rescale")
 
 - title: Miscellaneous
   contents:

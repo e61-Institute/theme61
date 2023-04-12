@@ -28,8 +28,8 @@ usually you do not need to provide this explicitly.}
 appropriate height based on the labels you have provided, but this is
 sensitive to small changes in the graph text so you should check if the
 automatic value is aesthetically appropriate (no excess whitespace).
-Otherwise, the function will default a value of 9 but this is unlikely to
-be appropriate.}
+Otherwise, the function will default to a value of 9 but this is unlikely
+to be appropriate.}
 
 \item{resize}{Rescales the graph and text. Useful when you need a very large
 or small graph and cannot use a vector graphics format. This only works
@@ -56,11 +56,6 @@ Designed to save ggplot graphs made with the e61 theme with
   supported.
 
   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
-
-  This function tries to support multi-panel graphs generated using
-  \code{mpanel_e61} by doubling the default width to 17, but you will need to
-  make adjustments to the dimensions to ensure the graph is sized
-  appropriately.
 }
 \details{
 Setting the correct height and width parameters is quite difficult
@@ -76,4 +71,9 @@ Setting the correct height and width parameters is quite difficult
   excess space on the left/right or top/bottom (if the values are too high),
   or the graph itself will be shrunk and look weird (if the values are too
   low).
+
+  This function tries to support multi-panel graphs generated using
+  \code{mpanel_e61} by doubling the default width to 17, but you will need to
+  make adjustments to the dimensions to ensure the graph is sized
+  appropriately.
 }
