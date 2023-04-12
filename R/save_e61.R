@@ -12,11 +12,6 @@
 #'
 #'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 #'
-#'   This function tries to support multi-panel graphs generated using
-#'   \code{mpanel_e61} by doubling the default width to 17, but you will need to
-#'   make adjustments to the dimensions to ensure the graph is sized
-#'   appropriately.
-#'
 #' @details Setting the correct height and width parameters is quite difficult
 #'   due to the way that ggplot translates ggplot objects from pixels into
 #'   physical dimensions (inches or centimetres). Font sizes are also
@@ -31,6 +26,11 @@
 #'   or the graph itself will be shrunk and look weird (if the values are too
 #'   low).
 #'
+#'   This function tries to support multi-panel graphs generated using
+#'   \code{mpanel_e61} by doubling the default width to 17, but you will need to
+#'   make adjustments to the dimensions to ensure the graph is sized
+#'   appropriately.
+#'
 #' @param resize Rescales the graph and text. Useful when you need a very large
 #'   or small graph and cannot use a vector graphics format. This only works
 #'   when saving to the PNG file format. A value of 2 doubles the graph
@@ -44,8 +44,8 @@
 #'   appropriate height based on the labels you have provided, but this is
 #'   sensitive to small changes in the graph text so you should check if the
 #'   automatic value is aesthetically appropriate (no excess whitespace).
-#'   Otherwise, the function will default a value of 9 but this is unlikely to
-#'   be appropriate.
+#'   Otherwise, the function will default to a value of 9 but this is unlikely
+#'   to be appropriate.
 #' @inheritDotParams ggplot2::ggsave scale dpi
 #' @export
 
@@ -85,7 +85,9 @@ save_e61 <-
       n_count <- function(text)
         nchar(text) - nchar(gsub("\n", "", text, fixed = TRUE))
 
-      # Calculate the height adjustment needed
+      # Calculate the height adjustment needed for...
+
+      # Titles
       if (!is.null(plot$labels$title)) {
         t_adj <- 0.6 + n_count(plot$labels$title) * 0.3
 
@@ -93,6 +95,7 @@ save_e61 <-
         t_adj <- 0
       }
 
+      # Subtitles
       if (!is.null(plot$labels$subtitle)) {
         st_adj <- 0.5 + n_count(plot$labels$subtitle) * 0.3
 
@@ -100,6 +103,7 @@ save_e61 <-
         st_adj <- 0
       }
 
+      # Captions
       if (!is.null(plot$labels$caption)) {
         cp_adj <- 0.5 + n_count(plot$labels$caption) * 0.3
 
@@ -107,7 +111,14 @@ save_e61 <-
         cp_adj <- 0
       }
 
-    height <- h + t_adj + st_adj + cp_adj
+      # Adjustment for width of y-axis label
+      if (!is.null(plot$labels$y)) {
+        y_adj <- (nchar(plot$labels$y) - 1) * -0.2
+      } else {
+        y_adj <- 0
+      }
+
+    height <- h + t_adj + st_adj + cp_adj + y_adj
 
     cli::cli_text(cli::col_green("Note: save_e61() has automatically set the height to ", height, ". Please check if this is actually appropriate for your graph. You may have to adjust the value if the y-axis is particularly wide."))
 
