@@ -4,60 +4,6 @@
 # message code entirely from v0.4 onwards, as users have had ample warning to
 # fix their code.
 
-
-# Defunct from v0.2 -------------------------------------------------------
-# Delete this section from v0.4 onwards
-
-#' Defunct
-#' @export
-#' @noRd
-e61_labs <- function(...) {
-  lifecycle::deprecate_stop("0.2.0", "e61_labs()", "labs_e61()")
-}
-
-#' Defunct
-#' @export
-#' @noRd
-e61_save <- function(...) {
-  lifecycle::deprecate_stop("0.2.0", "e61_save()", "save_e61()")
-}
-
-#' Defunct
-#' @export
-#' @noRd
-e61_y_title_top <- function(...) {
-  lifecycle::deprecate_stop("0.2.0", "e61_y_title_top()", "y_title_top_e61()")
-}
-
-#' Defunct
-#' @export
-#' @noRd
-e61_colour_manual <- function(...) {
-  lifecycle::deprecate_stop("0.2.0", "e61_colour_manual()", "scale_colour_e61()")
-}
-
-#' Defunct
-#' @export
-#' @noRd
-e61_fill_manual <- function(...) {
-  lifecycle::deprecate_stop("0.2.0", "e61_fill_manual()", "scale_fill_e61()")
-}
-
-#' Defunct
-#' @export
-#' @noRd
-e61_colour_aus <- function(...) {
-  lifecycle::deprecate_stop("0.2.0", "e61_colour_aus()", "scale_colour_e61_aus()")
-}
-
-#' Defunct
-#' @export
-#' @noRd
-e61_fill_aus <- function(...) {
-  lifecycle::deprecate_stop("0.2.0", "e61_fill_aus()", "scale_fill_e61_aus()")
-}
-
-
 # Defunct from v0.3 -----------------------------------------------------
 # Delete this section from v0.5 onwards
 
