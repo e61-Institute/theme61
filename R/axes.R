@@ -1,5 +1,8 @@
 #' Format axes in the e61 Institute style
 #'
+#' These functions format the x and y axes to be consistent with e61 styling.
+#' This includes removing white space at the beginning and end of each axis.
+#'
 #' @param expand_bottom Numeric. Add extra space between data points and the
 #'   bottom of the graph. See \link[ggplot2]{expansion} for details.
 #' @param expand_top Numeric. Add extra space between data points and the top of
@@ -25,10 +28,6 @@
 #'     }
 #' @inheritDotParams ggplot2::scale_y_continuous -breaks -minor_breaks -n.breaks
 #'   -expand -sec.axis
-#'
-#' @description These functions format the x and y axes to be consistent with
-#'   e61 styling. This includes removing white space at the beginning and end of
-#'   each axis.
 #'
 #' @rdname e61_axes
 #' @export
@@ -74,6 +73,8 @@ scale_x_continuous_e61 <- function(expand_left = 0,
                    expand_right = expand_right,
                    ...)
 }
+
+# Internal functions ------------------------------------------------------
 
 # These functions go in the above functions
 e61_y_continuous <- function(expand_bottom = 0,
