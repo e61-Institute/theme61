@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='240.94pt' height='255.12pt' viewBox='0 0 240.94 255.12'>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='240.94pt' height='201.26pt' viewBox='0 0 240.94 201.26'>
 <defs>
   <style type='text/css'><![CDATA[
     .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
@@ -16,21 +16,22 @@
 </defs>
 <rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
 <defs>
-  <clipPath id='cpMC4wMHwyNDAuOTR8MC4wMHwyNTUuMTI='>
-    <rect x='0.00' y='0.00' width='240.94' height='255.12' />
+  <clipPath id='cpMC4wMHwyNDAuOTR8MC4wMHwyMDEuMjY='>
+    <rect x='0.00' y='0.00' width='240.94' height='201.26' />
   </clipPath>
 </defs>
-<g clip-path='url(#cpMC4wMHwyNDAuOTR8MC4wMHwyNTUuMTI=)'>
-<rect x='0.00' y='0.00' width='240.94' height='255.12' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
+<g clip-path='url(#cpMC4wMHwyNDAuOTR8MC4wMHwyMDEuMjY=)'>
+<rect x='0.00' y='0.00' width='240.94' height='201.26' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
 </g>
 <defs>
-  <clipPath id='cpNS40OHwyMzUuNDd8NS40OHwyNDkuNjQ='>
-    <rect x='5.48' y='5.48' width='229.99' height='244.16' />
+  <clipPath id='cpNS40OHwyMzUuNDd8MjMuMTh8MTk1Ljc4'>
+    <rect x='5.48' y='23.18' width='229.99' height='172.60' />
   </clipPath>
 </defs>
-<g clip-path='url(#cpNS40OHwyMzUuNDd8NS40OHwyNDkuNjQ=)'>
-<rect x='5.48' y='5.48' width='229.99' height='244.16' style='stroke-width: 1.07; stroke: none; fill: #EBEBEB;' />
+<g clip-path='url(#cpNS40OHwyMzUuNDd8MjMuMTh8MTk1Ljc4)'>
+<rect x='5.48' y='23.18' width='229.99' height='172.60' style='stroke-width: 1.07; stroke: none; fill: #EBEBEB;' />
 </g>
-<g clip-path='url(#cpMC4wMHwyNDAuOTR8MC4wMHwyNTUuMTI=)'>
+<g clip-path='url(#cpMC4wMHwyNDAuOTR8MC4wMHwyMDEuMjY=)'>
+<text x='5.48' y='14.93' style='font-size: 13.20px; font-family: "Arial";' textLength='24.19px' lengthAdjust='spacingAndGlyphs'>Test</text>
 </g>
 </svg>

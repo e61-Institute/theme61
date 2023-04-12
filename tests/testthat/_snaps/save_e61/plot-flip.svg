@@ -24,13 +24,14 @@
 <rect x='0.00' y='0.00' width='481.89' height='340.16' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
 </g>
 <defs>
-  <clipPath id='cpNS40OHw0NzYuNDF8NS40OHwzMzQuNjg='>
-    <rect x='5.48' y='5.48' width='470.93' height='329.20' />
+  <clipPath id='cpNS40OHw0NzYuNDF8MjMuMTh8MzM0LjY4'>
+    <rect x='5.48' y='23.18' width='470.93' height='311.50' />
   </clipPath>
 </defs>
-<g clip-path='url(#cpNS40OHw0NzYuNDF8NS40OHwzMzQuNjg=)'>
-<rect x='5.48' y='5.48' width='470.93' height='329.20' style='stroke-width: 1.07; stroke: none; fill: #EBEBEB;' />
+<g clip-path='url(#cpNS40OHw0NzYuNDF8MjMuMTh8MzM0LjY4)'>
+<rect x='5.48' y='23.18' width='470.93' height='311.50' style='stroke-width: 1.07; stroke: none; fill: #EBEBEB;' />
 </g>
 <g clip-path='url(#cpMC4wMHw0ODEuODl8MC4wMHwzNDAuMTY=)'>
+<text x='5.48' y='14.93' style='font-size: 13.20px; font-family: "Arial";' textLength='24.19px' lengthAdjust='spacingAndGlyphs'>Test</text>
 </g>
 </svg>
