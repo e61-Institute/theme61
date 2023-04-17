@@ -69,10 +69,10 @@ save_e61 <-
     # exploiting the fact that those graphs have zero-length labels, while
     # labs_e61 forces the user to have at least a title (so length > 0 for
     # single panels)
-    is_multi <- length(plot$labels) == 0
+    is_multi <- !is.null(attr(plot, "panel_dim"))
 
-    # For multi-panels: Double the width to fit the extra panels and send out user message to specify the height
-    if (is_multi && is.null(width)) width <- 17
+    # For multi-panels: Adjust the width to fit the extra panels and send out user message to specify the height
+    if (is_multi && is.null(width)) width <- 8.5 * attr(plot, "panel_dim")[["rows"]]
     if (is_multi && is.null(height))
       cli::cli_text(cli::col_red("Note: You are saving a multi-panel graph, the default dimensions in save_e61() are designed for single-panel graphs so you must choose your own height value to ensure the graph looks appropriate when saved."))
 
@@ -80,10 +80,6 @@ save_e61 <-
     if (is.null(height) && !flip && !is_multi) {
 
       h <- 6.5
-
-      # Helper function that counts the number of occurrences of \n
-      n_count <- function(text)
-        nchar(text) - nchar(gsub("\n", "", text, fixed = TRUE))
 
       # Calculate the height adjustment needed for...
 
@@ -171,3 +167,8 @@ save_e61 <-
       ...
     )
   }
+
+
+# Helper function that counts the number of occurrences of \n ----
+n_count <- function(text)
+  nchar(text) - nchar(gsub("\n", "", text, fixed = TRUE))

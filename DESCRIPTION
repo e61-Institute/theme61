@@ -13,11 +13,11 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     cli (>= 3.6.0),
+    cowplot (>= 1.1.1),
     data.table (>= 1.14.8),
     esquisse (>= 1.1.2),
     ggmap (>= 3.0.0),
     ggplot2 (>= 3.4.1),
-    ggpubr (>= 0.6.0),
     ggrepel (>= 0.9.2),
     ggthemes (>= 4.2.4),
     grDevices (>= 4.1.3),

@@ -1,6 +1,6 @@
 #' Create a multi-panel graph with e61 formatting
 #'
-#' @description Wrapper around \link[ggpubr]{ggarrange} and \code{labs_e61} to
+#' @description Wrapper around \link[cowplot]{plot_grid} and \code{labs_e61} to
 #'   create multi-panel graphs with appropriate title and footer formatting.
 #'
 #'   This function is designed for creating 2x2 panel graphs, although it should
@@ -13,8 +13,16 @@
 #'   change (increase) the width and height arguments to reflect the larger size
 #'   of multi-panel graphs.
 #'
-#' @inheritDotParams ggpubr::ggarrange
 #' @inheritParams labs_e61
+#' @inheritParams cowplot::plot_grid
+#' @param title_max_char,footnote_max_char Numeric. Set the maximum number of
+#'   characters per line in the title, subtitle, sources or footnotes. The
+#'   default is roughly appropriate for the default graph dimensions in
+#'   \code{e61_save}.
+#' @param title_wrap,footnote_wrap Logical. Enables text wrapping for the title,
+#'   subtitle, sources or footnotes. Defaults to TRUE.
+#' @param rel_heights A numeric vector giving the relative proportions of each
+#'   graph component (title, plots, footer (optional)).
 #'
 #' @return ggplot2 object
 #' @export
@@ -31,13 +39,17 @@
 
 mpanel_e61 <-
   function(...,
+           plotlist = NULL,
            title,
            footnotes = NULL,
            sources = NULL,
            title_max_char = 35,
            footnote_max_char = 55,
            title_wrap = TRUE,
-           footnote_wrap = TRUE
+           footnote_wrap = TRUE,
+           ncol = 2,
+           nrow = NULL,
+           rel_heights = NULL
            ) {
 
     # Stop titles from being too long by wrapping it to multiple lines
@@ -94,23 +106,63 @@ mpanel_e61 <-
     caption <- paste0(c(footnotes, sources), collapse = "\n")
     if (caption == "") caption <- NULL # Return NULL caption if blank
 
-    # Put together the panels
-    gg <- ggpubr::ggarrange(...)
+    # Gather the plots
+    plots <- c(..., plotlist)
+    if (is.null(nrow)) {
+      nrow <- ceiling(length(plots) / ncol)
+    }
 
-    gg <- ggpubr::annotate_figure(
-      gg,
-      top = ggpubr::text_grob(
-        title,
-        face = "bold",
-        size = 12
-        ),
-      bottom = ggpubr::text_grob(
-        caption,
-        just = "left",
-        x = 0.05,
-        size = 9
-        )
+    # Put together the panels
+    gg <- cowplot::plot_grid(plotlist = plots,
+                             ncol = ncol,
+                             nrow = nrow
+                             )
+
+    title <-
+      ggdraw() +
+      draw_label(title,
+                 fontface = "bold",
+                 x = 0.5, hjust = 0.5,
+                 size = 12
       )
+
+    if (!is.null(caption)) {
+
+      footer <-
+        ggdraw() +
+        draw_label(caption,
+                   x = 0, hjust = 0,
+                   size = 9
+        ) +
+        theme(plot.margin = margin(0, 0, 0, 3))
+
+    }
+
+    # Adjust the footer height depending on how much text there is
+    if (!is.null(caption)) {
+      cap_h <- 0.04 * n_count(caption)
+
+      if (is.null(rel_heights)) rel_heights <- c(0.05, 1, cap_h)
+
+      gg <- cowplot::plot_grid(
+        title, gg, footer,
+        ncol = 1,
+        rel_heights = rel_heights
+      )
+    } else {
+
+      if (is.null(rel_heights)) rel_heights <- c(0.05, 1)
+
+      gg <- cowplot::plot_grid(
+        title, gg,
+        ncol = 1,
+        rel_heights = rel_heights
+      )
+    }
+
+    # Add some extra info on the multi-panel attributes
+    attr(gg, "panel_dim") <- c(rows = nrow, cols = ncol)
+    attr(gg, "n_plots") <- length(plots)
 
     return(gg)
 
