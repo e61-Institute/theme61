@@ -39,7 +39,7 @@
 #'     footnotes = c("Footnote 1", "Footnote 2")
 #'     )
 
-labs_e61 <- function(title,
+labs_e61 <- function(title = NULL,
                      subtitle = NULL,
                      footnotes = NULL,
                      sources = NULL,
@@ -60,7 +60,7 @@ labs_e61 <- function(title,
   if (!is.numeric(footnote_max_char) || footnote_max_char < 0)
     stop("footnote_max_char must be a positive integer.")
 
-  if (!is.character(title))
+  if (!is.null(title) && !is.character(title))
     stop("title must be a string.")
 
   # Stop titles from being too long by wrapping it to multiple lines
