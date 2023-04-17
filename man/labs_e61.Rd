@@ -5,7 +5,7 @@
 \title{Wrapper function to produce e61 style graph titles and footers}
 \usage{
 labs_e61(
-  title,
+  title = NULL,
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,

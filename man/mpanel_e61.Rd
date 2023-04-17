@@ -6,56 +6,25 @@
 \usage{
 mpanel_e61(
   ...,
+  plotlist = NULL,
   title,
   footnotes = NULL,
   sources = NULL,
   title_max_char = 35,
   footnote_max_char = 55,
   title_wrap = TRUE,
-  footnote_wrap = TRUE
+  footnote_wrap = TRUE,
+  ncol = NULL,
+  nrow = NULL,
+  rel_heights = NULL
 )
 }
 \arguments{
-\item{...}{
-  Arguments passed on to \code{\link[ggpubr:ggarrange]{ggpubr::ggarrange}}
-  \describe{
-    \item{\code{plotlist}}{(optional) list of plots to display.}
-    \item{\code{ncol}}{(optional) number of columns in the plot grid.}
-    \item{\code{nrow}}{(optional) number of rows in the plot grid.}
-    \item{\code{labels}}{(optional) list of labels to be added to the plots. You can
-also set labels="AUTO" to auto-generate upper-case labels or labels="auto"
-to auto-generate lower-case labels.}
-    \item{\code{label.x}}{(optional) Single value or vector of x positions for plot
-labels, relative to each subplot. Defaults to 0 for all labels. (Each label
-is placed all the way to the left of each plot.)}
-    \item{\code{label.y}}{(optional) Single value or vector of y positions for plot
-labels, relative to each subplot. Defaults to 1 for all labels. (Each label
-is placed all the way to the top of each plot.)}
-    \item{\code{hjust}}{Adjusts the horizontal position of each label. More negative values move the label further
-to the right on the plot canvas. Can be a single value (applied to all labels) or a vector of values
-(one for each label). Default is -0.5.}
-    \item{\code{vjust}}{Adjusts the vertical position of each label. More positive values move the label further
-down on the plot canvas. Can be a single value (applied to all labels) or a vector of values
-(one for each label). Default is 1.5.}
-    \item{\code{font.label}}{a list of arguments for customizing labels. Allowed values
-are the combination of the following elements: size (e.g.: 14), face (e.g.:
-"plain", "bold", "italic", "bold.italic"), color (e.g.: "red") and family.
-For example font.label = list(size = 14, face = "bold", color ="red").}
-    \item{\code{align}}{(optional) Specifies whether graphs in the grid should be horizontally ("h") or
-vertically ("v") aligned. Options are "none" (default), "hv" (align in both directions), "h", and "v".}
-    \item{\code{widths}}{(optional) numerical vector of relative columns widths. For
-example, in a two-column grid, widths = c(2, 1) would make the first column
-twice as wide as the second column.}
-    \item{\code{heights}}{same as \code{widths} but for column heights.}
-    \item{\code{legend}}{character specifying legend position. Allowed values are one of
-c("top", "bottom", "left", "right", "none"). To remove the legend use
-legend = "none".}
-    \item{\code{common.legend}}{logical value. Default is FALSE. If TRUE, a common
-unique legend will be created for arranged plots.}
-    \item{\code{legend.grob}}{a legend grob as returned by the function
-\code{\link[ggpubr]{get_legend}()}. If provided, it will be used as the common
-legend.}
-  }}
+\item{...}{List of plots to be arranged into the grid. The plots can be any objects that
+the function \code{\link[cowplot:as_gtable]{as_gtable()}} can handle (see also examples).}
+
+\item{plotlist}{(optional) List of plots to display. Alternatively, the plots can be provided
+individually as the first n arguments of the function plot_grid (see examples).}
 
 \item{title}{The text for the title.}
 
@@ -65,12 +34,27 @@ in the title/subtitle yourself. Please be sensible with the number of
 separate points you include in the graph.}
 
 \item{sources}{String vector providing the names of sources for the graph.}
+
+\item{title_max_char, footnote_max_char}{Numeric. Set the maximum number of
+characters per line in the title, subtitle, sources or footnotes. The
+default is roughly appropriate for the default graph dimensions in
+\code{e61_save}.}
+
+\item{title_wrap, footnote_wrap}{Logical. Enables text wrapping for the title,
+subtitle, sources or footnotes. Defaults to TRUE.}
+
+\item{ncol}{(optional) Number of columns in the plot grid.}
+
+\item{nrow}{(optional) Number of rows in the plot grid.}
+
+\item{rel_heights}{A numeric vector giving the relative proportions of each
+graph component (title, plots, footer (optional)).}
 }
 \value{
 ggplot2 object
 }
 \description{
-Wrapper around \link[ggpubr]{ggarrange} and \code{labs_e61} to
+Wrapper around \link[cowplot]{plot_grid} and \code{labs_e61} to
   create multi-panel graphs with appropriate title and footer formatting.
 
   This function is designed for creating 2x2 panel graphs, although it should
