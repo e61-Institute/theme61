@@ -119,8 +119,8 @@ mpanel_e61 <-
                              )
 
     title <-
-      ggdraw() +
-      draw_label(title,
+      cowplot::ggdraw() +
+      cowplot::draw_label(title,
                  fontface = "bold",
                  x = 0.5, hjust = 0.5,
                  size = 12
@@ -129,18 +129,18 @@ mpanel_e61 <-
     if (!is.null(caption)) {
 
       footer <-
-        ggdraw() +
-        draw_label(caption,
+        cowplot::ggdraw() +
+        cowplot::draw_label(caption,
                    x = 0, hjust = 0,
                    size = 9
         ) +
-        theme(plot.margin = margin(0, 0, 0, 3))
+        ggplot2::theme(plot.margin = margin(0, 0, 0, 3))
 
     }
 
     # Adjust the footer height depending on how much text there is
     if (!is.null(caption)) {
-      cap_h <- 0.04 * n_count(caption)
+      cap_h <- 0.05 * (n_count(caption) + 1)
 
       if (is.null(rel_heights)) rel_heights <- c(0.05, 1, cap_h)
 
@@ -161,8 +161,8 @@ mpanel_e61 <-
     }
 
     # Add some extra info on the multi-panel attributes
-    attr(gg, "panel_dim") <- c(rows = nrow, cols = ncol)
-    attr(gg, "n_plots") <- length(plots)
+    attr(gg, "panel_rows") <- nrow
+    attr(gg, "panel_cols") <- ncol
 
     return(gg)
 
