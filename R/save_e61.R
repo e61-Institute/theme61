@@ -181,6 +181,11 @@ save_e61 <-
     # Save the data used to make the graph
     if (save_data) {
       data_name <- gsub("\\.(svg|png)$", "\\.csv", filename)
+
+      # Check if the data can be written easily
+      if (!is.data.frame(plot$data))
+        stop(cli::col_red("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph."))
+
       data.table::fwrite(plot$data, data_name)
     }
 

@@ -155,3 +155,21 @@ test_that("Output graphs have sensible dimensions", {
   rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), graph_2))
 
 })
+
+test_that("Test whether save_data works", {
+  data <- data.frame(x = 1, y = 1)
+
+  dir <- tempdir()
+
+  gg <- ggplot(data, aes(x, y)) +
+    geom_point()
+
+  expect_no_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), save_data = TRUE)))
+
+  # This should leave the $data container empty
+  gg <- ggplot() +
+    geom_point(data = data, aes(x, y)) +
+    geom_point(data = data, aes(x, y))
+
+  expect_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), save_data = TRUE)))
+})
