@@ -46,12 +46,17 @@
 #'   automatic value is aesthetically appropriate (no excess whitespace).
 #'   Otherwise, the function will default to a value of 9 but this is unlikely
 #'   to be appropriate.
+#' @param save_data Logical. Set to TRUE if you want to save a .csv with the
+#'   same name as the graph that contains the data needed to recreate the graph
+#'   (defaults to FALSE).
 #' @inheritParams ggplot2::ggsave
+#' @return Invisibly returns the plot object.
 #' @export
 
 save_e61 <-
   function(filename,
            plot = ggplot2::last_plot(),
+           save_data = FALSE,
            width = NULL,
            height = NULL,
            resize = NULL,
@@ -172,6 +177,14 @@ save_e61 <-
       scale = scale,
       dpi = dpi
     )
+
+    # Save the data used to make the graph
+    if (save_data) {
+      data_name <- gsub("\\.(svg|png)$", "\\.csv", filename)
+      data.table::fwrite(plot$data, data_name)
+    }
+
+    invisible(plot)
   }
 
 

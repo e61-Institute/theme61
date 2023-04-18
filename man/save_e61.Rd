@@ -7,6 +7,7 @@
 save_e61(
   filename,
   plot = ggplot2::last_plot(),
+  save_data = FALSE,
   width = NULL,
   height = NULL,
   resize = NULL,
@@ -20,6 +21,10 @@ file extension, e.g. \code{.svg}.}
 
 \item{plot}{Plot object to save. Defaults to the last plot displayed so
 usually you do not need to provide this explicitly.}
+
+\item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
+same name as the graph that contains the data needed to recreate the graph
+(defaults to FALSE).}
 
 \item{width}{Plot width in cm. Defaults to 8.5.}
 
@@ -39,6 +44,9 @@ dimensions.}
 
 \item{dpi}{Plot resolution. Also accepts a string input: "retina" (320),
 "print" (300), or "screen" (72). Applies only to raster output types.}
+}
+\value{
+Invisibly returns the plot object.
 }
 \description{
 Designed to save ggplot graphs made with the e61 theme with
