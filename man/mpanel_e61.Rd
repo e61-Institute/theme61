@@ -14,7 +14,7 @@ mpanel_e61(
   footnote_max_char = 55,
   title_wrap = TRUE,
   footnote_wrap = TRUE,
-  ncol = NULL,
+  ncol = 2,
   nrow = NULL,
   rel_heights = NULL
 )
