@@ -16,7 +16,8 @@ labs_e61(
   subtitle_wrap = TRUE,
   footnote_wrap = TRUE,
   x = NULL,
-  y = ggplot2::waiver()
+  y = ggplot2::waiver(),
+  ...
 )
 }
 \arguments{
@@ -41,6 +42,8 @@ for the title, subtitle, sources or footnotes. Defaults to TRUE.}
 
 \item{x, y}{String to set the x- and y-axis titles. Note that the x-axis title
 is blank (NULL) by default.}
+
+\item{...}{Additional graph component titles (optional).}
 }
 \description{
 Simple wrapper around \code{\link[ggplot2]{labs}} that makes it easier to
