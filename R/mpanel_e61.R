@@ -21,6 +21,8 @@
 #'   \code{e61_save}.
 #' @param title_wrap,footnote_wrap Logical. Enables text wrapping for the title,
 #'   subtitle, sources or footnotes. Defaults to TRUE.
+#' @param title_adj Rescales the size of the title text (default is 1). 2
+#'   doubles the font size.
 #' @param rel_heights A numeric vector giving the relative proportions of each
 #'   graph component (title, plots, footer (optional)).
 #'
@@ -47,6 +49,7 @@ mpanel_e61 <-
            footnote_max_char = 130,
            title_wrap = TRUE,
            footnote_wrap = TRUE,
+           title_adj = 1,
            ncol = 2,
            nrow = NULL,
            rel_heights = NULL
@@ -123,7 +126,7 @@ mpanel_e61 <-
       cowplot::draw_label(title,
                  fontface = "bold",
                  x = 0.5, hjust = 0.5,
-                 size = 12
+                 size = 12 * title_adj
       )
 
     if (!is.null(caption)) {

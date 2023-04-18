@@ -14,6 +14,7 @@ mpanel_e61(
   footnote_max_char = 130,
   title_wrap = TRUE,
   footnote_wrap = TRUE,
+  title_adj = 1,
   ncol = 2,
   nrow = NULL,
   rel_heights = NULL
@@ -41,6 +42,9 @@ default is roughly appropriate for the default graph dimensions in
 
 \item{title_wrap, footnote_wrap}{Logical. Enables text wrapping for the title,
 subtitle, sources or footnotes. Defaults to TRUE.}
+
+\item{title_adj}{Rescales the size of the title text (default is 1). 2
+doubles the font size.}
 
 \item{ncol}{(optional) Number of columns in the plot grid.}
 
