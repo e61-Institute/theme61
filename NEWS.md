@@ -1,6 +1,6 @@
 # theme61 0.4.0
 
-XX XXX 2023
+21 Apr 2023
 
 * Add the ability to make multi-panel graphs via `mpanel_e61()` (referring to combining multiple discrete graphs into a single panel, not faceted graphs).
 * Add dual y-axis support allowing for graphs with secondary y-axes with different scales to be created.
