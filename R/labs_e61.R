@@ -26,7 +26,6 @@
 #'   dimensions in \code{e61_save}.
 #' @param title_wrap,subtitle_wrap,footnote_wrap Logical. Enables text wrapping
 #'   for the title, subtitle, sources or footnotes. Defaults to TRUE.
-#' @inheritDotParams ggplot2::labs
 #'
 #' @export
 #' @examples
@@ -50,8 +49,7 @@ labs_e61 <- function(title = NULL,
                      subtitle_wrap = TRUE,
                      footnote_wrap = TRUE,
                      x = NULL,
-                     y = waiver(),
-                     ...
+                     y = ggplot2::waiver()
                      ) {
 
   if (!is.numeric(title_max_char) || title_max_char < 0)
@@ -128,12 +126,13 @@ labs_e61 <- function(title = NULL,
   if (caption == "") caption <- NULL # Return NULL caption if blank
 
   label <-
-    labs(title = title,
-         subtitle = subtitle,
-         caption = caption,
-         x = x,
-         y = y,
-         ...)
+    ggplot2::labs(
+      title = title,
+      subtitle = subtitle,
+      caption = caption,
+      x = x,
+      y = y
+    )
 
   return(label)
 }

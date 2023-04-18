@@ -16,8 +16,7 @@ labs_e61(
   subtitle_wrap = TRUE,
   footnote_wrap = TRUE,
   x = NULL,
-  y = waiver(),
-  ...
+  y = ggplot2::waiver()
 )
 }
 \arguments{
@@ -42,17 +41,6 @@ for the title, subtitle, sources or footnotes. Defaults to TRUE.}
 
 \item{x, y}{String to set the x- and y-axis titles. Note that the x-axis title
 is blank (NULL) by default.}
-
-\item{...}{
-  Arguments passed on to \code{\link[ggplot2:labs]{ggplot2::labs}}
-  \describe{
-    \item{\code{caption}}{The text for the caption which will be displayed in the
-bottom-right of the plot by default.}
-    \item{\code{tag}}{The text for the tag label which will be displayed at the
-top-left of the plot by default.}
-    \item{\code{alt,alt_insight}}{Text used for the generation of alt-text for the plot.
-See \link[ggplot2]{get_alt_text} for examples.}
-  }}
 }
 \description{
 Simple wrapper around \code{\link[ggplot2]{labs}} that makes it easier to
