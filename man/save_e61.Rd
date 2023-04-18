@@ -11,8 +11,7 @@ save_e61(
   height = NULL,
   resize = NULL,
   scale = 1,
-  dpi = 100,
-  ...
+  dpi = 100
 )
 }
 \arguments{
@@ -36,13 +35,10 @@ or small graph and cannot use a vector graphics format. This only works
 when saving to the PNG file format. A value of 2 doubles the graph
 dimensions.}
 
-\item{...}{
-  Arguments passed on to \code{\link[ggplot2:ggsave]{ggplot2::ggsave}}
-  \describe{
-    \item{\code{scale}}{Multiplicative scaling factor.}
-    \item{\code{dpi}}{Plot resolution. Also accepts a string input: "retina" (320),
+\item{scale}{Multiplicative scaling factor.}
+
+\item{dpi}{Plot resolution. Also accepts a string input: "retina" (320),
 "print" (300), or "screen" (72). Applies only to raster output types.}
-  }}
 }
 \description{
 Designed to save ggplot graphs made with the e61 theme with

@@ -46,7 +46,7 @@
 #'   automatic value is aesthetically appropriate (no excess whitespace).
 #'   Otherwise, the function will default to a value of 9 but this is unlikely
 #'   to be appropriate.
-#' @inheritDotParams ggplot2::ggsave scale dpi
+#' @inheritParams ggplot2::ggsave
 #' @export
 
 save_e61 <-
@@ -56,8 +56,8 @@ save_e61 <-
            height = NULL,
            resize = NULL,
            scale = 1,
-           dpi = 100,
-           ...) {
+           dpi = 100
+           ) {
 
     if (!grepl("(\\.png|\\.svg)", filename))
       stop("You must provide a file extension. Only .svg and .png file formats are currently supported.")
@@ -170,8 +170,7 @@ save_e61 <-
       height = height,
       units = "cm",
       scale = scale,
-      dpi = dpi,
-      ...
+      dpi = dpi
     )
   }
 
