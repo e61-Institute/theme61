@@ -20,8 +20,7 @@ mpanel_e61(
 )
 }
 \arguments{
-\item{...}{List of plots to be arranged into the grid. The plots can be any objects that
-the function \code{\link[cowplot:as_gtable]{as_gtable()}} can handle (see also examples).}
+\item{...}{Additional graph component titles (optional).}
 
 \item{plotlist}{(optional) List of plots to display. Alternatively, the plots can be provided
 individually as the first n arguments of the function plot_grid (see examples).}

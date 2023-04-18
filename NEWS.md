@@ -2,7 +2,7 @@
 
 XX XXX 2023
 
-* Add better support for multi-panel graphs via `mpanel_e61()` (referring to combining multiple discrete graphs into a single panel, not faceted graphs).
+* Add the ability to make multi-panel graphs via `mpanel_e61()` (referring to combining multiple discrete graphs into a single panel, not faceted graphs).
 * Add dual y-axis support allowing for graphs with secondary y-axes with different scales to be created.
 * Add experimental automatic graph height calculation in `save_e61()`, which should reduce the need for users to manually specify `height` when saving graphs.
 * Correct whitespace margins around graphs.
