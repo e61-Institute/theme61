@@ -226,7 +226,7 @@ theme_e61 <- function(y_top = TRUE,
         vjust = 0.5
       ),
       plot.tag.position = "topleft",
-      plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "lines"),
+      plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "lines"),
       complete = TRUE
     )
 
