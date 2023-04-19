@@ -49,6 +49,8 @@
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
+#' @param dim_msg Logical. Set to TRUE if you want to know what dimensions the
+#'   graph was saved to (defaults to FALSE).
 #' @inheritParams ggplot2::ggsave
 #' @return Invisibly returns the plot object.
 #' @export
@@ -61,7 +63,8 @@ save_e61 <-
            height = NULL,
            resize = NULL,
            scale = 1,
-           dpi = 100
+           dpi = 100,
+           dim_msg = FALSE
            ) {
 
     if (!grepl("(\\.png|\\.svg)", filename))
@@ -177,6 +180,8 @@ save_e61 <-
       scale = scale,
       dpi = dpi
     )
+
+    if (dim_msg) cli::col_green("The graph height and width have been set to ", height, " and ", width, ".")
 
     # Save the data used to make the graph
     if (save_data) {

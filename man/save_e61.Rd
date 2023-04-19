@@ -12,7 +12,8 @@ save_e61(
   height = NULL,
   resize = NULL,
   scale = 1,
-  dpi = 100
+  dpi = 100,
+  dim_msg = FALSE
 )
 }
 \arguments{
@@ -44,6 +45,9 @@ dimensions.}
 
 \item{dpi}{Plot resolution. Also accepts a string input: "retina" (320),
 "print" (300), or "screen" (72). Applies only to raster output types.}
+
+\item{dim_msg}{Logical. Set to TRUE if you want to know what dimensions the
+graph was saved to (defaults to FALSE).}
 }
 \value{
 Invisibly returns the plot object.
