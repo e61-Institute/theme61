@@ -52,7 +52,9 @@ mpanel_e61 <-
            title_adj = 1,
            ncol = 2,
            nrow = NULL,
-           rel_heights = NULL
+           rel_heights = NULL,
+           align = c("none", "h", "v", "hv"),
+           axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr")
            ) {
 
     # Stop titles from being too long by wrapping it to multiple lines
@@ -110,13 +112,15 @@ mpanel_e61 <-
     if (caption == "") caption <- NULL # Return NULL caption if blank
 
     # Gather the plots
-    plots <- c(..., plotlist)
+    plots <- c(list(...), plotlist)
     if (is.null(nrow)) {
       nrow <- ceiling(length(plots) / ncol)
     }
 
     # Put together the panels
     gg <- cowplot::plot_grid(plotlist = plots,
+                             align = align,
+                             axis = axis,
                              ncol = ncol,
                              nrow = nrow
                              )

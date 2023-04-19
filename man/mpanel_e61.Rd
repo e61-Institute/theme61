@@ -17,7 +17,9 @@ mpanel_e61(
   title_adj = 1,
   ncol = 2,
   nrow = NULL,
-  rel_heights = NULL
+  rel_heights = NULL,
+  align = c("none", "h", "v", "hv"),
+  axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr")
 )
 }
 \arguments{
@@ -52,6 +54,13 @@ doubles the font size.}
 
 \item{rel_heights}{A numeric vector giving the relative proportions of each
 graph component (title, plots, footer (optional)).}
+
+\item{align}{(optional) Specifies whether graphs in the grid should be horizontally ("h") or
+vertically ("v") aligned. Options are "none" (default), "hv" (align in both directions), "h", and "v".}
+
+\item{axis}{(optional) Specifies whether graphs should be aligned by the left ("l"), right ("r"), top ("t"), or bottom ("b")
+margins. Options are "none" (default), or a string of any combination of l, r, t, and b in any order (e.g. "tblr" or "rlbt" for aligning all margins).
+Must be specified if any of the graphs are complex (e.g. faceted) and alignment is specified and desired. See \code{\link[cowplot:align_plots]{align_plots()}} for details.}
 }
 \value{
 ggplot2 object
