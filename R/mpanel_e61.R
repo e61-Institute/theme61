@@ -53,7 +53,7 @@ mpanel_e61 <-
            ncol = 2,
            nrow = NULL,
            rel_heights = NULL,
-           align = c("none", "h", "v", "hv"),
+           align = c("v", "none", "h", "hv"),
            axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr")
            ) {
 
