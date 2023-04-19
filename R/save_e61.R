@@ -70,6 +70,10 @@ save_e61 <-
     if (!grepl("(\\.png|\\.svg)", filename))
       stop("You must provide a file extension. Only .svg and .png file formats are currently supported.")
 
+    # Check if the data frame can be written
+    if (save_data && !is.data.frame(plot$data))
+      stop(cli::col_red("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph."))
+
     # Check if graph is horizontal
     is_flip <- isTRUE("CoordFlip" %in% class(ggplot2::ggplot_build(plot)$layout$coord))
 
@@ -181,16 +185,11 @@ save_e61 <-
       dpi = dpi
     )
 
-    if (dim_msg) cli::col_green("The graph height and width have been set to ", height, " and ", width, ".")
+    if (dim_msg) cli::cli_text(cli::col_green("The graph height and width have been set to ", height, " and ", width, "."))
 
     # Save the data used to make the graph
     if (save_data) {
       data_name <- gsub("\\.(svg|png)$", "\\.csv", filename)
-
-      # Check if the data can be written easily
-      if (!is.data.frame(plot$data))
-        stop(cli::col_red("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph."))
-
       data.table::fwrite(plot$data, data_name)
     }
 
