@@ -16,12 +16,6 @@
 #' @param ... Plot objects to put on the panel.
 #' @inheritParams labs_e61
 #' @inheritParams cowplot::plot_grid
-#' @param title_max_char,footnote_max_char Numeric. Set the maximum number of
-#'   characters per line in the title, subtitle, sources or footnotes. The
-#'   default is roughly appropriate for the default graph dimensions in
-#'   \code{e61_save}.
-#' @param title_wrap,footnote_wrap Logical. Enables text wrapping for the title,
-#'   subtitle, sources or footnotes. Defaults to TRUE.
 #' @param title_adj Rescales the size of the title text to be slightly larger
 #'   than the titles of the subplots (default is 1.1). 2 doubles the font size.
 #' @param rel_heights A numeric vector giving the relative proportions of each

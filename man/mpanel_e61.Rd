@@ -8,13 +8,16 @@ mpanel_e61(
   ...,
   plotlist = NULL,
   title,
+  subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
   title_max_char = 90,
+  subtitle_max_char = 90,
   footnote_max_char = 130,
   title_wrap = TRUE,
+  subtitle_wrap = TRUE,
   footnote_wrap = TRUE,
-  title_adj = 1,
+  title_adj = 1.1,
   ncol = 2,
   nrow = NULL,
   rel_heights = NULL,
@@ -23,12 +26,14 @@ mpanel_e61(
 )
 }
 \arguments{
-\item{...}{Additional graph component titles (optional).}
+\item{...}{Plot objects to put on the panel.}
 
 \item{plotlist}{(optional) List of plots to display. Alternatively, the plots can be provided
 individually as the first n arguments of the function plot_grid (see examples).}
 
 \item{title}{The text for the title.}
+
+\item{subtitle}{The text for the subtitle.}
 
 \item{footnotes}{A vector of footnote text strings. Each new string will be
 prepended with *, **, ***, etc. Note you'll need to include the asterisks
@@ -37,16 +42,16 @@ separate points you include in the graph.}
 
 \item{sources}{String vector providing the names of sources for the graph.}
 
-\item{title_max_char, footnote_max_char}{Numeric. Set the maximum number of
-characters per line in the title, subtitle, sources or footnotes. The
-default is roughly appropriate for the default graph dimensions in
-\code{e61_save}.}
+\item{title_max_char, subtitle_max_char, footnote_max_char}{Numeric. Set the
+maximum number of characters per line in the title, subtitle, sources or
+footnotes. The default is roughly appropriate for the default graph
+dimensions in \code{e61_save}.}
 
-\item{title_wrap, footnote_wrap}{Logical. Enables text wrapping for the title,
-subtitle, sources or footnotes. Defaults to TRUE.}
+\item{title_wrap, subtitle_wrap, footnote_wrap}{Logical. Enables text wrapping
+for the title, subtitle, sources or footnotes. Defaults to TRUE.}
 
-\item{title_adj}{Rescales the size of the title text (default is 1). 2
-doubles the font size.}
+\item{title_adj}{Rescales the size of the title text to be slightly larger
+than the titles of the subplots (default is 1.1). 2 doubles the font size.}
 
 \item{ncol}{(optional) Number of columns in the plot grid.}
 
@@ -87,6 +92,7 @@ Wrapper around \link[cowplot]{plot_grid} and \code{labs_e61} to
 
  mpanel_e61(gg, gg, gg, gg,
    title = "Multi-panel graph title",
+   subtitle = "Graph subtitle",
    footnotes = c("Footnote 1", "Footnote 2"),
    sources = c("Source 1", "Source 2"))
 }
