@@ -78,8 +78,6 @@ Wrapper around \link[cowplot]{plot_grid} and \code{labs_e61} to
   work for any arrangement of panels (e.g. 2x1, 3x2, etc.). Your mileage may
   vary.
 
-  Subtitles are currently not supported in the multi-panel header.
-
   When saving multi-panel graphs using \code{save_e61()} you will need to
   change (increase) the width and height arguments to reflect the larger size
   of multi-panel graphs.
