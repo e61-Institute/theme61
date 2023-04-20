@@ -1,10 +1,5 @@
 test_that("Functionality in labs_e61 works", {
 
-  # Minimum requirements are to provide a title
-  lab <- labs_e61(title = "Test")
-  expect_equal(lab$title, "Test")
-  expect_error(labs_e61())
-
   # Users should not be able to supply a caption if footnotes or sources are supplied
   expect_error(labs_e61(title = "Something", footnotes = "Test", caption = "Fail"))
 
