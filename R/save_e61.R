@@ -196,7 +196,13 @@ save_e61 <-
     invisible(plot)
   }
 
+#' Counts the number of occurrences of a line break (\n)
+#'
+#' @param text The string to be parsed.
+#' @return Integer counting the number of line breaks in the string.
+#' @noRd
 
-# Helper function that counts the number of occurrences of \n ----
 n_count <- function(text)
   nchar(text) - nchar(gsub("\n", "", text, fixed = TRUE))
+
+
