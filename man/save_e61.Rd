@@ -7,12 +7,13 @@
 save_e61(
   filename,
   plot = ggplot2::last_plot(),
+  save_data = FALSE,
   width = NULL,
   height = NULL,
   resize = NULL,
   scale = 1,
   dpi = 100,
-  ...
+  dim_msg = FALSE
 )
 }
 \arguments{
@@ -22,22 +23,34 @@ file extension, e.g. \code{.svg}.}
 \item{plot}{Plot object to save. Defaults to the last plot displayed so
 usually you do not need to provide this explicitly.}
 
+\item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
+same name as the graph that contains the data needed to recreate the graph
+(defaults to FALSE).}
+
 \item{width}{Plot width in cm. Defaults to 8.5.}
 
-\item{height}{Plot height in cm. Defaults to 9 but you should specify your own.}
+\item{height}{Plot height in cm. The function will attempt to calculate an
+appropriate height based on the labels you have provided, but this is
+sensitive to small changes in the graph text so you should check if the
+automatic value is aesthetically appropriate (no excess whitespace).
+Otherwise, the function will default to a value of 9 but this is unlikely
+to be appropriate.}
 
 \item{resize}{Rescales the graph and text. Useful when you need a very large
 or small graph and cannot use a vector graphics format. This only works
 when saving to the PNG file format. A value of 2 doubles the graph
 dimensions.}
 
-\item{...}{
-  Arguments passed on to \code{\link[ggplot2:ggsave]{ggplot2::ggsave}}
-  \describe{
-    \item{\code{scale}}{Multiplicative scaling factor.}
-    \item{\code{dpi}}{Plot resolution. Also accepts a string input: "retina" (320),
+\item{scale}{Multiplicative scaling factor.}
+
+\item{dpi}{Plot resolution. Also accepts a string input: "retina" (320),
 "print" (300), or "screen" (72). Applies only to raster output types.}
-  }}
+
+\item{dim_msg}{Logical. Set to TRUE if you want to know what dimensions the
+graph was saved to (defaults to FALSE).}
+}
+\value{
+Invisibly returns the plot object.
 }
 \description{
 Designed to save ggplot graphs made with the e61 theme with
@@ -66,4 +79,9 @@ Setting the correct height and width parameters is quite difficult
   excess space on the left/right or top/bottom (if the values are too high),
   or the graph itself will be shrunk and look weird (if the values are too
   low).
+
+  This function tries to support multi-panel graphs generated using
+  \code{mpanel_e61} by doubling the default width to 17, but you will need to
+  make adjustments to the dimensions to ensure the graph is sized
+  appropriately.
 }

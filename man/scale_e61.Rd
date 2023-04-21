@@ -3,7 +3,7 @@
 \name{scale_colour_e61}
 \alias{scale_colour_e61}
 \alias{scale_fill_e61}
-\title{Set e61 colour palettes in scale_*_manual/gradient}
+\title{Colour and fill scales using colours from the e61 palette}
 \usage{
 scale_colour_e61(
   n = 0,
@@ -60,7 +60,10 @@ as output
 ggplot2 object
 }
 \description{
-Set e61 colour palettes in scale_*_manual/gradient
+The colour and fill scales are designed for discrete scales. If the data are
+continuous, we recommend binning the data as this often makes it easier to
+distinguish between values than a continuous scale. If a continuous scale is
+desired, the \code{discrete} argument can be set to \code{FALSE}.
 }
 \examples{
 
@@ -68,6 +71,6 @@ library(ggplot2)
 
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
    geom_point() +
-   e61_colour_manual(n = 3) +
+   scale_colour_e61(n = 3) +
    theme_e61()
 }

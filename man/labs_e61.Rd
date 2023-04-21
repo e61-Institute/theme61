@@ -5,7 +5,7 @@
 \title{Wrapper function to produce e61 style graph titles and footers}
 \usage{
 labs_e61(
-  title,
+  title = NULL,
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
@@ -15,6 +15,8 @@ labs_e61(
   title_wrap = TRUE,
   subtitle_wrap = TRUE,
   footnote_wrap = TRUE,
+  x = NULL,
+  y = ggplot2::waiver(),
   ...
 )
 }
@@ -38,12 +40,10 @@ dimensions in \code{e61_save}.}
 \item{title_wrap, subtitle_wrap, footnote_wrap}{Logical. Enables text wrapping
 for the title, subtitle, sources or footnotes. Defaults to TRUE.}
 
-\item{...}{
-  Arguments passed on to \code{\link[ggplot2:labs]{ggplot2::labs}}
-  \describe{
-    \item{\code{alt,alt_insight}}{Text used for the generation of alt-text for the plot.
-See \link[ggplot2]{get_alt_text} for examples.}
-  }}
+\item{x, y}{String to set the x- and y-axis titles. Note that the x-axis title
+is blank (NULL) by default.}
+
+\item{...}{Additional graph component titles (optional).}
 }
 \description{
 Simple wrapper around \code{\link[ggplot2]{labs}} that makes it easier to

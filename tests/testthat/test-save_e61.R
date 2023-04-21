@@ -18,8 +18,8 @@ test_that("Test dimensioning functions", {
 
   # Test horizontal graph detection code
   withr::with_tempdir({
-    plot <- ggplot()
-    plot_h <- ggplot() + coord_flip()
+    plot <- ggplot() + labs(title = "Test")
+    plot_h <- ggplot() + coord_flip() + labs(title = "Test")
 
     expect_snapshot_file(suppressMessages(save_e61("plot-norm.svg", plot)))
     expect_snapshot_file(suppressMessages(save_e61("plot-flip.svg", plot_h)))
@@ -31,7 +31,7 @@ test_that("Test dimensioning functions", {
 test_that("Test resizing feature for PNGs", {
 
   # Create a graph that will be written to disk (and deleted afterwards)
-  g <- ggplot()
+  g <- ggplot() + labs(title = "Test")
 
   withr::with_tempdir({
     temp_file <- "test.png"
@@ -46,7 +46,7 @@ test_that("Test resizing feature for PNGs", {
       tibble::tibble(
         format = "PNG",
         width = 334,
-        height = 354
+        height = 279
       )
 
     lapply(c("format", "width", "height"), function(x) {
@@ -63,7 +63,7 @@ test_that("Test resizing feature for PNGs", {
       tibble::tibble(
         format = "PNG",
         width = 669,
-        height = 708
+        height = 559
       )
 
     lapply(c("format", "width", "height"), function(x) {
@@ -77,7 +77,7 @@ test_that("Test resizing feature for PNGs", {
 test_that("Test support for different file formats", {
 
   # Create a graph that will be written to disk (and deleted afterwards)
-  g <- ggplot()
+  g <- ggplot() + labs(title = "Test")
 
   withr::with_tempdir({
     temp_file <- "test.svg"
@@ -91,7 +91,7 @@ test_that("Test support for different file formats", {
       tibble::tibble(
         format = "SVG",
         width = 321,
-        height = 340
+        height = 268
       )
 
     lapply(c("format", "width", "height"), function(x) {
@@ -154,4 +154,22 @@ test_that("Output graphs have sensible dimensions", {
 
   rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), graph_2))
 
+})
+
+test_that("Test whether save_data works", {
+  data <- data.frame(x = 1, y = 1)
+
+  dir <- tempdir()
+
+  gg <- ggplot(data, aes(x, y)) +
+    geom_point()
+
+  expect_no_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), save_data = TRUE)))
+
+  # This should leave the $data container empty
+  gg <- ggplot() +
+    geom_point(data = data, aes(x, y)) +
+    geom_point(data = data, aes(x, y))
+
+  expect_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), save_data = TRUE)))
 })

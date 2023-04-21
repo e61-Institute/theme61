@@ -44,6 +44,8 @@ plot_label <- function(label, x, y, n_labs = NA, n = NA, colour = NA, size = 3) 
 #' @param label String vector. Label text to be displayed.
 #' @param x Numeric or string vector. X-axis positions of the label text.
 #' @param y Numeric or string vector. Y-axis positions of the label text.
+#' @param colour Optional vector of manually-selected colours. Default uses the
+#'   order of colours in the e61 palette.
 #' @param size Integer. Size of the text, the default size should be appropriate
 #'   in most cases.
 #'

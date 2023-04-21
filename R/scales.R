@@ -1,4 +1,9 @@
-#' Set e61 colour palettes in scale_*_manual/gradient
+#' Colour and fill scales using colours from the e61 palette
+#'
+#' The colour and fill scales are designed for discrete scales. If the data are
+#' continuous, we recommend binning the data as this often makes it easier to
+#' distinguish between values than a continuous scale. If a continuous scale is
+#' desired, the \code{discrete} argument can be set to \code{FALSE}.
 #'
 #' @param n Numeric. The number of colours in your colour scale, required for
 #'   discrete scales.
@@ -10,7 +15,7 @@
 #' @inheritDotParams ggplot2::scale_colour_manual
 #'
 #' @return ggplot2 object
-#' @rdname e61_scale
+#' @rdname scale_e61
 #' @export
 #'
 #' @examples
@@ -19,7 +24,7 @@
 #'
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 #'    geom_point() +
-#'    e61_colour_manual(n = 3) +
+#'    scale_colour_e61(n = 3) +
 #'    theme_e61()
 
 scale_colour_e61 <- function(n = 0,
@@ -43,7 +48,7 @@ scale_colour_e61 <- function(n = 0,
   }
 }
 
-#' @rdname e61_scale
+#' @rdname scale_e61
 #' @export
 scale_fill_e61 <- function(n = 0, reverse = FALSE,
                             discrete = TRUE,
@@ -72,7 +77,7 @@ scale_fill_e61 <- function(n = 0, reverse = FALSE,
 #' @inheritDotParams ggplot2::scale_colour_manual
 #'
 #' @return ggplot2 object
-#' @rdname e61_scale_aus
+#' @rdname scale_e61_aus
 #' @export
 #'
 #' @examples
@@ -96,7 +101,7 @@ scale_colour_e61_aus <- function(...) {
 
 #' @inheritDotParams ggplot2::scale_fill_manual
 #'
-#' @rdname e61_scale_aus
+#' @rdname scale_e61_aus
 #' @export
 
 scale_fill_e61_aus <- function(...) {
