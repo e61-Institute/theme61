@@ -12,7 +12,7 @@ produce good looking footer text when using footnotes and sources."><!-- mathjax
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@ produce good looking footer text when using footnotes and sources.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">labs_e61</span><span class="op">(</span></span>
-<span>  <span class="va">title</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  footnotes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sources <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -74,6 +74,8 @@ produce good looking footer text when using footnotes and sources.</p>
 <span>  title_wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  subtitle_wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  footnote_wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  x <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/waiver.html" class="external-link">waiver</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -111,13 +113,13 @@ dimensions in <code>e61_save</code>.</p></dd>
 for the title, subtitle, sources or footnotes. Defaults to TRUE.</p></dd>
 
 
-<dt>...</dt>
-<dd><p>Arguments passed on to <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggplot2::labs</a></code></p><dl><dt><code>alt,alt_insight</code></dt>
-<dd><p>Text used for the generation of alt-text for the plot.
-See <a href="https://ggplot2.tidyverse.org/reference/get_alt_text.html" class="external-link">get_alt_text</a> for examples.</p></dd>
+<dt>x, y</dt>
+<dd><p>String to set the x- and y-axis titles. Note that the x-axis title
+is blank (NULL) by default.</p></dd>
 
-  
-</dl></dd>
+
+<dt>...</dt>
+<dd><p>Additional graph component titles (optional).</p></dd>
 
 </dl></div>
     <div class="section level2">

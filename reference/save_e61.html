@@ -26,7 +26,7 @@ See ggsave for details on custom function arguments."><!-- mathjax --><script sr
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,12 +87,13 @@ See ggsave for details on custom function arguments."><!-- mathjax --><script sr
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">save_e61</span><span class="op">(</span></span>
 <span>  <span class="va">filename</span>,</span>
 <span>  plot <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/last_plot.html" class="external-link">last_plot</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  save_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  height <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  resize <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  dpi <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  dim_msg <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -108,12 +109,23 @@ file extension, e.g. <code>.svg</code>.</p></dd>
 usually you do not need to provide this explicitly.</p></dd>
 
 
+<dt>save_data</dt>
+<dd><p>Logical. Set to TRUE if you want to save a .csv with the
+same name as the graph that contains the data needed to recreate the graph
+(defaults to FALSE).</p></dd>
+
+
 <dt>width</dt>
 <dd><p>Plot width in cm. Defaults to 8.5.</p></dd>
 
 
 <dt>height</dt>
-<dd><p>Plot height in cm. Defaults to 9 but you should specify your own.</p></dd>
+<dd><p>Plot height in cm. The function will attempt to calculate an
+appropriate height based on the labels you have provided, but this is
+sensitive to small changes in the graph text so you should check if the
+automatic value is aesthetically appropriate (no excess whitespace).
+Otherwise, the function will default to a value of 9 but this is unlikely
+to be appropriate.</p></dd>
 
 
 <dt>resize</dt>
@@ -123,18 +135,26 @@ when saving to the PNG file format. A value of 2 doubles the graph
 dimensions.</p></dd>
 
 
-<dt>...</dt>
-<dd><p>Arguments passed on to <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave</a></code></p><dl><dt><code>scale</code></dt>
+<dt>scale</dt>
 <dd><p>Multiplicative scaling factor.</p></dd>
 
-    <dt><code>dpi</code></dt>
+
+<dt>dpi</dt>
 <dd><p>Plot resolution. Also accepts a string input: "retina" (320),
 "print" (300), or "screen" (72). Applies only to raster output types.</p></dd>
 
-  
-</dl></dd>
+
+<dt>dim_msg</dt>
+<dd><p>Logical. Set to TRUE if you want to know what dimensions the
+graph was saved to (defaults to FALSE).</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>Invisibly returns the plot object.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Setting the correct height and width parameters is quite difficult
@@ -149,6 +169,10 @@ dimensions.</p></dd>
   excess space on the left/right or top/bottom (if the values are too high),
   or the graph itself will be shrunk and look weird (if the values are too
   low).</p>
+<p>This function tries to support multi-panel graphs generated using
+  <code>mpanel_e61</code> by doubling the default width to 17, but you will need to
+  make adjustments to the dimensions to ensure the graph is sized
+  appropriately.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
