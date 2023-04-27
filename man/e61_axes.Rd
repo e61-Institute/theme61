@@ -6,7 +6,7 @@
 \title{Format axes in the e61 Institute style}
 \usage{
 scale_y_continuous_e61(
-  limits,
+  limits = NULL,
   sec_axis = dup_axis(),
   y_top = TRUE,
   expand_bottom = 0,
@@ -14,7 +14,7 @@ scale_y_continuous_e61(
   ...
 )
 
-scale_x_continuous_e61(expand_left = 0, expand_right = 0.015, ...)
+scale_x_continuous_e61(limits = NULL, expand_left = 0, expand_right = 0, ...)
 }
 \arguments{
 \item{limits}{One of:

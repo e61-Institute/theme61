@@ -32,18 +32,12 @@
 #' @rdname e61_axes
 #' @export
 
-scale_y_continuous_e61 <- function(limits,
+scale_y_continuous_e61 <- function(limits = NULL,
                                    sec_axis = dup_axis(),
                                    y_top = TRUE,
                                    expand_bottom = 0,
                                    expand_top = 0,
                                    ...) {
-
-  if (!is.null(limits) && is.numeric(limits)) {
-    # Very slightly reduce the upper limit so the break label does not appear
-    # This is needed so that the axis title does not overlap with the break label
-    limits[[2]] <- limits[[2]] - 0.0001
-  }
 
   # Set sec_axis to default behaviour if we don't want it
   if (isFALSE(sec_axis)) sec_axis <- waiver()
@@ -51,63 +45,76 @@ scale_y_continuous_e61 <- function(limits,
   # Put the little bit of y-axis back in
   if (isFALSE(y_top)) limits[[2]] <- limits[[2]] + 0.0001
 
-  e61_y_continuous(
-    expand_bottom = expand_bottom,
-    expand_top = expand_top,
-    sec_axis = sec_axis,
+  # Prepares limits and breaks
+  if (!is.null(limits) && is.numeric(limits)) {
+
+    if (length(limits) == 3) {
+      breaks <- seq(limits[[1]], limits[[2]], limits[[3]])
+
+      # Hides the last break to make space for the unit label
+      breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
+
+    } else {
+      breaks <- function(x) {
+        x <- scales::breaks_extended()(x)
+        # Hides the last break to make space for the unit label
+        x[x == max(x, na.rm = TRUE)] <- NA
+        return(x)
+      }
+    }
+  } else {
+    breaks <- ggplot2::waiver()
+  }
+
+  # Put it all together
+  ggplot2::scale_y_continuous(
+    expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
+    sec.axis = sec_axis,
     limits = limits,
+    breaks = breaks,
     ...
   )
 
 }
 
+#' @inheritParams scale_y_continuous_e61
 #' @inheritDotParams ggplot2::scale_x_continuous
 #' @rdname e61_axes
 #' @export
 
-scale_x_continuous_e61 <- function(expand_left = 0,
-                                   expand_right = 0.015,
+scale_x_continuous_e61 <- function(limits = NULL,
+                                   expand_left = 0,
+                                   expand_right = 0,
                                    ...) {
 
-  e61_x_continuous(expand_left = expand_left,
-                   expand_right = expand_right,
-                   ...)
-}
+  # Prepares limits and breaks
+  if (!is.null(limits) && is.numeric(limits)) {
 
-# Internal functions ------------------------------------------------------
+    if (length(limits) == 3) {
+      breaks <- seq(limits[[1]], limits[[2]], limits[[3]])
 
-# These functions go in the above functions
-e61_y_continuous <- function(expand_bottom = 0,
-                             expand_top = 0.015,
-                             sec_axis = sec_axis,
-                             limits = limits,
-                             ...) {
+      # Hides the first and last break
+      breaks[breaks == min(breaks, na.rm = TRUE)] <- NA
+      breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
 
-  if (length(limits) == 3) {
-    custom_breaks <- seq(limits[[1]], limits[[2]], limits[[3]])
-
+    } else {
+      breaks <- function(x) {
+        x <- scales::breaks_extended()(x)
+        # Hides the first and last break
+        x[x == min(x, na.rm = TRUE)] <- NA
+        x[x == max(x, na.rm = TRUE)] <- NA
+        return(x)
+      }
+    }
   } else {
-    custom_breaks <- ggplot2::waiver()
+    breaks <- ggplot2::waiver()
   }
 
-  ggplot2::scale_y_continuous(
-    expand = ggplot2::expansion(mult = c(expand_bottom,
-                                         expand_top)),
-    sec.axis = sec_axis,
+  # Put it all together
+  ggplot2::scale_x_continuous(
+    expand = ggplot2::expansion(mult = c(expand_left, expand_right)),
     limits = limits,
-    breaks = custom_breaks,
-    ...
-  )
-}
-
-
-
-e61_x_continuous <- function(expand_left = 0,
-                             expand_right = 0.015,
-                             ...) {
-
-  ggplot2::scale_x_continuous(expand = ggplot2::expansion(mult = c(expand_left,
-                                                                   expand_right)),
-                              ...)
+    breaks = breaks,
+    ...)
 
 }
