@@ -57,7 +57,11 @@ mplot_label <- function(label, x, y, colour = NA, size = 3) {
     stop("The number of x and y positions must equal the number of labels.")
 
   # df requires vectors to be equal lengths
-  if (is.na(colour)) colour <- rep(colour, length(label))
+  if (length(colour) == 1 && is.na(colour)) {
+    colour <- rep(colour, length(label))
+  } else if (length(colour) != length(label)) {
+    stop("The number of colours must equal the number of labels.")
+  }
 
   plot_lab <- data.frame(
     label = label,
