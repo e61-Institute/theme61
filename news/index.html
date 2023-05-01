@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,16 +54,6 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.4.0" id="theme61-040">theme61 0.4.0<a class="anchor" aria-label="anchor" href="#theme61-040"></a></h2>
-<p>21 Apr 2023</p>
-<ul><li>Add the ability to make multi-panel graphs via <code><a href="../reference/mpanel_e61.html">mpanel_e61()</a></code> (referring to combining multiple discrete graphs into a single panel, not faceted graphs).</li>
-<li>Add dual y-axis support allowing for graphs with secondary y-axes with different scales to be created.</li>
-<li>Add experimental automatic graph height calculation in <code><a href="../reference/save_e61.html">save_e61()</a></code>, which should reduce the need for users to manually specify <code>height</code> when saving graphs.</li>
-<li>Add argument to <code><a href="../reference/save_e61.html">save_e61()</a></code> to allow you to save the data used to produce the graph as a csv.</li>
-<li>Correct whitespace margins around graphs.</li>
-<li>Improvements to various documentation.</li>
-</ul></div>
-    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.1" id="theme61-031">theme61 0.3.1<a class="anchor" aria-label="anchor" href="#theme61-031"></a></h2>
 <p>15 Mar 2023</p>
 <ul><li>Refactored <code><a href="../reference/mplot_label.html">mplot_label()</a></code> to use <code><a href="../reference/plot_label.html">plot_label()</a></code> as the underlying function rather than a <code>data.frame</code> and <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text()</a></code>. This fixed two bugs where the function throws an error if <code>colour</code> is an aesthetic in <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code> <code>aes</code> and the <code>x</code> argument was not automatically converting dates.</li>
@@ -72,7 +62,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="theme61-030">theme61 0.3.0<a class="anchor" aria-label="anchor" href="#theme61-030"></a></h2>
 <p>09 Mar 2023</p>
-<ul><li>Add new function <code>format_flip_bar_charts()</code> that applies most of the formatting needed to make horizontal bar graphs pretty.</li>
+<ul><li>Add new function <code><a href="../reference/format_flip_bar_charts.html">format_flip_bar_charts()</a></code> that applies most of the formatting needed to make horizontal bar graphs pretty.</li>
 <li>Add new functions <code><a href="../reference/plot_label.html">plot_label()</a></code> and <code><a href="../reference/mplot_label.html">mplot_label()</a></code> that make it easier to add on-graph plot labels. <code><a href="../reference/mplot_label.html">mplot_label()</a></code> is the vectorised version that lets you do multiple labels in one function.</li>
 <li>Add new function <code><a href="../reference/add_zeroline.html">add_zeroline()</a></code> to add an appropriately formatted black line along the zero y-axis.</li>
 <li>New functionality in <code><a href="../reference/e61_axes.html">scale_y_continuous_e61()</a></code> to specify break intervals directly in the <code>limits</code> argument.</li>
