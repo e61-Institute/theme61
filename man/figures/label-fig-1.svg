@@ -45,8 +45,18 @@
 <polyline points='15.65,59.16 225.30,59.16 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
 <polyline points='25.18,177.09 34.71,175.12 44.24,173.16 53.76,171.19 63.29,169.23 72.82,167.26 82.35,165.30 91.88,163.33 101.41,161.37 110.94,159.40 120.47,157.43 130.00,155.47 139.53,153.50 149.06,151.54 158.59,149.57 168.12,147.61 177.65,145.64 187.18,143.68 196.71,141.71 206.24,139.74 215.77,137.78 ' style='stroke-width: 2.13; stroke: #66CED6; stroke-linecap: butt;' />
 <polyline points='25.18,177.09 34.71,169.23 44.24,161.37 53.76,153.50 63.29,145.64 72.82,137.78 82.35,129.92 91.88,122.06 101.41,114.19 110.94,106.33 120.47,98.47 130.00,90.61 139.53,82.75 149.06,74.88 158.59,67.02 168.12,59.16 177.65,51.30 187.18,43.44 196.71,35.57 206.24,27.71 215.77,19.85 ' style='stroke-width: 2.13; stroke: #008080; stroke-linecap: butt;' />
+<<<<<<< HEAD
 <text x='187.18' y='132.97' style='font-size: 8.54px;fill: #66CED6; font-family: "Arial";' textLength='34.62px' lengthAdjust='spacingAndGlyphs'>Source A</text>
 <text x='187.18' y='77.94' style='font-size: 8.54px;fill: #008080; font-family: "Arial";' textLength='35.09px' lengthAdjust='spacingAndGlyphs'>Source B</text>
+=======
+<<<<<<< HEAD
+<text x='187.18' y='133.48' style='font-size: 9.96px;fill: #66CED6; font-family: "Arial";' textLength='40.39px' lengthAdjust='spacingAndGlyphs'>Source A</text>
+<text x='187.18' y='78.45' style='font-size: 9.96px;fill: #008080; font-family: "Arial";' textLength='40.94px' lengthAdjust='spacingAndGlyphs'>Source B</text>
+=======
+<text x='187.18' y='132.97' style='font-size: 8.54px;fill: #66CED6; font-family: "Arial";' textLength='34.62px' lengthAdjust='spacingAndGlyphs'>Source A</text>
+<text x='187.18' y='77.94' style='font-size: 8.54px;fill: #008080; font-family: "Arial";' textLength='35.09px' lengthAdjust='spacingAndGlyphs'>Source B</text>
+>>>>>>> 936e9f2 (update website)
+>>>>>>> 33ae431 (update website)
 <rect x='15.65' y='19.85' width='209.65' height='157.24' style='stroke-width: 1.50;' />
 </g>
 <g clip-path='url(#cpMC4wMHwyNDAuOTR8MC4wMHwyMTUuNDM=)'>
