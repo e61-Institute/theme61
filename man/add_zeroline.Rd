@@ -4,9 +4,14 @@
 \alias{add_zeroline}
 \title{Adds a black line at y = 0}
 \usage{
-add_zeroline(colour = "black", linewidth = 0.25)
+add_zeroline(y = 0, colour = "black", linewidth = 0.25)
 }
 \arguments{
+\item{y}{Numeric. The y-intercept of the line. Defaults to 0 since it is
+called \code{add_zeroline} after all. But you can set it to 100 if you have
+an index on your y-axis, for example. Or any other value if you're feeling
+chaotic.}
+
 \item{colour}{String. The line is black by default but you can change it if
 you need another colour.}
 

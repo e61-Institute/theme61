@@ -4,7 +4,15 @@
 \alias{mplot_label}
 \title{Add Multiple On-graph Labels to Graphs}
 \usage{
-mplot_label(label, x, y, colour = NA, size = 3)
+mplot_label(
+  label,
+  x,
+  y,
+  colour = NA,
+  size = 3,
+  hjust = 0,
+  geom = c("text", "label")
+)
 }
 \arguments{
 \item{label}{String vector. Label text to be displayed.}
@@ -18,6 +26,12 @@ order of colours in the e61 palette.}
 
 \item{size}{Integer. Size of the text, the default size should be appropriate
 in most cases.}
+
+\item{hjust}{A numeric value from 0-1. Adjusts the alignment of the text. 0
+left-aligns (default), 0.5 centre-aligns and 1 right-aligns.}
+
+\item{geom}{String. Either "text" (default) or "label". "label" adds a white
+box around the text which could be useful sometimes.}
 }
 \value{
 ggplot2 object
