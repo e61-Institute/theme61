@@ -53,8 +53,23 @@ test_that("Text and label plot labels work", {
     plot_label("text", 2, 2, 1, 1, geom = "text")
 
   withr::with_tempdir({
-    expect_snapshot_file(save_e61("plot-label-1.svg", p1, height = 10))
-    expect_snapshot_file(save_e61("plot-label-2.svg", p2, height = 10))
+    expect_snapshot_file(save_e61("plot-label-text-1.svg", p1, height = 10))
+    expect_snapshot_file(save_e61("plot-label-label-2.svg", p2, height = 10))
   })
+
+})
+
+test_that("Changing horizontal alignment of text works", {
+  skip("This 'test' is only for interactive purposes")
+
+  p1 <- ggplot() +
+    plot_label("Left-aligned text", 2, 2, 1, 1, hjust = 0) +
+    plot_label("Centre-aligned text", 2, 2.1, 1, 1, hjust = 0.5) +
+    plot_label("Right-aligned text", 2, 2.2, 1, 1, hjust = 1)
+
+  withr::with_tempdir({
+    expect_snapshot_file(save_e61("plot-label-hjust-1.svg", p1, height = 10))
+  })
+
 
 })
