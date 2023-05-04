@@ -1,3 +1,12 @@
+# theme61 0.4.0.9000
+
+XX XXX 2023
+
+* Added a new argument `hjust` to `plot_label()`/`mplot_label()` to change the alignment. Changed the default alignment of plot labels to left-align.
+* Added the ability to add a white box around text in `plot_label()`/`mplot_label()` through `geom` argument.
+* Added `y` argument to `add_zeroline()` so you can put your zero line at values other than zero.
+* Added more documentation explaining how `rel_heights` in `mpanel_e61()` works.
+
 # theme61 0.4.0
 
 21 Apr 2023
