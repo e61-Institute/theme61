@@ -50,7 +50,7 @@ dimensions.}
 graph was saved to (defaults to FALSE).}
 }
 \value{
-Invisibly returns the plot object.
+Invisibly returns the file name.
 }
 \description{
 Designed to save ggplot graphs made with the e61 theme with
