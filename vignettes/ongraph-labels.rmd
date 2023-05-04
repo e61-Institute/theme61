@@ -39,9 +39,9 @@ Finally, labels are more aesthetic than legends.
 
 The simplest way to add plot labels is to use the `plot_label()` function in `theme61`. The following code provides an example. Most of the code is to set up the mock data and create a graph, the only two lines that are important are the `plot_label()` lines.
 
-`plot_label()` requires you to provide the text of the label (`label`), the `x` and `y` positioning, the total number of different colours/labels to plot (`n_labs`), and which number element you are currently plotting (`n`). For more information, see the documentation (`?plot_label`).
+**If you have more than one label you should use `mplot_label()`**, which is introduced in the next section.
 
-If you have multiple labels it may be more efficient to use `mplot_label()`, which is introduced in the next section.
+`plot_label()` requires you to provide the text of the label (`label`), the `x` and `y` positioning, the total number of different colours/labels to plot (`n_labs`), and which number element you are currently plotting (`n`). For more information, see the documentation (`?plot_label`).
 
 ```{r}
 # Mock data
