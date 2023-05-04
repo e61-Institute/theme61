@@ -52,7 +52,7 @@
 #' @param dim_msg Logical. Set to TRUE if you want to know what dimensions the
 #'   graph was saved to (defaults to FALSE).
 #' @inheritParams ggplot2::ggsave
-#' @return Invisibly returns the plot object.
+#' @return Invisibly returns the file name.
 #' @export
 
 save_e61 <-
@@ -193,7 +193,7 @@ save_e61 <-
       data.table::fwrite(plot$data, data_name)
     }
 
-    invisible(plot)
+    invisible(filename)
   }
 
 #' Counts the number of occurrences of a line break (\n)
