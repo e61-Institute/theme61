@@ -47,8 +47,8 @@
 <polyline points='89.23,251.97 89.23,5.48 ' style='stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;' />
 <polyline points='137.97,251.97 137.97,5.48 ' style='stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;' />
 <polyline points='186.72,251.97 186.72,5.48 ' style='stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;' />
-<text x='137.97' y='243.82' text-anchor='middle' style='font-size: 8.54px;fill: #66CED6; font-family: "Arial";' textLength='21.81px' lengthAdjust='spacingAndGlyphs'>Plot 1</text>
-<text x='137.97' y='19.74' text-anchor='middle' style='font-size: 8.54px;fill: #008080; font-family: "Arial";' textLength='21.81px' lengthAdjust='spacingAndGlyphs'>Plot 2</text>
+<text x='137.97' y='243.82' style='font-size: 8.54px;fill: #66CED6; font-family: "Arial";' textLength='21.81px' lengthAdjust='spacingAndGlyphs'>Plot 1</text>
+<text x='137.97' y='19.74' style='font-size: 8.54px;fill: #008080; font-family: "Arial";' textLength='21.81px' lengthAdjust='spacingAndGlyphs'>Plot 2</text>
 </g>
 <g clip-path='url(#cpMC4wMHwyNDAuOTR8MC4wMHwyODMuNDY=)'>
 <text x='35.55' y='243.91' text-anchor='end' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='17.14px' lengthAdjust='spacingAndGlyphs'>2.00</text>
