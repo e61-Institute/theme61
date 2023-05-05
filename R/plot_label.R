@@ -31,7 +31,7 @@ plot_label <-
            n_labs = NA,
            n = NA,
            colour = NA,
-           size = 3,
+           size = 3.5,
            hjust = 0,
            geom = c("text", "label")) {
 
@@ -71,55 +71,62 @@ plot_label <-
 #'
 #' @return ggplot2 object
 #' @export
-mplot_label <- function(label, x, y, colour = NA, size = 3, hjust = 0, geom = c("text", "label")) {
+mplot_label <-
+  function(label,
+           x,
+           y,
+           colour = NA,
+           size = 3.5,
+           hjust = 0,
+           geom = c("text", "label")) {
 
-  geom <- match.arg(geom)
+    geom <- match.arg(geom)
 
-  if (!all.equal(length(label), length(x), length(y)))
-    stop("The number of x and y positions must equal the number of labels.")
+    if (!all.equal(length(label), length(x), length(y)))
+      stop("The number of x and y positions must equal the number of labels.")
 
-  # df requires vectors to be equal lengths
-  if (length(colour) == 1 && is.na(colour)) {
-    colour <- rep(colour, length(label))
-  } else if (length(colour) != length(label)) {
-    stop("The number of colours must equal the number of labels.")
-  }
+    # df requires vectors to be equal lengths
+    if (length(colour) == 1 && is.na(colour)) {
+      colour <- rep(colour, length(label))
+    } else if (length(colour) != length(label)) {
+      stop("The number of colours must equal the number of labels.")
+    }
 
-  plot_lab <- data.frame(
-    label = label,
-    x = x,
-    y = y,
-    colour = colour,
-    size = rep(size, length(label)),
-    hjust = rep(hjust, length(label)),
-    geom = rep(geom, length(label))
-  )
+    plot_lab <- data.frame(
+      label = label,
+      x = x,
+      y = y,
+      colour = colour,
+      size = rep(size, length(label)),
+      hjust = rep(hjust, length(label)),
+      geom = rep(geom, length(label))
+    )
 
-  plot_lab$n_labs <- nrow(plot_lab)
-  plot_lab$n <- 1:nrow(plot_lab)
+    plot_lab$n_labs <- nrow(plot_lab)
+    plot_lab$n <- 1:nrow(plot_lab)
 
-  # This converts the data.frame into a list of lists, where the 1st level list
-  # corresponds to each label, and the elements of the 2nd level list are the
-  # components needed for plot_label()
-  plot_lab <- split(plot_lab, seq(nrow(plot_lab)))
-  plot_lab <- lapply(plot_lab, as.list)
+    # This converts the data.frame into a list of lists, where the 1st level list
+    # corresponds to each label, and the elements of the 2nd level list are the
+    # components needed for plot_label()
+    plot_lab <- split(plot_lab, seq(nrow(plot_lab)))
+    plot_lab <- lapply(plot_lab, as.list)
 
-  # Runs through each list element and calls plot_label() to generate the labels
-  retval <-
-    lapply(plot_lab, function(x) {
-      plot_label(
-        label = x$label,
-        x = x$x,
-        y = x$y,
-        n_labs = x$n_labs,
-        n = x$n,
-        colour = x$colour,
-        size = x$size,
-        hjust = x$hjust,
-        geom = x$geom
-      )
-    })
+    # Runs through each list element and calls plot_label() to generate the labels
+    retval <-
+      lapply(plot_lab, function(x) {
+        plot_label(
+          label = x$label,
+          x = x$x,
+          y = x$y,
+          n_labs = x$n_labs,
+          n = x$n,
+          colour = x$colour,
+          size = x$size,
+          hjust = x$hjust,
+          geom = x$geom
+        )
+      })
 
-  return(retval)
+    return(retval)
 
 }
