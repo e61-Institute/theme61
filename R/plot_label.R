@@ -51,7 +51,7 @@ plot_label <-
 
   }
 
-#' Add Multiple On-graph Labels to Graphs
+#' Add multiple on-graph labels to graphs
 #'
 #' This is a vectorised version of \code{plot_label} to allow you to easily add
 #' multiple plot labels onto graphs.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_label.R
 \name{mplot_label}
 \alias{mplot_label}
-\title{Add Multiple On-graph Labels to Graphs}
+\title{Add multiple on-graph labels to graphs}
 \usage{
 mplot_label(
   label,
