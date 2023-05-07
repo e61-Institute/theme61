@@ -2,10 +2,14 @@
 
 XX XXX 2023
 
-* Added a new argument `hjust` to `plot_label()`/`mplot_label()` to change the alignment. Changed the default alignment of plot labels to left-align.
+* Added new functions `set_open_graph()` and `unset_open_graph()` which toggles an option to automatically open a graph that has been created with `save_e61()`. Helpful for your workflow when perfecting graphs.
+* Change the default alignment of plot labels to left-align and added a new argument `hjust` to `plot_label()`/`mplot_label()` to change the alignment.
 * Added the ability to add a white box around text in `plot_label()`/`mplot_label()` through `geom` argument.
 * Added `y` argument to `add_zeroline()` so you can put your zero line at values other than zero.
 * Added more documentation explaining how `rel_heights` in `mpanel_e61()` works.
+* Fixed a bug in `mplot_label()` that didn't allow a vector of colours to be supplied.
+* Refactored `scale_y_continuous_e61()` with cleaner code (no functionality changes).
+* Slightly increased default size of plot labels to match size of axis text.
 
 # theme61 0.4.0
 
