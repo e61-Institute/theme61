@@ -3,8 +3,7 @@
 \name{set_open_graph}
 \alias{set_open_graph}
 \alias{unset_open_graph}
-\title{Sets a session-wide option to automatically open files created by
-\code{save_e61}}
+\title{Set option to automatically open files created by \code{save_e61}}
 \usage{
 set_open_graph()
 

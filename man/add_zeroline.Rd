@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_zeroline.R
 \name{add_zeroline}
 \alias{add_zeroline}
-\title{Adds a black line at y = 0}
+\title{Adds a thin black line at y = 0}
 \usage{
 add_zeroline(y = 0, colour = "black", linewidth = 0.25)
 }
@@ -22,5 +22,12 @@ should be appropriate for default graph scaling.}
 ggplot object
 }
 \description{
-Adds a black line at y = 0
+Adds a thin black line (by default at y = 0). This is useful shorthand for
+when you would otherwise have to use \code{geom_hline}, which by default adds
+a black line that is too thick.
+}
+\details{
+Some examples of when you want a zeroline include whenever the y-axis on your
+graph includes 0 (for units and percentages) or 100 (for indices that start
+at 100).
 }
