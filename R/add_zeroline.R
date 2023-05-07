@@ -1,4 +1,12 @@
-#' Adds a black line at y = 0
+#' Adds a thin black line at y = 0
+#'
+#' Adds a thin black line (by default at y = 0). This is useful shorthand for
+#' when you would otherwise have to use \code{geom_hline}, which by default adds
+#' a black line that is too thick.
+#'
+#' Some examples of when you want a zeroline include whenever the y-axis on your
+#' graph includes 0 (for units and percentages) or 100 (for indices that start
+#' at 100).
 #'
 #' @param y Numeric. The y-intercept of the line. Defaults to 0 since it is
 #'   called \code{add_zeroline} after all. But you can set it to 100 if you have
