@@ -9,7 +9,7 @@ mplot_label(
   x,
   y,
   colour = NA,
-  size = 3,
+  size = 3.5,
   hjust = 0,
   geom = c("text", "label")
 )
