@@ -11,7 +11,7 @@ plot_label(
   n_labs = NA,
   n = NA,
   colour = NA,
-  size = 3,
+  size = 3.5,
   hjust = 0,
   geom = c("text", "label")
 )
