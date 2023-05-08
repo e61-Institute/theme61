@@ -91,7 +91,7 @@ save_e61 <-
     if (is_multi && is.null(height)) {
       height <- 7.5 + 7 * (attr(plot, "panel_rows") - 1)
 
-      cli::cli_text(cli::col_red("Note: You are saving a multi-panel graph, save_e61() has automatically set the height to ", height, ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
+      cli::cli_text(cli::col_green("Note: You are saving a multi-panel graph, save_e61() has automatically set the height to ", height, ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
     }
 
 
@@ -144,9 +144,9 @@ save_e61 <-
     # setting is used it does not trigger.
     if (is.null(height) || isTRUE(getOption("save_e61.message"))) {
 
-      cli::cli_text(cli::col_red("Note: When you use ", sQuote("save_e61()"), " to save images with defaults, you should set the ", sQuote("height"), " argument manually to your own value to avoid excess/insufficient whitespace on the rendered image."))
-      cli::cli_text("Unfortunately the only way to check this is to open the rendered graphic and inspect it visually.")
-      cli::cli_text("This message is shown if you leave 'height = NULL' and the automatic height functionality is not used. It may be disabled by setting options('save_e61.message' = FALSE). See ?save_e61 for more details.")
+      cli::cli_text(cli::col_green("Note: When you use ", sQuote("save_e61()"), " to save images with defaults, you should set the ", sQuote("height"), " argument manually to your own value to avoid excess/insufficient whitespace on the rendered image."))
+      cli::cli_text(cli::col_green("Unfortunately the only way to check this is to open the rendered graphic and inspect it visually."))
+      cli::cli_text(cli::col_green("This message is shown if you leave 'height = NULL' and the automatic height functionality is not used. It may be disabled by setting options('save_e61.message' = FALSE). See ?save_e61 for more details."))
 
       options('save_e61.message' = FALSE)
     }
