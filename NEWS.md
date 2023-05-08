@@ -1,3 +1,9 @@
+# theme61 0.4.1
+
+08 May 2023
+
+* Fixing a bug in `plot_label()` caused by a change to how dates work in R 4.3.0. Unfortunately this means that if you are using dates to specify x-axis locations for your label, you will now have to surround them in `as.Date()` rather than just putting in the plain string.
+
 # theme61 0.4.0
 
 21 Apr 2023
