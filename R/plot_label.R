@@ -26,11 +26,11 @@ plot_label <- function(label, x, y, n_labs = NA, n = NA, colour = NA, size = 3) 
 
   if (is.na(colour)) colour <- e61_palette(n_labs)[[n]]
 
-  # Automatically convert dates to dates if specified, so the user doesn't have
-  # to wrap dates in as.Date() which saves some room.
-  if (class(try(as.Date(x), silent = TRUE)) != "try-error") {
-    x <- as.Date(x)
-  }
+  # # Automatically convert dates to dates if specified, so the user doesn't have
+  # # to wrap dates in as.Date() which saves some room.
+  # if (class(try(as.Date(x), silent = TRUE)) != "try-error") {
+  #   x <- as.Date(x)
+  # }
 
   annotate("text", label = label, x = x, y = y, size = size,
            colour = colour)
