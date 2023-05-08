@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,11 @@
       <small>Source: <a href="https://github.com/e61-institute/theme61/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.1" id="theme61-041">theme61 0.4.1<a class="anchor" aria-label="anchor" href="#theme61-041"></a></h2>
+<p>08 May 2023</p>
+<ul><li>Fixing a bug in <code><a href="../reference/plot_label.html">plot_label()</a></code> caused by a change to how dates work in R 4.3.0. Unfortunately this means that if you are using dates to specify x-axis locations for your label, you will now have to surround them in <code><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date()</a></code> rather than just putting in the plain string.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="theme61-040">theme61 0.4.0<a class="anchor" aria-label="anchor" href="#theme61-040"></a></h2>
 <p>21 Apr 2023</p>
