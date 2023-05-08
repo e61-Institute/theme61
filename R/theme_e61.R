@@ -53,12 +53,12 @@ theme_e61 <- function(y_top = TRUE,
   # Add a message for the user reminding them to use scale_y_continuous_e61
   if(getOption("scale_e61.message", TRUE)) {
 
-    message(paste(
+    cli::cli_text(cli::col_cyan(paste(
       "Please remember to use", sQuote("scale_y_continuous_e61()"),
       "in conjunction with", sQuote("theme_e61()"), "to ensure the graph axes",
       "render correctly.",
       'This message is shown once per session and may be disabled by setting',
-      "options('save_e61.message' = FALSE). See ?theme_e61 for more details."))
+      "options('save_e61.message' = FALSE). See ?theme_e61 for more details.")))
     options("scale_e61.message" = FALSE)
   }
 
