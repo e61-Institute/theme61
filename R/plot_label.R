@@ -34,7 +34,6 @@ plot_label <-
            size = 3.5,
            hjust = 0,
            geom = c("text", "label")) {
-
     geom <- match.arg(geom)
 
     if (is.na(colour) && (is.na(n_labs) || is.na(n)))
@@ -42,16 +41,15 @@ plot_label <-
 
     if (is.na(colour)) colour <- e61_palette(n_labs)[[n]]
 
-    # Automatically convert dates to dates if specified, so the user doesn't have
-    # to wrap dates in as.Date() which saves some room.
-    if (class(try(as.Date(x), silent = TRUE)) != "try-error") {
-      x <- as.Date(x)
-    }
+    # # Automatically convert dates to dates if specified, so the user doesn't have
+    # # to wrap dates in as.Date() which saves some room.
+    # if (class(try(as.Date(x), silent = TRUE)) != "try-error") {
+    #   x <- as.Date(x)
+    # }
 
-    annotate(geom = geom, label = label, x = x, y = y, size = size,
-             colour = colour, hjust = hjust)
+    annotate(geom = geom, label = label, x = x, y = y, size = size, colour = colour, hjust = hjust)
 
-}
+  }
 
 #' Add multiple on-graph labels to graphs
 #'

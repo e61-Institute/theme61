@@ -45,8 +45,8 @@
 <polyline points='15.65,69.62 225.30,69.62 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
 <polyline points='25.18,187.55 34.71,185.59 44.24,183.62 53.76,181.65 63.29,179.69 72.82,177.72 82.35,175.76 91.88,173.79 101.41,171.83 110.94,169.86 120.47,167.90 130.00,165.93 139.53,163.97 149.06,162.00 158.59,160.03 168.12,158.07 177.65,156.10 187.18,154.14 196.71,152.17 206.24,150.21 215.77,148.24 ' style='stroke-width: 2.13; stroke: #66CED6; stroke-linecap: butt;' />
 <polyline points='25.18,187.55 34.71,179.69 44.24,171.83 53.76,163.97 63.29,156.10 72.82,148.24 82.35,140.38 91.88,132.52 101.41,124.66 110.94,116.79 120.47,108.93 130.00,101.07 139.53,93.21 149.06,85.35 158.59,77.48 168.12,69.62 177.65,61.76 187.18,53.90 196.71,46.04 206.24,38.17 215.77,30.31 ' style='stroke-width: 2.13; stroke: #008080; stroke-linecap: butt;' />
-<text x='187.18' y='143.44' style='font-size: 8.54px;fill: #66CED6; font-family: "Arial";' textLength='34.62px' lengthAdjust='spacingAndGlyphs'>Source A</text>
-<text x='187.18' y='88.40' style='font-size: 8.54px;fill: #008080; font-family: "Arial";' textLength='35.09px' lengthAdjust='spacingAndGlyphs'>Source B</text>
+<text x='187.18' y='143.94' style='font-size: 9.96px;fill: #66CED6; font-family: "Arial";' textLength='40.39px' lengthAdjust='spacingAndGlyphs'>Source A</text>
+<text x='187.18' y='88.91' style='font-size: 9.96px;fill: #008080; font-family: "Arial";' textLength='40.94px' lengthAdjust='spacingAndGlyphs'>Source B</text>
 <rect x='15.65' y='30.31' width='209.65' height='157.24' style='stroke-width: 1.50;' />
 </g>
 <g clip-path='url(#cpMC4wMHwyNDAuOTR8MC4wMHwyMjMuOTQ=)'>

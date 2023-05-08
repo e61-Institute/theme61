@@ -1,4 +1,4 @@
-# theme61 0.4.0.9000
+# theme61 0.4.1.9000
 
 XX XXX 2023
 
@@ -10,6 +10,12 @@ XX XXX 2023
 * Fixed a bug in `mplot_label()` that didn't allow a vector of colours to be supplied.
 * Refactored `scale_y_continuous_e61()` with cleaner code (no functionality changes).
 * Slightly increased default size of plot labels to match size of axis text.
+
+# theme61 0.4.1
+
+08 May 2023
+
+* Fixing a bug in `plot_label()` caused by a change to how dates work in R 4.3.0. Unfortunately this means that if you are using dates to specify x-axis locations for your label, you will now have to surround them in `as.Date()` rather than just putting in the plain string.
 
 # theme61 0.4.0
 
