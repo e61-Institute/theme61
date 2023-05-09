@@ -66,7 +66,7 @@ save_e61 <-  function(filename,
                       dim_msg = FALSE
                       ) {
 
-  if (!grepl("(\\.png|\\.svg)", filename))
+  if (!grepl("(\\.png$|\\.svg$)", filename))
     stop("You must provide a file extension. Only .svg and .png file formats are currently supported.")
 
   # Check if the data frame can be written
