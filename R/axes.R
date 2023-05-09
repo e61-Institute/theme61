@@ -26,24 +26,21 @@
 #'     and the increment between each axis tick, e.g. \code{c(0, 25, 5)} will
 #'     set the axis to range from 0 to 25, with increments of 5 per tick.}
 #'     }
-#' @inheritDotParams ggplot2::scale_y_continuous -breaks -minor_breaks -n.breaks
-#'   -expand -sec.axis
+#' @inheritDotParams ggplot2::scale_y_continuous name oob na.value trans guide
+#'   position
 #'
 #' @rdname e61_axes
 #' @export
 
 scale_y_continuous_e61 <- function(limits = NULL,
-                                   sec_axis = dup_axis(),
+                                   sec_axis = ggplot2::dup_axis(),
                                    y_top = TRUE,
                                    expand_bottom = 0,
                                    expand_top = 0,
                                    ...) {
 
   # Set sec_axis to default behaviour if we don't want it
-  if (isFALSE(sec_axis)) sec_axis <- waiver()
-
-  # Put the little bit of y-axis back in
-  if (isFALSE(y_top)) limits[[2]] <- limits[[2]] + 0.0001
+  if (isFALSE(sec_axis)) sec_axis <- ggplot2::waiver()
 
   # Prepares limits and breaks
   if (!is.null(limits) && is.numeric(limits)) {
@@ -52,13 +49,13 @@ scale_y_continuous_e61 <- function(limits = NULL,
       breaks <- seq(limits[[1]], limits[[2]], limits[[3]])
 
       # Hides the last break to make space for the unit label
-      breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
+      if (isTRUE(y_top)) breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
 
     } else {
       breaks <- function(x) {
         x <- scales::breaks_extended()(x)
         # Hides the last break to make space for the unit label
-        x[x == max(x, na.rm = TRUE)] <- NA
+        if (isTRUE(y_top)) breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
         return(x)
       }
     }
@@ -77,14 +74,16 @@ scale_y_continuous_e61 <- function(limits = NULL,
 
 }
 
+#' @param hide_first_last Logical. Defaults to TRUE. Hides the first and
+#'   last x-axis labels to avoid overlapping with the bottom of the y-axis.
 #' @inheritParams scale_y_continuous_e61
-#' @inheritDotParams ggplot2::scale_x_continuous
 #' @rdname e61_axes
 #' @export
 
 scale_x_continuous_e61 <- function(limits = NULL,
                                    expand_left = 0,
                                    expand_right = 0,
+                                   keep_first_last = FALSE,
                                    ...) {
 
   # Prepares limits and breaks
@@ -94,15 +93,20 @@ scale_x_continuous_e61 <- function(limits = NULL,
       breaks <- seq(limits[[1]], limits[[2]], limits[[3]])
 
       # Hides the first and last break
-      breaks[breaks == min(breaks, na.rm = TRUE)] <- NA
-      breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
+      if (hide_first_last) {
+        breaks[breaks == min(breaks, na.rm = TRUE)] <- NA
+        breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
+      }
+
 
     } else {
       breaks <- function(x) {
         x <- scales::breaks_extended()(x)
         # Hides the first and last break
-        x[x == min(x, na.rm = TRUE)] <- NA
-        x[x == max(x, na.rm = TRUE)] <- NA
+        if (hide_first_last) {
+          x[x == min(x, na.rm = TRUE)] <- NA
+          x[x == max(x, na.rm = TRUE)] <- NA
+        }
         return(x)
       }
     }
