@@ -322,10 +322,18 @@ theme_e61_clean <- function(
 #'
 #' Legend symbols for line graphs default to coloured lines, which can sometimes
 #' be hard to read. This function overrides the default and converts the colours
-#' to squares.
+#' to squares. This needs to be used in conjunction with some invisible point
+#' geoms so the function has a shape to reshape.
 #'
 #' @return ggplot object
 #' @export
+#' @examples
+#' ggplot(data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
+#'   aes(x, y, colour = group)) +
+#'   geom_line() +
+#'   geom_point(alpha = 0) + # The required "invisible points"
+#'   square_legend_symbols()
+#'
 
 square_legend_symbols <- function() {
   ggplot2::guides(colour = ggplot2::guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))
