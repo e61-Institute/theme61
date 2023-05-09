@@ -159,6 +159,7 @@ save_e61 <-  function(filename,
   if (is.null(width) && is_flip) width <- 17
   if (is.null(height) && is_flip) height <- 12
 
+  # Resize elements if a png is to be output
   if (!is.null(resize)) {
     if (!grepl("\\.png", filename))
       stop("The 'resize' argument is not supported unless the file format is .png")
@@ -174,6 +175,7 @@ save_e61 <-  function(filename,
 
   }
 
+  # This saves the graph to disk
   ggplot2::ggsave(
     filename,
     plot = plot,
@@ -184,6 +186,7 @@ save_e61 <-  function(filename,
     dpi = dpi
   )
 
+  ## Post saving messages and functionality below
   if (dim_msg) cli::cli_text(cli::col_green("The graph height and width have been set to ", height, " and ", width, "."))
 
   # Save the data used to make the graph
@@ -192,7 +195,7 @@ save_e61 <-  function(filename,
     data.table::fwrite(plot$data, data_name)
   }
 
-  # Opens the graph file if the environment variable is set
+  # Opens the graph file if the option is set
   if (as.logical(getOption("open_e61_graph", FALSE))) {
     file_to_open <- shQuote(here::here(filename))
 
@@ -201,6 +204,9 @@ save_e61 <-  function(filename,
     if (out != 0) warning("Graph file could not be opened.")
   }
 
+  # Invisibly returns the filename because not sure what else is worth
+  # returning? Currently some of the tests rely on the filename being returned
+  # so maybe don't change this without a good reason.
   invisible(filename)
 }
 
