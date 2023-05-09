@@ -11,6 +11,7 @@
 * Fixed a bug in `mplot_label()` that didn't allow a vector of colours to be supplied.
 * Refactored `scale_y_continuous_e61()` with cleaner code (no functionality changes).
 * Slightly increased default size of plot labels to match size of axis text.
+* Miscellaneous minor documentation improvements.
 
 # theme61 0.4.0
 
