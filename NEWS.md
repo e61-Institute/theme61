@@ -2,14 +2,23 @@
 
 XX XXX 2023
 
-* Added new functions `set_open_graph()` and `unset_open_graph()` which toggles an option to automatically open a graph that has been created with `save_e61()`. Helpful for your workflow when perfecting graphs.
+## New functions
+
+* Added new functions `set_open_graph()` and `unset_open_graph()` which toggle an option to automatically open a graph that has been created with `save_e61()`. Helpful for your workflow when perfecting graphs.
+
+## New/changed functionality
+
 * Change the default alignment of plot labels to left-align and added a new argument `hjust` to `plot_label()`/`mplot_label()` to change the alignment.
 * Added the ability to add a white box around text in `plot_label()`/`mplot_label()` through `geom` argument.
 * Added `y` argument to `add_zeroline()` so you can put your zero line at values other than zero.
-* Added more documentation explaining how `rel_heights` in `mpanel_e61()` works.
-* Fixed a bug in `mplot_label()` that didn't allow a vector of colours to be supplied.
-* Refactored `scale_y_continuous_e61()` with cleaner code (no functionality changes).
+* Added argument to `scale_x_continuous_e61()` to add back the first/last labels that are removed by default.
 * Slightly increased default size of plot labels to match size of axis text.
+
+## Bug fixes and documentation changes
+
+* Fixed a bug in `scale_y_continuous_e61()` that made `y_top` stop working and also refactored the code.
+* Fixed a bug in `mplot_label()` that didn't allow a vector of colours to be supplied.
+* Added more documentation explaining how `rel_heights` in `mpanel_e61()` works.
 * Miscellaneous minor documentation improvements.
 
 # theme61 0.4.1
