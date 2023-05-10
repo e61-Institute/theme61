@@ -16,6 +16,7 @@
 
 #### Bug fixes and documentation changes
 
+* Permanent fix to the bug that was temporarily bodged in v0.4.1. Now dates can be entered as strings in `plot_label()` and they will be converted to dates.
 * Fixed a bug in `scale_y_continuous_e61()` that made `y_top` stop working and also refactored the code.
 * Fixed a bug in `mplot_label()` that didn't allow a vector of colours to be supplied.
 * Added more documentation explaining how `rel_heights` in `mpanel_e61()` works.
