@@ -8,6 +8,7 @@ XX XXX 2023
 
 #### New/changed functionality
 
+* Add support in `save_e61()` for saving images in PDF format for compatibility with LaTeX.
 * Change the default alignment of plot labels to left-align and added a new argument `hjust` to `plot_label()`/`mplot_label()` to change the alignment.
 * Added the ability to add a white box around text in `plot_label()`/`mplot_label()` through `geom` argument.
 * Added `y` argument to `add_zeroline()` so you can put your zero line at values other than zero.
