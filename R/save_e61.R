@@ -4,11 +4,11 @@
 #'   sensible defaults that ensure the text size is appropriately proportioned
 #'   given default sizing.
 #'
-#'   Currently the only file formats supported are \code{.svg} (preferred) and
-#'   \code{.png}. SVG is a modern vector graphics file format which means it can
-#'   be scaled up and down in size without blurring or becoming pixelated. Use
-#'   the PNG file format in the rare case that vector graphics are not
-#'   supported.
+#'   Currently the only file formats supported are \code{.pdf} or \code{.svg}
+#'   (preferred), and \code{.png}. PDF and SVG are modern vector graphics file
+#'   formats which can be scaled up and down in size without blurring or
+#'   becoming pixelated. Use the PNG file format in the rare case that vector
+#'   graphics are not supported.
 #'
 #'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 #'
@@ -66,8 +66,8 @@ save_e61 <-  function(filename,
                       dim_msg = FALSE
                       ) {
 
-  if (!grepl("(\\.png$|\\.svg$)", filename))
-    stop("You must provide a file extension. Only .svg and .png file formats are currently supported.")
+  if (!grepl("(\\.png|\\.svg|\\.pdf)$", filename))
+    stop("You must provide a file extension. Only PDF, SVG and PNG file formats are currently supported.")
 
   # Check if the data frame can be written
   if (save_data && !is.data.frame(plot$data))
