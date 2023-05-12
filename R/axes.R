@@ -55,7 +55,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
       breaks <- function(x) {
         x <- scales::breaks_extended()(x)
         # Hides the last break to make space for the unit label
-        if (isTRUE(y_top)) breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
+        if (isTRUE(y_top)) x[x == max(x, na.rm = TRUE)] <- NA
         return(x)
       }
     }
