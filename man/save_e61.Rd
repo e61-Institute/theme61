@@ -57,11 +57,11 @@ Designed to save ggplot graphs made with the e61 theme with
   sensible defaults that ensure the text size is appropriately proportioned
   given default sizing.
 
-  Currently the only file formats supported are \code{.svg} (preferred) and
-  \code{.png}. SVG is a modern vector graphics file format which means it can
-  be scaled up and down in size without blurring or becoming pixelated. Use
-  the PNG file format in the rare case that vector graphics are not
-  supported.
+  Currently the only file formats supported are \code{.pdf} or \code{.svg}
+  (preferred), and \code{.png}. PDF and SVG are modern vector graphics file
+  formats which can be scaled up and down in size without blurring or
+  becoming pixelated. Use the PNG file format in the rare case that vector
+  graphics are not supported.
 
   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 }
