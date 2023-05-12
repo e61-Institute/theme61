@@ -66,8 +66,19 @@ save_e61 <-  function(filename,
                       dim_msg = FALSE
                       ) {
 
-  if (!grepl("(\\.png|\\.svg|\\.pdf)$", filename))
+  # Enforce file format requirements (quietly support EPS too)
+  if (!grepl("\\.(png|svg|pdf|eps)$", filename))
     stop("You must provide a file extension. Only PDF, SVG and PNG file formats are currently supported.")
+
+  device <- if (grepl("\\.pdf$", filename)) {
+    "cairo_pdf"
+    } else if (grepl("\\.svg$", filename)) {
+      "svg"
+    } else if (grepl("\\.png$", filename)) {
+      "png"
+    } else if (grepl("\\.eps$", filename)) {
+      "eps"
+    }
 
   # Check if the data frame can be written
   if (save_data && !is.data.frame(plot$data))
@@ -178,6 +189,7 @@ save_e61 <-  function(filename,
   # This saves the graph to disk
   ggplot2::ggsave(
     filename,
+    device = get(device),
     plot = plot,
     width = width,
     height = height,
