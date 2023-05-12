@@ -83,7 +83,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
 scale_x_continuous_e61 <- function(limits = NULL,
                                    expand_left = 0,
                                    expand_right = 0,
-                                   keep_first_last = FALSE,
+                                   hide_first_last = TRUE,
                                    ...) {
 
   # Prepares limits and breaks
