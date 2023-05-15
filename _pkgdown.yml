@@ -13,8 +13,8 @@ reference:
 
 - title: Formatting
   contents:
-  - format_flipped_bar
   - e61_palette
+  - format_flipped_bar
   - mpanel_e61
   - square_legend_symbols
   - theme_e61
@@ -30,6 +30,8 @@ reference:
   contents:
   - crop_aus_coord
   - e61_map
+  - set_open_graph
+  - unset_open_graph
 
 - title: Colours
   contents:

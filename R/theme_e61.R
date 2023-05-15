@@ -53,12 +53,12 @@ theme_e61 <- function(y_top = TRUE,
   # Add a message for the user reminding them to use scale_y_continuous_e61
   if(getOption("scale_e61.message", TRUE)) {
 
-    message(paste(
+    cli::cli_text(cli::col_cyan(paste(
       "Please remember to use", sQuote("scale_y_continuous_e61()"),
       "in conjunction with", sQuote("theme_e61()"), "to ensure the graph axes",
       "render correctly.",
       'This message is shown once per session and may be disabled by setting',
-      "options('save_e61.message' = FALSE). See ?theme_e61 for more details."))
+      "options('save_e61.message' = FALSE). See ?theme_e61 for more details.")))
     options("scale_e61.message" = FALSE)
   }
 
@@ -322,10 +322,18 @@ theme_e61_clean <- function(
 #'
 #' Legend symbols for line graphs default to coloured lines, which can sometimes
 #' be hard to read. This function overrides the default and converts the colours
-#' to squares.
+#' to squares. This needs to be used in conjunction with some invisible point
+#' geoms so the function has a shape to reshape.
 #'
 #' @return ggplot object
 #' @export
+#' @examples
+#' ggplot(data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
+#'   aes(x, y, colour = group)) +
+#'   geom_line() +
+#'   geom_point(alpha = 0) + # The required "invisible points"
+#'   square_legend_symbols()
+#'
 
 square_legend_symbols <- function() {
   ggplot2::guides(colour = ggplot2::guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))

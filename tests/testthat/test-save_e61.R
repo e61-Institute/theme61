@@ -90,7 +90,7 @@ test_that("Test support for different file formats", {
     expected_deets <-
       tibble::tibble(
         format = "SVG",
-        width = 321,
+        width = 320,
         height = 268
       )
 
@@ -110,6 +110,10 @@ test_that("Test support for different file formats", {
     expect_error(suppressMessages(save_e61(paste0(tempdir(), "\\png-text.jpg"))))
 
   })
+
+  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), g)))
+  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".pdf"), g)))
+  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".png"), g)))
 
 })
 
@@ -173,3 +177,4 @@ test_that("Test whether save_data works", {
 
   expect_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), save_data = TRUE)))
 })
+
