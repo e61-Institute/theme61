@@ -18,7 +18,7 @@ scale_x_continuous_e61(
   limits = NULL,
   expand_left = 0,
   expand_right = 0,
-  keep_first_last = FALSE,
+  hide_first_last = TRUE,
   ...
 )
 }
