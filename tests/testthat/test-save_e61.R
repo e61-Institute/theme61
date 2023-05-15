@@ -111,9 +111,9 @@ test_that("Test support for different file formats", {
 
   })
 
-  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), graph)))
-  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".pdf"), graph)))
-  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".png"), graph)))
+  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), g)))
+  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".pdf"), g)))
+  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".png"), g)))
 
 })
 
