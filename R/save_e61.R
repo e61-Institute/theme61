@@ -69,7 +69,7 @@ save_e61 <-  function(filename,
 
   # Guard clauses and failing checks ----------------------------------------
 
-  # Enforce file format requirements (quietly support EPS too)
+  # Enforce file format requirements (quiet support for EPS only)
   if (!grepl("\\.(png|svg|pdf|eps)$", filename))
     stop("You must provide a file extension. Only PDF, SVG and PNG file formats are currently supported.")
 
@@ -95,7 +95,6 @@ save_e61 <-  function(filename,
   # labs_e61 forces the user to have at least a title (so length > 0 for
   # single panels)
   is_multi <- !is.null(attr(plot, "panel_rows"))
-
 
   # Advisory messages -------------------------------------------------------
 
@@ -123,7 +122,6 @@ save_e61 <-  function(filename,
       "to ensure the e61 colour palette is used.")))
   }
 
-
   # Height and width setting ------------------------------------------------
 
   # For multi-panels: Adjust the width to fit the extra panels and send out user
@@ -138,7 +136,6 @@ save_e61 <-  function(filename,
     cli::cli_text(cli::col_green("Note: You are saving a multi-panel graph, save_e61() has automatically set the height to ", height, ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
   }
 
-
   # Calculate graph height based on the graph labels for normal orientation graphs
   if (is.null(height) && !is_flip && !is_multi) {
 
@@ -147,35 +144,20 @@ save_e61 <-  function(filename,
     # Calculate the height adjustment needed for...
 
     # Titles
-    if (!is.null(plot$labels$title)) {
-      t_adj <- 0.6 + n_count(plot$labels$title) * 0.3
-
-    } else {
-      t_adj <- 0
-    }
+    t_adj <-
+      if (!is.null(plot$labels$title)) 0.6 + n_count(plot$labels$title) * 0.3 else 0
 
     # Subtitles
-    if (!is.null(plot$labels$subtitle)) {
-      st_adj <- 0.5 + n_count(plot$labels$subtitle) * 0.3
-
-    } else {
-      st_adj <- 0
-    }
+    st_adj <-
+      if (!is.null(plot$labels$subtitle)) 0.5 + n_count(plot$labels$subtitle) * 0.3 else 0
 
     # Captions
-    if (!is.null(plot$labels$caption)) {
-      cp_adj <- 0.5 + n_count(plot$labels$caption) * 0.3
-
-    } else {
-      cp_adj <- 0
-    }
+    cp_adj <-
+      if (!is.null(plot$labels$caption)) 0.5 + n_count(plot$labels$caption) * 0.3 else 0
 
     # Adjustment for width of y-axis label
-    if (!is.null(plot$labels$y)) {
-      y_adj <- (nchar(plot$labels$y) - 1) * -0.2
-    } else {
-      y_adj <- 0
-    }
+    y_adj <-
+      if (!is.null(plot$labels$y)) (nchar(plot$labels$y) - 1) * -0.2 else 0
 
   height <- h + t_adj + st_adj + cp_adj + y_adj
 
