@@ -11,9 +11,9 @@ test_that("Test dimensioning functions", {
 
   # Test custom dimensions work
   withr::with_tempdir({
-    expect_snapshot_file(save_e61("custom-dim-1.svg", ggplot(), width = 10, height = 10))
-    expect_snapshot_file(save_e61("custom-dim-2.svg", ggplot(), width = 10, height = 5))
-    expect_snapshot_file(save_e61("custom-dim-3.svg", ggplot(), width = 5, height = 10))
+    expect_snapshot_file(suppressMessages(save_e61("custom-dim-1.svg", ggplot(), width = 10, height = 10)))
+    expect_snapshot_file(suppressMessages(save_e61("custom-dim-2.svg", ggplot(), width = 10, height = 5)))
+    expect_snapshot_file(suppressMessages(save_e61("custom-dim-3.svg", ggplot(), width = 5, height = 10)))
   })
 
   # Test horizontal graph detection code
@@ -111,9 +111,9 @@ test_that("Test support for different file formats", {
 
   })
 
-  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), g)))
-  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".pdf"), g)))
-  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".png"), g)))
+  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), g), classes = c("warning", "message")))
+  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".pdf"), g), classes = c("warning", "message")))
+  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".png"), g), classes = c("warning", "message")))
 
 })
 
@@ -208,9 +208,9 @@ test_that("Test advisory messages", {
   )
 
   # No messages for multipanels
-  gg4 <- mpanel_e61(gg, gg, gg, gg)
+  gg <- mpanel_e61(gg)
 
   expect_no_message(
-    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg4, height = 1))
+    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
   )
 })
