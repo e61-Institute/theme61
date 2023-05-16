@@ -14,6 +14,7 @@
 * Added `y` argument to `add_zeroline()` so you can put your zero line at values other than zero.
 * Added argument to `scale_x_continuous_e61()` to add back the first/last labels that are removed by default.
 * Slightly increased default size of plot labels to match size of axis text.
+* `save_e61()` now notifies you if you forget to use the theme and scale functions.
 
 #### Bug fixes and documentation changes
 
