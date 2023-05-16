@@ -70,15 +70,13 @@ save_e61 <-  function(filename,
   if (!grepl("\\.(png|svg|pdf|eps)$", filename))
     stop("You must provide a file extension. Only PDF, SVG and PNG file formats are currently supported.")
 
-  device <- if (grepl("\\.pdf$", filename)) {
-    "cairo_pdf"
-    } else if (grepl("\\.svg$", filename)) {
-      "svg"
-    } else if (grepl("\\.png$", filename)) {
-      "png"
-    } else if (grepl("\\.eps$", filename)) {
-      "eps"
-    }
+  device <- switch(
+    gsub(".*\\.(\\w+)$", "\\1", filename),
+    pdf = "cairo_pdf",
+    svg = "svg",
+    png = "png",
+    eps = "eps"
+  )
 
   # Check if the data frame can be written
   if (save_data && !is.data.frame(plot$data))
@@ -93,7 +91,8 @@ save_e61 <-  function(filename,
   # single panels)
   is_multi <- !is.null(attr(plot, "panel_rows"))
 
-  # For multi-panels: Adjust the width to fit the extra panels and send out user message to specify the height
+  # For multi-panels: Adjust the width to fit the extra panels and send out user
+  # message to specify the height
   if (is_multi && is.null(width)) {
     width <- 8.5 * attr(plot, "panel_cols")
   }
