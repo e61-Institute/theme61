@@ -56,8 +56,8 @@ graph_data[source == "Source B", y := seq(0, by = 1, length = 21)]
 # Graph
 graph <- ggplot(graph_data, aes(x, y, colour = source)) +
   geom_line(linewidth = 1) +
-  plot_label(label = "Source A", x = 2017, y = 6, n_labs = 2, n = 1) +
-  plot_label(label = "Source B", x = 2017, y = 13, n_labs = 2, n = 2) +
+  plot_label(label = "Source A", x = 2016, y = 6, n_labs = 2, n = 1) +
+  plot_label(label = "Source B", x = 2016, y = 13, n_labs = 2, n = 2) +
   theme_e61() +
   scale_y_continuous_e61(limits = c(0, 20, 5)) +
   scale_colour_e61(2) +
@@ -95,7 +95,7 @@ graph <- ggplot(graph_data, aes(x, y, colour = source)) +
   geom_line(linewidth = 1) +
   mplot_label(
     label = levels(graph_data$source),
-    x = c(2017, 2017),
+    x = c(2016, 2016),
     y = c(6, 13)
   ) +
   theme_e61() +
