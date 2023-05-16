@@ -66,6 +66,9 @@ save_e61 <-  function(filename,
                       dim_msg = FALSE
                       ) {
 
+
+  # Guard clauses and failing checks ----------------------------------------
+
   # Enforce file format requirements (quietly support EPS too)
   if (!grepl("\\.(png|svg|pdf|eps)$", filename))
     stop("You must provide a file extension. Only PDF, SVG and PNG file formats are currently supported.")
@@ -82,6 +85,8 @@ save_e61 <-  function(filename,
   if (save_data && !is.data.frame(plot$data))
     stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
+  # Identify graph attributes -----------------------------------------------
+
   # Check if graph is horizontal
   is_flip <- isTRUE("CoordFlip" %in% class(ggplot2::ggplot_build(plot)$layout$coord))
 
@@ -90,6 +95,36 @@ save_e61 <-  function(filename,
   # labs_e61 forces the user to have at least a title (so length > 0 for
   # single panels)
   is_multi <- !is.null(attr(plot, "panel_rows"))
+
+
+  # Advisory messages -------------------------------------------------------
+
+  # The following checks don't apply when multi-panel graphs are created
+  # Message if theme function not used
+  if (!is_multi && is.null(attr(plot$theme, "t61"))) {
+    cli::cli_text(cli::bg_br_yellow(cli::col_black(
+      "Please remember to use 'theme_e61()' in your ggplot code to ensure the ",
+      "e61 theme is applied.")))
+  }
+
+  # Message if package scale_x/y function not used
+  if (!is_multi && !"scale_e61" %in% class(ggplot2::layer_scales(plot)$y)) {
+    cli::cli_text(cli::bg_br_yellow(cli::col_black(
+      "Please remember to use 'scale_x/y_continuous_e61()' in your ggplot code ",
+      "to ensure the graph axes render correctly.")))
+  }
+
+  # Message if colour/fill functions aren't used, message to appear only if a
+  # colour/fill mappping exists
+  if (!is_multi && any(grepl("(colour|color|fill)", names(plot$mapping))) &&
+      !"scale_col_e61" %in% unlist(sapply(plot$scales$scales, class))) {
+    cli::cli_text(cli::bg_br_yellow(cli::col_black(
+      "Please remember to use 'scale_colour/fill_e61()' in your ggplot code ",
+      "to ensure the e61 colour palette is used.")))
+  }
+
+
+  # Height and width setting ------------------------------------------------
 
   # For multi-panels: Adjust the width to fit the extra panels and send out user
   # message to specify the height
@@ -185,6 +220,9 @@ save_e61 <-  function(filename,
 
   }
 
+
+  # Save --------------------------------------------------------------------
+
   # This saves the graph to disk
   ggplot2::ggsave(
     filename,
@@ -197,7 +235,7 @@ save_e61 <-  function(filename,
     dpi = dpi
   )
 
-  ## Post saving messages and functionality below
+  # Post-saving messages and functions ---------------------
   if (dim_msg) cli::cli_text(cli::col_green("The graph height and width have been set to ", height, " and ", width, "."))
 
   # Save the data used to make the graph

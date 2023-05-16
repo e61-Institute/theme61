@@ -39,13 +39,17 @@ scale_colour_e61 <- function(n = 0,
 
     pal <- get_palette(n)
 
-    return(ggplot2::scale_colour_manual(values = pal, ...))
+    retval <- ggplot2::scale_colour_manual(values = pal, ...)
   }
 
   if (!discrete) {
     pal <- e61_pal(palette = palette, reverse = reverse)
-    return(ggplot2::scale_color_gradientn(colours = pal(256), ...))
+    retval <- ggplot2::scale_color_gradientn(colours = pal(256), ...)
   }
+
+  class(retval) <- c(class(retval), "scale_col_e61")
+
+  return(retval)
 }
 
 #' @rdname scale_e61
@@ -61,13 +65,17 @@ scale_fill_e61 <- function(n = 0, reverse = FALSE,
 
     pal <- get_palette(n)
 
-    return(ggplot2::scale_fill_manual(values = pal, ...))
+    retval <- ggplot2::scale_fill_manual(values = pal, ...)
   }
 
   if (!discrete) {
     pal <- e61_pal(palette = palette, reverse = reverse)
-    return(ggplot2::scale_fill_gradientn(colours = pal(256), ...))
+    retval <- ggplot2::scale_fill_gradientn(colours = pal(256), ...)
   }
+
+  class(retval) <- c(class(retval), "scale_col_e61")
+
+  return(retval)
 
 }
 
