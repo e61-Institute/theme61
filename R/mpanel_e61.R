@@ -69,7 +69,7 @@
 mpanel_e61 <-
   function(...,
            plotlist = NULL,
-           title,
+           title = NULL,
            subtitle = NULL,
            footnotes = NULL,
            sources = NULL,

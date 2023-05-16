@@ -7,7 +7,7 @@
 mpanel_e61(
   ...,
   plotlist = NULL,
-  title,
+  title = NULL,
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
