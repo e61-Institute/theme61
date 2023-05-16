@@ -178,3 +178,39 @@ test_that("Test whether save_data works", {
   expect_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), save_data = TRUE)))
 })
 
+test_that("Test advisory messages", {
+  # No theming, no y-axis
+  gg <- ggplot()
+
+  expect_message(
+    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1)),
+    "^Please remember to use.*"
+  )
+
+  # No colour palette
+  gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
+    geom_col()
+
+  expect_message(
+    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1)),
+    "^Please remember to use.*"
+  )
+
+  # No message if you do it right
+  gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
+    geom_col() +
+    scale_y_continuous_e61(c(0, 4)) +
+    scale_fill_e61(3) +
+    theme_e61()
+
+  expect_no_message(
+    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
+  )
+
+  # No messages for multipanels
+  gg4 <- mpanel_e61(gg, gg, gg, gg)
+
+  expect_no_message(
+    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg4, height = 1))
+  )
+})

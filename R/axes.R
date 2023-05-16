@@ -64,13 +64,17 @@ scale_y_continuous_e61 <- function(limits = NULL,
   }
 
   # Put it all together
-  ggplot2::scale_y_continuous(
+  retval <- ggplot2::scale_y_continuous(
     expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
     sec.axis = sec_axis,
     limits = limits,
     breaks = breaks,
     ...
-  )
+    )
+
+  class(retval) <- c(class(retval), "scale_e61")
+
+  return(retval)
 
 }
 
@@ -115,10 +119,15 @@ scale_x_continuous_e61 <- function(limits = NULL,
   }
 
   # Put it all together
-  ggplot2::scale_x_continuous(
+  retval <- ggplot2::scale_x_continuous(
     expand = ggplot2::expansion(mult = c(expand_left, expand_right)),
     limits = limits,
     breaks = breaks,
-    ...)
+    ...
+    )
+
+  class(retval) <- c(class(retval), "scale_e61")
+
+  return(retval)
 
 }

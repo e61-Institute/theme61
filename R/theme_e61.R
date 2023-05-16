@@ -50,19 +50,6 @@ theme_e61 <- function(y_top = TRUE,
                       base_rect_size = points_to_mm(1)
                       ) {
 
-  # Add a message for the user reminding them to use scale_y_continuous_e61
-  if(getOption("scale_e61.message", TRUE)) {
-
-    cli::cli_text(cli::col_cyan(paste(
-      "Please remember to use", sQuote("scale_y_continuous_e61()"),
-      "in conjunction with", sQuote("theme_e61()"), "to ensure the graph axes",
-      "render correctly.",
-      'This message is shown once per session and may be disabled by setting',
-      "options('save_e61.message' = FALSE). See ?theme_e61 for more details.")))
-    options("scale_e61.message" = FALSE)
-  }
-
-
   legend <- match.arg(legend)
 
   half_line <- base_size / 2
@@ -265,6 +252,9 @@ theme_e61 <- function(y_top = TRUE,
   if (y_top) {
     ret <- ret + y_title_top(adj = adj, fix_left = fix_left)
   }
+
+  # Add attribute to identify it as a theme61 object
+  attr(ret, "t61_obj") <- TRUE
 
   return(ret)
 }
