@@ -58,7 +58,7 @@ theme_e61 <- function(y_top = TRUE,
     theme(
       line = element_line(
         colour = e61_greylight6,
-        size = base_line_size,
+        linewidth = base_line_size,
         linetype = 1,
         lineend = "butt"
       ),
@@ -66,7 +66,7 @@ theme_e61 <- function(y_top = TRUE,
       rect = element_rect(
         fill = background,
         colour = e61_greylight6,
-        size = base_rect_size,
+        linewidth = base_rect_size,
         linetype = 0
       ),
       text = element_text(
@@ -81,7 +81,7 @@ theme_e61 <- function(y_top = TRUE,
         margin = margin(),
         size = base_size
       ),
-      axis.line = element_line(size = points_to_mm(1),
+      axis.line = element_line(linewidth = points_to_mm(1),
                                colour = "black"),
       axis.line.x = NULL,
       axis.line.y = NULL,
@@ -156,7 +156,7 @@ theme_e61 <- function(y_top = TRUE,
       ),
       panel.grid.major.x = element_blank(),
       panel.grid.major.y = element_line(colour = e61_greylight6,
-                                  size = points_to_mm(0.5)),
+                                        linewidth = points_to_mm(0.5)),
       panel.grid.minor = element_blank(),
       panel.spacing = unit(1, "lines"),
       panel.spacing.x = NULL,
@@ -346,7 +346,7 @@ square_legend_symbols <- function() {
 
 format_flipped_bar <- function(x_adj = -9) {
   theme(
-    panel.grid.major.x = element_line(colour = e61_greylight6, size = points_to_mm(0.5)),
+    panel.grid.major.x = element_line(colour = e61_greylight6, linewidth = points_to_mm(0.5)),
     panel.grid.major.y = element_blank(),
     axis.text.x.top = element_blank(),
     axis.ticks.x.top = element_blank(),
