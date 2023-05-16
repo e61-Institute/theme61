@@ -240,7 +240,7 @@ save_e61 <-  function(filename,
 
   # Save the data used to make the graph
   if (save_data) {
-    data_name <- gsub("\\.(svg|png)$", "\\.csv", filename)
+    data_name <- gsub("\\.(\\w{3})$", "\\.csv", filename)
     data.table::fwrite(plot$data, data_name)
   }
 
