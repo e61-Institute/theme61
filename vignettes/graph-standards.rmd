@@ -58,7 +58,8 @@ This vignette aims to make it easy for you to produce a correctly formatted grap
 We're going to turn a normal ggplot2 graph into one that is formatted in the e61 style using the features of the theme61 package.
 
 ```{r}
-gg <- ggplot(data_3, aes(x = year, y = value, colour = category)) + geom_line() + theme(legend.position = "bottom")
+gg <- ggplot(data_3, aes(x = year, y = value, colour = category)) + 
+  geom_line() + theme(legend.position = "bottom")
 ```
 
 ```{r, echo = FALSE}
@@ -153,9 +154,11 @@ gg <-
   ggplot(data_dual, aes(x = year)) + 
   geom_line(aes(y = `Food and Tobacco`), colour = e61_palette(2)[[1]]) +
   # All the action is in the next two lines
-  geom_line(aes(y = sec_rescale_inv(`Personal Care`, scale = 0.1, shift = 0)), colour = e61_palette(2)[[2]]) +
+  geom_line(aes(y = sec_rescale_inv(`Personal Care`, scale = 0.1, shift = 0)), 
+            colour = e61_palette(2)[[2]]) +
   scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b",
-                         sec_axis = sec_axis(~sec_rescale(.), name = "$b"), rescale_sec = TRUE) +
+                         sec_axis = sec_axis(~sec_rescale(.), name = "$b"), 
+                         rescale_sec = TRUE) +
   theme_e61() +
   mplot_label(c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
               c(1945, 1948),
@@ -242,11 +245,12 @@ g1 <-
 g2 <- 
   ggplot(data_dual, aes(x = year)) + 
   geom_line(aes(y = `Food and Tobacco`), colour = e61_palette(2)[[1]]) +
-  geom_line(aes(y = sec_rescale_inv(`Personal Care`, scale = 0.1)), colour = e61_palette(2)[[2]]) +
+  geom_line(aes(y = sec_rescale_inv(`Personal Care`, scale = 0.1)), 
+            colour = e61_palette(2)[[2]]) +
   theme_e61() +
   scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b",
-                         sec_axis = sec_axis(~sec_rescale(.), name = "$b", 
-                                             labels = c("0.0", "2.5", "5.0", "7.5", ""))) +
+                         sec_axis = sec_axis(~sec_rescale(.), name = "$b"), 
+                         rescale_sec = TRUE) +
   mplot_label(c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
               c(1945, 1948),
               c(75, 40)) +
