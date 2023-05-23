@@ -47,6 +47,9 @@
 #'   (defaults to FALSE).
 #' @param dim_msg Logical. Set to TRUE if you want to know what dimensions the
 #'   graph was saved to (defaults to FALSE).
+#' @param resize Numeric. Only used when PNG is the file format. Resize the
+#'   graph width and height. You may also need to adjust the \code{pointsize}
+#'   and \code{res} to ensure the text is readable.
 #' @inheritParams grDevices::png
 #' @return Invisibly returns the file name.
 #' @export
@@ -57,6 +60,7 @@ save_e61 <-  function(filename,
                       height = NULL,
                       save_data = FALSE,
                       dim_msg = FALSE,
+                      resize = NULL,
                       pointsize = NULL,
                       res = NULL
                       ) {

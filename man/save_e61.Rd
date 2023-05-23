@@ -11,6 +11,7 @@ save_e61(
   height = NULL,
   save_data = FALSE,
   dim_msg = FALSE,
+  resize = NULL,
   pointsize = NULL,
   res = NULL
 )
@@ -37,6 +38,10 @@ same name as the graph that contains the data needed to recreate the graph
 
 \item{dim_msg}{Logical. Set to TRUE if you want to know what dimensions the
 graph was saved to (defaults to FALSE).}
+
+\item{resize}{Numeric. Only used when PNG is the file format. Resize the
+graph width and height. You may also need to adjust the \code{pointsize}
+and \code{res} to ensure the text is readable.}
 
 \item{pointsize}{the default pointsize of plotted text, interpreted as
     big points (1/72 inch) at \code{res} ppi.}

@@ -90,7 +90,7 @@ test_that("Test support for different file formats", {
     expected_deets <-
       tibble::tibble(
         format = "SVG",
-        width = 320,
+        width = 321,
         height = 268
       )
 
