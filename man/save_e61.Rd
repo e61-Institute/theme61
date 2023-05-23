@@ -9,11 +9,10 @@ save_e61(
   plot = ggplot2::last_plot(),
   width = NULL,
   height = NULL,
-  resize = NULL,
-  scale = 1,
-  dpi = 100,
   save_data = FALSE,
-  dim_msg = FALSE
+  dim_msg = FALSE,
+  pointsize = NULL,
+  res = NULL
 )
 }
 \arguments{
@@ -32,22 +31,20 @@ automatic value is aesthetically appropriate (no excess whitespace).
 Otherwise, the function will default to a value of 9 but this is unlikely
 to be appropriate.}
 
-\item{resize}{Only used if saving a PNG. Rescales the graph and text. Useful
-when you need a very large or small graph and cannot use a vector graphics
-format. A value of 2 doubles the graph dimensions.}
-
-\item{scale}{Only used if saving a PNG. Multiplicative scaling factor. You
-don't need to change this.}
-
-\item{dpi}{Only used if saving a PNG. Plot resolution. You don't need to
-change this.}
-
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph
 (defaults to FALSE).}
 
 \item{dim_msg}{Logical. Set to TRUE if you want to know what dimensions the
 graph was saved to (defaults to FALSE).}
+
+\item{pointsize}{the default pointsize of plotted text, interpreted as
+    big points (1/72 inch) at \code{res} ppi.}
+
+\item{res}{The nominal resolution in ppi which will be recorded in the
+    bitmap file, if a positive integer.  Also used for units other than
+    the default.  If not specified, taken as 72 ppi to set the size of
+    text and line widths.}
 }
 \value{
 Invisibly returns the file name.

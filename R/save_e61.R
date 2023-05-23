@@ -42,18 +42,12 @@
 #'   automatic value is aesthetically appropriate (no excess whitespace).
 #'   Otherwise, the function will default to a value of 9 but this is unlikely
 #'   to be appropriate.
-#' @param resize Only used if saving a PNG. Rescales the graph and text. Useful
-#'   when you need a very large or small graph and cannot use a vector graphics
-#'   format. A value of 2 doubles the graph dimensions.
-#' @param scale Only used if saving a PNG. Multiplicative scaling factor. You
-#'   don't need to change this.
-#' @param dpi Only used if saving a PNG. Plot resolution. You don't need to
-#'   change this.
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
 #' @param dim_msg Logical. Set to TRUE if you want to know what dimensions the
 #'   graph was saved to (defaults to FALSE).
+#' @inheritParams grDevices::png
 #' @return Invisibly returns the file name.
 #' @export
 
@@ -61,11 +55,10 @@ save_e61 <-  function(filename,
                       plot = ggplot2::last_plot(),
                       width = NULL,
                       height = NULL,
-                      resize = NULL,
-                      scale = 1,
-                      dpi = 100,
                       save_data = FALSE,
-                      dim_msg = FALSE
+                      dim_msg = FALSE,
+                      pointsize = NULL,
+                      res = NULL
                       ) {
 
 
@@ -190,10 +183,6 @@ save_e61 <-  function(filename,
     # Rescale elements as required
     width <- width * resize
     height <- height * resize
-    dpi <- dpi * resize
-    scale <-
-      scale / resize # scale works inversely to size for reasons
-
   }
 
 
@@ -204,7 +193,7 @@ save_e61 <-  function(filename,
     svg = svglite::svglite(filename = filename, width = cm_to_in(width), height = cm_to_in(height)),
     eps = cairo_ps(filename = filename, width = cm_to_in(width), height = cm_to_in(height)),
     pdf = cairo_pdf(filename = filename, width = cm_to_in(width), height = cm_to_in(height)),
-    png = png(filename = filename, width = width, height = height, units = "cm", res = dpi)
+    png = png(filename = filename, width = width, height = height, units = "cm", pointsize = pointsize, res = res)
     )
   print(plot)
   dev.off()
