@@ -46,12 +46,12 @@
 <polyline points='30.24,186.53 75.35,153.33 120.47,130.85 165.59,110.60 210.71,90.35 ' style='stroke-width: 1.07; stroke: #66CED6; stroke-linecap: butt;' />
 <polyline points='30.24,203.95 75.35,196.51 120.47,176.41 165.59,165.24 210.71,150.80 ' style='stroke-width: 1.07; stroke: #008080; stroke-linecap: butt;' />
 <polyline points='30.24,214.33 75.35,211.01 120.47,205.13 165.59,198.74 210.71,188.17 ' style='stroke-width: 1.07; stroke: #003039; stroke-linecap: butt;' />
-<text x='66.33' y='126.65' style='font-size: 9.96px;fill: #66CED6; font-family: "Arial";' textLength='42.06px' lengthAdjust='spacingAndGlyphs'>Food and</text>
-<text x='66.33' y='140.99' style='font-size: 9.96px;fill: #66CED6; font-family: "Arial";' textLength='37.07px' lengthAdjust='spacingAndGlyphs'>Tobacco</text>
-<text x='156.57' y='141.54' style='font-size: 9.96px;fill: #008080; font-family: "Arial";' textLength='47.59px' lengthAdjust='spacingAndGlyphs'>Household</text>
-<text x='156.57' y='155.88' style='font-size: 9.96px;fill: #008080; font-family: "Arial";' textLength='43.71px' lengthAdjust='spacingAndGlyphs'>Operation</text>
-<text x='165.59' y='178.76' style='font-size: 9.96px;fill: #003039; font-family: "Arial";' textLength='34.29px' lengthAdjust='spacingAndGlyphs'>Medical</text>
-<text x='165.59' y='193.10' style='font-size: 9.96px;fill: #003039; font-family: "Arial";' textLength='48.15px' lengthAdjust='spacingAndGlyphs'>and Health</text>
+<text x='66.33' y='119.20' style='font-size: 9.96px;fill: #66CED6; font-family: "Arial";' textLength='42.06px' lengthAdjust='spacingAndGlyphs'>Food and</text>
+<text x='66.33' y='133.54' style='font-size: 9.96px;fill: #66CED6; font-family: "Arial";' textLength='37.07px' lengthAdjust='spacingAndGlyphs'>Tobacco</text>
+<text x='156.57' y='134.09' style='font-size: 9.96px;fill: #008080; font-family: "Arial";' textLength='47.59px' lengthAdjust='spacingAndGlyphs'>Household</text>
+<text x='156.57' y='148.43' style='font-size: 9.96px;fill: #008080; font-family: "Arial";' textLength='43.71px' lengthAdjust='spacingAndGlyphs'>Operation</text>
+<text x='147.54' y='178.76' style='font-size: 9.96px;fill: #003039; font-family: "Arial";' textLength='53.67px' lengthAdjust='spacingAndGlyphs'>Medical and</text>
+<text x='147.54' y='193.10' style='font-size: 9.96px;fill: #003039; font-family: "Arial";' textLength='28.77px' lengthAdjust='spacingAndGlyphs'>Health</text>
 <rect x='21.21' y='70.70' width='198.52' height='148.89' style='stroke-width: 1.50;' />
 </g>
 <g clip-path='url(#cpMC4wMHwyNDAuOTR8MC4wMHwzMTEuODE=)'>

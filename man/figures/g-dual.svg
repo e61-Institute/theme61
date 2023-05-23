@@ -57,9 +57,9 @@
 <text x='16.73' y='124.90' text-anchor='end' style='font-size: 10.00px; font-family: "Arial";' textLength='11.13px' lengthAdjust='spacingAndGlyphs'>25</text>
 <text x='16.73' y='88.20' text-anchor='end' style='font-size: 10.00px; font-family: "Arial";' textLength='11.13px' lengthAdjust='spacingAndGlyphs'>50</text>
 <text x='16.73' y='51.50' text-anchor='end' style='font-size: 10.00px; font-family: "Arial";' textLength='11.13px' lengthAdjust='spacingAndGlyphs'>75</text>
-<text x='221.44' y='161.61' style='font-size: 10.00px; font-family: "Arial";' textLength='13.91px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text x='221.44' y='161.61' style='font-size: 10.00px; font-family: "Arial";' textLength='5.57px' lengthAdjust='spacingAndGlyphs'>0</text>
 <text x='221.44' y='124.90' style='font-size: 10.00px; font-family: "Arial";' textLength='13.91px' lengthAdjust='spacingAndGlyphs'>2.5</text>
-<text x='221.44' y='88.20' style='font-size: 10.00px; font-family: "Arial";' textLength='13.91px' lengthAdjust='spacingAndGlyphs'>5.0</text>
+<text x='221.44' y='88.20' style='font-size: 10.00px; font-family: "Arial";' textLength='5.57px' lengthAdjust='spacingAndGlyphs'>5</text>
 <text x='221.44' y='51.50' style='font-size: 10.00px; font-family: "Arial";' textLength='13.91px' lengthAdjust='spacingAndGlyphs'>7.5</text>
 <polyline points='21.21,158.02 216.95,158.02 ' style='stroke-width: 0.75; stroke-linecap: butt;' />
 <polyline points='30.11,155.53 30.11,158.02 ' style='stroke-width: 0.56; stroke-linecap: butt;' />
