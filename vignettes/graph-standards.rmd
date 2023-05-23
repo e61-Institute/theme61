@@ -89,8 +89,8 @@ In case you want to customise the chosen colours, all of the valid colours in th
 -   Examples: `e61_bluedark3` or `e61_maroonlight8`.
 -   Specifying just the colour name (e.g. `e61_teallight`) will also select the left-most colour on the scale (colour "0").
 
-```{r theme61-colours, echo = FALSE}
-knitr::include_graphics(here::here("docs/articles/theme61_files/figure-html/colour-palette-chart-1.png"))
+```{r theme61-colours, echo = FALSE, out.width='80%'}
+source("colour-palette.R", print.eval = TRUE)
 ```
 
 ## Formatting graph colours
@@ -145,7 +145,7 @@ gg <-
   # All the action is in the next two lines
   geom_line(aes(y = sec_rescale_inv(`Personal Care`, scale = 0.1)), colour = e61_palette(2)[[2]]) +
   scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b",
-                         sec_axis = sec_axis(~sec_rescale(.), name = "$b", labels = c("0.0", "2.5", "5.0", "7.5", ""))) +
+                         sec_axis = sec_axis(~sec_rescale(.), name = "$b"), rescale_sec = TRUE) +
   theme_e61() +
   mplot_label(c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
               c(1945, 1948),
