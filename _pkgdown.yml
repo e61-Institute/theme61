@@ -43,4 +43,5 @@ articles:
   navbar: ~
   contents:
   - theme61
+  - graph-standards
   - ongraph-labels
