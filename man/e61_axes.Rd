@@ -8,6 +8,7 @@
 scale_y_continuous_e61(
   limits = NULL,
   sec_axis = ggplot2::dup_axis(),
+  rescale_sec = FALSE,
   y_top = TRUE,
   expand_bottom = 0,
   expand_top = 0,
@@ -35,7 +36,11 @@ scale_x_continuous_e61(
 
 \item{sec_axis}{Adds a secondary axis (defaults to \code{dup_axis()}, which
 duplicates the axis), see \link[ggplot2]{sec_axis} for more details. Set to
-FALSE to hide a secondary axis.}
+FALSE to hide a secondary axis. For support for rescaled secondary axes,
+see the documentation for \link[theme61]{dual_y_axis}.}
+
+\item{rescale_sec}{Logical. Set this to TRUE if you are using a rescaled
+secondary axis, otherwise leave it as FALSE (default).}
 
 \item{y_top}{Logical. Ensures there is space at the top of the y-axis for the
 axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
