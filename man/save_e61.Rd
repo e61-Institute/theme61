@@ -7,12 +7,12 @@
 save_e61(
   filename,
   plot = ggplot2::last_plot(),
-  save_data = FALSE,
   width = NULL,
   height = NULL,
   resize = NULL,
   scale = 1,
   dpi = 100,
+  save_data = FALSE,
   dim_msg = FALSE
 )
 }
@@ -23,10 +23,6 @@ file extension, e.g. \code{.svg}.}
 \item{plot}{Plot object to save. Defaults to the last plot displayed so
 usually you do not need to provide this explicitly.}
 
-\item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
-same name as the graph that contains the data needed to recreate the graph
-(defaults to FALSE).}
-
 \item{width}{Plot width in cm. Defaults to 8.5.}
 
 \item{height}{Plot height in cm. The function will attempt to calculate an
@@ -36,15 +32,19 @@ automatic value is aesthetically appropriate (no excess whitespace).
 Otherwise, the function will default to a value of 9 but this is unlikely
 to be appropriate.}
 
-\item{resize}{Rescales the graph and text. Useful when you need a very large
-or small graph and cannot use a vector graphics format. This only works
-when saving to the PNG file format. A value of 2 doubles the graph
-dimensions.}
+\item{resize}{Only used if saving a PNG. Rescales the graph and text. Useful
+when you need a very large or small graph and cannot use a vector graphics
+format. A value of 2 doubles the graph dimensions.}
 
-\item{scale}{Multiplicative scaling factor.}
+\item{scale}{Only used if saving a PNG. Multiplicative scaling factor. You
+don't need to change this.}
 
-\item{dpi}{Plot resolution. Also accepts a string input: "retina" (320),
-"print" (300), or "screen" (72). Applies only to raster output types.}
+\item{dpi}{Only used if saving a PNG. Plot resolution. You don't need to
+change this.}
+
+\item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
+same name as the graph that contains the data needed to recreate the graph
+(defaults to FALSE).}
 
 \item{dim_msg}{Logical. Set to TRUE if you want to know what dimensions the
 graph was saved to (defaults to FALSE).}
