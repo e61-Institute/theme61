@@ -169,6 +169,8 @@ knitr::include_graphics(here::here("man/figures/g-dual.svg"))
 
 ## Plot labelling
 
+*A full guide to plot labelling is [here](ongraph-labels.html).*
+
 Graph legends are inferior to labels on the graph, so `theme61` defaults to hiding the legends. This is because legends require you to rapidly flip between the coloured lines or bars on the graph and match them with a box outside the graph that tells you what that colour represents. This creates additional cognitive load, making the message of your graph harder and slower to communicate to the audience and therefore your graph is less effective. Graph labels put the label on the graph directly, near the datapoint that is being identified. This makes it faster to figure out what the graph is about.
 
 ```{r}
