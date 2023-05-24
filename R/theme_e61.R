@@ -1,11 +1,16 @@
 #' e61 themed graph options
 #'
-#' Applies the e61 theme to ggplot graphs.
+#' Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
+#' appearance. If you are looking to change the appearance of titles or labels,
+#' check the arguments in \code{\link[theme61]{labs_e61}}, which are probably
+#' what you are looking for.
 #'
 #' \code{scale_y_continuous_e61()} should be used in conjunction with this
 #' function to ensure that theming and axes are applied correctly.
 #'
-#' @param y_top Defaults to TRUE. Moves the y-axis title to the top.
+#' @param y_top Defaults to TRUE. Puts the y-axis title at the top. If you
+#'   change this argument you also need to change the argument with the same
+#'   name in \code{\link[theme61]{scale_y_continuous_e61}}.
 #' @param adj Either a single numeric to adjust left and right axis titles
 #'   simultaneously or a vector of 2 numerics to adjust each axis title
 #'   separately. More negative values move the text closer to the graph panel.

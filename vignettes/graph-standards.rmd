@@ -49,13 +49,11 @@ data_col[, category := factor(category,
 data_chg <- copy(data)[, change := value - shift(value), by = category]
 ```
 
-## Introduction
-
-This vignette aims to make it easy for you to produce a correctly formatted graph at e61.
+The purpose of this vignette is to demonstrate how to use the functions in `theme61` to produce a correctly formatted graph in the e61 Institute style.
 
 ## The starting graph
 
-We're going to turn a normal ggplot2 graph into one that is formatted in the e61 style using the features of the theme61 package.
+We're going to turn a default ggplot2 graph into one that is formatted in the e61 style using the package features.
 
 ```{r}
 gg <- ggplot(data_3, aes(x = year, y = value, colour = category)) + 
@@ -122,7 +120,7 @@ knitr::include_graphics(here::here("man/figures/g-colours.svg"))
 
 ## Formatting axis scales
 
-`scale_y_continuous_e61()` is the preferred axis scale function for graphs. It duplicates the axis by default and requires you to provide the axis limits in the `limits` argument to ensure good aesthetics. Limits are highly recommended to be manually specified as the defaults are likely to be a bit unaesthetic.
+`scale_y_continuous_e61()` is the preferred axis scale function for graphs. It duplicates the axis by default and allows you to specify the axis limits in the `limits` argument to ensure good aesthetics. Limits are highly recommended to be manually specified as the defaults are likely to be a bit unaesthetic.
 
 ```{r}
 gg <- 
@@ -138,9 +136,9 @@ save_e61(here::here("man/figures/g-axis.svg"), height = 6.8)
 knitr::include_graphics(here::here("man/figures/g-axis.svg"))
 ```
 
-### Dual y-axis scale support\*
+### Dual y-axis scale support
 
-\* Admittedly this feature is somewhat advanced/fiddly.
+Note: Admittedly this feature is somewhat advanced/fiddly.
 
 Despite [Hadley's best efforts](https://stackoverflow.com/questions/3099219/ggplot-with-2-y-axes-on-each-side-and-different-scales/3101876#3101876) to make it difficult to add a differently-scaled second y-axis, this feature now exists in `theme61.`
 

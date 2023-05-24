@@ -1,33 +1,29 @@
-#' Format axes in the e61 Institute style
+#' Format axes in the e61 style
 #'
 #' These functions format the x and y axes to be consistent with e61 styling.
 #' This includes removing white space at the beginning and end of each axis.
 #'
-#' @param expand_bottom Numeric. Add extra space between data points and the
-#'   bottom of the graph. See \link[ggplot2]{expansion} for details.
-#' @param expand_top Numeric. Add extra space between data points and the top of
-#'   the graph.
-#' @param sec_axis Adds a secondary axis (defaults to \code{dup_axis()}, which
-#'   duplicates the axis), see \link[ggplot2]{sec_axis} for more details. Set to
-#'   FALSE to hide a secondary axis. For support for rescaled secondary axes,
-#'   see the documentation for \link[theme61]{dual_y_axis}.
+#' @param expand_bottom,expand_top Numeric. Add extra space between data points
+#'   and the top/bottom of the graph. See \link[ggplot2]{expansion} for details.
+#' @param sec_axis Defaults to duplicating the y-axis so it shows on the left
+#'   and right. To add a rescaled secondary axis, see the documentation for
+#'   \link[theme61]{dual_y_axis}. Set to FALSE to hide the secondary axis.
 #' @param rescale_sec Logical. Set this to TRUE if you are using a rescaled
 #'   secondary axis, otherwise leave it as FALSE (default).
 #' @param y_top Logical. Ensures there is space at the top of the y-axis for the
 #'   axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
-#'   elsewhere.
-#' @param expand_left Numeric. Add extra space between data points and the left
-#'   of the graph.
-#' @param expand_right Numeric. Add extra space between data points and the
-#'   right of the graph.
+#'   elsewhere. If you change this argument you also need to change the argument
+#'   with the same name in \code{\link[theme61]{theme_e61}}.
+#' @param expand_left,expand_right Numeric. Add extra space between data points
+#'   and the left/right of the graph. See \link[ggplot2]{expansion} for details.
 #' @param limits One of:
 #'   \itemize{
-#'     \item{\code{NULL} to use the default scale range.}
-#'     \item{A numeric vector of length two providing the minimum and maximum
-#'     limits of the scale.}
 #'     \item{A numeric vector of length three providing the limits of the scale
 #'     and the increment between each axis tick, e.g. \code{c(0, 25, 5)} will
 #'     set the axis to range from 0 to 25, with increments of 5 per tick.}
+#'     \item{A numeric vector of length two providing the minimum and maximum
+#'     limits of the scale. The break increments will be automatically chosen.}
+#'     \item{\code{NULL} to use the default scale range.}
 #'     }
 #' @inheritDotParams ggplot2::scale_y_continuous name oob na.value trans guide
 #'   position

@@ -45,7 +45,7 @@ separate points you include in the graph.}
 \item{title_max_char, subtitle_max_char, footnote_max_char}{Numeric. Set the
 maximum number of characters per line in the title, subtitle, sources or
 footnotes. The default is roughly appropriate for the default graph
-dimensions in \code{e61_save}.}
+dimensions in \code{\link[theme61]{e61_save}}.}
 
 \item{title_wrap, subtitle_wrap, footnote_wrap}{Logical. Enables text wrapping
 for the title, subtitle, sources or footnotes. Defaults to TRUE.}
