@@ -31,8 +31,10 @@
 #'   make adjustments to the dimensions to ensure the graph is sized
 #'   appropriately.
 #'
-#' @param filename File name to create on disk. Remember you must provide the
-#'   file extension, e.g. \code{.svg}.
+#' @param filename File name to create on disk. Providing the file format
+#'   extension (e.g. .svg) is optional. The file extension must be lowercase. If
+#'   you want to save multiple files with different formats, see the
+#'   \code{format} argument for details.
 #' @param plot Plot object to save. Defaults to the last plot displayed so
 #'   usually you do not need to provide this explicitly.
 #' @param width Plot width in cm. Defaults to 8.5.
@@ -42,6 +44,10 @@
 #'   automatic value is aesthetically appropriate (no excess whitespace).
 #'   Otherwise, the function will default to a value of 9 but this is unlikely
 #'   to be appropriate.
+#' @param format An optional vector of file formats to save as. For example
+#'   \code{c("svg", "pdf")} will save 2 files with the same name to the same
+#'   location to SVG and PDF formats. Only supports vector file formats. If the
+#'   file format is specified in \code{filename}, then this argument is ignored.
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
@@ -58,6 +64,7 @@ save_e61 <-  function(filename,
                       plot = ggplot2::last_plot(),
                       width = NULL,
                       height = NULL,
+                      format = c("svg", "pdf", "eps", "png"),
                       save_data = FALSE,
                       dim_msg = FALSE,
                       resize = NULL,
@@ -68,9 +75,18 @@ save_e61 <-  function(filename,
 
   # Guard clauses and failing checks ----------------------------------------
 
-  # Enforce file format requirements (quiet support for EPS only)
-  if (!grepl("\\.(png|svg|pdf|eps)$", filename))
+  # Enforce file format requirements if a file extension is provided (quietly
+  # permits eps files too)
+  if (grepl("\\..{3}$", filename) && !grepl("\\.(png|svg|pdf|eps)$", filename)) {
     stop("You must provide a file extension. Only PDF, SVG and PNG file formats are currently supported.")
+  }
+
+  # Determine which file formats to save
+  if (grepl("\\..{3}$", filename)) {
+    format <- gsub("\\.(.{3})$", "\\1", filename)
+  } else {
+    format <- match.arg(format, several.ok = TRUE)
+  }
 
   # Check if the data frame can be written
   if (save_data && !is.data.frame(plot$data))
@@ -191,16 +207,17 @@ save_e61 <-  function(filename,
 
 
   # Save --------------------------------------------------------------------
-
-  switch(
-    gsub(".*\\.(\\w+)$", "\\1", filename),
-    svg = svglite::svglite(filename = filename, width = cm_to_in(width), height = cm_to_in(height)),
-    eps = cairo_ps(filename = filename, width = cm_to_in(width), height = cm_to_in(height)),
-    pdf = cairo_pdf(filename = filename, width = cm_to_in(width), height = cm_to_in(height)),
-    png = png(filename = filename, width = width, height = height, units = "cm", pointsize = pointsize, res = res)
+  lapply(format, function(fmt) {
+    switch(
+      fmt,
+      svg = svglite::svglite(filename = filename, width = cm_to_in(width), height = cm_to_in(height)),
+      eps = cairo_ps(filename = filename, width = cm_to_in(width), height = cm_to_in(height)),
+      pdf = cairo_pdf(filename = filename, width = cm_to_in(width), height = cm_to_in(height)),
+      png = png(filename = filename, width = width, height = height, units = "cm", pointsize = pointsize, res = res)
     )
-  print(plot)
-  dev.off()
+    print(plot)
+    dev.off()
+  })
 
   # Post-saving messages and functions ---------------------
   if (dim_msg) cli::cli_text(cli::col_green("The graph height and width have been set to ", height, " and ", width, "."))
