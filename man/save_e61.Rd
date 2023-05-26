@@ -9,16 +9,19 @@ save_e61(
   plot = ggplot2::last_plot(),
   width = NULL,
   height = NULL,
+  format = c("svg", "pdf", "eps", "png"),
   save_data = FALSE,
   dim_msg = FALSE,
   resize = NULL,
-  pointsize = NULL,
-  res = NULL
+  pointsize = 12,
+  res = 72
 )
 }
 \arguments{
-\item{filename}{File name to create on disk. Remember you must provide the
-file extension, e.g. \code{.svg}.}
+\item{filename}{File name to create on disk. Providing the file format
+extension (e.g. .svg) is optional. The file extension must be lowercase. If
+you want to save multiple files with different formats, see the
+\code{format} argument for details.}
 
 \item{plot}{Plot object to save. Defaults to the last plot displayed so
 usually you do not need to provide this explicitly.}
@@ -31,6 +34,11 @@ sensitive to small changes in the graph text so you should check if the
 automatic value is aesthetically appropriate (no excess whitespace).
 Otherwise, the function will default to a value of 9 but this is unlikely
 to be appropriate.}
+
+\item{format}{An optional vector of file formats to save as. For example
+\code{c("svg", "pdf")} will save 2 files with the same name to the same
+location to SVG and PDF formats. If the file format is specified in
+\code{filename}, then this argument is ignored.}
 
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph
