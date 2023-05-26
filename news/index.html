@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,6 +27,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/graph-standards.html">Graph standards</a>
     <a class="dropdown-item" href="../articles/ongraph-labels.html">Adding on-graph labels</a>
   </div>
 </li>
@@ -53,6 +54,38 @@
       <small>Source: <a href="https://github.com/e61-institute/theme61/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.0" id="theme61-050">theme61 0.5.0<a class="anchor" aria-label="anchor" href="#theme61-050"></a></h2>
+<p>26 May 2023</p>
+<div class="section level5">
+<h5 id="new-functions-0-5-0">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-5-0"></a></h5>
+<ul><li>Added new functions <code><a href="../reference/set_open_graph.html">set_open_graph()</a></code> and <code><a href="../reference/set_open_graph.html">unset_open_graph()</a></code> which toggle an option to automatically open a graph that has been created with <code><a href="../reference/save_e61.html">save_e61()</a></code>. Helpful for your workflow when perfecting graphs.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="newchanged-functionality-0-5-0">New/changed functionality<a class="anchor" aria-label="anchor" href="#newchanged-functionality-0-5-0"></a></h5>
+<ul><li>Add ability to save graphs in multiple formats at once using the new <code>format</code> argument in <code><a href="../reference/save_e61.html">save_e61()</a></code>.</li>
+<li>Add support in <code><a href="../reference/save_e61.html">save_e61()</a></code> for saving images in PDF format for compatibility with LaTeX.</li>
+<li>Change the default alignment of plot labels to left-align and added a new argument <code>hjust</code> to <code><a href="../reference/plot_label.html">plot_label()</a></code>/<code><a href="../reference/mplot_label.html">mplot_label()</a></code> to change the alignment.</li>
+<li>Added the ability to add a white box around text in <code><a href="../reference/plot_label.html">plot_label()</a></code>/<code><a href="../reference/mplot_label.html">mplot_label()</a></code> through <code>geom</code> argument.</li>
+<li>Added <code>y</code> argument to <code><a href="../reference/add_zeroline.html">add_zeroline()</a></code> so you can put your zero line at values other than zero.</li>
+<li>Added argument to <code><a href="../reference/e61_axes.html">scale_x_continuous_e61()</a></code> to add back the first/last labels that are removed by default.</li>
+<li>Slightly increased default size of plot labels to match size of axis text.</li>
+<li>
+<code><a href="../reference/save_e61.html">save_e61()</a></code> now notifies you if you forget to use the theme and scale functions.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="bug-fixes-0-5-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-0"></a></h5>
+<ul><li>Permanent fix to the bug that was temporarily bodged in v0.4.1. Now dates can be entered as strings in <code><a href="../reference/plot_label.html">plot_label()</a></code> and they will be converted to dates.</li>
+<li>Fixed a bug in <code><a href="../reference/e61_axes.html">scale_y_continuous_e61()</a></code> that made <code>y_top</code> stop working and also refactored the code.</li>
+<li>Fixed a bug in <code><a href="../reference/mplot_label.html">mplot_label()</a></code> that didn’t allow a vector of colours to be supplied.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="documentation-updates-0-5-0">Documentation updates<a class="anchor" aria-label="anchor" href="#documentation-updates-0-5-0"></a></h5>
+<ul><li>Added a new Graph standards vignette based on masterclass materials.</li>
+<li>Added more documentation explaining how <code>rel_heights</code> in <code><a href="../reference/mpanel_e61.html">mpanel_e61()</a></code> works.</li>
+<li>Miscellaneous minor documentation improvements.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.1" id="theme61-041">theme61 0.4.1<a class="anchor" aria-label="anchor" href="#theme61-041"></a></h2>
 <p>08 May 2023</p>

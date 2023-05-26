@@ -24,7 +24,7 @@ When saving multi-panel graphs using save_e61() you will need to
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,7 @@ When saving multi-panel graphs using save_e61() you will need to
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/graph-standards.html">Graph standards</a>
     <a class="dropdown-item" href="../articles/ongraph-labels.html">Adding on-graph labels</a>
   </div>
 </li>
@@ -84,7 +85,7 @@ When saving multi-panel graphs using save_e61() you will need to
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">mpanel_e61</span><span class="op">(</span></span>
 <span>  <span class="va">...</span>,</span>
 <span>  plotlist <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">title</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  footnotes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sources <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -160,7 +161,8 @@ than the titles of the subplots (default is 1.1). 2 doubles the font size.</p></
 
 <dt>rel_heights</dt>
 <dd><p>A numeric vector giving the relative proportions of each
-graph component (title, plots, footer (optional)).</p></dd>
+graph component (title, plots, footer (optional)). See the Details for more
+detail.</p></dd>
 
 
 <dt>align</dt>
@@ -180,6 +182,35 @@ Must be specified if any of the graphs are complex (e.g. faceted) and alignment 
 
 <p>ggplot2 object</p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p><strong>Read this if your titles and stuff are getting cut off.</strong></p>
+<p>The function tries to be smart when setting the values for
+  <code>rel_heights</code>, but it can be incorrect due to differences in the
+  amount of text in each component.</p>
+<p>The way <code>mpanel_e61</code> works is that the title, subtitle, graph panels
+  and footers are all separate components that are then put together after
+  they have been independently generated. The purpose of <code>rel_heights</code>
+  is to specify what proportion of the final plot each of these components
+  require. As a result, if the values are too small for a given component,
+  part of it will get visually cut off.</p>
+<p>The function tries to increase the amount of space given to a component if,
+  for example, your title has two lines, or you write a really long footnote
+  that spans many lines of text. But this is an inexact science. In all
+  likelihood, you will need to specify your own values, which why this
+  paragraph of text tries to explain the underlying function so you aren't
+  just blindly inputting numbers.</p>
+<p>The default values for <code>rel_heights</code> for a 1-line title, 1-line
+  subtitle, 1-line footnote and 1-line sources list is <code>c(0.05, 0.05, 1,
+  0.1)</code>. If you only have a title and footnotes/sources then only 3 values
+  are needed: <code>c(0.05, 1, 0.1)</code>.</p>
+<p>These values are all relative ratios, meaning, in the second example, the
+  title gets \(\frac{0.05}{1.15}\), or around 4 per cent of the total graph
+  height. This means that if your graph panels are really tall (e.g. you make
+  a 3x2 multi-panel), you will need to reduce the share of the space
+  allocated to the titles or you will have extra whitespace (I think? Haven't
+  actually tested this).</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -193,34 +224,6 @@ Must be specified if any of the graphs are complex (e.g. faceted) and alignment 
 <span class="r-in"><span>   subtitle <span class="op">=</span> <span class="st">"Graph subtitle"</span>,</span></span>
 <span class="r-in"><span>   footnotes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Footnote 1"</span>, <span class="st">"Footnote 2"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>   sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Source 1"</span>, <span class="st">"Source 2"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>font family 'Arial' not found in PostScript font database</span>
 <span class="r-plt img"><img src="mpanel_e61-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>

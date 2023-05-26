@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +44,7 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/graph-standards.html">Graph standards</a>
     <a class="dropdown-item" href="../articles/ongraph-labels.html">Adding on-graph labels</a>
   </div>
 </li>
@@ -110,14 +111,15 @@ narrower than it otherwise would be.</p>
 following code provides an example. Most of the code is to set up the
 mock data and create a graph, the only two lines that are important are
 the <code><a href="../reference/plot_label.html">plot_label()</a></code> lines.</p>
+<p><strong>If you have more than one label you should use
+<code><a href="../reference/mplot_label.html">mplot_label()</a></code></strong>, which is introduced in the next
+section.</p>
 <p><code><a href="../reference/plot_label.html">plot_label()</a></code> requires you to provide the text of the
 label (<code>label</code>), the <code>x</code> and <code>y</code>
 positioning, the total number of different colours/labels to plot
 (<code>n_labs</code>), and which number element you are currently
 plotting (<code>n</code>). For more information, see the documentation
 (<code><a href="../reference/plot_label.html">?plot_label</a></code>).</p>
-<p>If you have multiple labels it may be more efficient to use
-<code><a href="../reference/mplot_label.html">mplot_label()</a></code>, which is introduced in the next section.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Mock data</span></span>
 <span><span class="va">graph_data</span> <span class="op">&lt;-</span> <span class="fu">CJ</span><span class="op">(</span></span>
@@ -131,8 +133,8 @@ plotting (<code>n</code>). For more information, see the documentation
 <span><span class="co"># Graph</span></span>
 <span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">graph_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, colour <span class="op">=</span> <span class="va">source</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/plot_label.html">plot_label</a></span><span class="op">(</span>label <span class="op">=</span> <span class="st">"Source A"</span>, x <span class="op">=</span> <span class="fl">2017</span>, y <span class="op">=</span> <span class="fl">6</span>, n_labs <span class="op">=</span> <span class="fl">2</span>, n <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/plot_label.html">plot_label</a></span><span class="op">(</span>label <span class="op">=</span> <span class="st">"Source B"</span>, x <span class="op">=</span> <span class="fl">2017</span>, y <span class="op">=</span> <span class="fl">13</span>, n_labs <span class="op">=</span> <span class="fl">2</span>, n <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/plot_label.html">plot_label</a></span><span class="op">(</span>label <span class="op">=</span> <span class="st">"Source A"</span>, x <span class="op">=</span> <span class="fl">2016</span>, y <span class="op">=</span> <span class="fl">6</span>, n_labs <span class="op">=</span> <span class="fl">2</span>, n <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/plot_label.html">plot_label</a></span><span class="op">(</span>label <span class="op">=</span> <span class="st">"Source B"</span>, x <span class="op">=</span> <span class="fl">2016</span>, y <span class="op">=</span> <span class="fl">13</span>, n_labs <span class="op">=</span> <span class="fl">2</span>, n <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/scale_e61.html">scale_colour_e61</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
@@ -174,7 +176,7 @@ ordered factor, and calling the label names using
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/mplot_label.html">mplot_label</a></span><span class="op">(</span></span>
 <span>    label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">graph_data</span><span class="op">$</span><span class="va">source</span><span class="op">)</span>,</span>
-<span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2017</span>, <span class="fl">2017</span><span class="op">)</span>,</span>
+<span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2016</span>, <span class="fl">2016</span><span class="op">)</span>,</span>
 <span>    y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">13</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>

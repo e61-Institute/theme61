@@ -2,9 +2,10 @@ pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
+  graph-standards: graph-standards.html
   ongraph-labels: ongraph-labels.html
   theme61: theme61.html
-last_built: 2023-05-08T02:20Z
+last_built: 2023-05-26T06:16Z
 urls:
   reference: https://e61-institute.github.io/theme61/reference
   article: https://e61-institute.github.io/theme61/articles
