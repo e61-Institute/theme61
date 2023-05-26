@@ -14,13 +14,15 @@ theme_e61(
   panel_borders = TRUE,
   background = "white",
   base_size = 10,
-  base_family = "Arial",
+  base_family = "ArialMT",
   base_line_size = points_to_mm(0.75),
   base_rect_size = points_to_mm(1)
 )
 }
 \arguments{
-\item{y_top}{Defaults to TRUE. Moves the y-axis title to the top.}
+\item{y_top}{Defaults to TRUE. Puts the y-axis title at the top. If you
+change this argument you also need to change the argument with the same
+name in \code{\link[theme61]{scale_y_continuous_e61}}.}
 
 \item{adj}{Either a single numeric to adjust left and right axis titles
 simultaneously or a vector of 2 numerics to adjust each axis title
@@ -55,7 +57,10 @@ legend.}
 ggplot2 object
 }
 \description{
-Applies the e61 theme to ggplot graphs.
+Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
+appearance. If you are looking to change the appearance of titles or labels,
+check the arguments in \code{\link[theme61]{labs_e61}}, which are probably
+what you are looking for.
 }
 \details{
 \code{scale_y_continuous_e61()} should be used in conjunction with this

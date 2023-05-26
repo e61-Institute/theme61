@@ -1,113 +1,140 @@
-#' Format axes in the e61 Institute style
+#' Format axes in the e61 style
 #'
 #' These functions format the x and y axes to be consistent with e61 styling.
 #' This includes removing white space at the beginning and end of each axis.
 #'
-#' @param expand_bottom Numeric. Add extra space between data points and the
-#'   bottom of the graph. See \link[ggplot2]{expansion} for details.
-#' @param expand_top Numeric. Add extra space between data points and the top of
-#'   the graph.
-#' @param sec_axis Adds a secondary axis (defaults to \code{dup_axis()}, which
-#'   duplicates the axis), see \link[ggplot2]{sec_axis} for more details. Set to
-#'   FALSE to hide a secondary axis.
+#' @param expand_bottom,expand_top Numeric. Add extra space between data points
+#'   and the top/bottom of the graph. See \link[ggplot2]{expansion} for details.
+#' @param sec_axis Defaults to duplicating the y-axis so it shows on the left
+#'   and right. To add a rescaled secondary axis, see the documentation for
+#'   \link[theme61]{dual_y_axis}. Set to FALSE to hide the secondary axis.
+#' @param rescale_sec Logical. Set this to TRUE if you are using a rescaled
+#'   secondary axis, otherwise leave it as FALSE (default).
 #' @param y_top Logical. Ensures there is space at the top of the y-axis for the
 #'   axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
-#'   elsewhere.
-#' @param expand_left Numeric. Add extra space between data points and the left
-#'   of the graph.
-#' @param expand_right Numeric. Add extra space between data points and the
-#'   right of the graph.
+#'   elsewhere. If you change this argument you also need to change the argument
+#'   with the same name in \code{\link[theme61]{theme_e61}}.
+#' @param expand_left,expand_right Numeric. Add extra space between data points
+#'   and the left/right of the graph. See \link[ggplot2]{expansion} for details.
 #' @param limits One of:
 #'   \itemize{
-#'     \item{\code{NULL} to use the default scale range.}
-#'     \item{A numeric vector of length two providing the minimum and maximum
-#'     limits of the scale.}
 #'     \item{A numeric vector of length three providing the limits of the scale
 #'     and the increment between each axis tick, e.g. \code{c(0, 25, 5)} will
 #'     set the axis to range from 0 to 25, with increments of 5 per tick.}
+#'     \item{A numeric vector of length two providing the minimum and maximum
+#'     limits of the scale. The break increments will be automatically chosen.}
+#'     \item{\code{NULL} to use the default scale range.}
 #'     }
-#' @inheritDotParams ggplot2::scale_y_continuous -breaks -minor_breaks -n.breaks
-#'   -expand -sec.axis
+#' @inheritDotParams ggplot2::scale_y_continuous name oob na.value trans guide
+#'   position
 #'
 #' @rdname e61_axes
 #' @export
 
-scale_y_continuous_e61 <- function(limits,
-                                   sec_axis = dup_axis(),
+scale_y_continuous_e61 <- function(limits = NULL,
+                                   sec_axis = ggplot2::dup_axis(),
+                                   rescale_sec = FALSE,
                                    y_top = TRUE,
                                    expand_bottom = 0,
                                    expand_top = 0,
                                    ...) {
 
+  # Set sec_axis to default behaviour if we don't want it
+  if (isFALSE(sec_axis)) sec_axis <- ggplot2::waiver()
+
+  # Prepares limits and breaks
   if (!is.null(limits) && is.numeric(limits)) {
-    # Very slightly reduce the upper limit so the break label does not appear
-    # This is needed so that the axis title does not overlap with the break label
-    limits[[2]] <- limits[[2]] - 0.0001
+
+    if (length(limits) == 3) {
+      breaks <- seq(limits[[1]], limits[[2]], limits[[3]])
+
+      # Hides the last break to make space for the unit label
+      if (isTRUE(y_top)) breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
+
+    } else {
+      breaks <- function(x) {
+        x <- scales::breaks_extended()(x)
+        # Hides the last break to make space for the unit label
+        if (isTRUE(y_top)) x[x == max(x, na.rm = TRUE)] <- NA
+        return(x)
+      }
+    }
+  } else {
+    breaks <- ggplot2::waiver()
   }
 
-  # Set sec_axis to default behaviour if we don't want it
-  if (isFALSE(sec_axis)) sec_axis <- waiver()
+  # Prepares breaks for the rescaled secondary axis if used
+  if (isTRUE(rescale_sec)) {
+    sec_labels <- sec_rescale(breaks)
+    sec_labels[is.na(sec_labels)] <- ""
+    sec_axis$labels <- sec_labels
+  }
 
-  # Put the little bit of y-axis back in
-  if (isFALSE(y_top)) limits[[2]] <- limits[[2]] + 0.0001
-
-  e61_y_continuous(
-    expand_bottom = expand_bottom,
-    expand_top = expand_top,
-    sec_axis = sec_axis,
+  # Put it all together
+  retval <- ggplot2::scale_y_continuous(
+    expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
+    sec.axis = sec_axis,
     limits = limits,
+    breaks = breaks,
     ...
-  )
+    )
+
+  class(retval) <- c(class(retval), "scale_e61")
+
+  return(retval)
 
 }
 
-#' @inheritDotParams ggplot2::scale_x_continuous
+#' @param hide_first_last Logical. Defaults to TRUE. Hides the first and
+#'   last x-axis labels to avoid overlapping with the bottom of the y-axis.
+#' @inheritParams scale_y_continuous_e61
 #' @rdname e61_axes
 #' @export
 
-scale_x_continuous_e61 <- function(expand_left = 0,
-                                   expand_right = 0.015,
+scale_x_continuous_e61 <- function(limits = NULL,
+                                   expand_left = 0,
+                                   expand_right = 0,
+                                   hide_first_last = TRUE,
                                    ...) {
 
-  e61_x_continuous(expand_left = expand_left,
-                   expand_right = expand_right,
-                   ...)
-}
+  # Prepares limits and breaks
+  if (!is.null(limits) && is.numeric(limits)) {
 
-# Internal functions ------------------------------------------------------
+    if (length(limits) == 3) {
+      breaks <- seq(limits[[1]], limits[[2]], limits[[3]])
 
-# These functions go in the above functions
-e61_y_continuous <- function(expand_bottom = 0,
-                             expand_top = 0.015,
-                             sec_axis = sec_axis,
-                             limits = limits,
-                             ...) {
+      # Hides the first and last break
+      if (hide_first_last) {
+        breaks[breaks == min(breaks, na.rm = TRUE)] <- NA
+        breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
+      }
 
-  if (length(limits) == 3) {
-    custom_breaks <- seq(limits[[1]], limits[[2]], limits[[3]])
 
+    } else {
+      breaks <- function(x) {
+        x <- scales::breaks_extended()(x)
+        # Hides the first and last break
+        if (hide_first_last) {
+          x[x == min(x, na.rm = TRUE)] <- NA
+          x[x == max(x, na.rm = TRUE)] <- NA
+        }
+        return(x)
+      }
+    }
   } else {
-    custom_breaks <- ggplot2::waiver()
+    breaks <- ggplot2::waiver()
   }
 
-  ggplot2::scale_y_continuous(
-    expand = ggplot2::expansion(mult = c(expand_bottom,
-                                         expand_top)),
-    sec.axis = sec_axis,
+  # Put it all together
+  retval <- ggplot2::scale_x_continuous(
+    expand = ggplot2::expansion(mult = c(expand_left, expand_right)),
     limits = limits,
-    breaks = custom_breaks,
+    breaks = breaks,
     ...
-  )
-}
+    )
 
+  class(retval) <- c(class(retval), "scale_e61")
 
-
-e61_x_continuous <- function(expand_left = 0,
-                             expand_right = 0.015,
-                             ...) {
-
-  ggplot2::scale_x_continuous(expand = ggplot2::expansion(mult = c(expand_left,
-                                                                   expand_right)),
-                              ...)
+  return(retval)
 
 }

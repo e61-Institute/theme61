@@ -44,7 +44,7 @@
 <polyline points='15.65,117.55 120.47,117.55 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
 <polyline points='15.65,97.89 120.47,97.89 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
 <rect x='20.41' y='117.55' width='47.65' height='39.31' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #66CED6;' />
-<rect x='68.06' y='97.89' width='47.65' height='58.97' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #008080;' />
+<rect x='68.06' y='97.89' width='47.65' height='58.96' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #008080;' />
 <text x='41.59' y='113.64' text-anchor='middle' style='font-size: 11.04px;fill: #66CED6; font-family: "Arial";' textLength='7.36px' lengthAdjust='spacingAndGlyphs'>P</text>
 <text x='94.53' y='93.98' text-anchor='middle' style='font-size: 11.04px;fill: #008080; font-family: "Arial";' textLength='8.58px' lengthAdjust='spacingAndGlyphs'>Q</text>
 <rect x='15.65' y='78.24' width='104.83' height='78.62' style='stroke-width: 1.50;' />
@@ -63,7 +63,7 @@
 <polyline points='120.47,117.55 225.30,117.55 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
 <polyline points='120.47,97.89 225.30,97.89 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
 <rect x='125.24' y='117.55' width='47.65' height='39.31' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #66CED6;' />
-<rect x='172.89' y='97.89' width='47.65' height='58.97' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #008080;' />
+<rect x='172.89' y='97.89' width='47.65' height='58.96' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #008080;' />
 <rect x='120.47' y='78.24' width='104.83' height='78.62' style='stroke-width: 1.50;' />
 </g>
 <g clip-path='url(#cpMC4wMHwyNDAuOTR8MC4wMHwyMjMuOTQ=)'>

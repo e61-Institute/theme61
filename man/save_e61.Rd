@@ -7,25 +7,24 @@
 save_e61(
   filename,
   plot = ggplot2::last_plot(),
-  save_data = FALSE,
   width = NULL,
   height = NULL,
+  format = c("svg", "pdf", "eps", "png"),
+  save_data = FALSE,
+  dim_msg = FALSE,
   resize = NULL,
-  scale = 1,
-  dpi = 100,
-  dim_msg = FALSE
+  pointsize = 12,
+  res = 72
 )
 }
 \arguments{
-\item{filename}{File name to create on disk. Remember you must provide the
-file extension, e.g. \code{.svg}.}
+\item{filename}{File name to create on disk. Providing the file format
+extension (e.g. .svg) is optional. The file extension must be lowercase. If
+you want to save multiple files with different formats, see the
+\code{format} argument for details.}
 
 \item{plot}{Plot object to save. Defaults to the last plot displayed so
 usually you do not need to provide this explicitly.}
-
-\item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
-same name as the graph that contains the data needed to recreate the graph
-(defaults to FALSE).}
 
 \item{width}{Plot width in cm. Defaults to 8.5.}
 
@@ -36,32 +35,43 @@ automatic value is aesthetically appropriate (no excess whitespace).
 Otherwise, the function will default to a value of 9 but this is unlikely
 to be appropriate.}
 
-\item{resize}{Rescales the graph and text. Useful when you need a very large
-or small graph and cannot use a vector graphics format. This only works
-when saving to the PNG file format. A value of 2 doubles the graph
-dimensions.}
+\item{format}{An optional vector of file formats to save as. For example
+\code{c("svg", "pdf")} will save 2 files with the same name to the same
+location to SVG and PDF formats. If the file format is specified in
+\code{filename}, then this argument is ignored.}
 
-\item{scale}{Multiplicative scaling factor.}
-
-\item{dpi}{Plot resolution. Also accepts a string input: "retina" (320),
-"print" (300), or "screen" (72). Applies only to raster output types.}
+\item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
+same name as the graph that contains the data needed to recreate the graph
+(defaults to FALSE).}
 
 \item{dim_msg}{Logical. Set to TRUE if you want to know what dimensions the
 graph was saved to (defaults to FALSE).}
+
+\item{resize}{Numeric. Only used when PNG is the file format. Resize the
+graph width and height. You may also need to adjust the \code{pointsize}
+and \code{res} to ensure the text is readable.}
+
+\item{pointsize}{the default pointsize of plotted text, interpreted as
+    big points (1/72 inch) at \code{res} ppi.}
+
+\item{res}{The nominal resolution in ppi which will be recorded in the
+    bitmap file, if a positive integer.  Also used for units other than
+    the default.  If not specified, taken as 72 ppi to set the size of
+    text and line widths.}
 }
 \value{
-Invisibly returns the plot object.
+Invisibly returns the file name.
 }
 \description{
 Designed to save ggplot graphs made with the e61 theme with
   sensible defaults that ensure the text size is appropriately proportioned
   given default sizing.
 
-  Currently the only file formats supported are \code{.svg} (preferred) and
-  \code{.png}. SVG is a modern vector graphics file format which means it can
-  be scaled up and down in size without blurring or becoming pixelated. Use
-  the PNG file format in the rare case that vector graphics are not
-  supported.
+  Currently the only file formats supported are \code{.pdf} or \code{.svg}
+  (preferred), and \code{.png}. PDF and SVG are modern vector graphics file
+  formats which can be scaled up and down in size without blurring or
+  becoming pixelated. Use the PNG file format in the rare case that vector
+  graphics are not supported.
 
   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 }

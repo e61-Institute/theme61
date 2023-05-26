@@ -1,11 +1,16 @@
 #' e61 themed graph options
 #'
-#' Applies the e61 theme to ggplot graphs.
+#' Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
+#' appearance. If you are looking to change the appearance of titles or labels,
+#' check the arguments in \code{\link[theme61]{labs_e61}}, which are probably
+#' what you are looking for.
 #'
 #' \code{scale_y_continuous_e61()} should be used in conjunction with this
 #' function to ensure that theming and axes are applied correctly.
 #'
-#' @param y_top Defaults to TRUE. Moves the y-axis title to the top.
+#' @param y_top Defaults to TRUE. Puts the y-axis title at the top. If you
+#'   change this argument you also need to change the argument with the same
+#'   name in \code{\link[theme61]{scale_y_continuous_e61}}.
 #' @param adj Either a single numeric to adjust left and right axis titles
 #'   simultaneously or a vector of 2 numerics to adjust each axis title
 #'   separately. More negative values move the text closer to the graph panel.
@@ -45,23 +50,10 @@ theme_e61 <- function(y_top = TRUE,
                       panel_borders = TRUE,
                       background = "white",
                       base_size = 10,
-                      base_family = "Arial",
+                      base_family = "ArialMT",
                       base_line_size = points_to_mm(0.75),
                       base_rect_size = points_to_mm(1)
                       ) {
-
-  # Add a message for the user reminding them to use scale_y_continuous_e61
-  if(getOption("scale_e61.message", TRUE)) {
-
-    message(paste(
-      "Please remember to use", sQuote("scale_y_continuous_e61()"),
-      "in conjunction with", sQuote("theme_e61()"), "to ensure the graph axes",
-      "render correctly.",
-      'This message is shown once per session and may be disabled by setting',
-      "options('save_e61.message' = FALSE). See ?theme_e61 for more details."))
-    options("scale_e61.message" = FALSE)
-  }
-
 
   legend <- match.arg(legend)
 
@@ -71,7 +63,7 @@ theme_e61 <- function(y_top = TRUE,
     theme(
       line = element_line(
         colour = e61_greylight6,
-        size = base_line_size,
+        linewidth = base_line_size,
         linetype = 1,
         lineend = "butt"
       ),
@@ -79,7 +71,7 @@ theme_e61 <- function(y_top = TRUE,
       rect = element_rect(
         fill = background,
         colour = e61_greylight6,
-        size = base_rect_size,
+        linewidth = base_rect_size,
         linetype = 0
       ),
       text = element_text(
@@ -94,7 +86,7 @@ theme_e61 <- function(y_top = TRUE,
         margin = margin(),
         size = base_size
       ),
-      axis.line = element_line(size = points_to_mm(1),
+      axis.line = element_line(linewidth = points_to_mm(1),
                                colour = "black"),
       axis.line.x = NULL,
       axis.line.y = NULL,
@@ -169,7 +161,7 @@ theme_e61 <- function(y_top = TRUE,
       ),
       panel.grid.major.x = element_blank(),
       panel.grid.major.y = element_line(colour = e61_greylight6,
-                                  size = points_to_mm(0.5)),
+                                        linewidth = points_to_mm(0.5)),
       panel.grid.minor = element_blank(),
       panel.spacing = unit(1, "lines"),
       panel.spacing.x = NULL,
@@ -266,6 +258,9 @@ theme_e61 <- function(y_top = TRUE,
     ret <- ret + y_title_top(adj = adj, fix_left = fix_left)
   }
 
+  # Add attribute to identify it as a theme61 object
+  attr(ret, "t61_obj") <- TRUE
+
   return(ret)
 }
 
@@ -322,10 +317,18 @@ theme_e61_clean <- function(
 #'
 #' Legend symbols for line graphs default to coloured lines, which can sometimes
 #' be hard to read. This function overrides the default and converts the colours
-#' to squares.
+#' to squares. This needs to be used in conjunction with some invisible point
+#' geoms so the function has a shape to reshape.
 #'
 #' @return ggplot object
 #' @export
+#' @examples
+#' ggplot(data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
+#'   aes(x, y, colour = group)) +
+#'   geom_line() +
+#'   geom_point(alpha = 0) + # The required "invisible points"
+#'   square_legend_symbols()
+#'
 
 square_legend_symbols <- function() {
   ggplot2::guides(colour = ggplot2::guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))
@@ -348,7 +351,7 @@ square_legend_symbols <- function() {
 
 format_flipped_bar <- function(x_adj = -9) {
   theme(
-    panel.grid.major.x = element_line(colour = e61_greylight6, size = points_to_mm(0.5)),
+    panel.grid.major.x = element_line(colour = e61_greylight6, linewidth = points_to_mm(0.5)),
     panel.grid.major.y = element_blank(),
     axis.text.x.top = element_blank(),
     axis.ticks.x.top = element_blank(),

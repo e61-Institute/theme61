@@ -39,9 +39,9 @@ Finally, labels are more aesthetic than legends.
 
 The simplest way to add plot labels is to use the `plot_label()` function in `theme61`. The following code provides an example. Most of the code is to set up the mock data and create a graph, the only two lines that are important are the `plot_label()` lines.
 
-`plot_label()` requires you to provide the text of the label (`label`), the `x` and `y` positioning, the total number of different colours/labels to plot (`n_labs`), and which number element you are currently plotting (`n`). For more information, see the documentation (`?plot_label`).
+**If you have more than one label you should use `mplot_label()`**, which is introduced in the next section.
 
-If you have multiple labels it may be more efficient to use `mplot_label()`, which is introduced in the next section.
+`plot_label()` requires you to provide the text of the label (`label`), the `x` and `y` positioning, the total number of different colours/labels to plot (`n_labs`), and which number element you are currently plotting (`n`). For more information, see the documentation (`?plot_label`).
 
 ```{r}
 # Mock data
@@ -56,8 +56,8 @@ graph_data[source == "Source B", y := seq(0, by = 1, length = 21)]
 # Graph
 graph <- ggplot(graph_data, aes(x, y, colour = source)) +
   geom_line(linewidth = 1) +
-  plot_label(label = "Source A", x = 2017, y = 6, n_labs = 2, n = 1) +
-  plot_label(label = "Source B", x = 2017, y = 13, n_labs = 2, n = 2) +
+  plot_label(label = "Source A", x = 2016, y = 6, n_labs = 2, n = 1) +
+  plot_label(label = "Source B", x = 2016, y = 13, n_labs = 2, n = 2) +
   theme_e61() +
   scale_y_continuous_e61(limits = c(0, 20, 5)) +
   scale_colour_e61(2) +
@@ -95,7 +95,7 @@ graph <- ggplot(graph_data, aes(x, y, colour = source)) +
   geom_line(linewidth = 1) +
   mplot_label(
     label = levels(graph_data$source),
-    x = c(2017, 2017),
+    x = c(2016, 2016),
     y = c(6, 13)
   ) +
   theme_e61() +

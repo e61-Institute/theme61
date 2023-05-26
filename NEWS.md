@@ -1,3 +1,34 @@
+# theme61 0.5.0
+
+26 May 2023
+
+#### New functions
+
+* Added new functions `set_open_graph()` and `unset_open_graph()` which toggle an option to automatically open a graph that has been created with `save_e61()`. Helpful for your workflow when perfecting graphs.
+
+#### New/changed functionality
+
+* Add ability to save graphs in multiple formats at once using the new `format` argument in `save_e61()`.
+* Add support in `save_e61()` for saving images in PDF format for compatibility with LaTeX.
+* Change the default alignment of plot labels to left-align and added a new argument `hjust` to `plot_label()`/`mplot_label()` to change the alignment.
+* Added the ability to add a white box around text in `plot_label()`/`mplot_label()` through `geom` argument.
+* Added `y` argument to `add_zeroline()` so you can put your zero line at values other than zero.
+* Added argument to `scale_x_continuous_e61()` to add back the first/last labels that are removed by default.
+* Slightly increased default size of plot labels to match size of axis text.
+* `save_e61()` now notifies you if you forget to use the theme and scale functions.
+
+#### Bug fixes
+
+* Permanent fix to the bug that was temporarily bodged in v0.4.1. Now dates can be entered as strings in `plot_label()` and they will be converted to dates.
+* Fixed a bug in `scale_y_continuous_e61()` that made `y_top` stop working and also refactored the code.
+* Fixed a bug in `mplot_label()` that didn't allow a vector of colours to be supplied.
+
+#### Documentation updates
+
+* Added a new Graph standards vignette based on masterclass materials.
+* Added more documentation explaining how `rel_heights` in `mpanel_e61()` works.
+* Miscellaneous minor documentation improvements.
+
 # theme61 0.4.1
 
 08 May 2023

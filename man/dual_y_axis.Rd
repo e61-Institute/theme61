@@ -46,6 +46,11 @@ data <- data.frame(x = 1:5, y1 = 1:5 * 10, y2 = 5:1 - 5)
 ggplot(data, aes(x)) +
   geom_col(aes(y = y1)) +
   geom_point(aes(y = sec_rescale_inv(y2, scale = 0.1, shift = 5))) +
-  scale_y_continuous_e61(limits = c(0, 60, 10), sec_axis = sec_axis(~sec_rescale(.)))
+  # Some extra arguments are required to correctly format the secondary axis:
+  # Set rescaled_sec = TRUE in scale_y_continuous_e61() to format the breaks correctly.
+  # The secondary y-axis label (name = "\%") needs to be explicitly specified otherwise it will not appear.
+  scale_y_continuous_e61(limits = c(0, 60, 10), sec_axis = sec_axis(~sec_rescale(.), name = "\%"), rescale_sec = TRUE) +
+  theme_e61() +
+  labs_e61(y = "\%")
 
 }

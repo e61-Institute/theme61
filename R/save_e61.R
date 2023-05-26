@@ -4,11 +4,11 @@
 #'   sensible defaults that ensure the text size is appropriately proportioned
 #'   given default sizing.
 #'
-#'   Currently the only file formats supported are \code{.svg} (preferred) and
-#'   \code{.png}. SVG is a modern vector graphics file format which means it can
-#'   be scaled up and down in size without blurring or becoming pixelated. Use
-#'   the PNG file format in the rare case that vector graphics are not
-#'   supported.
+#'   Currently the only file formats supported are \code{.pdf} or \code{.svg}
+#'   (preferred), and \code{.png}. PDF and SVG are modern vector graphics file
+#'   formats which can be scaled up and down in size without blurring or
+#'   becoming pixelated. Use the PNG file format in the rare case that vector
+#'   graphics are not supported.
 #'
 #'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 #'
@@ -31,12 +31,10 @@
 #'   make adjustments to the dimensions to ensure the graph is sized
 #'   appropriately.
 #'
-#' @param resize Rescales the graph and text. Useful when you need a very large
-#'   or small graph and cannot use a vector graphics format. This only works
-#'   when saving to the PNG file format. A value of 2 doubles the graph
-#'   dimensions.
-#' @param filename File name to create on disk. Remember you must provide the
-#'   file extension, e.g. \code{.svg}.
+#' @param filename File name to create on disk. Providing the file format
+#'   extension (e.g. .svg) is optional. The file extension must be lowercase. If
+#'   you want to save multiple files with different formats, see the
+#'   \code{format} argument for details.
 #' @param plot Plot object to save. Defaults to the last plot displayed so
 #'   usually you do not need to provide this explicitly.
 #' @param width Plot width in cm. Defaults to 8.5.
@@ -46,163 +44,242 @@
 #'   automatic value is aesthetically appropriate (no excess whitespace).
 #'   Otherwise, the function will default to a value of 9 but this is unlikely
 #'   to be appropriate.
+#' @param format An optional vector of file formats to save as. For example
+#'   \code{c("svg", "pdf")} will save 2 files with the same name to the same
+#'   location to SVG and PDF formats. If the file format is specified in
+#'   \code{filename}, then this argument is ignored.
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
 #' @param dim_msg Logical. Set to TRUE if you want to know what dimensions the
 #'   graph was saved to (defaults to FALSE).
-#' @inheritParams ggplot2::ggsave
-#' @return Invisibly returns the plot object.
+#' @param resize Numeric. Only used when PNG is the file format. Resize the
+#'   graph width and height. You may also need to adjust the \code{pointsize}
+#'   and \code{res} to ensure the text is readable.
+#' @inheritParams grDevices::png
+#' @return Invisibly returns the file name.
 #' @export
 
-save_e61 <-
-  function(filename,
-           plot = ggplot2::last_plot(),
-           save_data = FALSE,
-           width = NULL,
-           height = NULL,
-           resize = NULL,
-           scale = 1,
-           dpi = 100,
-           dim_msg = FALSE
-           ) {
-
-    if (!grepl("(\\.png|\\.svg)", filename))
-      stop("You must provide a file extension. Only .svg and .png file formats are currently supported.")
-
-    # Check if the data frame can be written
-    if (save_data && !is.data.frame(plot$data))
-      stop(cli::col_red("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph."))
-
-    # Check if graph is horizontal
-    is_flip <- isTRUE("CoordFlip" %in% class(ggplot2::ggplot_build(plot)$layout$coord))
-
-    # Check if the graph is a multi-panel generated with mpanel_e61 by
-    # exploiting the fact that those graphs have zero-length labels, while
-    # labs_e61 forces the user to have at least a title (so length > 0 for
-    # single panels)
-    is_multi <- !is.null(attr(plot, "panel_rows"))
-
-    # For multi-panels: Adjust the width to fit the extra panels and send out user message to specify the height
-    if (is_multi && is.null(width)) {
-      width <- 8.5 * attr(plot, "panel_cols")
-    }
-
-    if (is_multi && is.null(height)) {
-      height <- 7.5 + 7 * (attr(plot, "panel_rows") - 1)
-
-      cli::cli_text(cli::col_red("Note: You are saving a multi-panel graph, save_e61() has automatically set the height to ", height, ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
-    }
+save_e61 <-  function(filename,
+                      plot = ggplot2::last_plot(),
+                      width = NULL,
+                      height = NULL,
+                      format = c("svg", "pdf", "eps", "png"),
+                      save_data = FALSE,
+                      dim_msg = FALSE,
+                      resize = NULL,
+                      pointsize = 12,
+                      res = 72
+                      ) {
 
 
-    # Calculate graph height based on the graph labels for normal orientation graphs
-    if (is.null(height) && !is_flip && !is_multi) {
+  # Guard clauses and failing checks ----------------------------------------
 
-      h <- 6.5
-
-      # Calculate the height adjustment needed for...
-
-      # Titles
-      if (!is.null(plot$labels$title)) {
-        t_adj <- 0.6 + n_count(plot$labels$title) * 0.3
-
-      } else {
-        t_adj <- 0
-      }
-
-      # Subtitles
-      if (!is.null(plot$labels$subtitle)) {
-        st_adj <- 0.5 + n_count(plot$labels$subtitle) * 0.3
-
-      } else {
-        st_adj <- 0
-      }
-
-      # Captions
-      if (!is.null(plot$labels$caption)) {
-        cp_adj <- 0.5 + n_count(plot$labels$caption) * 0.3
-
-      } else {
-        cp_adj <- 0
-      }
-
-      # Adjustment for width of y-axis label
-      if (!is.null(plot$labels$y)) {
-        y_adj <- (nchar(plot$labels$y) - 1) * -0.2
-      } else {
-        y_adj <- 0
-      }
-
-    height <- h + t_adj + st_adj + cp_adj + y_adj
-
-    cli::cli_text(cli::col_green("Note: save_e61() has automatically set the height to ", height, ". Please open the saved graph file and check if this is actually appropriate for your graph. You may have to adjust the value if the y-axis is particularly wide."))
-
-    }
-
-    # Message for the user to specify their own height to dimension graphs
-    # correctly. This message runs after the above so when the automatic height
-    # setting is used it does not trigger.
-    if (is.null(height) || isTRUE(getOption("save_e61.message"))) {
-
-      cli::cli_text(cli::col_red("Note: When you use ", sQuote("save_e61()"), " to save images with defaults, you should set the ", sQuote("height"), " argument manually to your own value to avoid excess/insufficient whitespace on the rendered image."))
-      cli::cli_text("Unfortunately the only way to check this is to open the rendered graphic and inspect it visually.")
-      cli::cli_text("This message is shown if you leave 'height = NULL' and the automatic height functionality is not used. It may be disabled by setting options('save_e61.message' = FALSE). See ?save_e61 for more details.")
-
-      options('save_e61.message' = FALSE)
-    }
-
-    # Fallback default dimensions if not otherwise specified
-    if (is.null(width) && !is_flip) width <- 8.5
-    if (is.null(height) && !is_flip) height <- 9
-
-    # When coord_flip() is used to make a plot horizontal, the default dims are
-    # too small
-    if (is.null(width) && is_flip) width <- 17
-    if (is.null(height) && is_flip) height <- 12
-
-    if (!is.null(resize)) {
-      if (!grepl("\\.png", filename))
-        stop("The 'resize' argument is not supported unless the file format is .png")
-      if (!is.numeric(resize))
-        stop("'resize' must be numeric.")
-
-      # Rescale elements as required
-      width <- width * resize
-      height <- height * resize
-      dpi <- dpi * resize
-      scale <-
-        scale / resize # scale works inversely to size for reasons
-
-    }
-
-    ggplot2::ggsave(
-      filename,
-      plot = plot,
-      width = width,
-      height = height,
-      units = "cm",
-      scale = scale,
-      dpi = dpi
-    )
-
-    if (dim_msg) cli::cli_text(cli::col_green("The graph height and width have been set to ", height, " and ", width, "."))
-
-    # Save the data used to make the graph
-    if (save_data) {
-      data_name <- gsub("\\.(svg|png)$", "\\.csv", filename)
-      data.table::fwrite(plot$data, data_name)
-    }
-
-    invisible(plot)
+  # Enforce file format requirements if a file extension is provided (quietly
+  # permits eps files too)
+  if (grepl("\\..{3}$", filename) && !grepl("\\.(png|svg|pdf|eps)$", filename)) {
+    stop("You must provide a file extension. Only PDF, SVG and PNG file formats are currently supported.")
   }
+
+  # Determine which file formats to save
+  if (grepl("\\..{3}$", filename)) {
+    format <- gsub("^.*\\.(.{3})$", "\\1", filename)
+
+    # Strip file extension from filename
+    filename <- gsub("^(.*)\\..{3}$", "\\1", filename)
+  } else {
+    format <- match.arg(format, several.ok = TRUE)
+  }
+
+  # Check if the data frame can be written
+  if (save_data && !is.data.frame(plot$data))
+    stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
+
+  # Identify graph attributes -----------------------------------------------
+
+  # Check if graph is horizontal
+  is_flip <- isTRUE("CoordFlip" %in% class(ggplot2::ggplot_build(plot)$layout$coord))
+
+  # Check if the graph is a multi-panel generated with mpanel_e61 by
+  # exploiting the fact that those graphs have zero-length labels, while
+  # labs_e61 forces the user to have at least a title (so length > 0 for
+  # single panels)
+  is_multi <- !is.null(attr(plot, "panel_rows"))
+
+  # Advisory messages -------------------------------------------------------
+
+  # The following checks don't apply when multi-panel graphs are created
+  # Message if theme function not used
+  if (!is_multi && is.null(attr(plot$theme, "t61"))) {
+    cli::cli_text(cli::bg_br_yellow(cli::col_black(
+      "Please remember to use 'theme_e61()' in your ggplot code to ensure the ",
+      "e61 theme is applied.")))
+  }
+
+  # Message if package scale_x/y function not used
+  if (!is_multi && !"scale_e61" %in% class(ggplot2::layer_scales(plot)$y)) {
+    cli::cli_text(cli::bg_br_yellow(cli::col_black(
+      "Please remember to use 'scale_x/y_continuous_e61()' in your ggplot code ",
+      "to ensure the graph axes render correctly.")))
+  }
+
+  # Message if colour/fill functions aren't used, message to appear only if a
+  # colour/fill mappping exists
+  if (!is_multi && any(grepl("(colour|color|fill)", names(plot$mapping))) &&
+      !"scale_col_e61" %in% unlist(sapply(plot$scales$scales, class))) {
+    cli::cli_text(cli::bg_br_yellow(cli::col_black(
+      "Please remember to use 'scale_colour/fill_e61()' in your ggplot code ",
+      "to ensure the e61 colour palette is used.")))
+  }
+
+  # Height and width setting ------------------------------------------------
+
+  # For multi-panels: Adjust the width to fit the extra panels and send out user
+  # message to specify the height
+  if (is_multi && is.null(width)) {
+    width <- 8.5 * attr(plot, "panel_cols")
+  }
+
+  if (is_multi && is.null(height)) {
+    height <- 7.5 + 7 * (attr(plot, "panel_rows") - 1)
+
+    cli::cli_text(cli::col_green("Note: You are saving a multi-panel graph, save_e61() has automatically set the height to ", height, ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
+  }
+
+  # Calculate graph height based on the graph labels for normal orientation graphs
+  if (is.null(height) && !is_flip && !is_multi) {
+
+    h <- 6.5
+
+    # Calculate the height adjustment needed for...
+
+    # Titles
+    t_adj <-
+      if (!is.null(plot$labels$title)) 0.6 + n_count(plot$labels$title) * 0.3 else 0
+
+    # Subtitles
+    st_adj <-
+      if (!is.null(plot$labels$subtitle)) 0.5 + n_count(plot$labels$subtitle) * 0.3 else 0
+
+    # Captions
+    cp_adj <-
+      if (!is.null(plot$labels$caption)) 0.5 + n_count(plot$labels$caption) * 0.3 else 0
+
+    # Adjustment for width of y-axis label
+    y_adj <-
+      if (!is.null(plot$labels$y)) (nchar(plot$labels$y) - 1) * -0.2 else 0
+
+  height <- h + t_adj + st_adj + cp_adj + y_adj
+
+  cli::cli_text(cli::col_green("Note: save_e61() has automatically set the height to ", height, ". Please open the saved graph file and check if this is actually appropriate for your graph. You may have to adjust the value if the y-axis is particularly wide."))
+
+  }
+
+  # Message for the user to specify their own height to dimension graphs
+  # correctly. This message runs after the above so when the automatic height
+  # setting is used it does not trigger.
+  if (is.null(height) || isTRUE(getOption("save_e61.message"))) {
+
+    cli::cli_text(cli::col_green("Note: When you use ", sQuote("save_e61()"), " to save images with defaults, you should set the ", sQuote("height"), " argument manually to your own value to avoid excess/insufficient whitespace on the rendered image."))
+    cli::cli_text(cli::col_green("Unfortunately the only way to check this is to open the rendered graphic and inspect it visually."))
+    cli::cli_text(cli::col_green("This message is shown if you leave 'height = NULL' and the automatic height functionality is not used. It may be disabled by setting options('save_e61.message' = FALSE). See ?save_e61 for more details."))
+
+    options('save_e61.message' = FALSE)
+  }
+
+  # Fallback default dimensions if not otherwise specified
+  if (is.null(width) && !is_flip) width <- 8.5
+  if (is.null(height) && !is_flip) height <- 9
+
+  # When coord_flip() is used to make a plot horizontal, the default dims are
+  # too small
+  if (is.null(width) && is_flip) width <- 17
+  if (is.null(height) && is_flip) height <- 12
+
+  # Resize elements if a png is to be output
+  if (!is.null(resize)) {
+    if (format != "png")
+      stop("The 'resize' argument is not supported unless the file format is .png")
+    if (!is.numeric(resize))
+      stop("'resize' must be numeric.")
+
+    # Rescale elements as required
+    width <- width * resize
+    height <- height * resize
+  }
+
+
+  # Save --------------------------------------------------------------------
+  lapply(format, function(fmt) {
+    file_i <- paste0(filename, ".", fmt)
+
+    switch(
+      fmt,
+      svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height)),
+      eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height)),
+      pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height)),
+      png = png(filename = file_i, width = width, height = height, units = "cm", pointsize = pointsize, res = res)
+    )
+    print(plot)
+    dev.off()
+  })
+
+  # Post-saving messages and functions ---------------------
+  if (dim_msg) cli::cli_text(cli::col_green("The graph height and width have been set to ", height, " and ", width, "."))
+
+  # Save the data used to make the graph
+  if (save_data) {
+    data_name <- gsub("\\.(\\w{3})$", "\\.csv", filename)
+    data.table::fwrite(plot$data, data_name)
+  }
+
+  # Opens the graph file if the option is set
+  if (as.logical(getOption("open_e61_graph", FALSE))) {
+    # Put filename back together
+    filename <- paste0(filename, ".", format[[1]])
+
+    file_to_open <- shQuote(here::here(filename))
+    out <- try(system2("open", file_to_open))
+
+    if (out != 0) warning("Graph file could not be opened.")
+  }
+
+  # Invisibly returns the filename because not sure what else is worth
+  # returning? Currently some of the tests rely on the filename being returned
+  # so maybe don't change this without a good reason.
+  invisible(filename)
+}
+
+#' Set option to automatically open files created by \code{save_e61}
+#'
+#' These functions set and unset a session-wide option to automatically open
+#' files created by \code{save_e61}. This is useful when you want to look at the
+#' graph you have just created, such as when you are trying to figure out label
+#' locations or graph dimensions and don't want to manually navigate to the file
+#' location every time.
+#'
+#' @return This function is used for its side effects.
+#' @rdname set_open_graph
+#' @export
+set_open_graph <- function() {
+  options(open_e61_graph = TRUE)
+
+  invisible(TRUE)
+}
+
+#' @rdname set_open_graph
+#' @export
+unset_open_graph <- function() {
+  options(open_e61_graph = FALSE)
+
+  invisible(FALSE)
+}
 
 #' Counts the number of occurrences of a line break (\n)
 #'
 #' @param text The string to be parsed.
 #' @return Integer counting the number of line breaks in the string.
 #' @noRd
-
-n_count <- function(text)
+n_count <- function(text) {
   nchar(text) - nchar(gsub("\n", "", text, fixed = TRUE))
-
-
+}

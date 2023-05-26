@@ -11,9 +11,22 @@ test_that("Test dimensioning functions", {
 
   # Test custom dimensions work
   withr::with_tempdir({
-    expect_snapshot_file(save_e61("custom-dim-1.svg", ggplot(), width = 10, height = 10))
-    expect_snapshot_file(save_e61("custom-dim-2.svg", ggplot(), width = 10, height = 5))
-    expect_snapshot_file(save_e61("custom-dim-3.svg", ggplot(), width = 5, height = 10))
+
+    suppressMessages(save_e61("custom-dim.svg", ggplot(), width = 10, height = 10))
+    g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
+    expect_equal(g_info$width, 378)
+    expect_equal(g_info$height, 378)
+
+    suppressMessages(save_e61("custom-dim.svg", ggplot(), width = 10, height = 5))
+    g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
+    expect_equal(g_info$width, 378)
+    expect_equal(g_info$height, 189)
+
+    suppressMessages(save_e61("custom-dim.svg", ggplot(), width = 5, height = 10))
+    g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
+    expect_equal(g_info$width, 189)
+    expect_equal(g_info$height, 378)
+
   })
 
   # Test horizontal graph detection code
@@ -21,9 +34,15 @@ test_that("Test dimensioning functions", {
     plot <- ggplot() + labs(title = "Test")
     plot_h <- ggplot() + coord_flip() + labs(title = "Test")
 
-    expect_snapshot_file(suppressMessages(save_e61("plot-norm.svg", plot)))
-    expect_snapshot_file(suppressMessages(save_e61("plot-flip.svg", plot_h)))
+    suppressMessages(save_e61("gg.svg", plot))
+    g_info <- magick::image_info(magick::image_read("gg.svg"))
+    expect_equal(g_info$width, 321)
+    expect_equal(g_info$height, 268)
 
+    suppressMessages(save_e61("gg.svg", plot_h))
+    g_info <- magick::image_info(magick::image_read("gg.svg"))
+    expect_equal(g_info$width, 643)
+    expect_equal(g_info$height, 454)
   })
 
 })
@@ -45,8 +64,8 @@ test_that("Test resizing feature for PNGs", {
     expected_deets <-
       tibble::tibble(
         format = "PNG",
-        width = 334,
-        height = 279
+        width = 240,
+        height = 201
       )
 
     lapply(c("format", "width", "height"), function(x) {
@@ -62,8 +81,8 @@ test_that("Test resizing feature for PNGs", {
     expected_deets <-
       tibble::tibble(
         format = "PNG",
-        width = 669,
-        height = 559
+        width = 481,
+        height = 402
       )
 
     lapply(c("format", "width", "height"), function(x) {
@@ -110,6 +129,10 @@ test_that("Test support for different file formats", {
     expect_error(suppressMessages(save_e61(paste0(tempdir(), "\\png-text.jpg"))))
 
   })
+
+  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), g), classes = c("warning", "message")))
+  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".pdf"), g), classes = c("warning", "message")))
+  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".png"), g), classes = c("warning", "message")))
 
 })
 
@@ -165,6 +188,7 @@ test_that("Test whether save_data works", {
     geom_point()
 
   expect_no_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), save_data = TRUE)))
+  expect_no_error(suppressMessages(save_e61(file.path(dir, "graph"), format = "svg", save_data = TRUE)))
 
   # This should leave the $data container empty
   gg <- ggplot() +
@@ -172,4 +196,91 @@ test_that("Test whether save_data works", {
     geom_point(data = data, aes(x, y))
 
   expect_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), save_data = TRUE)))
+})
+
+test_that("Test advisory messages", {
+  # No theming, no y-axis
+  gg <- ggplot()
+
+  expect_message(
+    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1)),
+    "^Please remember to use.*"
+  )
+
+  # No colour palette
+  gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
+    geom_col()
+
+  expect_message(
+    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1)),
+    "^Please remember to use.*"
+  )
+
+  # No message if you do it right
+  gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
+    geom_col() +
+    scale_y_continuous_e61(c(0, 4)) +
+    scale_fill_e61(3) +
+    theme_e61()
+
+  expect_no_message(
+    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
+  )
+
+  # No messages for multipanels
+  gg <- mpanel_e61(gg)
+
+  expect_no_message(
+    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
+  )
+})
+
+test_that("Test multiple file format saving features", {
+  g <- ggplot()
+
+  # Test 3 formats
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file", g, format = c("svg", "pdf", "eps")))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                 c("test_file.eps", "test_file.pdf", "test_file.svg"))
+
+  })
+
+  # Test if PNG breaks everything (it shouldn't)
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file", g, format = c("svg", "png")))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                 c("test_file.svg", "test_file.png"))
+  })
+
+  # Test providing file format in file path
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file.svg", g))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                 c("test_file.svg"))
+  })
+
+  # Test if providing format in path overrules format argument
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file.svg", g, format = "png"))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                 c("test_file.svg"))
+  })
+
+  # Test what happens if nothing is provided (do the defaults do what you expect?)
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file", g))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                 c("test_file.svg", "test_file.png", "test_file.pdf", "test_file.eps"))
+  })
+
+  # Error if invalid filename used
+  withr::with_tempdir({
+    expect_error(suppressMessages(save_e61("test_file", g, format = "mp3")))
+  })
 })

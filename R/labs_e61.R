@@ -1,7 +1,13 @@
-#' Wrapper function to produce e61 style graph titles and footers
+#' Add graph titles and footers in the e61 style
 #'
-#' Simple wrapper around \code{\link[ggplot2]{labs}} that makes it easier to
-#' produce good looking footer text when using footnotes and sources.
+#' Provides support for well-formatted titles and footer text with minimal user
+#' adjustment needed.
+#'
+#' You should use vectors in the footnotes and sources to take advantage of the
+#' formatting features of this function.
+#'
+#' The arguments in the function allow you to make changes to the text
+#' formatting if required.
 #'
 #' @details The primary purpose of this function is to correctly format footer
 #'   text without requiring the user to guess where to put manual line breaks
@@ -23,7 +29,7 @@
 #' @param title_max_char,subtitle_max_char,footnote_max_char Numeric. Set the
 #'   maximum number of characters per line in the title, subtitle, sources or
 #'   footnotes. The default is roughly appropriate for the default graph
-#'   dimensions in \code{e61_save}.
+#'   dimensions in \code{\link[theme61]{e61_save}}.
 #' @param title_wrap,subtitle_wrap,footnote_wrap Logical. Enables text wrapping
 #'   for the title, subtitle, sources or footnotes. Defaults to TRUE.
 #' @param ... Additional graph component titles (optional).

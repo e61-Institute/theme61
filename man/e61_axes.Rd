@@ -3,68 +3,59 @@
 \name{scale_y_continuous_e61}
 \alias{scale_y_continuous_e61}
 \alias{scale_x_continuous_e61}
-\title{Format axes in the e61 Institute style}
+\title{Format axes in the e61 style}
 \usage{
 scale_y_continuous_e61(
-  limits,
-  sec_axis = dup_axis(),
+  limits = NULL,
+  sec_axis = ggplot2::dup_axis(),
+  rescale_sec = FALSE,
   y_top = TRUE,
   expand_bottom = 0,
   expand_top = 0,
   ...
 )
 
-scale_x_continuous_e61(expand_left = 0, expand_right = 0.015, ...)
+scale_x_continuous_e61(
+  limits = NULL,
+  expand_left = 0,
+  expand_right = 0,
+  hide_first_last = TRUE,
+  ...
+)
 }
 \arguments{
 \item{limits}{One of:
 \itemize{
-  \item{\code{NULL} to use the default scale range.}
-  \item{A numeric vector of length two providing the minimum and maximum
-  limits of the scale.}
   \item{A numeric vector of length three providing the limits of the scale
   and the increment between each axis tick, e.g. \code{c(0, 25, 5)} will
   set the axis to range from 0 to 25, with increments of 5 per tick.}
+  \item{A numeric vector of length two providing the minimum and maximum
+  limits of the scale. The break increments will be automatically chosen.}
+  \item{\code{NULL} to use the default scale range.}
   }}
 
-\item{sec_axis}{Adds a secondary axis (defaults to \code{dup_axis()}, which
-duplicates the axis), see \link[ggplot2]{sec_axis} for more details. Set to
-FALSE to hide a secondary axis.}
+\item{sec_axis}{Defaults to duplicating the y-axis so it shows on the left
+and right. To add a rescaled secondary axis, see the documentation for
+\link[theme61]{dual_y_axis}. Set to FALSE to hide the secondary axis.}
+
+\item{rescale_sec}{Logical. Set this to TRUE if you are using a rescaled
+secondary axis, otherwise leave it as FALSE (default).}
 
 \item{y_top}{Logical. Ensures there is space at the top of the y-axis for the
 axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
-elsewhere.}
+elsewhere. If you change this argument you also need to change the argument
+with the same name in \code{\link[theme61]{theme_e61}}.}
 
-\item{expand_bottom}{Numeric. Add extra space between data points and the
-bottom of the graph. See \link[ggplot2]{expansion} for details.}
-
-\item{expand_top}{Numeric. Add extra space between data points and the top of
-the graph.}
+\item{expand_bottom, expand_top}{Numeric. Add extra space between data points
+and the top/bottom of the graph. See \link[ggplot2]{expansion} for details.}
 
 \item{...}{
-  Arguments passed on to \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous}}, \code{\link[ggplot2:scale_continuous]{ggplot2::scale_x_continuous}}
+  Arguments passed on to \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous}}
   \describe{
     \item{\code{name}}{The name of the scale. Used as the axis or legend title. If
 \code{waiver()}, the default, the name of the scale is taken from the first
 mapping used for that aesthetic. If \code{NULL}, the legend title will be
 omitted.}
-    \item{\code{labels}}{One of:
-\itemize{
-\item \code{NULL} for no labels
-\item \code{waiver()} for the default labels computed by the
-transformation object
-\item A character vector giving labels (must be same length as \code{breaks})
-\item An expression vector (must be the same length as breaks). See ?plotmath for details.
-\item A function that takes the breaks as input and returns labels
-as output. Also accepts rlang \link[rlang:as_function]{lambda} function
-notation.
-}}
-    \item{\code{expand}}{For position scales, a vector of range expansion constants used to add some
-padding around the data to ensure that they are placed some distance
-away from the axes. Use the convenience function \code{\link[ggplot2:expansion]{expansion()}}
-to generate the values for the \code{expand} argument. The defaults are to
-expand the scale by 5\% on each side for continuous variables, and by
-0.6 units on each side for discrete variables.}
     \item{\code{oob}}{One of:
 \itemize{
 \item Function that handles limits outside of the scale limits
@@ -89,39 +80,13 @@ are defined in the scales package, and are called \verb{<name>_trans} (e.g.,
 transformation with \code{\link[scales:trans_new]{scales::trans_new()}}.}
     \item{\code{guide}}{A function used to create a guide or its name. See
 \code{\link[ggplot2:guides]{guides()}} for more information.}
-    \item{\code{position}}{For position scales, The position of the axis.
-\code{left} or \code{right} for y axes, \code{top} or \code{bottom} for x axes.}
-    \item{\code{breaks}}{One of:
-\itemize{
-\item \code{NULL} for no breaks
-\item \code{waiver()} for the default breaks computed by the
-\link[scales:trans_new]{transformation object}
-\item A numeric vector of positions
-\item A function that takes the limits as input and returns breaks
-as output (e.g., a function returned by \code{\link[scales:breaks_extended]{scales::extended_breaks()}}).
-Also accepts rlang \link[rlang:as_function]{lambda} function notation.
-}}
-    \item{\code{minor_breaks}}{One of:
-\itemize{
-\item \code{NULL} for no minor breaks
-\item \code{waiver()} for the default breaks (one minor break between
-each major break)
-\item A numeric vector of positions
-\item A function that given the limits returns a vector of minor breaks. Also
-accepts rlang \link[rlang:as_function]{lambda} function notation.
-}}
-    \item{\code{n.breaks}}{An integer guiding the number of major breaks. The algorithm
-may choose a slightly different number to ensure nice break labels. Will
-only have an effect if \code{breaks = waiver()}. Use \code{NULL} to use the default
-number of breaks given by the transformation.}
-    \item{\code{sec.axis}}{\code{\link[ggplot2:sec_axis]{sec_axis()}} is used to specify a secondary axis.}
   }}
 
-\item{expand_left}{Numeric. Add extra space between data points and the left
-of the graph.}
+\item{expand_left, expand_right}{Numeric. Add extra space between data points
+and the left/right of the graph. See \link[ggplot2]{expansion} for details.}
 
-\item{expand_right}{Numeric. Add extra space between data points and the
-right of the graph.}
+\item{hide_first_last}{Logical. Defaults to TRUE. Hides the first and
+last x-axis labels to avoid overlapping with the bottom of the y-axis.}
 }
 \description{
 These functions format the x and y axes to be consistent with e61 styling.

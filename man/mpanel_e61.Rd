@@ -7,7 +7,7 @@
 mpanel_e61(
   ...,
   plotlist = NULL,
-  title,
+  title = NULL,
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
@@ -45,7 +45,7 @@ separate points you include in the graph.}
 \item{title_max_char, subtitle_max_char, footnote_max_char}{Numeric. Set the
 maximum number of characters per line in the title, subtitle, sources or
 footnotes. The default is roughly appropriate for the default graph
-dimensions in \code{e61_save}.}
+dimensions in \code{\link[theme61]{e61_save}}.}
 
 \item{title_wrap, subtitle_wrap, footnote_wrap}{Logical. Enables text wrapping
 for the title, subtitle, sources or footnotes. Defaults to TRUE.}
@@ -58,7 +58,8 @@ than the titles of the subplots (default is 1.1). 2 doubles the font size.}
 \item{nrow}{(optional) Number of rows in the plot grid.}
 
 \item{rel_heights}{A numeric vector giving the relative proportions of each
-graph component (title, plots, footer (optional)).}
+graph component (title, plots, footer (optional)). See the Details for more
+detail.}
 
 \item{align}{(optional) Specifies whether graphs in the grid should be horizontally ("h") or
 vertically ("v") aligned. Options are "none" (default), "hv" (align in both directions), "h", and "v".}
@@ -81,6 +82,39 @@ Wrapper around \link[cowplot]{plot_grid} and \code{labs_e61} to
   When saving multi-panel graphs using \code{save_e61()} you will need to
   change (increase) the width and height arguments to reflect the larger size
   of multi-panel graphs.
+}
+\details{
+\strong{Read this if your titles and stuff are getting cut off.}
+
+  The function tries to be smart when setting the values for
+  \code{rel_heights}, but it can be incorrect due to differences in the
+  amount of text in each component.
+
+  The way \code{mpanel_e61} works is that the title, subtitle, graph panels
+  and footers are all separate components that are then put together after
+  they have been independently generated. The purpose of \code{rel_heights}
+  is to specify what proportion of the final plot each of these components
+  require. As a result, if the values are too small for a given component,
+  part of it will get visually cut off.
+
+  The function tries to increase the amount of space given to a component if,
+  for example, your title has two lines, or you write a really long footnote
+  that spans many lines of text. But this is an inexact science. In all
+  likelihood, you will need to specify your own values, which why this
+  paragraph of text tries to explain the underlying function so you aren't
+  just blindly inputting numbers.
+
+  The default values for \code{rel_heights} for a 1-line title, 1-line
+  subtitle, 1-line footnote and 1-line sources list is \code{c(0.05, 0.05, 1,
+  0.1)}. If you only have a title and footnotes/sources then only 3 values
+  are needed: \code{c(0.05, 1, 0.1)}.
+
+  These values are all relative ratios, meaning, in the second example, the
+  title gets \eqn{\frac{0.05}{1.15}}, or around 4 per cent of the total graph
+  height. This means that if your graph panels are really tall (e.g. you make
+  a 3x2 multi-panel), you will need to reduce the share of the space
+  allocated to the titles or you will have extra whitespace (I think? Haven't
+  actually tested this).
 }
 \examples{
  gg <- ggplot2::ggplot() +
