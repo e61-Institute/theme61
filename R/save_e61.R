@@ -46,8 +46,8 @@
 #'   to be appropriate.
 #' @param format An optional vector of file formats to save as. For example
 #'   \code{c("svg", "pdf")} will save 2 files with the same name to the same
-#'   location to SVG and PDF formats. Only supports vector file formats. If the
-#'   file format is specified in \code{filename}, then this argument is ignored.
+#'   location to SVG and PDF formats. If the file format is specified in
+#'   \code{filename}, then this argument is ignored.
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
@@ -198,7 +198,7 @@ save_e61 <-  function(filename,
 
   # Resize elements if a png is to be output
   if (!is.null(resize)) {
-    if (!grepl("\\.png", filename))
+    if (format != "png")
       stop("The 'resize' argument is not supported unless the file format is .png")
     if (!is.numeric(resize))
       stop("'resize' must be numeric.")
@@ -235,8 +235,10 @@ save_e61 <-  function(filename,
 
   # Opens the graph file if the option is set
   if (as.logical(getOption("open_e61_graph", FALSE))) {
-    file_to_open <- shQuote(here::here(filename))
+    # Put filename back together
+    filename <- paste0(filename, ".", format[[1]])
 
+    file_to_open <- shQuote(here::here(filename))
     out <- try(system2("open", file_to_open))
 
     if (out != 0) warning("Graph file could not be opened.")
