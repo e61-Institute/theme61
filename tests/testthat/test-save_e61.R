@@ -38,6 +38,7 @@ test_that("Test resizing feature for PNGs", {
 
     # Test PNG with default scaling
     suppressMessages(save_e61(temp_file))
+    save_e61(temp_file, g)
 
     disk_file <- magick::image_read(temp_file)
     deets <- magick::image_info(disk_file)
@@ -45,8 +46,8 @@ test_that("Test resizing feature for PNGs", {
     expected_deets <-
       tibble::tibble(
         format = "PNG",
-        width = 334,
-        height = 279
+        width = 240,
+        height = 201
       )
 
     lapply(c("format", "width", "height"), function(x) {
@@ -62,8 +63,8 @@ test_that("Test resizing feature for PNGs", {
     expected_deets <-
       tibble::tibble(
         format = "PNG",
-        width = 669,
-        height = 559
+        width = 481,
+        height = 402
       )
 
     lapply(c("format", "width", "height"), function(x) {
@@ -213,4 +214,54 @@ test_that("Test advisory messages", {
   expect_no_message(
     suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
   )
+})
+
+test_that("Test multiple file format saving features", {
+  g <- ggplot()
+
+  # Test 3 formats
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file", g, format = c("svg", "pdf", "eps")))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                 c("test_file.eps", "test_file.pdf", "test_file.svg"))
+
+  })
+
+  # Test if PNG breaks everything (it shouldn't)
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file", g, format = c("svg", "png")))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                 c("test_file.svg", "test_file.png"))
+  })
+
+  # Test providing file format in file path
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file.svg", g))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                 c("test_file.svg"))
+  })
+
+  # Test if providing format in path overrules format argument
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file.svg", g, format = "png"))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                 c("test_file.svg"))
+  })
+
+  # Test what happens if nothing is provided (do the defaults do what you expect?)
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file", g))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                 c("test_file.svg", "test_file.png", "test_file.pdf", "test_file.eps"))
+  })
+
+  # Error if invalid filename used
+  withr::with_tempdir({
+    expect_error(suppressMessages(save_e61("test_file", g, format = "mp3")))
+  })
 })

@@ -68,8 +68,8 @@ save_e61 <-  function(filename,
                       save_data = FALSE,
                       dim_msg = FALSE,
                       resize = NULL,
-                      pointsize = NULL,
-                      res = NULL
+                      pointsize = 12,
+                      res = 72
                       ) {
 
 
@@ -83,7 +83,10 @@ save_e61 <-  function(filename,
 
   # Determine which file formats to save
   if (grepl("\\..{3}$", filename)) {
-    format <- gsub("\\.(.{3})$", "\\1", filename)
+    format <- gsub("^.*\\.(.{3})$", "\\1", filename)
+
+    # Strip file extension from filename
+    filename <- gsub("^(.*)\\..{3}$", "\\1", filename)
   } else {
     format <- match.arg(format, several.ok = TRUE)
   }
@@ -208,12 +211,14 @@ save_e61 <-  function(filename,
 
   # Save --------------------------------------------------------------------
   lapply(format, function(fmt) {
+    file_i <- paste0(filename, ".", fmt)
+
     switch(
       fmt,
-      svg = svglite::svglite(filename = filename, width = cm_to_in(width), height = cm_to_in(height)),
-      eps = cairo_ps(filename = filename, width = cm_to_in(width), height = cm_to_in(height)),
-      pdf = cairo_pdf(filename = filename, width = cm_to_in(width), height = cm_to_in(height)),
-      png = png(filename = filename, width = width, height = height, units = "cm", pointsize = pointsize, res = res)
+      svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height)),
+      eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height)),
+      pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height)),
+      png = png(filename = file_i, width = width, height = height, units = "cm", pointsize = pointsize, res = res)
     )
     print(plot)
     dev.off()
