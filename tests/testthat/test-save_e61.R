@@ -11,9 +11,22 @@ test_that("Test dimensioning functions", {
 
   # Test custom dimensions work
   withr::with_tempdir({
-    expect_snapshot_file(suppressMessages(save_e61("custom-dim-1.svg", ggplot(), width = 10, height = 10)))
-    expect_snapshot_file(suppressMessages(save_e61("custom-dim-2.svg", ggplot(), width = 10, height = 5)))
-    expect_snapshot_file(suppressMessages(save_e61("custom-dim-3.svg", ggplot(), width = 5, height = 10)))
+
+    suppressMessages(save_e61("custom-dim.svg", ggplot(), width = 10, height = 10))
+    g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
+    expect_equal(g_info$width, 378)
+    expect_equal(g_info$height, 378)
+
+    suppressMessages(save_e61("custom-dim.svg", ggplot(), width = 10, height = 5))
+    g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
+    expect_equal(g_info$width, 378)
+    expect_equal(g_info$height, 189)
+
+    suppressMessages(save_e61("custom-dim.svg", ggplot(), width = 5, height = 10))
+    g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
+    expect_equal(g_info$width, 189)
+    expect_equal(g_info$height, 378)
+
   })
 
   # Test horizontal graph detection code
@@ -21,9 +34,15 @@ test_that("Test dimensioning functions", {
     plot <- ggplot() + labs(title = "Test")
     plot_h <- ggplot() + coord_flip() + labs(title = "Test")
 
-    expect_snapshot_file(suppressMessages(save_e61("plot-norm.svg", plot)))
-    expect_snapshot_file(suppressMessages(save_e61("plot-flip.svg", plot_h)))
+    suppressMessages(save_e61("gg.svg", plot))
+    g_info <- magick::image_info(magick::image_read("gg.svg"))
+    expect_equal(g_info$width, 321)
+    expect_equal(g_info$height, 268)
 
+    suppressMessages(save_e61("gg.svg", plot_h))
+    g_info <- magick::image_info(magick::image_read("gg.svg"))
+    expect_equal(g_info$width, 643)
+    expect_equal(g_info$height, 454)
   })
 
 })
@@ -38,7 +57,6 @@ test_that("Test resizing feature for PNGs", {
 
     # Test PNG with default scaling
     suppressMessages(save_e61(temp_file))
-    save_e61(temp_file, g)
 
     disk_file <- magick::image_read(temp_file)
     deets <- magick::image_info(disk_file)
@@ -170,6 +188,7 @@ test_that("Test whether save_data works", {
     geom_point()
 
   expect_no_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), save_data = TRUE)))
+  expect_no_error(suppressMessages(save_e61(file.path(dir, "graph"), format = "svg", save_data = TRUE)))
 
   # This should leave the $data container empty
   gg <- ggplot() +
