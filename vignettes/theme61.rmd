@@ -131,7 +131,7 @@ df <- df[year(df$date) %in% c(1967:1981), ]
 graph <- ggplot(df, aes(x = date)) +
   geom_line(aes(y = value, colour = variable), size = 1) +
   # Not using mplot_label just to show how plot_label works
-  plot_label("Market returns", as.Date("1972-01-01"), 17, 2, 1) +
+  plot_label("Market returns", as.Date("1969-01-01"), 17, 2, 1) +
   plot_label("Unemployment", as.Date("1973-01-01"), 3, 2, 2) +
   labs_e61(
     title = "Time Series of Returns Percentage*",
