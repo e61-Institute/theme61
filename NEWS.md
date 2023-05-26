@@ -8,6 +8,7 @@
 
 #### New/changed functionality
 
+* Add ability to save graphs in multiple formats at once using the new `format` argument in `save_e61()`.
 * Add support in `save_e61()` for saving images in PDF format for compatibility with LaTeX.
 * Change the default alignment of plot labels to left-align and added a new argument `hjust` to `plot_label()`/`mplot_label()` to change the alignment.
 * Added the ability to add a white box around text in `plot_label()`/`mplot_label()` through `geom` argument.
