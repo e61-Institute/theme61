@@ -14,7 +14,7 @@ theme_e61(
   panel_borders = TRUE,
   background = "white",
   base_size = 10,
-  base_family = "Arial",
+  base_family = "ArialMT",
   base_line_size = points_to_mm(0.75),
   base_rect_size = points_to_mm(1)
 )
