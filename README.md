@@ -3,9 +3,9 @@
 
 # theme61
 
-This package contains functions and colour palettes that enable you to
-create e61 Institute themed graphs and know what colours to use in other
-applications.
+This package helps you create graphs that follow the e61 Institute
+graphing style. It provides functions that make it easier to make
+aesthetic graphs and easy access to the Institute’s colour palette.
 
 ### Installing theme61
 
@@ -21,7 +21,15 @@ Then load into R:
 
 `library(theme61)`
 
-### Making the best use of the features
+### Using theme61
 
-See the [package website](https://e61-institute.github.io/theme61/) to
-learn how to use the package features.
+The [package website](https://e61-institute.github.io/theme61/) contains
+a lot of information on how to use theme61.
+
+Start by reading these two articles:
+
+- [Get started](articles/theme61.html)
+- [Graph standards](articles/graph-standards.html)
+
+There is also a wealth of information contained in the individual
+function documentation that answers common usage questions.

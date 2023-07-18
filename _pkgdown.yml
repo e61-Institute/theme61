@@ -38,10 +38,30 @@ reference:
   - e61_aus_colours
   - matches("^e61_(blue|coral|grey|maroon|orange|sky|teal)")
 
-articles:
-- title: Get started
-  navbar: ~
-  contents:
-  - theme61
-  - graph-standards
-  - ongraph-labels
+navbar:
+  structure:
+    left: [home, standards, reference, articles, news]
+    right: [github]
+  components:
+    home:
+      text: "Get started"
+      href: articles/theme61.html
+    standards:
+      text: "Graph standards"
+      href: articles/graph-standards.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    articles:
+      text: Articles
+      menu:
+      - text: "Graph standards"
+        href: articles/graph-standards.html
+      - text: "Adding on-graph labels"
+        href: articles/ongraph-labels.html
+    news:
+      text: News
+      href: news/index.html
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/e61-Institute/theme61
