@@ -36,6 +36,26 @@ This article provides some examples to help you figure out what elements you can
 source("colour-palette.R", print.eval = TRUE)
 ```
 
+## Correct workflow
+
+When making graphs, you should follow the below workflow. 
+
+Save your graph using `save_e61()`. Do **not** use the Export button in the Plots tab or `ggsave()`.
+
+Start by creating an unthemed graph using the 'normal' stuff: `ggplot(data, aes(x, y)) + geom_blah()`
+
+Then:
+
+- Apply the theme: `theme_e61()`
+- Add graph colours: `scale_colour_e61()` or `scale_fill_e61()`
+- Format the scales/axes: `scale_y_continuous_e61()`, `scale_x_continuous_e61()`
+- Add plot labelling: `mplot_label()` or `plot_label()`
+- Add titles and footers: `labs_e61(title = "Title", footnotes = "Footnotes", sources = "Sources")`
+- Create a multi-panel (if required): `mpanel_e61()`
+- Save the graph: `save_e61()`
+
+The [Graph standards](graph-standards.html) article sets out this workflow in greater detail.
+
 ## Graph examples
 
 ### Scatter graph
