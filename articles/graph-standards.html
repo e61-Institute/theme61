@@ -91,7 +91,43 @@
 functions in <code>theme61</code> to produce a correctly formatted graph
 in the e61 Institute style.</p>
 <div class="section level2">
-<h2 id="the-starting-graph">The starting graph<a class="anchor" aria-label="anchor" href="#the-starting-graph"></a>
+<h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
+</h2>
+<p>You start by creating an unthemed graph using the ‘normal’ stuff:
+<code>ggplot(data, aes(x, y)) + geom_blah()</code></p>
+<p>Then:</p>
+<ul>
+<li>
+<a href="#theme">Apply the theme</a>: <code><a href="../reference/theme_e61.html">theme_e61()</a></code>
+</li>
+<li>
+<a href="#colours">Add graph colours</a>:
+<code><a href="../reference/scale_e61.html">scale_colour_e61()</a></code> or <code><a href="../reference/scale_e61.html">scale_fill_e61()</a></code>
+</li>
+<li>
+<a href="#scales">Format the scales/axes</a>:
+<code><a href="../reference/e61_axes.html">scale_y_continuous_e61()</a></code>,
+<code><a href="../reference/e61_axes.html">scale_x_continuous_e61()</a></code>
+</li>
+<li>
+<a href="#labels">Add plot labelling</a>: <code><a href="../reference/mplot_label.html">mplot_label()</a></code>
+or <code><a href="../reference/plot_label.html">plot_label()</a></code>
+</li>
+<li>
+<a href="#titles">Add titles and footers</a>:
+<code>labs_e61(title = "Title", footnotes = "Footnotes", sources = "Sources")</code>
+</li>
+<li>
+<a href="#mpanel">Create a multi-panel</a> (if required):
+<code><a href="../reference/mpanel_e61.html">mpanel_e61()</a></code>
+</li>
+<li>
+<a href="#save">Save the graph</a>: <code><a href="../reference/save_e61.html">save_e61()</a></code>
+</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="start">The starting graph<a class="anchor" aria-label="anchor" href="#start"></a>
 </h2>
 <p>We’re going to turn a default ggplot2 graph into one that is
 formatted in the e61 style using the package features.</p>
@@ -101,7 +137,7 @@ formatted in the e61 style using the package features.</p>
 <p><img src="../reference/figures/g-prev.svg" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
-<h2 id="applying-the-e61-theme-to-the-graph">Applying the e61 theme to the graph<a class="anchor" aria-label="anchor" href="#applying-the-e61-theme-to-the-graph"></a>
+<h2 id="theme">Applying the e61 theme to the graph<a class="anchor" aria-label="anchor" href="#theme"></a>
 </h2>
 <p>Most of the theming is done by the <code><a href="../reference/theme_e61.html">theme_e61()</a></code> function.
 Simply add this to your plot and (if needed) set some arguments.</p>
@@ -139,7 +175,7 @@ will also select the left-most colour on the scale (colour “0”).</li>
 </div>
 </div>
 <div class="section level2">
-<h2 id="formatting-graph-colours">Formatting graph colours<a class="anchor" aria-label="anchor" href="#formatting-graph-colours"></a>
+<h2 id="colours">Formatting graph colours<a class="anchor" aria-label="anchor" href="#colours"></a>
 </h2>
 <p><code><a href="../reference/scale_e61.html">scale_colour_e61()</a></code> and <code><a href="../reference/scale_e61.html">scale_fill_e61()</a></code>
 provide access to the e61 colour palette.</p>
@@ -156,7 +192,7 @@ codes.</p>
 <p><img src="../reference/figures/g-colours.svg" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
-<h2 id="formatting-axis-scales">Formatting axis scales<a class="anchor" aria-label="anchor" href="#formatting-axis-scales"></a>
+<h2 id="scales">Formatting axis scales<a class="anchor" aria-label="anchor" href="#scales"></a>
 </h2>
 <p><code><a href="../reference/e61_axes.html">scale_y_continuous_e61()</a></code> is the preferred axis scale
 function for graphs. It duplicates the axis by default and allows you to
@@ -196,7 +232,7 @@ y-axis, this feature now exists in <code>theme61.</code></p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="plot-labelling">Plot labelling<a class="anchor" aria-label="anchor" href="#plot-labelling"></a>
+<h2 id="labels">Plot labelling<a class="anchor" aria-label="anchor" href="#labels"></a>
 </h2>
 <p><em>A full guide to plot labelling is <a href="ongraph-labels.html">here</a>.</em></p>
 <p>Graph legends are inferior to labels on the graph, so
@@ -222,7 +258,7 @@ about.</p>
 <p><img src="../reference/figures/g-labels.svg" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
-<h2 id="graph-titles-subtitles-and-footers">Graph titles, subtitles and footers<a class="anchor" aria-label="anchor" href="#graph-titles-subtitles-and-footers"></a>
+<h2 id="titles">Graph titles, subtitles and footers<a class="anchor" aria-label="anchor" href="#titles"></a>
 </h2>
 <p>When adding titles, subtitles, captions and sources, use
 <code><a href="../reference/labs_e61.html">labs_e61()</a></code>. Text is automatically wrapped if it is too long
@@ -248,7 +284,7 @@ as a character vector.</p>
 <p><img src="../reference/figures/g-titles.svg" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
-<h2 id="multi-panel-graph-support">Multi-panel graph support<a class="anchor" aria-label="anchor" href="#multi-panel-graph-support"></a>
+<h2 id="mpanel">Multi-panel graph support<a class="anchor" aria-label="anchor" href="#mpanel"></a>
 </h2>
 <p>We have discovered in our research notes that putting multiple graphs
 together in a grid/panel works quite well with the format.
@@ -359,18 +395,20 @@ flipped graphs reasonably well. Your mileage may vary if you have a
 weird graph though, so always check the output!</p>
 </div>
 <div class="section level2">
-<h2 id="saving-graphs">Saving graphs<a class="anchor" aria-label="anchor" href="#saving-graphs"></a>
+<h2 id="save">Saving graphs<a class="anchor" aria-label="anchor" href="#save"></a>
 </h2>
-<p>You should use <code><a href="../reference/save_e61.html">save_e61()</a></code> when saving graphs at e61.
-<code><a href="../reference/save_e61.html">save_e61()</a></code> sets sensible defaults on graph widths (and
-experimentally, heights). The function supports vector graphics formats
-(SVG and PDF) and PNG formats because they are the only formats you
-should ever use in 2023.</p>
-<p>SVGs are a modern vector graphics format, which is the highly
+<p>Use <code><a href="../reference/save_e61.html">save_e61()</a></code> when saving graphs at e61.
+<code><a href="../reference/save_e61.html">save_e61()</a></code> ensures that the relative size of your graph
+elements and text is appropriate by setting sensible defaults on the
+graph dimensions.</p>
+<p>You should save your graphs using a vector graphics format (SVG or
+PDF). SVGs are a modern vector graphics format, which is the highly
 recommended format because you can resize them to any size without
 pixelation. If you are making graphs for LaTeX documents, you will need
 to save the graphs in PDF format for them to render as LaTeX does not
-support SVGs.</p>
+support SVGs. If for some reason you need to use a raster format, the
+package provides limited support for PNGs, although some customisation
+features may be unavailable.</p>
 <p>You do not need to supply the ggplot object when using
 <code><a href="../reference/save_e61.html">save_e61()</a></code> as it automatically saves the last-created
 graph. <em>However</em>, if you are saving a multi-panel graph and want
@@ -381,7 +419,7 @@ to supply the graph object as an argument, i.e. do this:
 <p>The <code>save_data</code> argument also lets you save a
 <code>.csv</code> file with the data used to create a graph.</p>
 <div class="section level3">
-<h3 id="the-importance-of-height-selection-when-saving-graphs">The importance of height selection when saving graphs<a class="anchor" aria-label="anchor" href="#the-importance-of-height-selection-when-saving-graphs"></a>
+<h3 id="proper-height-selection-when-saving-graphs">Proper height selection when saving graphs<a class="anchor" aria-label="anchor" href="#proper-height-selection-when-saving-graphs"></a>
 </h3>
 <p>Here I have made a graph with a pink background to show you the
 issues with height selection when saving graphs.</p>
@@ -402,13 +440,15 @@ issues with height selection when saving graphs.</p>
 <span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span>, <span class="st">"'datasets' package"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"lightpink"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>This graph is not ‘tall’ enough, <code>height</code> is too
-small.</p>
+<p>This graph is not ‘tall’ enough, <code>height</code> is too small.
+You can see the contents of the graph is squashed together and the
+footnote text spills past the graph border.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/g-save-wide.svg"</span><span class="op">)</span>, height <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/g-save-wide.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../reference/figures/g-save-wide.svg" width="60%" style="display: block; margin: auto;"></p>
-<p>This graph is too ‘tall’, <code>height</code> is too large.</p>
+<p>This graph is too ‘tall’, <code>height</code> is too large as you can
+see a lot of whitespace above and below the graph border.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/g-save-tall.svg"</span><span class="op">)</span>, height <span class="op">=</span> <span class="fl">11</span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/g-save-tall.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -436,31 +476,6 @@ function will print the height setting it has chosen in the console so
 you can use that as a starting base. On publication-quality graphs it is
 probably a good idea to adjust the height from the automatic value.</p>
 </div>
-</div>
-<div class="section level2">
-<h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
-</h2>
-<ul>
-<li>The ‘normal’ stuff:
-<code>ggplot(data, aes(x, y)) + geom_blah()</code>
-</li>
-<li>Graph colours: <code><a href="../reference/scale_e61.html">scale_colour_e61()</a></code> or
-<code><a href="../reference/scale_e61.html">scale_fill_e61()</a></code>
-</li>
-<li>Axes formatting: <code><a href="../reference/e61_axes.html">scale_y_continuous_e61()</a></code>,
-<code><a href="../reference/e61_axes.html">scale_x_continuous_e61()</a></code>
-</li>
-<li>Plot labelling: <code><a href="../reference/mplot_label.html">mplot_label()</a></code> or
-<code><a href="../reference/plot_label.html">plot_label()</a></code>
-</li>
-<li>Titles and footers:
-<code>labs_e61(title = "Title", footnotes = "Footnotes", sources = "Sources")</code>
-</li>
-<li>Multi-panel (if required): <code><a href="../reference/mpanel_e61.html">mpanel_e61()</a></code>
-</li>
-<li>Saving graphs: <code><a href="../reference/save_e61.html">save_e61()</a></code>
-</li>
-</ul>
 </div>
 <div class="section level2">
 <h2 id="the-finished-product">The finished product<a class="anchor" aria-label="anchor" href="#the-finished-product"></a>

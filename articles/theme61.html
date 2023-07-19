@@ -108,6 +108,39 @@ package.</p>
 <p><img src="theme61_files/figure-html/colour-palette-chart-1.png" width="700"></p>
 </div>
 <div class="section level2">
+<h2 id="correct-workflow">Correct workflow<a class="anchor" aria-label="anchor" href="#correct-workflow"></a>
+</h2>
+<p>When making graphs, you should follow the below workflow.</p>
+<p>Save your graph using <code><a href="../reference/save_e61.html">save_e61()</a></code>. Do
+<strong>not</strong> use the Export button in the Plots tab or
+<code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave()</a></code>.</p>
+<p>Start by creating an unthemed graph using the ‘normal’ stuff:
+<code>ggplot(data, aes(x, y)) + geom_blah()</code></p>
+<p>Then:</p>
+<ul>
+<li>Apply the theme: <code><a href="../reference/theme_e61.html">theme_e61()</a></code>
+</li>
+<li>Add graph colours: <code><a href="../reference/scale_e61.html">scale_colour_e61()</a></code> or
+<code><a href="../reference/scale_e61.html">scale_fill_e61()</a></code>
+</li>
+<li>Format the scales/axes: <code><a href="../reference/e61_axes.html">scale_y_continuous_e61()</a></code>,
+<code><a href="../reference/e61_axes.html">scale_x_continuous_e61()</a></code>
+</li>
+<li>Add plot labelling: <code><a href="../reference/mplot_label.html">mplot_label()</a></code> or
+<code><a href="../reference/plot_label.html">plot_label()</a></code>
+</li>
+<li>Add titles and footers:
+<code>labs_e61(title = "Title", footnotes = "Footnotes", sources = "Sources")</code>
+</li>
+<li>Create a multi-panel (if required): <code><a href="../reference/mpanel_e61.html">mpanel_e61()</a></code>
+</li>
+<li>Save the graph: <code><a href="../reference/save_e61.html">save_e61()</a></code>
+</li>
+</ul>
+<p>The <a href="graph-standards.html">Graph standards</a> article sets
+out this workflow in greater detail.</p>
+</div>
+<div class="section level2">
 <h2 id="graph-examples">Graph examples<a class="anchor" aria-label="anchor" href="#graph-examples"></a>
 </h2>
 <div class="section level3">
