@@ -117,6 +117,7 @@ save_e61 <-  function(filename,
   }
 
   # The following checks don't apply when multi-panel graphs are created
+
   # Message if theme function not used
   if (print_msg && is.null(attr(plot$theme, "t61"))) {
 
@@ -141,6 +142,20 @@ save_e61 <-  function(filename,
     cli::cli_text(cli::bg_br_yellow(cli::col_black(
       "Please remember to use 'scale_colour/fill_e61()' in your ggplot code ",
       "to ensure the e61 colour palette is used.")))
+  }
+
+  # Message if the y-axis label text is missing
+  if (print_msg && (is.null(plot$labels$y) || nchar(plot$labels$y) == 0)) {
+
+    cli::cli_text(cli::bg_br_yellow(cli::col_black(
+      "Your y-axis label is missing. Please provide the units of the axis for the reader.")))
+  }
+
+  # Message if the y-axis label text is too long
+  if (print_msg && isTRUE(nchar(plot$labels$y) > 5)) {
+
+    cli::cli_text(cli::bg_br_yellow(cli::col_black(
+      "Your y-axis label is too long. Consider if the information needed to interpret the graph is already in the title, and only specify the units in the y-axis label.")))
   }
 
   # Height and width setting ------------------------------------------------
