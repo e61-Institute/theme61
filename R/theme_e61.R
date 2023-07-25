@@ -155,7 +155,7 @@ theme_e61 <- function(y_top = TRUE,
       panel.background = element_rect(colour = NA),
       panel.border = element_rect(
         linetype = 1,
-        size = points_to_mm(2),
+        linewidth = points_to_mm(2),
         colour = "black",
         fill = NA
       ),
