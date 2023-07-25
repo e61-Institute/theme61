@@ -108,16 +108,26 @@ save_e61 <-  function(filename,
 
   # Advisory messages -------------------------------------------------------
 
+  print_msg <- if (is_multi) {
+    FALSE
+  } else if (isTRUE(getOption("no_t61_style_msg"))) {
+    FALSE
+  } else {
+    TRUE
+  }
+
   # The following checks don't apply when multi-panel graphs are created
   # Message if theme function not used
-  if (!is_multi && is.null(attr(plot$theme, "t61"))) {
+  if (print_msg && is.null(attr(plot$theme, "t61"))) {
+
     cli::cli_text(cli::bg_br_yellow(cli::col_black(
       "Please remember to use 'theme_e61()' in your ggplot code to ensure the ",
       "e61 theme is applied.")))
   }
 
   # Message if package scale_x/y function not used
-  if (!is_multi && !"scale_e61" %in% class(ggplot2::layer_scales(plot)$y)) {
+  if (print_msg && !"scale_e61" %in% class(ggplot2::layer_scales(plot)$y)) {
+
     cli::cli_text(cli::bg_br_yellow(cli::col_black(
       "Please remember to use 'scale_x/y_continuous_e61()' in your ggplot code ",
       "to ensure the graph axes render correctly.")))
@@ -125,8 +135,9 @@ save_e61 <-  function(filename,
 
   # Message if colour/fill functions aren't used, message to appear only if a
   # colour/fill mappping exists
-  if (!is_multi && any(grepl("(colour|color|fill)", names(plot$mapping))) &&
+  if (print_msg && any(grepl("(colour|color|fill)", names(plot$mapping))) &&
       !"scale_col_e61" %in% unlist(sapply(plot$scales$scales, class))) {
+
     cli::cli_text(cli::bg_br_yellow(cli::col_black(
       "Please remember to use 'scale_colour/fill_e61()' in your ggplot code ",
       "to ensure the e61 colour palette is used.")))
