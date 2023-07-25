@@ -199,6 +199,9 @@ test_that("Test whether save_data works", {
 })
 
 test_that("Test advisory messages", {
+  # Ensure option is not set
+  options(no_t61_style_msg = FALSE)
+
   # No theming, no y-axis
   gg <- ggplot()
 
@@ -215,6 +218,33 @@ test_that("Test advisory messages", {
     suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1)),
     "^Please remember to use.*"
   )
+
+  # y-axis text missing
+  gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
+    geom_col() +
+    scale_y_continuous_e61(c(0, 4)) +
+    scale_fill_e61(3) +
+    theme_e61() +
+    labs_e61(y = NULL)
+
+  expect_message(
+    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1)),
+    "^Your y-axis label.*"
+  )
+
+  # y-axis text too long
+  gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
+    geom_col() +
+    scale_y_continuous_e61(c(0, 4)) +
+    scale_fill_e61(3) +
+    theme_e61() +
+    labs_e61(y = "Really long y-axis label")
+
+  expect_message(
+    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1)),
+    "^Your y-axis label.*"
+  )
+
 
   # No message if you do it right
   gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
