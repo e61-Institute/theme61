@@ -162,12 +162,21 @@ save_e61 <-  function(filename,
 
   # For multi-panels: Adjust the width to fit the extra panels and send out user
   # message to specify the height
+
+  # Pull together mpanel attributes
+  mp_dims <- list(
+    cols = attr(plot, "panel_cols"),
+    rows = attr(plot, "panel_rows"),
+    head_dim = attr(plot, "panel_head"),
+    foot_dim = attr(plot, "panel_foot")
+  )
+
   if (is_multi && is.null(width)) {
-    width <- 8.5 * attr(plot, "panel_cols")
+    width <- 8.5 * mp_dims$cols
   }
 
   if (is_multi && is.null(height)) {
-    height <- 7.5 + 8 * (attr(plot, "panel_rows") - 1) + 0.5 * attr(plot, "panel_head") + 0.35 * attr(plot, "panel_foot")
+    height <- 7.5 + 8 * (mp_dims$rows - 1) + 0.5 * mp_dims$head_dim + 0.35 * mp_dims$foot_dim
 
     cli::cli_text(cli::col_green("Note: You are saving a multi-panel graph, save_e61() has automatically set the height to ", height, ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
   }
