@@ -2,6 +2,7 @@
 % Please edit documentation in R/plot_label.R
 \name{mplot_label}
 \alias{mplot_label}
+\alias{mplab}
 \title{Add multiple on-graph labels to graphs}
 \usage{
 mplot_label(
@@ -11,7 +12,19 @@ mplot_label(
   colour = NA,
   size = 3.5,
   hjust = 0,
-  geom = c("text", "label")
+  geom = c("text", "label"),
+  angle = 90
+)
+
+mplab(
+  label,
+  x,
+  y,
+  colour = NA,
+  size = 3.5,
+  hjust = 0,
+  geom = c("text", "label"),
+  angle = 90
 )
 }
 \arguments{

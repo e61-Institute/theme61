@@ -1,4 +1,4 @@
-#' Add On-graph Labels to Graphs
+#' Add a single on-graph label to a graph
 #'
 #' Wrapper function around \code{annotate()} that helps you add labels for
 #' lines, columns or other elements directly onto the graph plot as a
@@ -33,7 +33,8 @@ plot_label <-
            colour = NA,
            size = 3.5,
            hjust = 0,
-           geom = c("text", "label")) {
+           geom = c("text", "label"),
+           angle = 90) {
     geom <- match.arg(geom)
 
     if (is.na(colour) && (is.na(n_labs) || is.na(n)))
@@ -47,7 +48,7 @@ plot_label <-
       x <- as.Date(x)
     }
 
-    annotate(geom = geom, label = label, x = x, y = y, size = size, colour = colour, hjust = hjust)
+    annotate(geom = geom, label = label, x = x, y = y, size = size, colour = colour, hjust = hjust, angle = angle)
 
   }
 
@@ -76,7 +77,8 @@ mplot_label <-
            colour = NA,
            size = 3.5,
            hjust = 0,
-           geom = c("text", "label")) {
+           geom = c("text", "label"),
+           angle = 90) {
 
     geom <- match.arg(geom)
 
@@ -90,14 +92,23 @@ mplot_label <-
       stop("The number of colours must equal the number of labels.")
     }
 
+    len_chk <- function(vec, len = length(label)) {
+      if (length(vec) == len) return(vec)
+
+      if (length(vec) != 1) stop(substitute(vec), " must be length ", length(label), " or 1.")
+
+      return(rep(vec, len))
+    }
+
     plot_lab <- data.frame(
       label = label,
       x = x,
       y = y,
       colour = colour,
-      size = rep(size, length(label)),
-      hjust = rep(hjust, length(label)),
-      geom = rep(geom, length(label))
+      size = len_chk(size),
+      hjust = len_chk(hjust),
+      geom = len_chk(geom),
+      angle = len_chk(angle)
     )
 
     plot_lab$n_labs <- nrow(plot_lab)
@@ -121,10 +132,19 @@ mplot_label <-
           colour = x$colour,
           size = x$size,
           hjust = x$hjust,
-          geom = x$geom
+          geom = x$geom,
+          angle = x$angle
         )
       })
 
     return(retval)
 
 }
+
+#' @rdname plot_label
+#' @export
+plab <- mplot_label
+
+#' @rdname mplot_label
+#' @export
+mplab <- mplot_label
