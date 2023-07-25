@@ -108,30 +108,22 @@ save_e61 <-  function(filename,
 
   # Advisory messages -------------------------------------------------------
 
-  print_msg <- if (is_multi) {
-    FALSE
-  } else if (isTRUE(getOption("no_t61_style_msg"))) {
-    FALSE
-  } else {
-    TRUE
-  }
+  print_msg <-
+    if (is_multi || isTRUE(getOption("no_t61_style_msg"))) FALSE else TRUE
 
   # The following checks don't apply when multi-panel graphs are created
+  adv_msg <- c()
 
   # Message if theme function not used
   if (print_msg && is.null(attr(plot$theme, "t61"))) {
 
-    cli::cli_text(cli::bg_br_yellow(cli::col_black(
-      "Please remember to use 'theme_e61()' in your ggplot code to ensure the ",
-      "e61 theme is applied.")))
+    adv_msg <- c(adv_msg, "Use 'theme_e61()' in your ggplot code to ensure the e61 theme is applied.")
   }
 
   # Message if package scale_x/y function not used
   if (print_msg && !"scale_e61" %in% class(ggplot2::layer_scales(plot)$y)) {
 
-    cli::cli_text(cli::bg_br_yellow(cli::col_black(
-      "Please remember to use 'scale_x/y_continuous_e61()' in your ggplot code ",
-      "to ensure the graph axes render correctly.")))
+    adv_msg <- c(adv_msg, "Use 'scale_x/y_continuous_e61()' in your ggplot code to ensure the graph axes render correctly.")
   }
 
   # Message if colour/fill functions aren't used, message to appear only if a
@@ -139,24 +131,30 @@ save_e61 <-  function(filename,
   if (print_msg && any(grepl("(colour|color|fill)", names(plot$mapping))) &&
       !"scale_col_e61" %in% unlist(sapply(plot$scales$scales, class))) {
 
-    cli::cli_text(cli::bg_br_yellow(cli::col_black(
-      "Please remember to use 'scale_colour/fill_e61()' in your ggplot code ",
-      "to ensure the e61 colour palette is used.")))
+    adv_msg <- c(adv_msg, "Use 'scale_colour/fill_e61()' in your ggplot code to ensure the e61 colour palette is used.")
   }
 
   # Message if the y-axis label text is missing
   if (print_msg && (is.null(plot$labels$y) || nchar(plot$labels$y) == 0)) {
-
-    cli::cli_text(cli::bg_br_yellow(cli::col_black(
-      "Your y-axis label is missing. Please provide the units of the axis for the reader.")))
+    adv_msg <- c(adv_msg, "Your y-axis label is missing. Please provide the units of the axis for the reader.")
   }
 
   # Message if the y-axis label text is too long
   if (print_msg && isTRUE(nchar(plot$labels$y) > 5)) {
-
-    cli::cli_text(cli::bg_br_yellow(cli::col_black(
-      "Your y-axis label is too long. Consider if the information needed to interpret the graph is already in the title, and only specify the units in the y-axis label.")))
+    adv_msg <- c(adv_msg, "Your y-axis label is too long. Consider if the information needed to interpret the graph is already in the title, and only specify the units in the y-axis label.")
   }
+
+  # Print the whole message if needed
+  print_adv <- function() {
+    cli::cli_div(theme = list(.alert = list(color = "red"),
+                              .adv = list(`background-color` = "#FBFF00")))
+    cli::cli_h1("Please fix the following issues with your graph", class = "adv")
+    cli::cli_ul()
+    sapply(adv_msg, cli::cli_alert_warning)
+    cli::cli_end()
+  }
+
+  if (length(adv_msg) > 0) print_adv()
 
   # Height and width setting ------------------------------------------------
 
