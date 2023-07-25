@@ -6,20 +6,19 @@ reference:
 - title: Graph components
   contents:
   - add_e61_logo
-  - add_zeroline
+  - add_baseline
   - labs_e61
   - plot_label
   - mplot_label
 
 - title: Formatting
   contents:
-  - e61_palette
   - format_flipped_bar
   - mpanel_e61
+  - save_e61
   - square_legend_symbols
   - theme_e61
   - theme_e61_clean
-  - save_e61
 
 - title: Scales
   contents:
@@ -35,6 +34,7 @@ reference:
 
 - title: Colours
   contents:
+  - e61_palette
   - e61_aus_colours
   - matches("^e61_(blue|coral|grey|maroon|orange|sky|teal)")
 
