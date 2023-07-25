@@ -48,9 +48,9 @@ Then:
 
 - Apply the theme: `theme_e61()`
 - Add graph colours: `scale_colour_e61()` or `scale_fill_e61()`
-- Format the scales/axes: `scale_y_continuous_e61()`, `scale_x_continuous_e61()`
+- Format the x and y axes scales: `scale_y_continuous_e61()`, `scale_x_continuous_e61()`
 - Add plot labelling: `mplot_label()` or `plot_label()`
-- Add titles and footers: `labs_e61(title = "Title", footnotes = "Footnotes", sources = "Sources")`
+- Add titles, axes labels, footnotes and sources: `labs_e61(title = "Title", footnotes = "Footnotes", sources = c("Source 1", "Source 2"))`
 - Create a multi-panel (if required): `mpanel_e61()`
 - Save the graph: `save_e61()`
 
