@@ -204,13 +204,10 @@ save_e61 <-  function(filename,
   # Message for the user to specify their own height to dimension graphs
   # correctly. This message runs after the above so when the automatic height
   # setting is used it does not trigger.
-  if (is.null(height) || isTRUE(getOption("save_e61.message"))) {
+  if (is.null(height)) {
 
     cli::cli_text(cli::col_green("Note: When you use ", sQuote("save_e61()"), " to save images with defaults, you should set the ", sQuote("height"), " argument manually to your own value to avoid excess/insufficient whitespace on the rendered image."))
     cli::cli_text(cli::col_green("Unfortunately the only way to check this is to open the rendered graphic and inspect it visually."))
-    cli::cli_text(cli::col_green("This message is shown if you leave 'height = NULL' and the automatic height functionality is not used. It may be disabled by setting options('save_e61.message' = FALSE). See ?save_e61 for more details."))
-
-    options('save_e61.message' = FALSE)
   }
 
   # Fallback default dimensions if not otherwise specified
