@@ -51,6 +51,8 @@
 #' @param rel_heights A numeric vector giving the relative proportions of each
 #'   graph component (title, plots, footer (optional)). See the Details for more
 #'   detail.
+#' @param show_height Logical. Prints a message showing the \code{rel_heights}
+#'   used when producing the graph. Mostly used for testing. Defaults to FALSE.
 #'
 #' @return ggplot2 object
 #' @export
@@ -84,7 +86,8 @@ mpanel_e61 <-
            nrow = NULL,
            rel_heights = NULL,
            align = c("v", "none", "h", "hv"),
-           axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr")
+           axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
+           show_height = FALSE
            ) {
 
     # Prep header/footer text
@@ -121,14 +124,14 @@ mpanel_e61 <-
     lab_foot <- list()
 
     lab_head$title <-
-      cowplot::ggdraw() +
-      cowplot::draw_label(
-        lab_text$title,
-        fontface = "bold",
-        x = 0.5,
-        hjust = 0.5,
-        size = 12 * title_adj
-      )
+        cowplot::ggdraw() +
+        cowplot::draw_label(
+          lab_text$title,
+          fontface = "bold",
+          x = 0.5,
+          hjust = 0.5,
+          size = 12 * title_adj
+        )
 
     if (!is.null(lab_text$subtitle)) {
       lab_head$subtitle <-
@@ -144,7 +147,6 @@ mpanel_e61 <-
     }
 
     if (!is.null(lab_text$caption)) {
-
       lab_foot$footer <-
         cowplot::ggdraw() +
         cowplot::draw_label(lab_text$caption,
@@ -155,15 +157,22 @@ mpanel_e61 <-
 
     }
 
+    # Space for title if required
+    t_h <- if (!is.null(lab_text$title)) 0.07 else 0.001
+
     # Space for subtitle if required
-    sub_h <- if (!is.null(lab_text$subtitle)) 0.05 else NULL
+    s_h <- if (!is.null(lab_text$subtitle)) 0.07 else NULL
 
     # Adjust the footer height depending on how much text there is
-    cap_h <-
-      if (!is.null(lab_text$caption)) 0.05 * (n_count(lab_text$caption) + 1) else NULL
+    f_h <-
+      if (!is.null(lab_text$caption)) 0.06 * (n_count(lab_text$caption) + 1) else NULL
+
+    # Calculate plot height
+    p_h <- sum(t_h, s_h, 0.9, f_h) / 1.1
+    p_h <- p_h * (1 + nrow * 0.4) # Adjustment factor for >1 row plots
 
     # Use automatically generated relative heights if the user does not specify their own
-    if (is.null(rel_heights)) rel_heights <- c(0.05, sub_h, 1, cap_h)
+    if (is.null(rel_heights)) rel_heights <- c(t_h, s_h, p_h, f_h)
 
     gg <- cowplot::plot_grid(
       plotlist = c(lab_head, panels, lab_foot),
@@ -174,6 +183,11 @@ mpanel_e61 <-
     # Add some extra info on the multi-panel attributes
     attr(gg, "panel_rows") <- nrow
     attr(gg, "panel_cols") <- ncol
+    attr(gg, "panel_head") <- if (is.numeric(t_h) && is.numeric(s_h)) (t_h + s_h) / 0.07 else 0
+    attr(gg, "panel_foot") <- if (is.numeric(f_h)) f_h / 0.06 else 0
+
+    # Print the rel_heights used
+    if (show_height) message(paste(rel_heights, collapse = ", "))
 
     return(gg)
 

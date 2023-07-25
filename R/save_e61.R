@@ -167,7 +167,7 @@ save_e61 <-  function(filename,
   }
 
   if (is_multi && is.null(height)) {
-    height <- 7.5 + 7 * (attr(plot, "panel_rows") - 1)
+    height <- 7.5 + 8 * (attr(plot, "panel_rows") - 1) + 0.5 * attr(plot, "panel_head") + 0.35 * attr(plot, "panel_foot")
 
     cli::cli_text(cli::col_green("Note: You are saving a multi-panel graph, save_e61() has automatically set the height to ", height, ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
   }
@@ -270,10 +270,12 @@ save_e61 <-  function(filename,
     if (out != 0) warning("Graph file could not be opened.")
   }
 
-  # Invisibly returns the filename because not sure what else is worth
-  # returning? Currently some of the tests rely on the filename being returned
-  # so maybe don't change this without a good reason.
-  invisible(filename)
+  # Invisibly returns the filename (or vector of filenames). Currently some of
+  # the tests rely on the filename being returned so maybe don't change this
+  # without a good reason.
+  retval <- paste(filename, format, sep = ".")
+
+  invisible(retval)
 }
 
 #' Set option to automatically open files created by \code{save_e61}

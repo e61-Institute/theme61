@@ -314,3 +314,90 @@ test_that("Test multiple file format saving features", {
     expect_error(suppressMessages(save_e61("test_file", g, format = "mp3")))
   })
 })
+
+test_that("Test saving of multi-panel graphs", {
+
+  # This test should be run manually and the results inspected by hand
+  skip("This 'test' is only for interactive purposes")
+
+  # Generate some data
+  graph_data <- data.frame(x = runif(100, 1, 49), y = runif(100, 1, 49),
+                           xcol = 1:100)
+
+  # Graph
+  graph <- ggplot(graph_data, aes(x, y)) +
+    geom_point() +
+    theme_e61() +
+    scale_y_continuous_e61(limits = c(0, 50, 10)) +
+    scale_colour_e61(1) +
+    labs_e61(
+      title = "Graph",
+      footnotes = "Really long footnote to test that part of the code blah blah blah blah blah blah",
+      sources = c("e61 Institute"),
+      x = NULL, y = "units"
+    )
+
+  debug(mpanel_e61)
+  debug(save_e61)
+  undebug(mpanel_e61)
+  undebug(save_e61)
+  debugonce(mpanel_e61)
+  debugonce(save_e61)
+
+  # No title or subtitle
+  mp <- mpanel_e61(graph, graph)
+
+  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp))
+
+  # Title, no subtitle
+  mp <- mpanel_e61(graph, graph,
+                   title = "Title")
+
+  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp, height = 8))
+
+  # No title, with subtitle
+  mp <- mpanel_e61(graph, graph,
+                   subtitle = "Graph subtitle")
+
+  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp, height = 8))
+
+  # Title, caption
+  mp <- mpanel_e61(graph, graph,
+                   title = "Title",
+                   sources = "Source 1")
+
+  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp))
+
+  # No title, no subtitle, caption
+  mp <- mpanel_e61(graph, graph,
+                   sources = "Source 1")
+
+  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp))
+
+  # No title, no subtitle, footnotes, sources
+  mp <- mpanel_e61(graph, graph,
+                   footnotes = "Footnote 1",
+                   sources = "Source 1")
+
+  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp, height = 8.3))
+
+  # Title, subtitle, footnotes, sources
+  mp <- mpanel_e61(graph, graph,
+                   title = "Title",
+                   subtitle = "Graph subtitle",
+                   footnotes = "Footnote 1",
+                   sources = "Source 1")
+
+  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp))
+
+  # 2x2 with title, subtitle, footnotes, sources
+  mp <- mpanel_e61(graph, graph, graph, graph,
+                   ncol = 2,
+                   title = "Title",
+                   subtitle = "Graph subtitle",
+                   footnotes = "Footnote 1",
+                   sources = "Source 1",
+                   show_height = TRUE)
+
+  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp))
+
