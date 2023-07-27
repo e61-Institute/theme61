@@ -27,6 +27,7 @@
 #' @export
 #' @examples
 #'
+#' \dontrun{
 #' library(ggplot2)
 #' data <- data.frame(x = 1:5, y1 = 1:5 * 10, y2 = 5:1 - 5)
 #'
@@ -39,20 +40,19 @@
 #'   scale_y_continuous_e61(limits = c(0, 60, 10), sec_axis = sec_axis(~sec_rescale(.), name = "%"), rescale_sec = TRUE) +
 #'   theme_e61() +
 #'   labs_e61(y = "%")
+#' }
 #'
 sec_rescale_inv <- function(values, scale = 1, shift = 0) {
 
-  # Doing a bad thing here, assigning objects to the global environment is
-  # generally frowned upon. But here we need it to be supplied to another
-  # function, scale_function()
-  assign("sec_axis_scale", scale, envir = .GlobalEnv)
-  assign("sec_axis_shift", shift, envir = .GlobalEnv)
+  # Store scale and shift vars to supply to sec_rescale()
+  assign("sec_axis_scale", scale, envir = t61_env)
+  assign("sec_axis_shift", shift, envir = t61_env)
 
   return ((values + shift) / scale)
 }
 
 #' @rdname dual_y_axis
 #' @export
-sec_rescale <- function(values, scale = sec_axis_scale, shift = sec_axis_shift) {
+sec_rescale <- function(values, scale = t61_env$sec_axis_scale, shift = t61_env$sec_axis_shift) {
   return (values * scale - shift)
 }

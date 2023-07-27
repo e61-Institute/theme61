@@ -7,7 +7,11 @@
 \usage{
 sec_rescale_inv(values, scale = 1, shift = 0)
 
-sec_rescale(values, scale = sec_axis_scale, shift = sec_axis_shift)
+sec_rescale(
+  values,
+  scale = t61_env$sec_axis_scale,
+  shift = t61_env$sec_axis_shift
+)
 }
 \arguments{
 \item{values}{Vector of data that would normally be passed as the y aesthetic
@@ -40,6 +44,7 @@ values.
 }
 \examples{
 
+\dontrun{
 library(ggplot2)
 data <- data.frame(x = 1:5, y1 = 1:5 * 10, y2 = 5:1 - 5)
 
@@ -52,5 +57,6 @@ ggplot(data, aes(x)) +
   scale_y_continuous_e61(limits = c(0, 60, 10), sec_axis = sec_axis(~sec_rescale(.), name = "\%"), rescale_sec = TRUE) +
   theme_e61() +
   labs_e61(y = "\%")
+}
 
 }
