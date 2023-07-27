@@ -50,7 +50,7 @@ theme_e61 <- function(y_top = TRUE,
                       panel_borders = TRUE,
                       background = "white",
                       base_size = 10,
-                      base_family = "ArialMT",
+                      base_family = "PT Sans",
                       base_line_size = points_to_mm(0.75),
                       base_rect_size = points_to_mm(1)
                       ) {
