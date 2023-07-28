@@ -336,6 +336,7 @@ n_count <- function(text) {
 #' Masks ggplot2::ggsave to encourage users to use save_e61
 #'
 #' @noRd
+#' @export
 ggsave <- function(...) {
 
   warning("Please use save_e61() instead of ggsave() to ensure your graphs conform to the e61 style correctly.")
