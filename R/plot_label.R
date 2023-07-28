@@ -34,7 +34,7 @@ plot_label <-
            size = 3.5,
            hjust = 0,
            geom = c("text", "label"),
-           angle = 90) {
+           angle = 0) {
     geom <- match.arg(geom)
 
     if (is.na(colour) && (is.na(n_labs) || is.na(n)))
@@ -78,7 +78,7 @@ mplot_label <-
            size = 3.5,
            hjust = 0,
            geom = c("text", "label"),
-           angle = 90) {
+           angle = 0) {
 
     geom <- match.arg(geom)
 
