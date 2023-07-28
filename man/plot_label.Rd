@@ -15,7 +15,7 @@ plot_label(
   size = 3.5,
   hjust = 0,
   geom = c("text", "label"),
-  angle = 90
+  angle = 0
 )
 
 plab(
@@ -26,7 +26,7 @@ plab(
   size = 3.5,
   hjust = 0,
   geom = c("text", "label"),
-  angle = 90
+  angle = 0
 )
 }
 \arguments{

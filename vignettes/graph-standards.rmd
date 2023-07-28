@@ -108,7 +108,8 @@ In case you want to customise the chosen colours, all of the valid colours in th
 -   Specifying just the colour name (e.g. `e61_teallight`) will also select the left-most colour on the scale (colour "0").
 
 ```{r theme61-colours, echo = FALSE, out.width='80%'}
-source("colour-palette.R", print.eval = TRUE)
+source("colour-palette.R")
+knitr::include_graphics(here::here("man/figures/g-palette-colours.svg"))
 ```
 
 ## Formatting graph colours {#colours}
