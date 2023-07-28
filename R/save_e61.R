@@ -122,7 +122,7 @@ save_e61 <-  function(filename,
   }
 
   # Message if package scale_x/y function not used
-  if (print_msg && !"scale_e61" %in% class(ggplot2::layer_scales(plot)$y)) {
+  if (print_msg && !"scale_e61" %in% class(ggplot2::layer_scales(plot)$y) && "ScaleContinuous" %in% class(ggplot2::layer_scales(plot)$y)) {
 
     adv_msg <- c(adv_msg, "Add 'scale_y_continuous_e61()' to your ggplot code to ensure the graph axes render correctly.")
   }
