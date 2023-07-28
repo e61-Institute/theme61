@@ -142,7 +142,7 @@ save_e61 <-  function(filename,
 
   # Message if the y-axis label text is too long
   if (print_msg && isTRUE(nchar(plot$labels$y) > 5)) {
-    adv_msg <- c(adv_msg, "Your y-axis label is too long. Consider if the information needed to interpret the graph is already in the title and only specify the units in the y-axis label e.g. %, ppt, $b.")
+    adv_msg <- c(adv_msg, "Your y-axis label may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label e.g. %, ppt, $b.")
   }
 
   # Height and width setting ------------------------------------------------
@@ -341,3 +341,4 @@ ggsave <- function(...) {
   warning("Please use save_e61() instead of ggsave() to ensure your graphs conform to the e61 style correctly.")
 
   ggplot2::ggsave(...)
+}
