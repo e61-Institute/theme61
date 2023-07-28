@@ -332,3 +332,12 @@ unset_open_graph <- function() {
 n_count <- function(text) {
   nchar(text) - nchar(gsub("\n", "", text, fixed = TRUE))
 }
+
+#' Masks ggplot2::ggsave to encourage users to use save_e61
+#'
+#' @noRd
+ggsave <- function(...) {
+
+  warning("Please use save_e61() instead of ggsave() to ensure your graphs conform to the e61 style correctly.")
+
+  ggplot2::ggsave(...)

@@ -397,3 +397,6 @@ test_that("Test saving of multi-panel graphs", {
   rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp))
 
 })
+
+test_that("ggsave is masked by theme61", {
+  expect_warning(ggsave(withr::local_tempfile(fileext = ".svg"), ggplot()), "Please use.*")
