@@ -205,17 +205,13 @@ test_that("Test advisory messages", {
   # No theming, no y-axis
   gg <- ggplot()
 
-  expect_snapshot(
-    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
-  )
+  expect_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1), ".*Fix the following issues.*")
 
   # No colour palette
   gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
     geom_col()
 
-  expect_snapshot(
-    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
-  )
+  expect_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1), ".*Fix the following issues.*")
 
   # y-axis text missing
   gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
@@ -225,9 +221,7 @@ test_that("Test advisory messages", {
     theme_e61() +
     labs_e61(y = NULL)
 
-  expect_snapshot(
-    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
-  )
+  expect_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1), ".*Fix the following issues.*")
 
   # y-axis text too long
   gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
@@ -237,9 +231,7 @@ test_that("Test advisory messages", {
     theme_e61() +
     labs_e61(y = "Really long y-axis label")
 
-  expect_snapshot(
-    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
-  )
+  expect_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1), ".*Fix the following issues.*")
 
   # No message if you do it right
   gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
@@ -248,16 +240,12 @@ test_that("Test advisory messages", {
     scale_fill_e61(3) +
     theme_e61()
 
-  expect_no_message(
-    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
-  )
+  expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
 
   # No messages for multipanels
   gg <- mpanel_e61(gg)
 
-  expect_no_message(
-    suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
-  )
+  expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
 })
 
 test_that("Test multiple file format saving features", {
@@ -332,13 +320,6 @@ test_that("Test saving of multi-panel graphs", {
       x = NULL, y = "units"
     )
 
-  debug(mpanel_e61)
-  debug(save_e61)
-  undebug(mpanel_e61)
-  undebug(save_e61)
-  debugonce(mpanel_e61)
-  debugonce(save_e61)
-
   # No title or subtitle
   mp <- mpanel_e61(graph, graph)
 
@@ -400,3 +381,4 @@ test_that("Test saving of multi-panel graphs", {
 
 test_that("ggsave is masked by theme61", {
   expect_warning(ggsave(withr::local_tempfile(fileext = ".svg"), ggplot()), "Please use.*")
+})
