@@ -1,3 +1,24 @@
+# theme61 0.5.1
+
+XX XXX 2023
+
+#### New/changed functionality
+
+* Renamed `add_zeroline()` to `add_baseline()` because you can now add a line at a place other than `y = 0`.
+* Improvements to the advisory and information messages that are produced when you save a graph using `save_e61()` and forget to include certain functions.
+* Allow rotation of labels in `mplot_label()`.
+* Changed default font of graphs to 'PT Sans' to be consistent with research note font.
+* Add additional warning messages when inappropriately formatted y-axis labels are used.
+* Improvements to `mpanel_e61()` to better support multi-panel graphs with no titles.
+
+#### Bug fixes
+
+* Fixed an issue where saving graphs with no title created whitespace above the plot.
+
+#### Documentation updates
+
+* Improvements to the Graph standards and Introduction vignettes to clarify correct workflow when using the package.
+
 # theme61 0.5.0
 
 26 May 2023
