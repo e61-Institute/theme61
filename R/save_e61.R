@@ -108,22 +108,23 @@ save_e61 <-  function(filename,
 
   # Advisory messages -------------------------------------------------------
 
+  # Note that the following checks don't apply when multi-panel graphs are created
   print_msg <-
     if (is_multi || isTRUE(getOption("no_t61_style_msg"))) FALSE else TRUE
 
-  # The following checks don't apply when multi-panel graphs are created
   adv_msg <- c()
+  info_msg <- c()
 
   # Message if theme function not used
   if (print_msg && is.null(attr(plot$theme, "t61"))) {
 
-    adv_msg <- c(adv_msg, "Use 'theme_e61()' in your ggplot code to ensure the e61 theme is applied.")
+    adv_msg <- c(adv_msg, "Add 'theme_e61()' to your ggplot code to ensure the e61 theme is applied.")
   }
 
   # Message if package scale_x/y function not used
   if (print_msg && !"scale_e61" %in% class(ggplot2::layer_scales(plot)$y)) {
 
-    adv_msg <- c(adv_msg, "Use 'scale_x/y_continuous_e61()' in your ggplot code to ensure the graph axes render correctly.")
+    adv_msg <- c(adv_msg, "Add 'scale_y_continuous_e61()' to your ggplot code to ensure the graph axes render correctly.")
   }
 
   # Message if colour/fill functions aren't used, message to appear only if a
@@ -131,30 +132,18 @@ save_e61 <-  function(filename,
   if (print_msg && any(grepl("(colour|color|fill)", names(plot$mapping))) &&
       !"scale_col_e61" %in% unlist(sapply(plot$scales$scales, class))) {
 
-    adv_msg <- c(adv_msg, "Use 'scale_colour/fill_e61()' in your ggplot code to ensure the e61 colour palette is used.")
+    adv_msg <- c(adv_msg, "Add 'scale_colour/fill_e61()' to your ggplot code to ensure the e61 colour palette is used.")
   }
 
   # Message if the y-axis label text is missing
   if (print_msg && (is.null(plot$labels$y) || nchar(plot$labels$y) == 0)) {
-    adv_msg <- c(adv_msg, "Your y-axis label is missing. Please provide the units of the axis for the reader.")
+    adv_msg <- c(adv_msg, "Your y-axis label is missing. Please provide the units of the axis for the reader. Specify the 'y' argument in 'labs_e61()'.")
   }
 
   # Message if the y-axis label text is too long
   if (print_msg && isTRUE(nchar(plot$labels$y) > 5)) {
-    adv_msg <- c(adv_msg, "Your y-axis label is too long. Consider if the information needed to interpret the graph is already in the title, and only specify the units in the y-axis label.")
+    adv_msg <- c(adv_msg, "Your y-axis label is too long. Consider if the information needed to interpret the graph is already in the title and only specify the units in the y-axis label e.g. %, ppt, $b.")
   }
-
-  # Print the whole message if needed
-  print_adv <- function() {
-    cli::cli_div(theme = list(.alert = list(color = "red"),
-                              .adv = list(`background-color` = "#FBFF00")))
-    cli::cli_h1("Please fix the following issues with your graph", class = "adv")
-    cli::cli_ul()
-    sapply(adv_msg, cli::cli_alert_warning)
-    cli::cli_end()
-  }
-
-  if (length(adv_msg) > 0) print_adv()
 
   # Height and width setting ------------------------------------------------
 
@@ -176,7 +165,7 @@ save_e61 <-  function(filename,
   if (is_multi && is.null(height)) {
     height <- 7.5 + 8 * (mp_dims$rows - 1) + 0.5 * mp_dims$head_dim + 0.35 * mp_dims$foot_dim
 
-    cli::cli_text(cli::col_green("Note: You are saving a multi-panel graph, save_e61() has automatically set the height to ", height, ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
+    info_msg <- c(info_msg, paste0("You are saving a multi-panel graph, save_e61() has automatically set the height to ", height, ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
   }
 
   # Calculate graph height based on the graph labels for normal orientation graphs
@@ -204,7 +193,7 @@ save_e61 <-  function(filename,
 
   height <- h + t_adj + st_adj + cp_adj + y_adj
 
-  cli::cli_text(cli::col_green("Note: save_e61() has automatically set the height to ", height, ". Please open the saved graph file and check if this is actually appropriate for your graph. You may have to adjust the value if the y-axis is particularly wide."))
+  info_msg <- c(info_msg, paste0("save_e61() has automatically set the height to ", height, ". Please open the saved graph file and check if this is actually appropriate for your graph. You may have to adjust the value if the y-axis is particularly wide."))
 
   }
 
@@ -213,8 +202,7 @@ save_e61 <-  function(filename,
   # setting is used it does not trigger.
   if (is.null(height)) {
 
-    cli::cli_text(cli::col_green("Note: When you use ", sQuote("save_e61()"), " to save images with defaults, you should set the ", sQuote("height"), " argument manually to your own value to avoid excess/insufficient whitespace on the rendered image."))
-    cli::cli_text(cli::col_green("Unfortunately the only way to check this is to open the rendered graphic and inspect it visually."))
+    info_msg <- c(info_msg, paste0("When you use ", sQuote("save_e61()"), " to save images with defaults, you should set the ", sQuote("height"), " argument manually to your own value to avoid excess/insufficient whitespace on the rendered image. Unfortunately the only way to check this is to open the rendered graphic and inspect it visually."))
   }
 
   # Fallback default dimensions if not otherwise specified
@@ -255,7 +243,36 @@ save_e61 <-  function(filename,
   })
 
   # Post-saving messages and functions ---------------------
-  if (dim_msg) cli::cli_text(cli::col_green("The graph height and width have been set to ", height, " and ", width, "."))
+  if (dim_msg) {
+    info_msg <- c(info_msg, "The graph height and width have been set to ", height, " and ", width, ".")
+  }
+
+  # Compile the messages together
+  print_adv <- function() {
+    cli::cli_div(theme = list(".bad" = list(color = "#cc0000",
+                                            before = paste0(cli::symbol$cross, " ")),
+                              ".adv" = list(`background-color` = "#FBFF00")
+                              )
+                 )
+    cli::cli_h1("--- Fix the following issues with your graph ----------------------------------------", class = "adv")
+    cli::cli_ul()
+    sapply(adv_msg, cli::cli_alert, class = "bad")
+    cli::cli_end()
+  }
+
+  print_info <- function() {
+    cli::cli_div(theme = list(".info-head" = list(color = "#247700"),
+                              ".just-info" = list(color = "#000000")
+                              )
+                 )
+    cli::cli_h1("--- For information -----------------------", class = "info-head")
+    cli::cli_ul()
+    sapply(info_msg, cli::cli_alert_info, class = "just-info")
+    cli::cli_end()
+  }
+
+  if (length(adv_msg) > 0) print_adv()
+  if (length(info_msg) > 0) print_info()
 
   # Save the data used to make the graph
   if (save_data) {
