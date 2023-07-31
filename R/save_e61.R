@@ -227,6 +227,14 @@ save_e61 <-  function(filename,
   }
 
 
+  # Iterative auto-height code ----------------------------------------------
+
+  # Temporarily add a red background to the graph for the pixel detecting code to work
+
+
+
+
+
   # Save --------------------------------------------------------------------
   lapply(format, function(fmt) {
     file_i <- paste0(filename, ".", fmt)
@@ -333,14 +341,3 @@ n_count <- function(text) {
   nchar(text) - nchar(gsub("\n", "", text, fixed = TRUE))
 }
 
-#' Masks ggplot2::ggsave to encourage users to use save_e61
-#'
-#' @noRd
-#' @export
-ggsave <- function(...) {
-
-  # Throw warning message
-  cli::cli_bullets(c("x" = "Please use save_e61() instead of ggsave() to ensure your graphs conform to the e61 style correctly."))
-
-  ggplot2::ggsave(...)
-}
