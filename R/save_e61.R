@@ -339,7 +339,8 @@ n_count <- function(text) {
 #' @export
 ggsave <- function(...) {
 
-  warning("Please use save_e61() instead of ggsave() to ensure your graphs conform to the e61 style correctly.")
+  # Throw warning message
+  cli::cli_bullets(c("x" = "Please use save_e61() instead of ggsave() to ensure your graphs conform to the e61 style correctly."))
 
   ggplot2::ggsave(...)
 }
