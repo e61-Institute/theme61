@@ -241,10 +241,10 @@ save_e61 <-  function(filename,
 
     switch(
       fmt,
-      svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height)),
-      eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height)),
-      pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height)),
-      png = png(filename = file_i, width = width, height = height, units = "cm", pointsize = pointsize, res = res)
+      svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
+      eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
+      pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
+      png = png(filename = file_i, width = width, height = height, units = "cm", pointsize = pointsize, res = res, bg = "transparent")
     )
     print(plot)
     dev.off()
