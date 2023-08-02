@@ -22,7 +22,7 @@
 #'   rescale this to 0 to 5.
 #' @param shift Numeric. Moves the axis up and down. For example, if the scale
 #'   was 0 to 5, \code{shift = 5} moves the secondary scale down by 5 units to
-#'   -5 to 0.
+#'   range from -5 to 0.
 #' @rdname dual_y_axis
 #' @export
 #' @examples
