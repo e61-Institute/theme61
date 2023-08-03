@@ -25,6 +25,7 @@ Imports:
     here (>= 1.0.1),
     lifecycle (>= 1.0.3),
     magick (>= 2.7.3),
+    rsvg (>= 2.4.0),
     showtext (>= 0.9-6),
     svglite (>= 2.1.0),
     sysfonts (>= 0.8.8)
