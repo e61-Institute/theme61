@@ -21,3 +21,15 @@ labs <- function(...) {
 
   ggplot2::labs(...)
 }
+
+#' Masks ggplot2::scale_y_continuous to encourage users to use labs_e61
+#'
+#' @noRd
+#' @export
+scale_y_continuous <- function(...) {
+
+  # Throw warning message
+  cli::cli_bullets(c("x" = "Please use scale_y_continuous_e61() instead of scale_y_continuous() to ensure your graphs conform to the e61 style correctly."))
+
+  ggplot2::scale_y_continuous(...)
+}
