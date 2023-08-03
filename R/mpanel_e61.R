@@ -169,7 +169,7 @@ mpanel_e61 <-
 
     # Calculate plot height
     p_h <- sum(t_h, s_h, 0.9, f_h) / 1.1
-    p_h <- p_h * (1 + nrow * 0.4) # Adjustment factor for >1 row plots
+    p_h <- p_h * (1 + (nrow - 1) * 0.4) # Adjustment factor for >1 row plots
 
     # Use automatically generated relative heights if the user does not specify their own
     if (is.null(rel_heights)) rel_heights <- c(t_h, s_h, p_h, f_h)
