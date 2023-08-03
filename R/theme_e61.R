@@ -19,11 +19,11 @@
 #' @param fix_left Optional. Sometimes if the value of the \code{adj} argument
 #'   is too negative, the margins on the left side of the graph start to cut off
 #'   some of the text. Provide a small positive value (5?) to correct this.
-#' @param legend Character. Legend position, use "none" (default) to hide the
-#'   legend.
+#' @param legend Character. Legend position, "none" (default) hides the legend.
 #' @param legend_title Logical. Include Legend title? Defaults to FALSE.
 #' @param aspect_ratio Numeric. Sets the aspect ratio of the graph panel.
-#' @param background Character. Options are "white" (default) or "grey".
+#' @param background Character. Default is "white". For graphs used in research
+#'   note boxes, set the colour to e61_skylight8.
 #' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #' @param base_size Numeric. Chart font size. Default is 10.
 #' @param base_family Character. Chart font family. Default is Arial.
