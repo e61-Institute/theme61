@@ -10,6 +10,7 @@ save_e61(
   width = NULL,
   height = NULL,
   format = c("svg", "pdf", "eps", "png"),
+  autoheight = TRUE,
   save_data = FALSE,
   dim_msg = FALSE,
   resize = NULL,
@@ -39,6 +40,9 @@ to be appropriate.}
 \code{c("svg", "pdf")} will save 2 files with the same name to the same
 location to SVG and PDF formats. If the file format is specified in
 \code{filename}, then this argument is ignored.}
+
+\item{autoheight}{Automatically sets the graph height. Only works with vector
+graphics formats. Defaults to TRUE.}
 
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph

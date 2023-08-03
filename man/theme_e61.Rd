@@ -34,8 +34,7 @@ values.}
 is too negative, the margins on the left side of the graph start to cut off
 some of the text. Provide a small positive value (5?) to correct this.}
 
-\item{legend}{Character. Legend position, use "none" (default) to hide the
-legend.}
+\item{legend}{Character. Legend position, "none" (default) hides the legend.}
 
 \item{legend_title}{Logical. Include Legend title? Defaults to FALSE.}
 
@@ -43,7 +42,8 @@ legend.}
 
 \item{panel_borders}{Logical. Show panel borders? Defaults to TRUE.}
 
-\item{background}{Character. Options are "white" (default) or "grey".}
+\item{background}{Character. Default is "white". For graphs used in research
+note boxes, set the colour to e61_skylight8.}
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
 
