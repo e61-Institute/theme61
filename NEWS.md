@@ -4,7 +4,8 @@ XX XXX 2023
 
 #### New/changed functionality
 
-* Improvements to the advisory and information messages that are produced when you save a graph using `save_e61()` and forget to include certain functions.
+* Added console messages that tell you when common graphing mistakes have been made and how to correct them when you save a graph using `save_e61()`.
+* Significantly improved the ability of `save_e61()` to automatically select the correct `height` when saving graphs. In most circumstances you should no longer need to set your own `height` argument.
 * Changed default font of graphs to 'PT Sans' to be consistent with research note font.
 * Allow rotation of labels in `mplot_label()`.
 * Renamed `add_zeroline()` to `add_baseline()` because you can now add a line at a place other than `y = 0`.
