@@ -101,6 +101,14 @@ save_e61 <-  function(filename,
   if (save_data && !is.data.frame(plot$data))
     stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
+  # Switches off autoheight is PNG is specified
+  if ("png" %in% format & autoheight == TRUE) {
+    autoheight <- FALSE
+
+    warning("autoheight has been set to FALSE as a .png file was requested.")
+
+  }
+
   # Identify graph attributes -----------------------------------------------
 
   # Check if graph is horizontal
@@ -111,6 +119,8 @@ save_e61 <-  function(filename,
   # labs_e61 forces the user to have at least a title (so length > 0 for
   # single panels)
   is_multi <- !is.null(attr(plot, "panel_rows"))
+
+  user_height <- !is.null(height)
 
   # Advisory messages -------------------------------------------------------
 
@@ -171,11 +181,15 @@ save_e61 <-  function(filename,
   if (is_multi && is.null(height)) {
     height <- 7.5 + 8 * (mp_dims$rows - 1) + 0.5 * mp_dims$head_dim + 0.35 * mp_dims$foot_dim
 
-    info_msg <- c(info_msg, paste0("You are saving a multi-panel graph, save_e61() has automatically set the height to ", height, ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
+    # Only add msg if autoheight will not run later
+    if (!autoheight) {
+      info_msg <- c(info_msg, paste0("You are saving a multi-panel graph, save_e61() has automatically set the height to ", round(height, 1), ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
+    }
+
   }
 
   # Calculate graph height based on the graph labels for normal orientation graphs
-  if (is.null(height) && !is_flip && !is_multi) {
+  if (!user_height && !is_flip && !is_multi) {
 
     h <- 6.5
 
@@ -197,16 +211,18 @@ save_e61 <-  function(filename,
     y_adj <-
       if (!is.null(plot$labels$y)) (nchar(plot$labels$y) - 1) * -0.2 else 0
 
-  height <- h + t_adj + st_adj + cp_adj + y_adj
+    height <- h + t_adj + st_adj + cp_adj + y_adj
 
-  info_msg <- c(info_msg, paste0("save_e61() has automatically set the height to ", height, ". Please open the saved graph file and check if this is actually appropriate for your graph. You may have to adjust the value if the y-axis is particularly wide."))
+    # Only add msg if autoheight will not run later
+    if (!autoheight) {
+      info_msg <- c(info_msg, paste0("save_e61() has automatically set the height to ", height, ". Please open the saved graph file and check if this is actually appropriate for your graph. You may have to adjust the value if the y-axis is particularly wide."))
+    }
 
   }
 
   # Message for the user to specify their own height to dimension graphs
-  # correctly. This message runs after the above so when the automatic height
-  # setting is used it does not trigger.
-  if (is.null(height)) {
+  # correctly. This message does not appear if autoheight functions are used.
+  if (!user_height && !autoheight) {
 
     info_msg <- c(info_msg, paste0("When you use ", sQuote("save_e61()"), " to save images with defaults, you should set the ", sQuote("height"), " argument manually to your own value to avoid excess/insufficient whitespace on the rendered image. Unfortunately the only way to check this is to open the rendered graphic and inspect it visually."))
   }
@@ -276,7 +292,7 @@ save_e61 <-  function(filename,
 
   # Post-saving messages and functions ---------------------
   if (dim_msg) {
-    info_msg <- c(info_msg, "The graph height and width have been set to ", height, " and ", width, ".")
+    info_msg <- c(info_msg, paste0("The graph height and width have been set to ", height, " and ", width, "."))
   }
 
   # Compile the messages together
@@ -455,3 +471,4 @@ auto_height_finder <- function(plot, mpanel, width, height, incr = 0.2) {
 
   return(retval)
 
+}
