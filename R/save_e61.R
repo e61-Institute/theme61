@@ -232,14 +232,32 @@ save_e61 <-  function(filename,
     height <- height * resize
   }
 
+  # Trim excess height from graph ----------------------------------------------
 
-  # Iterative auto-height code ----------------------------------------------
+  if (!user_height && autoheight) {
 
-  # Temporarily add a red background to the graph for the pixel detecting code to work
+    if (!is.null(start_h)) height <- start_h
 
+    retval <- auto_height_finder(plot = plot,
+                                 mpanel = is_multi,
+                                 width = width,
+                                 height = height)
 
+    height <- round(retval$height, 1)
+    iter <- retval$iter
 
-
+    info_msg <-
+      c(info_msg,
+        paste0("Autoheight has set the graph height and width to ",
+               height,
+               " cm and ",
+               width,
+               " cm (in ",
+               iter,
+               " iterations)."
+               )
+        )
+  }
 
   # Save --------------------------------------------------------------------
   lapply(format, function(fmt) {
@@ -346,4 +364,94 @@ unset_open_graph <- function() {
 n_count <- function(text) {
   nchar(text) - nchar(gsub("\n", "", text, fixed = TRUE))
 }
+
+#' Helper function used in save_e61() to automatically determine the graph
+#' height
+#'
+#' @param plot ggplot2 object
+#' @param mpanel Logical. Whether the graph was generated using
+#'   \code{mpanel_e61()} or not.
+#' @param width Graph width as supplied to \code{save_e61()}.
+#' @param height Graph height as supplied to \code{save_e61()}.
+#' @param incr The increment in cm to iterate the graph heights by.
+#' @return The height of the graph.
+#' @noRd
+auto_height_finder <- function(plot, mpanel, width, height, incr = 0.2) {
+  tmp_file <- tempfile(fileext = ".svg")
+
+  # add red fill/border to check for sizing
+  if (mpanel) {
+    plot2 <- plot + theme(plot.background = element_rect(colour = "red"))
+  } else {
+    plot2 <- plot + theme(plot.background = element_rect(fill = "red"))
+  }
+
+  new_h <- height
+  too_tall <- TRUE
+  iter <- 0
+
+  while (too_tall) {
+
+    # Prevent infinite loops
+    if (iter > 20) stop("Stopping as the auto-height algorithm has repeated 20 times without finding an optimal height. Please manually set the 'height' argument in save_e61() for this graph.")
+
+    iter <- iter + 1
+
+    # Save graph with test height
+    svglite::svglite(filename = tmp_file, width = cm_to_in(width), height = cm_to_in(new_h), bg = "transparent")
+    print(plot2)
+    dev.off()
+
+    # Read back in
+    img <- magick::image_read_svg(tmp_file)
+
+    # Convert image into array of pixel colours
+    data <- magick::image_data(img)
+
+    # The data comes as a 4-dim array for the RGBA hex code, this combines them
+    pixel_tab <- sapply(1:dim(data)[[3]], function(x) {
+      retval <- paste0(data[1, , x], data[2, , x], data[3, , x], data[4, , x])
+      invisible(retval)
+    })
+
+    # For some reason the array comes transposed. We want to check the first
+    # column of pixels in mpanels so we transpose the matrix so it is correctly
+    # orientated. But for normal graphs we care about the first row so we just
+    # leave the matrix untransposed.
+    if (mpanel) {
+      pixel_tab <- t(pixel_tab)
+    }
+
+    # How we check graph sizing:
+    # For normal graphs: see if the first row is white and shrink the height
+    # slightly if it is.
+    # For mpanels: see if the border runs down the left side of the graph. If it
+    # doesn't then we need to shrink the height slightly until it does.
+
+    # Get first row or col
+    chk_col <- pixel_tab[, 1]
+    chk_col <- chk_col[-c(1, length(chk_col))]
+
+    if (mpanel) {
+      # Counts all the not-red pixels
+      if (length(chk_col[chk_col != "78000078"]) > 0) {
+        new_h <- new_h - incr
+      } else {
+        height <- new_h + 0.1
+        too_tall <- FALSE
+      }
+    } else {
+      # Checks if all the pixels are white
+      if (length(chk_col[chk_col == "00000000"]) == length(chk_col)) {
+        new_h <- new_h - incr
+      } else {
+        height <- new_h + 0.1
+        too_tall <- FALSE
+      }
+    }
+  }
+
+  retval <- list(height = height, iter = iter)
+
+  return(retval)
 
