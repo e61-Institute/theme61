@@ -111,18 +111,34 @@ save_e61 <-  function(filename,
 
   }
 
-  # Identify graph attributes -----------------------------------------------
+  # Collate graph attributes -----------------------------------------------
+
+  # Build the plot object internally
+  # Could have wider applications in the future...
+  plot_build <- ggplot_build(plot)
 
   # Check if graph is horizontal
   is_flip <- isTRUE("CoordFlip" %in% class(ggplot2::ggplot_build(plot)$layout$coord))
 
-  # Check if the graph is a multi-panel generated with mpanel_e61 by
-  # exploiting the fact that those graphs have zero-length labels, while
-  # labs_e61 forces the user to have at least a title (so length > 0 for
-  # single panels)
+  # Check if the graph was generated with mpanel_e61 by checking for attributes
+  # added to mpanels
   is_multi <- !is.null(attr(plot, "panel_rows"))
 
-  user_height <- !is.null(height)
+  # Check if user supplied a height/width or we need the automation
+  user_h <- !is.null(height)
+  user_w <- !is.null(width)
+
+  # Get facet dimensions if applicable
+  if (is.null(plot$facet$params)) {
+    is_facet <- TRUE
+
+    facet_dims <- list()
+    facet_dims$cols <- plot_build$layout$layout$COL
+    facet_dims$rows <- plot_build$layout$layout$ROW
+
+  } else {
+    is_facet <- FALSE
+  }
 
   # Advisory messages -------------------------------------------------------
 
@@ -165,8 +181,21 @@ save_e61 <-  function(filename,
 
   # Height and width setting ------------------------------------------------
 
-  # For multi-panels: Adjust the width to fit the extra panels and send out user
-  # message to specify the height
+  ## Fallback default dimensions ----
+
+  # Fallback default dimensions if not otherwise specified
+  if (!user_w && !is_flip) width <- 8.5
+  if (!user_h && !is_flip) height <- 9
+
+  # When coord_flip() is used to make a plot horizontal, the default dims are
+  # too small
+  if (!user_w && is_flip) width <- 17
+  if (!user_h && is_flip) height <- 12
+
+  ## Multi-panels ----
+
+  # Adjust the width to fit the extra panels and send out user message to
+  # specify the height
 
   # Pull together mpanel attributes
   mp_dims <- list(
@@ -176,11 +205,11 @@ save_e61 <-  function(filename,
     foot_dim = attr(plot, "panel_foot")
   )
 
-  if (is_multi && is.null(width)) {
+  if (is_multi && !user_w) {
     width <- 8.5 * mp_dims$cols
   }
 
-  if (is_multi && is.null(height)) {
+  if (is_multi && !user_h) {
     height <- 7.5 + 8 * (mp_dims$rows - 1) + 0.5 * mp_dims$head_dim + 0.35 * mp_dims$foot_dim
 
     # Only add msg if autoheight will not run later
@@ -190,8 +219,18 @@ save_e61 <-  function(filename,
 
   }
 
+  ## Faceted regular graphs ----
+
+  # Expand the width if the facet has multiple columns
+  if (is_facet && !user_w) {
+    width <- 8.5 * facet_dims$cols
+    height <- 9 * facet_dims$rows
+  }
+
+  ## Regular graphs ----
+
   # Calculate graph height based on the graph labels for normal orientation graphs
-  if (!user_height && !is_flip && !is_multi) {
+  if (!user_h && !is_flip && !is_multi) {
 
     h <- 6.5
 
@@ -219,24 +258,14 @@ save_e61 <-  function(filename,
     if (!autoheight) {
       info_msg <- c(info_msg, paste0("save_e61() has automatically set the height to ", height, ". Please open the saved graph file and check if this is actually appropriate for your graph. You may have to adjust the value if the y-axis is particularly wide."))
     }
-
   }
 
   # Message for the user to specify their own height to dimension graphs
   # correctly. This message does not appear if autoheight functions are used.
-  if (!user_height && !autoheight) {
+  if (!user_h && !autoheight) {
 
     info_msg <- c(info_msg, paste0("When you use ", sQuote("save_e61()"), " to save images with defaults, you should set the ", sQuote("height"), " argument manually to your own value to avoid excess/insufficient whitespace on the rendered image. Unfortunately the only way to check this is to open the rendered graphic and inspect it visually."))
   }
-
-  # Fallback default dimensions if not otherwise specified
-  if (is.null(width) && !is_flip) width <- 8.5
-  if (is.null(height) && !is_flip) height <- 9
-
-  # When coord_flip() is used to make a plot horizontal, the default dims are
-  # too small
-  if (is.null(width) && is_flip) width <- 17
-  if (is.null(height) && is_flip) height <- 12
 
   # Resize elements if a png is to be output
   if (!is.null(resize)) {
@@ -252,10 +281,11 @@ save_e61 <-  function(filename,
 
   # Trim excess height from graph ----------------------------------------------
 
-  if (!user_height && autoheight) {
+  if (!user_h && autoheight) {
 
     if (!is.null(start_h)) height <- start_h
 
+    # Autoheight function
     retval <- auto_height_finder(plot = plot,
                                  mpanel = is_multi,
                                  width = width,
@@ -321,8 +351,8 @@ save_e61 <-  function(filename,
     cli::cli_end()
   }
 
-  if (length(adv_msg) > 0) print_adv()
-  if (length(info_msg) > 0) print_info()
+  if (length(adv_msg) > 0 && test) print_adv()
+  if (length(info_msg) > 0 && test) print_info()
 
   # Save the data used to make the graph
   if (save_data) {
@@ -411,7 +441,7 @@ auto_height_finder <- function(plot, mpanel, width, height, incr = 0.2) {
   while (too_tall) {
 
     # Prevent infinite loops
-    if (iter > 20) stop("Stopping as the auto-height algorithm has repeated 20 times without finding an optimal height. Please manually set the 'height' argument in save_e61() for this graph.")
+    if (iter > 20) stop("Stopping as the autoheight algorithm has repeated 20 times without finding an optimal height. Try supplying a sensible starting height in the 'start_h' argument of save_e61() or manually set the 'height' argument in save_e61().")
 
     iter <- iter + 1
 
@@ -451,7 +481,7 @@ auto_height_finder <- function(plot, mpanel, width, height, incr = 0.2) {
     chk_col <- chk_col[-c(1, length(chk_col))]
 
     if (mpanel) {
-      # Counts all the not-red pixels
+      # Checks for any not-red pixels
       if (length(chk_col[chk_col != "78000078"]) > 0) {
         new_h <- new_h - incr
       } else {
