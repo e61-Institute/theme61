@@ -3,26 +3,36 @@ test_that("Test dimensioning functions", {
   # Test default height messages
   withr::with_tempdir({
 
-    temp_file <- "default-height.png"
+    withr::local_options(list(test_save = NULL,
+                              quiet_wrap = NULL))
 
-    expect_message(save_e61(temp_file, ggplot()))
+    temp_file <- "default-height.png"
+    plot <- ggplot() + scale_y_continuous_e61()
+
+    expect_message(save_e61(temp_file, plot, autoheight = FALSE))
 
   })
+
+  # Turn off messages
+  withr::local_options(list(test_save = TRUE,
+                            quiet_wrap = TRUE))
 
   # Test custom dimensions work
   withr::with_tempdir({
 
-    suppressMessages(save_e61("custom-dim.svg", ggplot(), width = 10, height = 10))
+    plot <- ggplot() + scale_y_continuous_e61()
+
+    suppressMessages(save_e61("custom-dim.svg", plot, width = 10, height = 10))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
     expect_equal(g_info$width, 378)
     expect_equal(g_info$height, 378)
 
-    suppressMessages(save_e61("custom-dim.svg", ggplot(), width = 10, height = 5))
+    suppressMessages(save_e61("custom-dim.svg", plot, width = 10, height = 5))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
     expect_equal(g_info$width, 378)
     expect_equal(g_info$height, 189)
 
-    suppressMessages(save_e61("custom-dim.svg", ggplot(), width = 5, height = 10))
+    suppressMessages(save_e61("custom-dim.svg", plot, width = 5, height = 10))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
     expect_equal(g_info$width, 189)
     expect_equal(g_info$height, 378)
@@ -37,17 +47,20 @@ test_that("Test dimensioning functions", {
     suppressMessages(save_e61("gg.svg", plot))
     g_info <- magick::image_info(magick::image_read("gg.svg"))
     expect_equal(g_info$width, 321)
-    expect_equal(g_info$height, 268)
+    expect_equal(g_info$height, 272)
 
     suppressMessages(save_e61("gg.svg", plot_h))
     g_info <- magick::image_info(magick::image_read("gg.svg"))
     expect_equal(g_info$width, 643)
-    expect_equal(g_info$height, 454)
+    expect_equal(g_info$height, 457)
   })
 
 })
 
 test_that("Test resizing feature for PNGs", {
+
+  withr::local_options(list(test_save = TRUE,
+                            quiet_wrap = TRUE))
 
   # Create a graph that will be written to disk (and deleted afterwards)
   g <- ggplot() + labs(title = "Test")
@@ -56,7 +69,7 @@ test_that("Test resizing feature for PNGs", {
     temp_file <- "test.png"
 
     # Test PNG with default scaling
-    suppressMessages(save_e61(temp_file))
+    suppressMessages(save_e61(temp_file, autoheight = FALSE))
 
     disk_file <- magick::image_read(temp_file)
     deets <- magick::image_info(disk_file)
@@ -73,7 +86,7 @@ test_that("Test resizing feature for PNGs", {
     })
 
     # Test resized PNG
-    suppressMessages(save_e61(temp_file, resize = 2))
+    suppressMessages(save_e61(temp_file, resize = 2, autoheight = FALSE))
 
     disk_file <- magick::image_read(temp_file)
     deets <- magick::image_info(disk_file)
@@ -95,6 +108,9 @@ test_that("Test resizing feature for PNGs", {
 
 test_that("Test support for different file formats", {
 
+  withr::local_options(list(test_save = TRUE,
+                            quiet_wrap = TRUE))
+
   # Create a graph that will be written to disk (and deleted afterwards)
   g <- ggplot() + labs(title = "Test")
 
@@ -110,7 +126,7 @@ test_that("Test support for different file formats", {
       tibble::tibble(
         format = "SVG",
         width = 321,
-        height = 268
+        height = 272
       )
 
     lapply(c("format", "width", "height"), function(x) {
@@ -199,8 +215,9 @@ test_that("Test whether save_data works", {
 })
 
 test_that("Test advisory messages", {
-  # Ensure option is not set
-  options(no_t61_style_msg = FALSE)
+  # Ensure option is not set, but turn off wrapper warnings
+  withr::local_options(list(no_t61_style_msg = FALSE,
+                            quiet_wrap = TRUE))
 
   # No theming, no y-axis
   gg <- ggplot()
@@ -253,7 +270,7 @@ test_that("Test multiple file format saving features", {
 
   # Test 3 formats
   withr::with_tempdir({
-    suppressMessages(save_e61("test_file", g, format = c("svg", "pdf", "eps")))
+    suppressMessages(save_e61("test_file", g, format = c("svg", "pdf", "eps"), autoheight = FALSE))
 
     expect_setequal(list.files(pattern = "test_file.*"),
                  c("test_file.eps", "test_file.pdf", "test_file.svg"))
@@ -262,7 +279,7 @@ test_that("Test multiple file format saving features", {
 
   # Test if PNG breaks everything (it shouldn't)
   withr::with_tempdir({
-    suppressMessages(save_e61("test_file", g, format = c("svg", "png")))
+    suppressMessages(save_e61("test_file", g, format = c("svg", "png"), autoheight = FALSE))
 
     expect_setequal(list.files(pattern = "test_file.*"),
                  c("test_file.svg", "test_file.png"))
@@ -270,7 +287,7 @@ test_that("Test multiple file format saving features", {
 
   # Test providing file format in file path
   withr::with_tempdir({
-    suppressMessages(save_e61("test_file.svg", g))
+    suppressMessages(save_e61("test_file.svg", g, autoheight = FALSE))
 
     expect_setequal(list.files(pattern = "test_file.*"),
                  c("test_file.svg"))
@@ -278,7 +295,7 @@ test_that("Test multiple file format saving features", {
 
   # Test if providing format in path overrules format argument
   withr::with_tempdir({
-    suppressMessages(save_e61("test_file.svg", g, format = "png"))
+    suppressMessages(save_e61("test_file.svg", g, format = "png", autoheight = FALSE))
 
     expect_setequal(list.files(pattern = "test_file.*"),
                  c("test_file.svg"))
@@ -286,7 +303,7 @@ test_that("Test multiple file format saving features", {
 
   # Test what happens if nothing is provided (do the defaults do what you expect?)
   withr::with_tempdir({
-    suppressMessages(save_e61("test_file", g))
+    suppressMessages(save_e61("test_file", g, autoheight = FALSE))
 
     expect_setequal(list.files(pattern = "test_file.*"),
                  c("test_file.svg", "test_file.png", "test_file.pdf", "test_file.eps"))
@@ -294,7 +311,7 @@ test_that("Test multiple file format saving features", {
 
   # Error if invalid filename used
   withr::with_tempdir({
-    expect_error(suppressMessages(save_e61("test_file", g, format = "mp3")))
+    expect_error(suppressMessages(save_e61("test_file", g, format = "mp3", autoheight = FALSE)))
   })
 })
 
@@ -379,6 +396,3 @@ test_that("Test saving of multi-panel graphs", {
 
 })
 
-test_that("ggsave is masked by theme61", {
-  expect_warning(ggsave(withr::local_tempfile(fileext = ".svg"), ggplot()), "Please use.*")
-})

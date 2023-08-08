@@ -60,6 +60,7 @@
 #' @param resize Numeric. Only used when PNG is the file format. Resize the
 #'   graph width and height. You may also need to adjust the \code{pointsize}
 #'   and \code{res} to ensure the text is readable.
+#' @param test For development use only.
 #' @inheritParams grDevices::png
 #' @return Invisibly returns the file name.
 #' @export
@@ -75,7 +76,8 @@ save_e61 <-  function(filename,
                       dim_msg = FALSE,
                       resize = NULL,
                       pointsize = 12,
-                      res = 72
+                      res = 72,
+                      test = !isTRUE(getOption("test_save"))
                       ) {
 
 
