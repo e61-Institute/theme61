@@ -1,9 +1,15 @@
-#' Australian jurisidictions colour palette
+#' Australian jurisdictions colour palette
 #'
 #' A named vector of hex codes containing a standardised colour palette for
 #' Australia, the States and Territories, and capital cities. Places can be
 #' referenced using a variety of full or abbreviated names.
 "e61_aus_colours"
+
+#' Hex code for the colour of research and micro note Box backgrounds
+#'
+#' #ecf9fa
+#'
+"e61_boxback"
 
 #' Hex code for the colour: e61 Blue Dark
 #'
