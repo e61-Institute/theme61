@@ -10,11 +10,14 @@ save_e61(
   width = NULL,
   height = NULL,
   format = c("svg", "pdf", "eps", "png"),
+  autoheight = TRUE,
+  start_h = NULL,
   save_data = FALSE,
   dim_msg = FALSE,
   resize = NULL,
   pointsize = 12,
-  res = 72
+  res = 72,
+  test = !isTRUE(getOption("test_save"))
 )
 }
 \arguments{
@@ -40,6 +43,12 @@ to be appropriate.}
 location to SVG and PDF formats. If the file format is specified in
 \code{filename}, then this argument is ignored.}
 
+\item{autoheight}{Automatically sets the graph height. Only works with vector
+graphics formats. Defaults to TRUE.}
+
+\item{start_h}{Numeric. Optionally, supply a starting height for the
+auto-height algorithm.}
+
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph
 (defaults to FALSE).}
@@ -58,6 +67,8 @@ and \code{res} to ensure the text is readable.}
     bitmap file, if a positive integer.  Also used for units other than
     the default.  If not specified, taken as 72 ppi to set the size of
     text and line widths.}
+
+\item{test}{For development use only.}
 }
 \value{
 Invisibly returns the file name.

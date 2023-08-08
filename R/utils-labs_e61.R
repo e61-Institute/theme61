@@ -22,11 +22,18 @@ label_wrap <- function(
     footnote_wrap = NULL
     ) {
 
-  # Stop titles from being too long by wrapping it to multiple lines
-  if (title_wrap) {
-    title <- paste(strwrap(title, width = title_max_char), collapse = "\n")
+  # Title
+  if (!is.null(title)) {
+
+    if (!is.character(title)) stop("title must be a string.")
+
+    if (title_wrap) {
+      title <- paste(strwrap(title, width = title_max_char), collapse = "\n")
+    }
+
   }
 
+  # Subtitle
   if (!is.null(subtitle)) {
 
     if (!is.character(subtitle))

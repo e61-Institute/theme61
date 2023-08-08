@@ -2,7 +2,8 @@
 % Please edit documentation in R/plot_label.R
 \name{plot_label}
 \alias{plot_label}
-\title{Add On-graph Labels to Graphs}
+\alias{plab}
+\title{Add a single on-graph label to a graph}
 \usage{
 plot_label(
   label,
@@ -13,7 +14,19 @@ plot_label(
   colour = NA,
   size = 3.5,
   hjust = 0,
-  geom = c("text", "label")
+  geom = c("text", "label"),
+  angle = 0
+)
+
+plab(
+  label,
+  x,
+  y,
+  colour = NA,
+  size = 3.5,
+  hjust = 0,
+  geom = c("text", "label"),
+  angle = 0
 )
 }
 \arguments{

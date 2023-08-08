@@ -22,7 +22,8 @@ mpanel_e61(
   nrow = NULL,
   rel_heights = NULL,
   align = c("v", "none", "h", "hv"),
-  axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr")
+  axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
+  show_height = FALSE
 )
 }
 \arguments{
@@ -67,6 +68,9 @@ vertically ("v") aligned. Options are "none" (default), "hv" (align in both dire
 \item{axis}{(optional) Specifies whether graphs should be aligned by the left ("l"), right ("r"), top ("t"), or bottom ("b")
 margins. Options are "none" (default), or a string of any combination of l, r, t, and b in any order (e.g. "tblr" or "rlbt" for aligning all margins).
 Must be specified if any of the graphs are complex (e.g. faceted) and alignment is specified and desired. See \code{\link[cowplot:align_plots]{align_plots()}} for details.}
+
+\item{show_height}{Logical. Prints a message showing the \code{rel_heights}
+used when producing the graph. Mostly used for testing. Defaults to FALSE.}
 }
 \value{
 ggplot2 object

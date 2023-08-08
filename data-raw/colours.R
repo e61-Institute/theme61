@@ -1,6 +1,10 @@
 
 # Define e61 colours ------------------------------------------------------
 
+## Note box background colour
+e61_boxback <- "#ecf9fa"
+usethis::use_data(e61_boxback, overwrite = TRUE)
+
 ## Blue
 
 # Dark
@@ -313,7 +317,6 @@ e61_palette_set <- list(
              e61_greylight1)
 )
 usethis::use_data(e61_palette_set, overwrite = TRUE)
-
 
 # State and territory colours ---------------------------------------------
 

@@ -6,20 +6,19 @@ reference:
 - title: Graph components
   contents:
   - add_e61_logo
-  - add_zeroline
+  - add_baseline
   - labs_e61
   - plot_label
   - mplot_label
 
 - title: Formatting
   contents:
-  - e61_palette
   - format_flipped_bar
   - mpanel_e61
+  - save_e61
   - square_legend_symbols
   - theme_e61
   - theme_e61_clean
-  - save_e61
 
 - title: Scales
   contents:
@@ -35,13 +34,35 @@ reference:
 
 - title: Colours
   contents:
+  - e61_palette
   - e61_aus_colours
+  - e61_boxback
   - matches("^e61_(blue|coral|grey|maroon|orange|sky|teal)")
 
-articles:
-- title: Get started
-  navbar: ~
-  contents:
-  - theme61
-  - graph-standards
-  - ongraph-labels
+navbar:
+  structure:
+    left: [home, standards, reference, articles, news]
+    right: [github]
+  components:
+    home:
+      text: "Get started"
+      href: articles/theme61.html
+    standards:
+      text: "Graph standards"
+      href: articles/graph-standards.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    articles:
+      text: Articles
+      menu:
+      - text: "Graph standards"
+        href: articles/graph-standards.html
+      - text: "Adding on-graph labels"
+        href: articles/ongraph-labels.html
+    news:
+      text: News
+      href: news/index.html
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/e61-Institute/theme61
