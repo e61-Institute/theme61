@@ -4,8 +4,9 @@
 #' @export
 ggsave <- function(...) {
 
-  # Throw warning message
-  cli::cli_bullets(c("x" = "Please use save_e61() instead of ggsave() to ensure your graphs conform to the e61 style correctly."))
+  # Throw warning message (unless testing)
+  if (!isTRUE(getOption("quiet_wrap")))
+    cli::cli_bullets(c("x" = "Please use save_e61() instead of ggsave() to ensure your graphs conform to the e61 style correctly."))
 
   ggplot2::ggsave(...)
 }
@@ -16,8 +17,9 @@ ggsave <- function(...) {
 #' @export
 labs <- function(...) {
 
-  # Throw warning message
-  cli::cli_bullets(c("x" = "Please use labs_e61() instead of labs() to ensure your graphs conform to the e61 style correctly."))
+  # Throw warning message (unless testing)
+  if (!isTRUE(getOption("quiet_wrap")))
+    cli::cli_bullets(c("x" = "Please use labs_e61() instead of labs() to ensure your graphs conform to the e61 style correctly."))
 
   ggplot2::labs(...)
 }
@@ -28,8 +30,9 @@ labs <- function(...) {
 #' @export
 scale_y_continuous <- function(...) {
 
-  # Throw warning message
-  cli::cli_bullets(c("x" = "Please use scale_y_continuous_e61() instead of scale_y_continuous() to ensure your graphs conform to the e61 style correctly."))
+  # Throw warning message (unless testing)
+  if (!isTRUE(getOption("quiet_wrap")))
+    cli::cli_bullets(c("x" = "Please use scale_y_continuous_e61() instead of scale_y_continuous() to ensure your graphs conform to the e61 style correctly."))
 
   ggplot2::scale_y_continuous(...)
 }
