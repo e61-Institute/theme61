@@ -36,6 +36,7 @@ reference:
   contents:
   - e61_palette
   - e61_aus_colours
+  - e61_boxback
   - matches("^e61_(blue|coral|grey|maroon|orange|sky|teal)")
 
 navbar:
