@@ -16,7 +16,8 @@ save_e61(
   dim_msg = FALSE,
   resize = NULL,
   pointsize = 12,
-  res = 72
+  res = 72,
+  test = !isTRUE(getOption("test_save"))
 )
 }
 \arguments{
@@ -66,6 +67,8 @@ and \code{res} to ensure the text is readable.}
     bitmap file, if a positive integer.  Also used for units other than
     the default.  If not specified, taken as 72 ppi to set the size of
     text and line widths.}
+
+\item{test}{For development use only.}
 }
 \value{
 Invisibly returns the file name.
