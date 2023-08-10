@@ -381,6 +381,17 @@ cm_to_in <- function(cm, round = FALSE) {
   }
 }
 
+in_to_cm <- function(inches, round = FALSE) {
+  cm <- 2.54 * inches
+
+  if (isTRUE(round)) {
+    round(cm, 2)
+  } else {
+    cm
+  }
+}
+
+
 # Reposition y-axis titles to the top
 y_title_top <- function(adj, fix_left) {
 

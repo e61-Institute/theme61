@@ -67,13 +67,11 @@
 
 save_e61 <-  function(filename,
                       plot = ggplot2::last_plot(),
-                      width = NULL,
-                      height = NULL,
+                      width = 8.5,
+                      height = NULL, # maximum height of the chart
                       format = c("svg", "pdf", "eps", "png"),
                       autoheight = TRUE,
-                      start_h = NULL,
                       save_data = FALSE,
-                      dim_msg = FALSE,
                       resize = NULL,
                       pointsize = 12,
                       res = 72,
@@ -103,13 +101,8 @@ save_e61 <-  function(filename,
   if (save_data && !is.data.frame(plot$data))
     stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
-  # Switches off autoheight is PNG is specified
-  if ("png" %in% format & autoheight == TRUE) {
-    autoheight <- FALSE
 
-    warning("autoheight has been set to FALSE as a .png file was requested.")
-
-  }
+  user_w <- !is.null(width)
 
   # Collate graph attributes -----------------------------------------------
 
@@ -124,10 +117,6 @@ save_e61 <-  function(filename,
   # added to mpanels
   is_multi <- !is.null(attr(plot, "panel_rows"))
 
-  # Check if user supplied a height/width or we need the automation
-  user_h <- !is.null(height)
-  user_w <- !is.null(width)
-
   # Get facet dimensions if applicable
   if (is.null(plot$facet$params)) {
     is_facet <- TRUE
@@ -140,11 +129,12 @@ save_e61 <-  function(filename,
     is_facet <- FALSE
   }
 
+
   # Advisory messages -------------------------------------------------------
 
   # Note that the following checks don't apply when multi-panel graphs are created
   print_msg <-
-    if (is_multi || isTRUE(getOption("no_t61_style_msg"))) FALSE else TRUE
+    if (is_multi || isTRUE(getOption("not_e61_style_msg"))) FALSE else TRUE
 
   adv_msg <- c()
   info_msg <- c()
@@ -209,16 +199,6 @@ save_e61 <-  function(filename,
     width <- 8.5 * mp_dims$cols
   }
 
-  if (is_multi && !user_h) {
-    height <- 7.5 + 8 * (mp_dims$rows - 1) + 0.5 * mp_dims$head_dim + 0.35 * mp_dims$foot_dim
-
-    # Only add msg if autoheight will not run later
-    if (!autoheight) {
-      info_msg <- c(info_msg, paste0("You are saving a multi-panel graph, save_e61() has automatically set the height to ", round(height, 1), ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
-    }
-
-  }
-
   ## Faceted regular graphs ----
 
   # Expand the width if the facet has multiple columns
@@ -228,37 +208,6 @@ save_e61 <-  function(filename,
   }
 
   ## Regular graphs ----
-
-  # Calculate graph height based on the graph labels for normal orientation graphs
-  if (!user_h && !is_flip && !is_multi) {
-
-    h <- 6.5
-
-    # Calculate the height adjustment needed for...
-
-    # Titles
-    t_adj <-
-      if (!is.null(plot$labels$title)) 0.6 + n_count(plot$labels$title) * 0.3 else 0
-
-    # Subtitles
-    st_adj <-
-      if (!is.null(plot$labels$subtitle)) 0.5 + n_count(plot$labels$subtitle) * 0.3 else 0
-
-    # Captions
-    cp_adj <-
-      if (!is.null(plot$labels$caption)) 0.5 + n_count(plot$labels$caption) * 0.3 else 0
-
-    # Adjustment for width of y-axis label
-    y_adj <-
-      if (!is.null(plot$labels$y)) (nchar(plot$labels$y) - 1) * -0.2 else 0
-
-    height <- h + t_adj + st_adj + cp_adj + y_adj
-
-    # Only add msg if autoheight will not run later
-    if (!autoheight) {
-      info_msg <- c(info_msg, paste0("save_e61() has automatically set the height to ", height, ". Please open the saved graph file and check if this is actually appropriate for your graph. You may have to adjust the value if the y-axis is particularly wide."))
-    }
-  }
 
   # Message for the user to specify their own height to dimension graphs
   # correctly. This message does not appear if autoheight functions are used.
@@ -308,6 +257,7 @@ save_e61 <-  function(filename,
   }
 
   # Save --------------------------------------------------------------------
+
   lapply(format, function(fmt) {
     file_i <- paste0(filename, ".", fmt)
 
@@ -425,82 +375,8 @@ n_count <- function(text) {
 #' @return The height of the graph.
 #' @noRd
 auto_height_finder <- function(plot, mpanel, width, height, incr = 0.2) {
-  tmp_file <- tempfile(fileext = ".svg")
 
-  # add red fill/border to check for sizing
-  if (mpanel) {
-    plot2 <- plot + theme(plot.background = element_rect(colour = "red"))
-  } else {
-    plot2 <- plot + theme(plot.background = element_rect(fill = "red"))
-  }
 
-  new_h <- height
-  too_tall <- TRUE
-  iter <- 0
 
-  while (too_tall) {
-
-    # Prevent infinite loops
-    if (iter > 20) stop("Stopping as the autoheight algorithm has repeated 20 times without finding an optimal height. Try supplying a sensible starting height in the 'start_h' argument of save_e61() or manually set the 'height' argument in save_e61().")
-
-    iter <- iter + 1
-
-    # Save graph with test height
-    svglite::svglite(filename = tmp_file, width = cm_to_in(width), height = cm_to_in(new_h), bg = "transparent")
-    print(plot2)
-    dev.off()
-
-    # Read back in
-    img <- magick::image_read_svg(tmp_file)
-
-    # Convert image into array of pixel colours
-    data <- magick::image_data(img)
-
-    # The data comes as a 4-dim array for the RGBA hex code, this combines them
-    pixel_tab <- sapply(1:dim(data)[[3]], function(x) {
-      retval <- paste0(data[1, , x], data[2, , x], data[3, , x], data[4, , x])
-      invisible(retval)
-    })
-
-    # For some reason the array comes transposed. We want to check the first
-    # column of pixels in mpanels so we transpose the matrix so it is correctly
-    # orientated. But for normal graphs we care about the first row so we just
-    # leave the matrix untransposed.
-    if (mpanel) {
-      pixel_tab <- t(pixel_tab)
-    }
-
-    # How we check graph sizing:
-    # For normal graphs: see if the first row is white and shrink the height
-    # slightly if it is.
-    # For mpanels: see if the border runs down the left side of the graph. If it
-    # doesn't then we need to shrink the height slightly until it does.
-
-    # Get first row or col
-    chk_col <- pixel_tab[, 1]
-    chk_col <- chk_col[-c(1, length(chk_col))]
-
-    if (mpanel) {
-      # Checks for any not-red pixels
-      if (length(chk_col[chk_col != "78000078"]) > 0) {
-        new_h <- new_h - incr
-      } else {
-        height <- new_h + 0.1
-        too_tall <- FALSE
-      }
-    } else {
-      # Checks if all the pixels are white
-      if (length(chk_col[chk_col == "00000000"]) == length(chk_col)) {
-        new_h <- new_h - incr
-      } else {
-        height <- new_h + 0.1
-        too_tall <- FALSE
-      }
-    }
-  }
-
-  retval <- list(height = height, iter = iter)
-
-  return(retval)
 
 }
