@@ -9,7 +9,7 @@
 #' @return A vector of hex codes.
 #' @export
 
-e61_palette <- function(n, reverse = FALSE) {
+palette_e61 <- function(n, reverse = FALSE) {
 
   if (n == 0) stop("You need to specify the number of colours/fills in your palette.")
   if (n > 12) stop("You cannot request more than 12 colours, consider using a
