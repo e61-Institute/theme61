@@ -1,4 +1,72 @@
-Masks ggplot2::ggsave to encourage users to use save_e61
+#' Masks ggplot2::ggplot to use the e61 colour palette and scales by default
+#'
+#' @noRd
+#' @export
+ggplot <-
+  function(data = NULL,
+           mapping = aes(),
+           ...,
+           environment = parent.frame()) {
+
+  p <- ggplot2::ggplot(data = data, mapping = mapping, environment = environment) + theme_e61()
+
+  # add e61 y-axis scale if the y-variable is numeric
+  if(!is.null(mapping$y)) {
+
+    y_var_name <- ggplot2::quo_name(mapping$y)
+    y_var_class <- data[[y_var_name]] %>% class()
+
+    if(y_var_class == "numeric"){
+      p <- p + scale_y_continuous_e61()
+    }
+  }
+
+  # add e61 x-axis scale if the x-variable is numeric
+  if(!is.null(mapping$x)) {
+
+    x_var_name <- ggplot2::quo_name(mapping$x)
+    x_var_class <- data[[x_var_name]] %>% class()
+
+    if(x_var_class == "numeric"){
+      p <- p + scale_x_continuous_e61()
+    }
+  }
+
+  fill_var_name <- ggplot2::quo_name(mapping$x)
+
+  # add the e61 colour palette
+  if(!is.null(mapping$fill)){
+
+    fill_var_name <- ggplot2::quo_name(mapping$fill)
+    fill_var_class <- data[[fill_var_name]] %>% class()
+
+    if(fill_var_class == "numeric"){
+      p <- p + scale_fill_e61(discrete = F)
+
+    } else if(fill_var_class == "factor" | fill_var_class == "factor") {
+
+      p <- p + scale_fill_e61()
+    }
+  }
+
+  if(!is.null(mapping$colour)){
+
+    colour_var_name <- ggplot2::quo_name(mapping$colour)
+    colour_var_class <- data[[colour_var_name]] %>% class()
+
+    if(colour_var_class == "numeric"){
+      p <- p + scale_colour_e61(discrete = F)
+
+    } else if(colour_var_class == "factor" | colour_var_class == "factor") {
+
+      p <- p + scale_colour_e61()
+    }
+  }
+
+  return(p)
+}
+
+#' Masks ggplot2::ggsave to encourage users to use save_e61
 #'
 #' @noRd
 #' @export
@@ -22,17 +90,4 @@ labs <- function(...) {
     cli::cli_bullets(c("x" = "Please use labs_e61() instead of labs() to ensure your graphs conform to the e61 style correctly."))
 
   ggplot2::labs(...)
-}
-
-#' Masks ggplot2::scale_y_continuous to encourage users to use labs_e61
-#'
-#' @noRd
-#' @export
-scale_y_continuous <- function(...) {
-
-  # Throw warning message (unless testing)
-  if (!isTRUE(getOption("quiet_wrap")))
-    cli::cli_bullets(c("x" = "Please use scale_y_continuous_e61() instead of scale_y_continuous() to ensure your graphs conform to the e61 style correctly."))
-
-  ggplot2::scale_y_continuous(...)
 }

@@ -65,18 +65,55 @@
 #' @return Invisibly returns the file name.
 #' @export
 
-save_e61 <-  function(filename,
-                      plot = ggplot2::last_plot(),
-                      width = 8.5,
-                      height = NULL, # maximum height of the chart
-                      format = c("svg", "pdf", "eps", "png"),
-                      autoheight = TRUE,
-                      save_data = FALSE,
-                      resize = NULL,
-                      pointsize = 12,
-                      res = 72,
-                      test = !isTRUE(getOption("test_save"))
-                      ) {
+
+save_e61 <- function(filename,
+                     plot = ggplot2::last_plot(),
+                     chart_type = "MN",
+                     width = NULL, # manual control over the width of the chart
+                     height = NULL, # manual control over the height of the chart
+                     max_height = NULL, # manual control over the maximum height of the chart
+                     format = c("svg", "pdf", "eps", "png"),
+                     save_data = FALSE,
+                     resize = NULL,
+                     pointsize = 12,
+                     res = 72,
+                     test = !isTRUE(getOption("test_save"))
+) {
+
+  # filename <- "C:/Users/JackBuckley/OneDrive - e61 Institute Ltd/Desktop/Test charts/test2_long_titles.svg"
+  # plot <- t2
+
+  # Advisory messages -------------------------------------------------------
+
+  # Note that the following checks don't apply when multi-panel graphs are created
+  print_msg <- TRUE
+
+  adv_msg <- c()
+  info_msg <- c()
+
+  # Message if theme function not used
+  if (print_msg && is.null(attr(plot$theme, "t61"))) {
+
+    adv_msg <- c(adv_msg, "Add 'theme_e61()' to your ggplot code to ensure the e61 theme is applied.")
+  }
+
+  # Message if colour/fill functions aren't used, message to appear only if a
+  # colour/fill mappping exists
+  if (print_msg && any(grepl("(colour|color|fill)", names(plot$mapping))) &&
+      !"scale_col_e61" %in% unlist(sapply(plot$scales$scales, class))) {
+
+    adv_msg <- c(adv_msg, "Add 'scale_colour/fill_e61()' to your ggplot code to ensure the e61 colour palette is used.")
+  }
+
+  # Message if the y-axis label text is missing
+  if (print_msg && (is.null(plot$labels$y) || nchar(plot$labels$y) == 0)) {
+    adv_msg <- c(adv_msg, "Your y-axis label is missing. Please provide the units of the axis for the reader. Specify the 'y' argument in 'labs_e61()'.")
+  }
+
+  # Message if the y-axis label text is too long
+  if (print_msg && isTRUE(nchar(plot$labels$y) > 5)) {
+    adv_msg <- c(adv_msg, "Your y-axis label may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label e.g. %, ppt, $b.")
+  }
 
 
   # Guard clauses and failing checks ----------------------------------------
@@ -102,161 +139,158 @@ save_e61 <-  function(filename,
     stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
 
-  user_w <- !is.null(width)
+  # Set maximum width based on output type ----------------------------------
 
-  # Collate graph attributes -----------------------------------------------
+  if(is.null(chart_type)) chart_type <- "MN"
 
-  # Build the plot object internally
-  # Could have wider applications in the future...
-  plot_build <- ggplot_build(plot)
+  # Set the maximum width based on the type of outputs
+  if(chart_type == "MN"){
 
-  # Check if graph is horizontal
-  is_flip <- isTRUE("CoordFlip" %in% class(ggplot2::ggplot_build(plot)$layout$coord))
+    max_width <- 18.59 # based on 215.9mm page width and 15mm margins either side
 
-  # Check if the graph was generated with mpanel_e61 by checking for attributes
-  # added to mpanels
-  is_multi <- !is.null(attr(plot, "panel_rows"))
+  } else if(chart_type == "RN"){
 
-  # Get facet dimensions if applicable
-  if (is.null(plot$facet$params)) {
-    is_facet <- TRUE
+    max_width <- 13.985 # based on 338.7mm page width, 20mm margins, 15mm column sep and 2 columns (i.e. divide the remainder by 2)
 
-    facet_dims <- list()
-    facet_dims$cols <- plot_build$layout$layout$COL
-    facet_dims$rows <- plot_build$layout$layout$ROW
+  } else if(chart_type == "PPT"){
+
+    max_height <- 13.25
+    max_width <- 31.32
+
+  } else if(is.null(chart_type)){
+
+    max_width <- 20
 
   } else {
-    is_facet <- FALSE
+    stop("Invalid chart type. Please select from one of the following: 'MN' for micronotes, 'RN' for research notes, 'PPT' for powerpoint slides, or leave blank to use default maximum widths")
   }
 
 
-  # Advisory messages -------------------------------------------------------
+  # Update y-axis limits ----------------------------------------------------
 
-  # Note that the following checks don't apply when multi-panel graphs are created
-  print_msg <-
-    if (is_multi || isTRUE(getOption("not_e61_style_msg"))) FALSE else TRUE
+  # Returns the order of the first scale function used - how do we determine this
+  y_scale_lims <- ggplot2::layer_scales(plot)$y$limits
 
-  adv_msg <- c()
-  info_msg <- c()
+  # If no y-axis scale has been built
+  if(is.null(y_scale_lims)){
 
-  # Message if theme function not used
-  if (print_msg && is.null(attr(plot$theme, "t61"))) {
+    max_y <- ggplot2::ggplot_build(plot)$data[[1]]$y %>% max()
+    min_y <- ggplot2::ggplot_build(plot)$data[[1]]$y %>% min()
 
-    adv_msg <- c(adv_msg, "Add 'theme_e61()' to your ggplot code to ensure the e61 theme is applied.")
+    # Check whether the chart is a column chart
+    geoms <- plot$layers
+
+    check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
+
+    is_bar <- F
+
+    for(i in seq_along(geoms)){
+
+      g <- geoms[[i]]
+
+      class <- class(g$geom)
+
+      if(any(class %in% check_geoms)){
+
+        is_bar <- T
+
+        break
+      }
+    }
+
+    # get aesthetic limits for the y-axis - if it is a bar chart, then include zero
+    aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
+
+    plot <- plot + scale_y_continuous_e61(limits = aes_lims)
   }
 
-  # Message if package scale_x/y function not used
-  if (print_msg && !"scale_e61" %in% class(ggplot2::layer_scales(plot)$y) && "ScaleContinuous" %in% class(ggplot2::layer_scales(plot)$y)) {
 
-    adv_msg <- c(adv_msg, "Add 'scale_y_continuous_e61()' to your ggplot code to ensure the graph axes render correctly.")
+  # Get the number of panel rows and columns --------------------------------
+
+  plot_build <- ggplot2::ggplot_build(plot)
+
+  # Check if the graph was generated with mpanel_e61 by checking for attributes added to mpanels
+  if(!is.null(attr(plot, "panel_rows"))){
+
+    n_panel_cols = attr(plot, "panel_cols")
+    n_panel_rows = attr(plot, "panel_rows")
+
+    # Get facet dimensions if applicable
+  } else if (length(plot$facet$params) != 0) {
+
+    n_panel_cols <- max(plot_build$layout$layout$COL)
+    n_panel_rows <- max(plot_build$layout$layout$ROW)
+
+    # The default is just 1 row and 1 column - i.e. no facets or mpanel plots have been used
+  } else {
+    n_panel_cols <- 1
+    n_panel_rows <- 1
   }
 
-  # Message if colour/fill functions aren't used, message to appear only if a
-  # colour/fill mappping exists
-  if (print_msg && any(grepl("(colour|color|fill)", names(plot$mapping))) &&
-      !"scale_col_e61" %in% unlist(sapply(plot$scales$scales, class))) {
 
-    adv_msg <- c(adv_msg, "Add 'scale_colour/fill_e61()' to your ggplot code to ensure the e61 colour palette is used.")
+  # Set width -------------------------------------------------------------
+
+  # check whether the user has supplied a given width first (i.e. different to the default 8.5cm)
+  if(is.null(width)) {
+
+    # When coord_flip() is used to make a plot horizontal, the default dims are too small
+    if (isTRUE("CoordFlip" %in% class(ggplot2::ggplot_build(plot)$layout$coord))) {
+
+      width <- max_width
+
+    # if it's only one panel, set the chart width to 2/3 of the max-width
+    } else if(n_panel_cols == 1){
+
+      width <- 2/3 * max_width
+
+    # else use the whole width
+    } else {
+      width <- max_width
+    }
   }
 
-  # Message if the y-axis label text is missing
-  if (print_msg && (is.null(plot$labels$y) || nchar(plot$labels$y) == 0)) {
-    adv_msg <- c(adv_msg, "Your y-axis label is missing. Please provide the units of the axis for the reader. Specify the 'y' argument in 'labs_e61()'.")
-  }
+  # update the size of the text used for titles, footnotes, axes etc.
+  p <- ggplotGrob(plot)
 
-  # Message if the y-axis label text is too long
-  if (print_msg && isTRUE(nchar(plot$labels$y) > 5)) {
-    adv_msg <- c(adv_msg, "Your y-axis label may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label e.g. %, ppt, $b.")
-  }
+  # allow charts to be the width of the panels
+  known_wd <- sum(grid::convertWidth(p$widths, "cm", valueOnly = TRUE))
+  tot_panel_width <- width - known_wd
 
-  # Height and width setting ------------------------------------------------
+  plot <- update_labs(plot = plot, plot_width = tot_panel_width)
 
-  ## Fallback default dimensions ----
 
-  # Fallback default dimensions if not otherwise specified
-  if (!user_w && !is_flip) width <- 8.5
-  if (!user_h && !is_flip) height <- 9
+  # Height adjustments ------------------------------------------------------
 
-  # When coord_flip() is used to make a plot horizontal, the default dims are
-  # too small
-  if (!user_w && is_flip) width <- 17
-  if (!user_h && is_flip) height <- 12
+  # Step 1 - Get the amount of free height and width we have to play with (what is not already used up by the set elements)
+  p <- ggplotGrob(plot)
 
-  ## Multi-panels ----
+  units <- "cm"
 
-  # Adjust the width to fit the extra panels and send out user message to
-  # specify the height
+  known_ht <- sum(grid::convertHeight(p$heights, units, valueOnly = TRUE))
+  known_wd <- sum(grid::convertWidth(p$widths, units, valueOnly = TRUE))
 
-  # Pull together mpanel attributes
-  mp_dims <- list(
-    cols = attr(plot, "panel_cols"),
-    rows = attr(plot, "panel_rows"),
-    head_dim = attr(plot, "panel_head"),
-    foot_dim = attr(plot, "panel_foot")
-  )
+  # calculate the free width and height we have to play with
+  free_ht <- if(!is.null(max_height)) max_height - known_ht else 100 - known_ht
+  free_wd <- width - known_wd
 
-  if (is_multi && !user_w) {
-    width <- 8.5 * mp_dims$cols
-  }
+  # Step 2 - Find the number of panels (these have null rows and heights because they are flexible)
+  null_rowhts <- as.numeric(p$heights[grid::unitType(p$heights) == "null"])
+  null_colwds <- as.numeric(p$widths[grid::unitType(p$widths) == "null"])
+  panel_asps <- (
+    matrix(null_rowhts, ncol = 1)
+    %*% matrix(1 / null_colwds, nrow = 1))
 
-  ## Faceted regular graphs ----
+  # check that aspect ratios are consistent
+  # stop("Panel aspect ratios must be consistent")
 
-  # Expand the width if the facet has multiple columns
-  if (is_facet && !user_w) {
-    width <- 8.5 * facet_dims$cols
-    height <- 9 * facet_dims$rows
-  }
+  # Step 3 - Divide the free width by the number of columns (panels) we have
+  panel_width <- free_wd / n_panel_cols # width of each panel
+  panel_height <- panel_width * max(panel_asps[1,]) # height of each panel (width * aspect ratio)
 
-  ## Regular graphs ----
+  height <- known_ht + panel_height * n_panel_rows
 
-  # Message for the user to specify their own height to dimension graphs
-  # correctly. This message does not appear if autoheight functions are used.
-  if (!user_h && !autoheight) {
 
-    info_msg <- c(info_msg, paste0("When you use ", sQuote("save_e61()"), " to save images with defaults, you should set the ", sQuote("height"), " argument manually to your own value to avoid excess/insufficient whitespace on the rendered image. Unfortunately the only way to check this is to open the rendered graphic and inspect it visually."))
-  }
-
-  # Resize elements if a png is to be output
-  if (!is.null(resize)) {
-    if (format != "png")
-      stop("The 'resize' argument is not supported unless the file format is .png")
-    if (!is.numeric(resize))
-      stop("'resize' must be numeric.")
-
-    # Rescale elements as required
-    width <- width * resize
-    height <- height * resize
-  }
-
-  # Trim excess height from graph ----------------------------------------------
-
-  if (!user_h && autoheight) {
-
-    if (!is.null(start_h)) height <- start_h
-
-    # Autoheight function
-    retval <- auto_height_finder(plot = plot,
-                                 mpanel = is_multi,
-                                 width = width,
-                                 height = height)
-
-    height <- round(retval$height, 1)
-    iter <- retval$iter
-
-    info_msg <-
-      c(info_msg,
-        paste0("Autoheight has set the graph height and width to ",
-               height,
-               " cm and ",
-               width,
-               " cm (in ",
-               iter,
-               " iterations)."
-               )
-        )
-  }
-
-  # Save --------------------------------------------------------------------
+  # Save ------------------------------------------------------------------
 
   lapply(format, function(fmt) {
     file_i <- paste0(filename, ".", fmt)
@@ -272,18 +306,15 @@ save_e61 <-  function(filename,
     dev.off()
   })
 
-  # Post-saving messages and functions ---------------------
-  if (dim_msg) {
-    info_msg <- c(info_msg, paste0("The graph height and width have been set to ", height, " and ", width, "."))
-  }
+  # Post-saving messages and functions ------------------------------------
 
   # Compile the messages together
   print_adv <- function() {
     cli::cli_div(theme = list(".bad" = list(color = "#cc0000",
                                             before = paste0(cli::symbol$cross, " ")),
                               ".adv" = list(`background-color` = "#FBFF00")
-                              )
-                 )
+    )
+    )
     cli::cli_h1("--- Fix the following issues with your graph ----------------------------------------", class = "adv")
     cli::cli_ul()
     sapply(adv_msg, cli::cli_alert, class = "bad")
@@ -293,8 +324,8 @@ save_e61 <-  function(filename,
   print_info <- function() {
     cli::cli_div(theme = list(".info-head" = list(color = "#247700"),
                               ".just-info" = list(color = "#000000")
-                              )
-                 )
+    )
+    )
     cli::cli_h1("--- For information -----------------------", class = "info-head")
     cli::cli_ul()
     sapply(info_msg, cli::cli_alert_info, class = "just-info")
@@ -328,6 +359,7 @@ save_e61 <-  function(filename,
 
   invisible(retval)
 }
+
 
 #' Set option to automatically open files created by \code{save_e61}
 #'

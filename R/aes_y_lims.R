@@ -2,31 +2,36 @@
 #'
 #' These functions are used to produce aesthetic y-axis limits and tick spacing
 #'
-#' @param y_val Numeric. Number for
-#' @param rescale_sec Logical. Set this to TRUE if you are using a rescaled
-#'   secondary axis, otherwise leave it as FALSE (default).
+#' @param y_val Numeric. Number for which we are going
+#' @param type String. Are we looking for the next smallest or next largest
+#' aesthetic value.
 #' @rdname e61_aes_limits
 #' @export
 
 # Get an aesthetic number for setting y-axis scaling defaults
-get_aes_num <- function(y_val, type = "next_largest") {
+get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
 
   # set the adjustment factor based on whether we are looking at a value above or below 1
   if (y_val > 0) adj <- 1 else adj <- -1
 
-  aes_y_points <- data.table(points = c(10, 12, 15, 16, 20, 25, 30, 40, 50, 60, 75, 80, 100))
+  aes_y_points <- data.frame(points = c(10, 12, 15, 16, 20, 25, 30, 40, 50, 60, 75, 80, 100))
 
   order_mag <- ceiling(log10(adj * y_val))
-  aes_y_points[, points_adj := adj * points]
-  aes_y_points[, points_diff := points_adj - (y_val / 10 ^ (order_mag - 2))]
+  aes_y_points <- aes_y_points %>% dplyr::mutate(points_adj = adj * points)
+  aes_y_points <- aes_y_points %>% dplyr::mutate(points_diff = points_adj - (y_val / 10 ^ (order_mag - 2)))
 
-  if(type == "next_smallest") aes_y_points[, points_diff := -1 * points_diff]
+  if(type == "next_smallest") aes_y_points <- aes_y_points %>% dplyr::mutate(points_diff = -1 * points_diff)
 
   if (y_val > 0) {
-    aes_y_points <- aes_y_points[points_diff > 0][points_diff == min(points_diff)]
+    aes_y_points <- aes_y_points %>%
+      dplyr::filter(points_diff > 0) %>%
+      dplyr::mutate(points_diff == min(points_diff))
 
   } else {
-    aes_y_points <- aes_y_points[points_diff < 0][points_diff == max(points_diff)]
+
+    aes_y_points <- aes_y_points %>%
+      dplyr::filter(points_diff < 0) %>%
+      dplyr::mutate(points_diff == max(points_diff))
   }
 
   # take the smallest value that is greater than 0
@@ -101,6 +106,8 @@ get_aes_ticks <- function(min_y_val, max_y_val){
 
   aes_y_points <- lapply(aes_y_points, function(x) x * 10 ^ (order_mag - 2))
 
+  order_mag_max <- ceiling(log10(max_size))
+
   # if the difference is a factor of 5, use five ticks
   if (any(unlist(lapply(aes_y_points$five_point, near, diff)))) {
     band_val <- diff / 5
@@ -120,8 +127,6 @@ get_aes_ticks <- function(min_y_val, max_y_val){
     aes_y_points <- aes_y_points %>% unlist()
 
     # adjust the order of magnitude if necessary
-    order_mag_max <- ceiling(log10(max_size))
-
     if(!any(unlist(lapply(aes_y_points, near, max_size / 10 ^ (order_mag_max - 2))))) {
       return(NULL)
 
@@ -135,14 +140,21 @@ get_aes_ticks <- function(min_y_val, max_y_val){
     band_val <- max_size
   }
 
+  # Adjust orders of magnitude so that modular arithmetic still works
+  adj_max_size <- max_size / 10 ^ (order_mag_max - 2)
+  adj_band_val <- band_val / 10 ^ (order_mag_max - 2)
+
+  adj_min_y_val <- min_y_val / 10 ^ (order_mag_max - 2)
+  adj_max_y_val <- max_y_val / 10 ^ (order_mag_max - 2)
+
   # Rule 3 - If both the top and bottom value are not factors of the band size then it will not be aesthetic!! (if they are either side of 0)
   if(min_y_val < 0 & max_y_val > 0){
-    if(max_size %% band_val != 0){
+    if(adj_max_size %% adj_band_val != 0){
 
-      if(max_size %% 2 == 0 & max_val) {
+      if(adj_max_size %% 2 == 0) {
         band_val <- max_size / 2
 
-      } else if(max_size %% 3 == 0){
+      } else if(adj_max_size %% 3 == 0){
         band_val <- max_size / 3
 
       } else {
@@ -150,7 +162,9 @@ get_aes_ticks <- function(min_y_val, max_y_val){
       }
     }
 
-    if(max_y_val %% band_val != 0 | min_y_val %% band_val != 0) {
+    adj_band_val <- band_val / 10 ^ (order_mag_max - 2)
+
+    if(adj_max_y_val %% adj_band_val != 0 | adj_min_y_val %% adj_band_val != 0) {
       return(NULL)
     }
   }
@@ -163,7 +177,7 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   return(band_val)
 }
 
-# Return potential aesthetic pairs for a given number
+# Return aesthetic number pairs for a given pair of y-axis numbers
 #' @param y_val_1 Double. Minimum y-axis value.
 #' @param y_val_2 Double. Maximum y-axis value.
 #' @rdname e61_aes_limits
@@ -181,7 +195,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
     smallest_val <- y_val_1
   }
 
-  aes_largest_val <- get_aes_num(largest_val)
+  aes_largest_val <- get_aes_num(largest_val, type = "next_largest")
 
   # 2 - Then find all the aesthetic pairs
   aes_y_points <- c(10, 12, 15, 16, 20, 25, 30, 40, 50, 60, 75, 80, 100)
@@ -231,7 +245,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
       pull(aes_small)
 
   } else {
-    aes_smallest_val <- get_aes_num(smallest_val)
+    aes_smallest_val <- get_aes_num(smallest_val, type = "next_largest")
 
     # adjust for the smallest aesthetic value
     ret_smallest_val <- temp_data %>%
@@ -246,3 +260,53 @@ get_aes_pair <- function(y_val_1, y_val_2){
   return(list(ret_smallest_val, aes_largest_val))
 }
 
+# Return aesthetic limits given a min and max y-axis values
+
+#' @param min_y_val Double. Minimum y-axis value.
+#' @param max_y_val Double. Maximum y-axis value.
+#' @param from_zero Logical. Should the limits start at zero or just below the
+#' minimum value?
+#' @rdname e61_aes_limits
+#' @export
+
+get_aes_limits <- function(min_y_val, max_y_val, from_zero = F){
+
+  if(is.null(min_y_val) | is.null(max_y_val)){
+    stop("Y-axis limits could not be determined. Please check your y-axis variable is numeric.")
+  }
+
+  if(max_y_val < min_y_val){
+    temp <- min_y_val
+    min_y_val <- max_y_val
+    max_y_val <- temp
+  }
+
+  # If they are the same, return a scale from 0 to the value
+  if(min_y_val == max_y_val){
+
+    aes_num <- get_aes_num(y_val = min_y_val, type = "next_largest")
+
+  # if we want to scale from from_zero then only use one value for the limits
+  } else if(from_zero){
+
+    if(min_y_val < 0){
+      limits <- list(get_aes_num(min_y_val, type = "next_largest"), 0)
+
+    } else {
+      limits <- list(0, get_aes_num(max_y_val, type = "next_largest"))
+    }
+
+  # otherwise just get an aesthetic pair (not equal and not a bar chart)
+  } else {
+
+    limits <- get_aes_pair(min_y_val, max_y_val)
+
+    temp <- unlist(limits)
+    limits <- list(min(temp), max(temp))
+  }
+
+  # Get the aestehtic tick spacing from the aesthetic pair
+  tick_spacing <- get_aes_ticks(min_y_val = limits[[1]], max_y_val = limits[[2]])
+
+  return(list(limits[[1]], limits[[2]], tick_spacing))
+}
