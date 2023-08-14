@@ -17,8 +17,8 @@ scale_y_continuous_e61(
 
 scale_x_continuous_e61(
   limits = NULL,
-  expand_left = 0,
-  expand_right = 0,
+  expand_left = 0.05,
+  expand_right = 0.05,
   hide_first_last = TRUE,
   ...
 )
