@@ -131,10 +131,7 @@ save_e61 <- function(filename,
 
   height <- known_ht + panel_height * n_panel_rows
 
-  # print(str_c("Width: ", width, " and Height: ", height))
-
   # Update y-axis limits if they have not been set
-
   ggsave(filename = filename, width = cm_to_in(width), height = cm_to_in(height))
 }
 
@@ -252,6 +249,7 @@ get_text_width <- function(txt, font_size = 10) {
   return(ret)
 }
 
+# split a character string into it's individual words
 split_text_into_words <- function(text) {
   words <- strsplit(text, "\\s+")[[1]]
   data.frame(word = words, text = text, stringsAsFactors = FALSE)
@@ -270,14 +268,33 @@ data[, year := as.numeric(as.character(year))]
 data_3 <- data[category %in% c("Food and Tobacco", "Household Operation", "Medical and Health")]
 
 
+# Functions for getting aesthetic numbers and spacing ---------------------
+
+
+# e61_plot - a wrapper around ggplot2 -------------------------------------
+
+e61_plot <- function(data = NULL, mapping = aes(), ..., environment = parent.frame()){
+
+  p <- ggplot(data = data, mapping = mapping, ..., environment = environment) + theme_e61()
+
+  # add a scaled y-axis if the y-variable is numeric
+  if(is.numeric(mapping$y)){
+    p <- p + scale_y_continuous_e61()
+  }
+
+  return(p)
+}
+
+
 # Making the charts -------------------------------------------------------
 
 # Test 1 - regular chart
 (plot <-
-   ggplot(data, aes(x = year, y = value, colour = category)) +
-   geom_line() +
+   ggplot(data, aes(x = year, y = value, fill = category)) +
+   geom_col() +
    theme_e61() +
    scale_y_continuous_e61() +
+   scale_fill_e61() +
    labs_e61(
      title = "Hello world!",
      subtitle = "Adding a subtitle for the hell of it",
@@ -369,186 +386,4 @@ min_y <- ggplot_build(plot)$data[[1]]$y %>% min()
 
 # determine the scale limits to set for the y-axis
 
-# first case - both numbers above 0
-if(min_y >= 0){
 
-  # default to including 0 for now - let the user manually override if they don't want to do that
-  min_y_new <- 0
-
-  ase_nums <- get_aes_num(max_y)
-
-  max_y_new <- ase_nums[[1]]
-  band_width <- ase_nums[[1]]
-
-  plot <- plot + scale_y_continuous_e61(limits = c(min_y_new, max_y_new, band_width))
-
-# second case - both values below 0
-} else if(max_y <= 0){
-
-  # default to including 0 for now - let the user manually override if they don't want to do that
-  max_y_new <- 0
-
-  ase_nums <- get_aes_num(min_y)
-
-  min_y_new <- ase_nums[[1]]
-  band_width <- ase_nums[[1]]
-
-  plot <- plot + scale_y_continuous_e61(limits = c(min_y_new, max_y_new, band_width))
-
-# third case - min < 0 and max > 0 - tricky one...
-} else {
-
-
-  # find the nice value in the skewed direction first - this will inform the spacing
-  if(abs(min_y) > max_y) {
-
-    ase_nums <- get_aes_num(min_y)
-
-    fct <- ase_nums[]
-
-  } else {
-
-    ase_nums <- get_aes_num(max_y)
-
-
-  }
-}
-
-
-# Functions for getting aesthetic numbers and spacing ---------------------
-
-# Get an asethetic number for setting y-axis scaling defaults
-get_aes_num <- function(
-    y_val, # value to find the aesthetic value for
-    set_val = NULL, # restrict the search to only values which are factors of this number
-    zero_overlap = F # boolean value to say whether the two value overlap 0
-  ) {
-
-  # define aesthetic y-axis max/min labels - normalise these values using the y_val value order of magnitude
-  aes_y_points <- data.table(points = c(10, 12, 15, 16, 20, 25, 30, 40, 50, 60, 75, 80, 100))
-
-  if(zero_overlap) aes_y_points <- aes_y_points[!points %in% c(12, 16)]
-
-  # set the adjustment factor based on whether we are looking at a minimum or maximum value
-  if (y_val > 0) adj <- 1 else adj <- -1
-
-  # check for the set variable and if we need to take it into account
-  if(!is.null(set_val)) {
-
-    set_val_order_mag <- ceiling(log10(set_val))
-
-    set_val_adj <- set_val / 10 ^ (set_val_order_mag - 2)
-
-    aes_y_points <- aes_y_points[points %% set_val_adj == 0]
-  }
-
-  order_mag <- ceiling(log10(adj * y_val))
-
-  aes_y_points[, points_adj := adj * points]
-
-  # choose an aesthetic finishing point if the max is close to one
-  aes_y_points[, points_diff := points_adj - (y_val / 10 ^ (order_mag - 2))]
-
-  if (y_val > 0) {
-    aes_y_points <- aes_y_points[points_diff > 0][points_diff == min(points_diff)]
-
-  } else {
-    aes_y_points <- aes_y_points[points_diff < 0][points_diff == max(points_diff)]
-  }
-
-  # take the smallest value that is greater than 0
-  y_aes_adj <- adj * aes_y_points$points[1]
-  y_aes <- aes_y_points$points[1]
-
-  return(y_aes_adj * 10 ^ (order_mag - 2))
-}
-
-# Testing basic function
-expect_equal(get_aes_num(87), 100)
-expect_equal(get_aes_num(101), 120)
-expect_equal(get_aes_num(987), 1000)
-expect_equal(get_aes_num(32), 40)
-expect_equal(get_aes_num(0.029), 0.03)
-expect_equal(get_aes_num(0.29), 0.3)
-
-expect_equal(get_aes_num(-87), -100)
-expect_equal(get_aes_num(-101), -120)
-expect_equal(get_aes_num(-987), -1000)
-expect_equal(get_aes_num(-0.029), -0.03)
-expect_equal(get_aes_num(-0.29), -0.3)
-
-# Testing zero overlap functionality
-expect_equal(get_aes_num(y_val = -0.09, set_val = 0.1, zero_overlap = T), -0.1)
-expect_equal(get_aes_num(y_val = -5, set_val = 2, zero_overlap = T), -6)
-expect_equal(get_aes_num(y_val = -7.5, set_val = 2.5, zero_overlap = T), -10)
-expect_equal(get_aes_num(y_val = 7.5, set_val = 2.5, zero_overlap = T), 10)
-expect_equal(get_aes_num(y_val = -7.4, set_val = 2.5, zero_overlap = T), -7.5)
-
-# Aesthetic tick spacing
-get_aes_ticks <- function(bot_val, top_val){
-
-  # check the argments are correctly ordered, otherwise adjust
-  if(top_val < bot_val) {
-    temp_bot <- bot_val
-    bot_val <- top_val
-    top_val <- temp_bot
-  }
-
-  # differences between points by the number of ticks to include
-  five_point <- c(10, 15, 25, 50, 75, 100)
-  four_point <- c(12, 16, 20, 40, 60, 80)
-  three_point <- c(30)
-
-  # the maximum size of the tick spacing
-  max_size <- 100
-
-  # determine the difference between the two points
-  if (bot_val <= 0 & top_val >= 0){
-    diff <- top_val + abs(bot_val)
-
-    if(bot_val != 0 & top_val != 0){
-      max_size <- min(c(top_val, abs(bot_val)))
-    }
-
-  } else if (bot_val < 0 & top_val < 0) {
-
-    diff <- abs(bot_val) - abs(top_val)
-
-  } else {
-    diff <- top_val - bot_val
-  }
-
-  # if the difference is a factor of 5, use five ticks
-  if (diff %in% five_point) {
-    band_size <- diff / 5
-
-    # if a factor of 4
-  } else if (diff %in% four_point) {
-    band_size <- diff / 4
-
-    # else use a factor of 3
-  } else {
-    band_size <- diff / 3
-  }
-
-  if(band_size > max_size) band_size <- max_size
-
-  return(band_size)
-}
-
-# Test function
-expect_equal(get_aes_ticks(0, 50), 10)
-expect_equal(get_aes_ticks(0, 60), 15)
-expect_equal(get_aes_ticks(20, 60), 10)
-expect_equal(get_aes_ticks(20, 30), 2)
-expect_equal(get_aes_ticks(-20, 30), 10)
-expect_equal(get_aes_ticks(-10, 30), 10)
-expect_equal(get_aes_ticks(-15, 30), 15)
-expect_equal(get_aes_ticks(-30, 30), 15)
-expect_equal(get_aes_ticks(-5, 30), 5)
-expect_equal(get_aes_ticks(-5, 5), 2)
-expect_equal(get_aes_ticks(-50, -20), 10)
-expect_equal(get_aes_ticks(-100, -20), 20)
-expect_equal(get_aes_ticks(20, 100), 20)
-expect_equal(get_aes_ticks(25, 100), 15)
-expect_equal(get_aes_ticks(40, 100), 15)

@@ -1,4 +1,4 @@
-#' Masks ggplot2::ggsave to encourage users to use save_e61
+Masks ggplot2::ggsave to encourage users to use save_e61
 #'
 #' @noRd
 #' @export

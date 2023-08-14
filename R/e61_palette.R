@@ -23,7 +23,6 @@ e61_palette <- function(n, reverse = FALSE) {
   }
 
   return(palette)
-
 }
 
 
