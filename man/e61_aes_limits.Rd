@@ -18,8 +18,7 @@ get_aes_limits(min_y_val, max_y_val, from_zero = F)
 \arguments{
 \item{y_val}{Numeric. Number for which we are going}
 
-\item{type}{String. Are we looking for the next smallest or next largest
-aesthetic value.}
+\item{type}{String. Are we looking for the next smallest or next largest aesthetic value.}
 
 \item{min_y_val}{Double. Minimum y-axis value.}
 
@@ -29,8 +28,7 @@ aesthetic value.}
 
 \item{y_val_2}{Double. Maximum y-axis value.}
 
-\item{from_zero}{Logical. Should the limits start at zero or just below the
-minimum value?}
+\item{from_zero}{Logical. Should the limits start at zero or just below the minimum value?}
 }
 \description{
 Get an aesthetic number near the one supplied.

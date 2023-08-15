@@ -28,14 +28,20 @@ you want to save multiple files with different formats, see the
 \item{plot}{Plot object to save. Defaults to the last plot displayed so
 usually you do not need to provide this explicitly.}
 
-\item{width}{Plot width in cm. Defaults to 8.5.}
+\item{chart_type}{Type of chart. This is used to set sensible chart widths
+based on the width of text in each document. Options include 'MN' (
+for micronote charts), 'RN' (research notes), 'PPT' (powerpoints).
+research note),'PPT}
 
-\item{height}{Plot height in cm. The function will attempt to calculate an
-appropriate height based on the labels you have provided, but this is
-sensitive to small changes in the graph text so you should check if the
-automatic value is aesthetically appropriate (no excess whitespace).
-Otherwise, the function will default to a value of 9 but this is unlikely
-to be appropriate.}
+\item{width}{Plot width in cm. Defaults to NULL which means the width will
+be set based on the chart type.}
+
+\item{height}{Plot height in cm. If you do not specify a height, the function
+will calculate an appropriate height based on the labels you have provided.}
+
+\item{max_height}{The maximum height of your plot. This is used to constrain
+the plot resizing algorithm in cases where you want to limit the height of
+your charts.}
 
 \item{format}{An optional vector of file formats to save as. For example
 \code{c("svg", "pdf")} will save 2 files with the same name to the same
@@ -59,15 +65,6 @@ and \code{res} to ensure the text is readable.}
     text and line widths.}
 
 \item{test}{For development use only.}
-
-\item{autoheight}{Automatically sets the graph height. Only works with vector
-graphics formats. Defaults to TRUE.}
-
-\item{start_h}{Numeric. Optionally, supply a starting height for the
-auto-height algorithm.}
-
-\item{dim_msg}{Logical. Set to TRUE if you want to know what dimensions the
-graph was saved to (defaults to FALSE).}
 }
 \value{
 Invisibly returns the file name.

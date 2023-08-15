@@ -38,7 +38,7 @@ update_labs <- function(plot, plot_width){
 
   sources <-
     stringr::str_extract(footnote_text, "(?<=Sources{0,1}\\:).*$") %>%
-    stringr:: str_split(";") %>%
+    stringr::str_split(";") %>%
     unlist() %>%
     stringr::str_squish()
 
@@ -57,7 +57,7 @@ update_labs <- function(plot, plot_width){
     dplyr::mutate(footnote_text = stringr::str_replace_all(footnote_text, "[\r\n]" , " "))
 
   # number footnotes and then split into words
-  footnote_data <- footnote_data %>% dplyr::mutate(footnote_num = row_number())
+  footnote_data <- footnote_data %>% dplyr::mutate(footnote_num = dplyr::row_number())
 
   # split into words to calculate line lengths
   text_lines <- list()

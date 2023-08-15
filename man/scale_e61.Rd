@@ -6,6 +6,7 @@
 \title{Colour and fill scales using colours from the e61 palette}
 \usage{
 scale_colour_e61(
+  n = 0,
   reverse = F,
   discrete = T,
   aesthetics = "colour",
