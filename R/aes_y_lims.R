@@ -1,14 +1,8 @@
-#' Get aesthetic y-axis limits and tick marks.
-#'
-#' These functions are used to produce aesthetic y-axis limits and tick spacing
-#'
+#' Get an aesthetic number near the one supplied.
 #' @param y_val Numeric. Number for which we are going
-#' @param type String. Are we looking for the next smallest or next largest
-#' aesthetic value.
+#' @param type String. Are we looking for the next smallest or next largest aesthetic value.
 #' @rdname e61_aes_limits
 #' @export
-
-# Get an aesthetic number for setting y-axis scaling defaults
 get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
 
   # set the adjustment factor based on whether we are looking at a value above or below 1
@@ -45,13 +39,11 @@ get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
   return(y_aes_adj * 10 ^ (order_mag - 2))
 }
 
-# Aesthetic tick s for a given pair of numbers
-
+# Aesthetic ticks for a given pair of numbers
 #' @param min_y_val Double. Minimum y-axis value.
 #' @param max_y_val Double. Maximum y-axis value.
 #' @rdname e61_aes_limits
 #' @export
-
 get_aes_ticks <- function(min_y_val, max_y_val){
 
   if(min_y_val == max_y_val) return(NULL)
@@ -186,7 +178,6 @@ get_aes_ticks <- function(min_y_val, max_y_val){
 #' @param y_val_2 Double. Maximum y-axis value.
 #' @rdname e61_aes_limits
 #' @export
-
 get_aes_pair <- function(y_val_1, y_val_2){
 
   # 1 - Start with the larger value - get an aesthic number for that one first
@@ -265,14 +256,11 @@ get_aes_pair <- function(y_val_1, y_val_2){
 }
 
 # Return aesthetic limits given a min and max y-axis values
-
 #' @param min_y_val Double. Minimum y-axis value.
 #' @param max_y_val Double. Maximum y-axis value.
-#' @param from_zero Logical. Should the limits start at zero or just below the
-#' minimum value?
+#' @param from_zero Logical. Should the limits start at zero or just below the minimum value?
 #' @rdname e61_aes_limits
 #' @export
-
 get_aes_limits <- function(min_y_val, max_y_val, from_zero = F){
 
   if(is.null(min_y_val) | is.null(max_y_val)){

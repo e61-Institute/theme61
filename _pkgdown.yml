@@ -39,6 +39,20 @@ reference:
   - e61_boxback
   - matches("^e61_(blue|coral|grey|maroon|orange|sky|teal)")
 
+- title: Aesthetic y-axis limits
+  contents:
+  - get_aes_num
+  - get_aes_ticks
+  - get_aes_pair
+  - get_aes_limits
+
+- title: Aesthetic labels
+  contents:
+  - update_labs
+  - get_lines
+  - get_text_width
+  - split_text_into_words
+
 navbar:
   structure:
     left: [home, standards, reference, articles, news]

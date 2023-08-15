@@ -13,6 +13,19 @@ XX XXX 2023
 * Add additional warning messages when inappropriately formatted y-axis labels are used.
 * Improvements to `mpanel_e61()` to better support multi-panel graphs with no titles.
 
+15 August 2023
+
+#### Automatic chart sizing, y-axis scaling, colour and fill scaling, sensible chart widths, y-axis title fixes.
+
+* Added automatic chart resizing functionality. This sets the chart height so there is no excess white space given the chart width. Note that this is only applied when chart is saved using `save_e61()`.
+* Added methods to automatically scale titles, subtitles and footnotes to eactly the panel width. This ensures that each exactly fits the width of the chart panel by taking into account the width of the panel (in cm) and the width of the text (in cm). Note this is only applied when chart is saved.
+* Added automatic y-axis scaling. This means that if you have a numeric y-axis the limits and breaks will be set to sensible, aesthetic defaults. Note this is only applied when the chart is saved. You can also override this automatic scaling by providing your own limits using `scale_y_continuous_e61()`.
+* Added sensible default chart widths that are different for micronotes, research notes and powerpoint presentations. These are based on the paragraph widths in each document and are chosen based on the `chart_type` argument supplied to `save_e61()`.
+* Added automatic colour and fill scaling. This means that your charts will use the e61 palette by default if you define a fill or colour variable in your main `ggplot` call (e.g. `ggplot(data, aes(x = x_var, y = y_var, fill = fill_var)))`). If you don't do this you can still take advantage of the new functionality when using `scale_fill_e61()` and `scale_colour_e61()` as you no longer need to state the number of colours you need (i.e. no more `n = 7`)
+* Added `theme61::ggplot()` which is a wrapper around ggplot that adds colour, fill and axis scaling by default. 
+* Fixed the adjustment of y-axis titles so they no longer overlap the chart panel or are too far away as the number of characters in y-axis labels changes. 
+* Minor changes to theme61 so that x-axis ticks no longer point in.
+
 #### Bug fixes
 
 * Fixed an issue where saving graphs with no title created whitespace above the plot.

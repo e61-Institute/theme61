@@ -37,26 +37,24 @@
 #'   \code{format} argument for details.
 #' @param plot Plot object to save. Defaults to the last plot displayed so
 #'   usually you do not need to provide this explicitly.
-#' @param width Plot width in cm. Defaults to 8.5.
-#' @param height Plot height in cm. The function will attempt to calculate an
-#'   appropriate height based on the labels you have provided, but this is
-#'   sensitive to small changes in the graph text so you should check if the
-#'   automatic value is aesthetically appropriate (no excess whitespace).
-#'   Otherwise, the function will default to a value of 9 but this is unlikely
-#'   to be appropriate.
+#' @param chart_type Type of chart. This is used to set sensible chart widths
+#'   based on the width of text in each document. Options include 'MN' (
+#'   for micronote charts), 'RN' (research notes), 'PPT' (powerpoints).
+#'   research note),'PPT
+#' @param width Plot width in cm. Defaults to NULL which means the width will
+#'   be set based on the chart type.
+#' @param height Plot height in cm. If you do not specify a height, the function
+#'   will calculate an appropriate height based on the labels you have provided.
+#' @param max_height The maximum height of your plot. This is used to constrain
+#'   the plot resizing algorithm in cases where you want to limit the height of
+#'   your charts.
 #' @param format An optional vector of file formats to save as. For example
 #'   \code{c("svg", "pdf")} will save 2 files with the same name to the same
 #'   location to SVG and PDF formats. If the file format is specified in
 #'   \code{filename}, then this argument is ignored.
-#' @param autoheight Automatically sets the graph height. Only works with vector
-#'   graphics formats. Defaults to TRUE.
-#' @param start_h Numeric. Optionally, supply a starting height for the
-#'   auto-height algorithm.
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
-#' @param dim_msg Logical. Set to TRUE if you want to know what dimensions the
-#'   graph was saved to (defaults to FALSE).
 #' @param resize Numeric. Only used when PNG is the file format. Resize the
 #'   graph width and height. You may also need to adjust the \code{pointsize}
 #'   and \code{res} to ensure the text is readable.
@@ -79,13 +77,6 @@ save_e61 <- function(filename,
                      res = 72,
                      test = !isTRUE(getOption("test_save"))
 ) {
-
-  # filename <- "C:/Users/JackBuckley/OneDrive - e61 Institute Ltd/Desktop/Test charts/test6_long_titles.svg"
-  # plot <- t1
-  # chart_type = "MN"
-  # width = NULL
-  # height = NULL
-  # max_height = NULL
 
   # Advisory messages -------------------------------------------------------
 
@@ -233,7 +224,7 @@ save_e61 <- function(filename,
       # get aesthetic limits for the y-axis - if it is a bar chart, then include zero
       aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
 
-      suppressWarnings(plot <- plot + scale_y_continuous_e61(limits = aes_lims))
+      suppressWarnings({plot <- plot + scale_y_continuous_e61(limits = aes_lims)})
     }
   }
 

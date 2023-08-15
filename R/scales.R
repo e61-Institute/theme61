@@ -25,7 +25,8 @@
 #'    scale_colour_e61() +
 #'    theme_e61()
 
-scale_colour_e61 <- function(reverse = F,
+scale_colour_e61 <- function(n = 0,
+                             reverse = F,
                              discrete = T,
                              aesthetics = "colour",
                              palette = c("light", "dark", "diverging", "grey"),

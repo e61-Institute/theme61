@@ -7,13 +7,12 @@
 save_e61(
   filename,
   plot = ggplot2::last_plot(),
+  chart_type = "MN",
   width = NULL,
   height = NULL,
+  max_height = NULL,
   format = c("svg", "pdf", "eps", "png"),
-  autoheight = TRUE,
-  start_h = NULL,
   save_data = FALSE,
-  dim_msg = FALSE,
   resize = NULL,
   pointsize = 12,
   res = 72,
@@ -43,18 +42,9 @@ to be appropriate.}
 location to SVG and PDF formats. If the file format is specified in
 \code{filename}, then this argument is ignored.}
 
-\item{autoheight}{Automatically sets the graph height. Only works with vector
-graphics formats. Defaults to TRUE.}
-
-\item{start_h}{Numeric. Optionally, supply a starting height for the
-auto-height algorithm.}
-
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph
 (defaults to FALSE).}
-
-\item{dim_msg}{Logical. Set to TRUE if you want to know what dimensions the
-graph was saved to (defaults to FALSE).}
 
 \item{resize}{Numeric. Only used when PNG is the file format. Resize the
 graph width and height. You may also need to adjust the \code{pointsize}
@@ -69,6 +59,15 @@ and \code{res} to ensure the text is readable.}
     text and line widths.}
 
 \item{test}{For development use only.}
+
+\item{autoheight}{Automatically sets the graph height. Only works with vector
+graphics formats. Defaults to TRUE.}
+
+\item{start_h}{Numeric. Optionally, supply a starting height for the
+auto-height algorithm.}
+
+\item{dim_msg}{Logical. Set to TRUE if you want to know what dimensions the
+graph was saved to (defaults to FALSE).}
 }
 \value{
 Invisibly returns the file name.

@@ -1,13 +1,8 @@
 #' Get aesthetic titles, subtitles and footnotes.
-#'
-#' These functions are used to produce aesthetic labels.
-#'
 #' @param plot Plot object to adjust.
 #' @param plot_width Numeric. Width of the plot.
 #' @rdname e61_aes_labs
 #' @export
-
-# get the current width of the title, subtitle and footnotes
 update_labs <- function(plot, plot_width){
 
   p <- ggplot2::ggplotGrob(plot)
