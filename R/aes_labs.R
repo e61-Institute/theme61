@@ -120,8 +120,10 @@ update_labs <- function(plot, plot_width){
 #' @export
 get_lines <- function(text, font_size, plot_width){
 
-  # add a little more width for aesthetic reasons
-  plot_width <- plot_width + 0.3
+  # add a little more width for aesthetic reasons - 1.1 for two or more digits y-axis, 1.075 for 1 digit
+  plot_width <- plot_width * 1.1
+  # plot_width <- plot_width * 1.1
+  # plot_width <- plot_width * 1.08
 
   # split text into words and calculate the length of each word
   words <- split_text_into_words(text)
@@ -159,7 +161,6 @@ get_lines <- function(text, font_size, plot_width){
 
   return(text_lines)
 }
-
 
 #' Calculate the width of text in ggplot titles, subtitles and footnotes
 #' @param text String. Text to be measured.

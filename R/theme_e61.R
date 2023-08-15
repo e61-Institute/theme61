@@ -42,8 +42,8 @@
 #'
 
 theme_e61 <- function(y_top = TRUE,
-                      adj = -12,
                       fix_left = 0,
+                      adj = 0,
                       legend = c("none", "bottom", "top", "left", "right"),
                       legend_title = FALSE,
                       aspect_ratio = 0.75,
@@ -106,7 +106,7 @@ theme_e61 <- function(y_top = TRUE,
       axis.ticks = element_line(colour = "black"),
       axis.ticks.y = element_blank(),
       axis.ticks.length = unit(half_line / 2, "pt"),
-      axis.ticks.length.x = unit(-1*half_line / 2, "pt"), # Puts ticks inside graph
+      axis.ticks.length.x = unit(half_line / 2, "pt"), # Puts ticks inside graph
       axis.ticks.length.x.top = NULL,
       axis.ticks.length.x.bottom = NULL,
       axis.ticks.length.y = NULL,
@@ -417,5 +417,4 @@ y_title_top <- function(adj, fix_left) {
     )
 
   return(ret)
-
 }

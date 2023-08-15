@@ -23,15 +23,19 @@ get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
   if(type == "next_smallest") aes_y_points <- aes_y_points %>% dplyr::mutate(points_diff = -1 * points_diff)
 
   if (y_val > 0) {
-    aes_y_points <- aes_y_points %>%
-      dplyr::filter(points_diff > 0) %>%
-      dplyr::mutate(points_diff == min(points_diff))
+    aes_y_points <- aes_y_points %>% dplyr::filter(points_diff > 0)
+
+    if(nrow(aes_y_points) != 0) {
+      aes_y_points <- aes_y_points %>% dplyr::filter(points_diff == min(points_diff))
+    }
 
   } else {
 
-    aes_y_points <- aes_y_points %>%
-      dplyr::filter(points_diff < 0) %>%
-      dplyr::mutate(points_diff == max(points_diff))
+    aes_y_points <- aes_y_points %>% dplyr::filter(points_diff < 0)
+
+    if(nrow(aes_y_points) != 0) {
+      aes_y_points <- aes_y_points %>% dplyr::filter(points_diff == max(points_diff))
+    }
   }
 
   # take the smallest value that is greater than 0
@@ -281,6 +285,23 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F){
     max_y_val <- temp
   }
 
+  # increase the size of each value to provide some buffer around the points
+  if(min_y_val > 0 & (min_y_val - (0.01 * abs(min_y_val))) < 0){
+
+    min_y_val <- 0
+
+  } else {
+    min_y_val <- min_y_val - (0.01 * abs(min_y_val))
+  }
+
+  if(max_y_val < 0 & (max_y_val + (0.01 * abs(max_y_val))) > 0){
+
+    max_y_val <- 0
+
+  } else {
+    max_y_val <- max_y_val + (0.01 * abs(max_y_val))
+  }
+
   # If they are the same, return a scale from 0 to the value
   if(min_y_val == max_y_val){
 
@@ -289,7 +310,14 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F){
   # if we want to scale from from_zero then only use one value for the limits
   } else if(from_zero){
 
-    if(min_y_val < 0){
+    if(min_y_val < 0 & max_y_val > 0){
+
+      limits <- get_aes_pair(min_y_val, max_y_val)
+
+      temp <- unlist(limits)
+      limits <- list(min(temp), max(temp))
+
+    } else if (min_y_val < 0){
       limits <- list(get_aes_num(min_y_val, type = "next_largest"), 0)
 
     } else {

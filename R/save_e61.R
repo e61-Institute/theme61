@@ -80,8 +80,12 @@ save_e61 <- function(filename,
                      test = !isTRUE(getOption("test_save"))
 ) {
 
-  # filename <- "C:/Users/JackBuckley/OneDrive - e61 Institute Ltd/Desktop/Test charts/test2_long_titles.svg"
-  # plot <- t2
+  # filename <- "C:/Users/JackBuckley/OneDrive - e61 Institute Ltd/Desktop/Test charts/test6_long_titles.svg"
+  # plot <- t1
+  # chart_type = "MN"
+  # width = NULL
+  # height = NULL
+  # max_height = NULL
 
   # Advisory messages -------------------------------------------------------
 
@@ -168,46 +172,73 @@ save_e61 <- function(filename,
 
   # Update y-axis limits ----------------------------------------------------
 
+  plot_build <- ggplot2::ggplot_build(plot)
+
   # Returns the order of the first scale function used - how do we determine this
   y_scale_lims <- ggplot2::layer_scales(plot)$y$limits
 
   # If no y-axis scale has been built
   if(is.null(y_scale_lims)){
 
-    max_y <- ggplot2::ggplot_build(plot)$data[[1]]$y %>% max()
-    min_y <- ggplot2::ggplot_build(plot)$data[[1]]$y %>% min()
+    # get the minimum and maximum y-axis values
+    min_y <- 0
+    max_y <- 0
+    chart_data <- ggplot2::ggplot_build(plot)$data
 
-    # Check whether the chart is a column chart
-    geoms <- plot$layers
+    for(i in seq_along(chart_data)){
 
-    check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
+      y_data <- chart_data[[i]]$y
 
-    is_bar <- F
+      # skip if not numeric
+      if(!is.numeric(y_data)) next
 
-    for(i in seq_along(geoms)){
+      temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
+      temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
 
-      g <- geoms[[i]]
-
-      class <- class(g$geom)
-
-      if(any(class %in% check_geoms)){
-
-        is_bar <- T
-
-        break
-      }
+      if(is.finite(min_y) & temp_min_y < min_y) min_y <- temp_min_y
+      if(is.finite(max_y) & temp_max_y > max_y) max_y <- temp_max_y
     }
 
-    # get aesthetic limits for the y-axis - if it is a bar chart, then include zero
-    aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
+    # save whether the y-variable is numeric or not
+    if(min_y == max_y & max_y == 0) {
 
-    plot <- plot + scale_y_continuous_e61(limits = aes_lims)
+      y_numeric <- F
+
+    } else {
+
+      y_numeric <- T
+    }
+
+    if(y_numeric){
+
+      # Check whether the chart is a column chart
+      geoms <- plot$layers
+
+      check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
+
+      is_bar <- F
+
+      for (i in seq_along(geoms)) {
+        g <- geoms[[i]]
+
+        class <- class(g$geom)
+
+        if (any(class %in% check_geoms)) {
+          is_bar <- T
+
+          break
+        }
+      }
+
+      # get aesthetic limits for the y-axis - if it is a bar chart, then include zero
+      aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
+
+      suppressWarnings(plot <- plot + scale_y_continuous_e61(limits = aes_lims))
+    }
   }
 
 
-  # Get the number of panel rows and columns --------------------------------
-
-  plot_build <- ggplot2::ggplot_build(plot)
+  # Get the number of panel rows and columns ------------------------------
 
   # Check if the graph was generated with mpanel_e61 by checking for attributes added to mpanels
   if(!is.null(attr(plot, "panel_rows"))){
@@ -215,13 +246,13 @@ save_e61 <- function(filename,
     n_panel_cols = attr(plot, "panel_cols")
     n_panel_rows = attr(plot, "panel_rows")
 
-    # Get facet dimensions if applicable
+  # Get facet dimensions if applicable
   } else if (length(plot$facet$params) != 0) {
 
     n_panel_cols <- max(plot_build$layout$layout$COL)
     n_panel_rows <- max(plot_build$layout$layout$ROW)
 
-    # The default is just 1 row and 1 column - i.e. no facets or mpanel plots have been used
+  # The default is just 1 row and 1 column - i.e. no facets or mpanel plots have been used
   } else {
     n_panel_cols <- 1
     n_panel_rows <- 1
@@ -238,18 +269,47 @@ save_e61 <- function(filename,
 
       width <- max_width
 
-    # if it's only one panel, set the chart width to 2/3 of the max-width
+    # If it's only one panel, set the chart width to 2/3 of the max-width
     } else if(n_panel_cols == 1){
 
       width <- 2/3 * max_width
 
-    # else use the whole width
+    # Else use the whole width
     } else {
       width <- max_width
     }
   }
 
-  # update the size of the text used for titles, footnotes, axes etc.
+
+  # Update labels -----------------------------------------------------------
+
+  # calculate the number of significant figures to adjust the y-axis labels if necessary
+  if(y_numeric){
+
+    sig_fig_max_y <- str_extract(max_y, "^[^\\.]*") %>% nchar()
+    sig_fig_min_y <- str_extract(min_y, "^[^\\.]*") %>% nchar()
+
+    if(is.na(sig_fig_max_y)) sig_fig_max_y <- 0
+    if(is.na(sig_fig_min_y)) sig_fig_min_y <- 0
+
+    # Update the theme adjustment
+    sig_fig <- max(c(sig_fig_max_y, sig_fig_min_y), na.rm = T)
+
+    if(sig_fig == 1){
+      adj <- -5
+
+    } else if(sig_fig >= 2){
+      adj <- -5 + -5 * (sig_fig - 1)
+    }
+
+    plot <- plot +
+      ggplot2::theme(
+        axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 5, r = adj), vjust = 1, angle = 0),
+        axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = adj, r = 5), vjust = 1, angle = 0)
+      )
+  }
+
+  # Update the size of the text used for titles, footnotes, axes etc.
   p <- ggplotGrob(plot)
 
   # allow charts to be the width of the panels
@@ -259,35 +319,50 @@ save_e61 <- function(filename,
   plot <- update_labs(plot = plot, plot_width = tot_panel_width)
 
 
-  # Height adjustments ------------------------------------------------------
+  # Height adjustments ----------------------------------------------------
 
-  # Step 1 - Get the amount of free height and width we have to play with (what is not already used up by the set elements)
-  p <- ggplotGrob(plot)
+  if(is.null(height)){
 
-  units <- "cm"
+    # Step 1 - Get the amount of free height and width we have to play with (what is not already used up by the set elements)
+    p <- ggplotGrob(plot)
 
-  known_ht <- sum(grid::convertHeight(p$heights, units, valueOnly = TRUE))
-  known_wd <- sum(grid::convertWidth(p$widths, units, valueOnly = TRUE))
+    units <- "cm"
 
-  # calculate the free width and height we have to play with
-  free_ht <- if(!is.null(max_height)) max_height - known_ht else 100 - known_ht
-  free_wd <- width - known_wd
+    known_ht <- sum(grid::convertHeight(p$heights, units, valueOnly = TRUE))
+    known_wd <- sum(grid::convertWidth(p$widths, units, valueOnly = TRUE))
 
-  # Step 2 - Find the number of panels (these have null rows and heights because they are flexible)
-  null_rowhts <- as.numeric(p$heights[grid::unitType(p$heights) == "null"])
-  null_colwds <- as.numeric(p$widths[grid::unitType(p$widths) == "null"])
-  panel_asps <- (
-    matrix(null_rowhts, ncol = 1)
-    %*% matrix(1 / null_colwds, nrow = 1))
+    # calculate the free width and height we have to play with
+    free_ht <- if(!is.null(max_height)) {
+      max_height - known_ht
 
-  # check that aspect ratios are consistent
-  # stop("Panel aspect ratios must be consistent")
+    } else {
+      100 - known_ht
+    }
 
-  # Step 3 - Divide the free width by the number of columns (panels) we have
-  panel_width <- free_wd / n_panel_cols # width of each panel
-  panel_height <- panel_width * max(panel_asps[1,]) # height of each panel (width * aspect ratio)
+    free_wd <- width - known_wd
 
-  height <- known_ht + panel_height * n_panel_rows
+    # Step 2 - Find the number of panels (these have null rows and heights because they are flexible)
+    null_rowhts <- as.numeric(p$heights[grid::unitType(p$heights) == "null"])
+    null_colwds <- as.numeric(p$widths[grid::unitType(p$widths) == "null"])
+    panel_asps <- (
+      matrix(null_rowhts, ncol = 1)
+      %*% matrix(1 / null_colwds, nrow = 1))
+
+    # check that aspect ratios are consistent
+    # stop("Panel aspect ratios must be consistent")
+
+    # Step 3 - Divide the free width by the number of columns (panels) we have
+    panel_width <- free_wd / n_panel_cols # width of each panel
+    panel_height <- panel_width * max(panel_asps[1,]) # height of each panel (width * aspect ratio)
+
+    # Step 4 - Work out the best height of the plot
+
+    # Variable to adjust scale the total plot height as the estimated height grows - there seems to be a small amount of error in the above calculation
+    size_adj <- 1.05
+
+    # calculate height taking into account the various adjustments
+    height <- known_ht * size_adj + panel_height * n_panel_rows
+  }
 
 
   # Save ------------------------------------------------------------------

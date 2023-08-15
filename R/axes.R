@@ -92,8 +92,8 @@ scale_y_continuous_e61 <- function(limits = NULL,
 #' @export
 
 scale_x_continuous_e61 <- function(limits = NULL,
-                                   expand_left = 0,
-                                   expand_right = 0,
+                                   expand_left = 0.025,
+                                   expand_right = 0.025,
                                    hide_first_last = TRUE,
                                    ...) {
 
