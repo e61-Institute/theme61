@@ -1,11 +1,11 @@
-# theme61 0.5.1
+# theme61 0.6.0
 
 XX XXX 2023
 
 #### New/changed functionality
 
 * Added console messages that tell you when common graphing mistakes have been made and how to correct them when you save a graph using `save_e61()`.
-* Significantly improved the ability of `save_e61()` to automatically select the correct `height` when saving graphs. In most circumstances you should no longer need to set your own `height` argument.
+* Significantly improved the ability of `save_e61()` to automatically select the correct `height` when saving graphs. In most circumstances you should no longer need to set your own `height` argument (see below).
 * Changed default font of graphs to 'PT Sans' to be consistent with research note font.
 * Allow rotation of labels in `mplot_label()`.
 * Renamed `add_zeroline()` to `add_baseline()` because you can now add a line at a place other than `y = 0`.
@@ -13,18 +13,16 @@ XX XXX 2023
 * Add additional warning messages when inappropriately formatted y-axis labels are used.
 * Improvements to `mpanel_e61()` to better support multi-panel graphs with no titles.
 
-15 August 2023
+##### Automatic graph sizing, y-axis scaling, colour and fill scaling, sensible graph widths, y-axis title fixes.
 
-#### Automatic chart sizing, y-axis scaling, colour and fill scaling, sensible chart widths, y-axis title fixes.
-
-* Added automatic chart resizing functionality. This sets the chart height so there is no excess white space given the chart width. Note that this is only applied when chart is saved using `save_e61()`.
-* Added methods to automatically scale titles, subtitles and footnotes to eactly the panel width. This ensures that each exactly fits the width of the chart panel by taking into account the width of the panel (in cm) and the width of the text (in cm). Note this is only applied when chart is saved.
-* Added automatic y-axis scaling. This means that if you have a numeric y-axis the limits and breaks will be set to sensible, aesthetic defaults. Note this is only applied when the chart is saved. You can also override this automatic scaling by providing your own limits using `scale_y_continuous_e61()`.
-* Added sensible default chart widths that are different for micronotes, research notes and powerpoint presentations. These are based on the paragraph widths in each document and are chosen based on the `chart_type` argument supplied to `save_e61()`.
-* Added automatic colour and fill scaling. This means that your charts will use the e61 palette by default if you define a fill or colour variable in your main `ggplot` call (e.g. `ggplot(data, aes(x = x_var, y = y_var, fill = fill_var)))`). If you don't do this you can still take advantage of the new functionality when using `scale_fill_e61()` and `scale_colour_e61()` as you no longer need to state the number of colours you need (i.e. no more `n = 7`)
-* Added `theme61::ggplot()` which is a wrapper around ggplot that adds colour, fill and axis scaling by default. 
-* Fixed the adjustment of y-axis titles so they no longer overlap the chart panel or are too far away as the number of characters in y-axis labels changes. 
-* Minor changes to theme61 so that x-axis ticks no longer point in.
+* Added automatic graph resizing functionality. This sets the graph height so there is no excess white space given the graph width. Note that this is only applied when graph is saved using `save_e61()`.
+* Added methods to automatically scale titles, subtitles and footnotes to exactly the panel width. This ensures that each exactly fits the width of the graph panel by taking into account the width of the panel (in cm) and the width of the text (in cm). Note this is only applied when graph is saved.
+* Added automatic y-axis scaling. This means that if you have a numeric y-axis the limits and breaks will be set to sensible, aesthetic defaults. Note this is only applied when the graph is saved. You can also override this automatic scaling by providing your own limits using `scale_y_continuous_e61()`.
+* Added sensible default graph widths that are different for micro notes, research notes and PowerPoint presentations. These are based on the paragraph widths in each document and are chosen based on the `graph_type` argument supplied to `save_e61()`.
+* Added automatic colour and fill scaling. This means that your graphs will use the e61 palette by default if you define a fill or colour variable in your main `ggplot` call (e.g. `ggplot(data, aes(x = x_var, y = y_var, fill = fill_var)))`). If you don't do this you can still take advantage of the new functionality when using `scale_fill_e61()` and `scale_colour_e61()` as you no longer need to state the number of colours you need (i.e. no more `n = 7`)
+* Added `theme61::ggplot()` which is a wrapper around `ggplot` that adds colour, fill and axis scaling by default. 
+* Fixed the adjustment of y-axis titles so they no longer overlap the graph panel or are too far away as the number of characters in y-axis labels changes. 
+* Minor changes to default x-axis tickmarks.
 
 #### Bug fixes
 
@@ -93,7 +91,7 @@ XX XXX 2023
 
 09 Mar 2023
 
-* Add new function `format_flip_bar_charts()` that applies most of the formatting needed to make horizontal bar graphs pretty.
+* Add new function `format_flip_bar_graphs()` that applies most of the formatting needed to make horizontal bar graphs pretty.
 * Add new functions `plot_label()` and `mplot_label()` that make it easier to add on-graph plot labels. `mplot_label()` is the vectorised version that lets you do multiple labels in one function.
 * Add new function `add_zeroline()` to add an appropriately formatted black line along the zero y-axis.
 * New functionality in `scale_y_continuous_e61()` to specify break intervals directly in the `limits` argument.
@@ -122,7 +120,7 @@ XX XXX 2023
 * Improvements to the automatic discrete colour palette selection.
 * Changes to the theme to fix graphs at a 0.75 aspect ratio.
 * Added an alternate minimal theme called `theme_e61_clean()`.
-* New add-in that creates charts based on `esquisse`.
+* New add-in that creates graphs based on `esquisse`.
 * Updated `save_e61()` to allow you to save plots other than the most recently generated one.
 * Many functions have been renamed to more closely align with existing ggplot2 function names, with `_e61` appended to them, for example `e61_colour_manual` now becomes `scale_colour_e61`. The old functions have now been deprecated and will be made defunct in future versions. Please stop using them and use the new functions instead.
 
