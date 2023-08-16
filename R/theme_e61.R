@@ -25,8 +25,8 @@
 #' @param background Character. Default is "white". For graphs used in research
 #'   note boxes, set the colour to e61_skylight8.
 #' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
-#' @param base_size Numeric. Chart font size. Default is 10.
-#' @param base_family Character. Chart font family. Default is Arial.
+#' @param base_size Numeric. Graph font size. Default is 10.
+#' @param base_family Character. Graph font family. Default is Arial.
 #' @param base_line_size Numeric. Default line width.
 #' @param base_rect_size Numeric. Default rect width.
 #'
@@ -267,8 +267,8 @@ theme_e61 <- function(y_top = TRUE,
 
 #' e61 themed graph options in an alternative style
 #'
-#' @param base_size Numeric. Chart font size. Default is 12.
-#' @param base_family Character. Chart font family. Default is Arial.
+#' @param base_size Numeric. Graph font size. Default is 12.
+#' @param base_family Character. Graph font family. Default is Arial.
 #'
 #' @return ggplot2 object
 #' @import ggplot2 ggthemes

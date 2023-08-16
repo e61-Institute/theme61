@@ -37,17 +37,17 @@
 #'   \code{format} argument for details.
 #' @param plot Plot object to save. Defaults to the last plot displayed so
 #'   usually you do not need to provide this explicitly.
-#' @param chart_type Type of chart. This is used to set sensible chart widths
-#'   based on the width of text in each document. Options include 'MN' (
-#'   for micronote charts), 'RN' (research notes), 'PPT' (powerpoints).
-#'   research note),'PPT
-#' @param width Plot width in cm. Defaults to NULL which means the width will
-#'   be set based on the chart type.
+#' @param graph_type Type of graph. This is used to set sensible graph widths
+#'   based on the width of text in each document. Options include 'MN' ( for
+#'   micronote graphs), 'RN' (research notes), 'PPT' (powerpoints). research
+#'   note),'PPT
+#' @param width Plot width in cm. Defaults to NULL which means the width will be
+#'   set based on the graph type.
 #' @param height Plot height in cm. If you do not specify a height, the function
 #'   will calculate an appropriate height based on the labels you have provided.
 #' @param max_height The maximum height of your plot. This is used to constrain
 #'   the plot resizing algorithm in cases where you want to limit the height of
-#'   your charts.
+#'   your graphs.
 #' @param format An optional vector of file formats to save as. For example
 #'   \code{c("svg", "pdf")} will save 2 files with the same name to the same
 #'   location to SVG and PDF formats. If the file format is specified in
@@ -66,10 +66,10 @@
 
 save_e61 <- function(filename,
                      plot = ggplot2::last_plot(),
-                     chart_type = "MN",
-                     width = NULL, # manual control over the width of the chart
-                     height = NULL, # manual control over the height of the chart
-                     max_height = NULL, # manual control over the maximum height of the chart
+                     graph_type = "MN",
+                     width = NULL, # manual control over the width of the graph
+                     height = NULL, # manual control over the height of the graph
+                     max_height = NULL, # manual control over the maximum height of the graph
                      format = c("svg", "pdf", "eps", "png"),
                      save_data = FALSE,
                      resize = NULL,
@@ -136,28 +136,28 @@ save_e61 <- function(filename,
 
   # Set maximum width based on output type ----------------------------------
 
-  if(is.null(chart_type)) chart_type <- "MN"
+  if(is.null(graph_type)) graph_type <- "MN"
 
   # Set the maximum width based on the type of outputs
-  if(chart_type == "MN"){
+  if(graph_type == "MN"){
 
     max_width <- 18.59 # based on 215.9mm page width and 15mm margins either side
 
-  } else if(chart_type == "RN"){
+  } else if(graph_type == "RN"){
 
     max_width <- 13.985 # based on 338.7mm page width, 20mm margins, 15mm column sep and 2 columns (i.e. divide the remainder by 2)
 
-  } else if(chart_type == "PPT"){
+  } else if(graph_type == "PPT"){
 
     max_height <- 13.25
     max_width <- 31.32
 
-  } else if(is.null(chart_type)){
+  } else if(is.null(graph_type)){
 
     max_width <- 20
 
   } else {
-    stop("Invalid chart type. Please select from one of the following: 'MN' for micronotes, 'RN' for research notes, 'PPT' for powerpoint slides, or leave blank to use default maximum widths")
+    stop("Invalid graph type. Please select from one of the following: 'MN' for micronotes, 'RN' for research notes, 'PPT' for powerpoint slides, or leave blank to use default maximum widths")
   }
 
 
@@ -174,17 +174,17 @@ save_e61 <- function(filename,
     # get the minimum and maximum y-axis values
     min_y <- 0
     max_y <- 0
-    chart_data <- ggplot2::ggplot_build(plot)$data
+    graph_data <- ggplot2::ggplot_build(plot)$data
 
-    for(i in seq_along(chart_data)){
+    for(i in seq_along(graph_data)){
 
-      y_data <- chart_data[[i]]$y
+      y_data <- graph_data[[i]]$y
 
       # skip if not numeric
       if(!is.numeric(y_data)) next
 
-      temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
-      temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
+      temp_max_y <- graph_data[[i]]$y %>% max(na.rm = T)
+      temp_min_y <- graph_data[[i]]$y %>% min(na.rm = T)
 
       if(is.finite(min_y) & temp_min_y < min_y) min_y <- temp_min_y
       if(is.finite(max_y) & temp_max_y > max_y) max_y <- temp_max_y
@@ -202,7 +202,7 @@ save_e61 <- function(filename,
 
     if(y_numeric){
 
-      # Check whether the chart is a column chart
+      # Check whether the graph is a column graph
       geoms <- plot$layers
 
       check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
@@ -221,7 +221,7 @@ save_e61 <- function(filename,
         }
       }
 
-      # get aesthetic limits for the y-axis - if it is a bar chart, then include zero
+      # get aesthetic limits for the y-axis - if it is a bar graph, then include zero
       aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
 
       suppressWarnings({plot <- plot + scale_y_continuous_e61(limits = aes_lims)})
@@ -260,7 +260,7 @@ save_e61 <- function(filename,
 
       width <- max_width
 
-    # If it's only one panel, set the chart width to 2/3 of the max-width
+    # If it's only one panel, set the graph width to 2/3 of the max-width
     } else if(n_panel_cols == 1){
 
       width <- 2/3 * max_width
@@ -303,7 +303,7 @@ save_e61 <- function(filename,
   # Update the size of the text used for titles, footnotes, axes etc.
   p <- ggplotGrob(plot)
 
-  # allow charts to be the width of the panels
+  # allow graphs to be the width of the panels
   known_wd <- sum(grid::convertWidth(p$widths, "cm", valueOnly = TRUE))
   tot_panel_width <- width - known_wd
 
