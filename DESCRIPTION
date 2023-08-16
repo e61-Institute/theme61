@@ -7,7 +7,7 @@ Authors@R: c(
     person("Elyse", "Dwyer", email = "elyse.dwyer@e61.in", role = c("aut")),
     person("Jack", "Buckley", email = "jack.buckley@e61.in", role = c("aut")))
 Description: Provides functions and colour palettes to allow users to create
-    ggplot2 charts that conform to the e61 Institute style and colours.
+    ggplot2 graphs that conform to the e61 Institute style and colours.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -23,7 +23,7 @@ Imports:
     grDevices (>= 4.2.2),
     grid (>= 4.2.2),
     gridExtra (>= 2.3),
-    graphics (>= 4.3.1),
+    graphics (>= 4.2.2),
     here (>= 1.0.1),
     lifecycle (>= 1.0.3),
     magick (>= 2.7.3),
