@@ -9,6 +9,7 @@ XX XXX 2023
 * Changed default font of graphs to 'PT Sans' to be consistent with research note font.
 * Allow rotation of labels in `mplot_label()`.
 * Renamed `add_zeroline()` to `add_baseline()` because you can now add a line at a place other than `y = 0`.
+* Renamed `e61_palette()` to `palette_e61()` for consistency with other functions suffixed `_e61`.
 * Added alias for `plot_label()` (`plab()`) and `mplot_label()` (`mplab()`) to let you type slightly less code when making graphs.
 * Add additional warning messages when inappropriately formatted y-axis labels are used.
 * Improvements to `mpanel_e61()` to better support multi-panel graphs with no titles.

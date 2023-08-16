@@ -45,9 +45,9 @@ values.}
 \item{background}{Character. Default is "white". For graphs used in research
 note boxes, set the colour to e61_skylight8.}
 
-\item{base_size}{Numeric. Chart font size. Default is 10.}
+\item{base_size}{Numeric. Graph font size. Default is 10.}
 
-\item{base_family}{Character. Chart font family. Default is Arial.}
+\item{base_family}{Character. Graph font family. Default is Arial.}
 
 \item{base_line_size}{Numeric. Default line width.}
 
