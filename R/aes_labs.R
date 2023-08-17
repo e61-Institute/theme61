@@ -1,11 +1,8 @@
 #' Get aesthetic titles, subtitles and footnotes.
-#' @param plot Plot object to adjust.
-#' @param plot_width Numeric. Width of the plot.
-#' @rdname e61_aes_labs
-#' @export
+#' plot - Plot object to adjust.
+#' plot_width - Numeric. Width of the plot.
+#' @noRd
 update_labs <- function(plot, is_mpanel, plot_width){
-
-  plot_width <- tot_panel_width
 
   p <- ggplot2::ggplotGrob(plot)
 
@@ -43,7 +40,6 @@ update_labs <- function(plot, is_mpanel, plot_width){
       )
   }
 
-
   # Footnotes ----
 
   footnote_grob <- p$grobs[[which(p$layout$name == "caption")]]
@@ -77,12 +73,11 @@ update_labs <- function(plot, is_mpanel, plot_width){
 }
 
 #' Format text based on font size, text type and plot width
-#' @param text The text to be rescaled (adding line breaks in the right places etc.)
-#' @param text_type Is the text for a title, subtitle or caption (footnotes and sources)
-#' @param font_size Numeric. Size of the font of the text.
-#' @param plot_width Numeric. Width of the plot.
-#' @rdname e61_aes_labs
-#' @export
+#' text - The text to be rescaled (adding line breaks in the right places etc.)
+#' text_type - Is the text for a title, subtitle or caption (footnotes and sources)
+#' font_size - Numeric. Size of the font of the text.
+#' plot_width - Numeric. Width of the plot.
+#' @noRd
 rescale_text <- function(text, text_type, font_size, plot_width){
 
   # one rule for titles and subtitles
@@ -162,15 +157,13 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 }
 
 #' Calculate break text up into aesthetically sized lines
-#' @param text String. Text to be measured.
-#' @param font_size Numeric. Size of the font of the text.
-#' @param plot_width Numeric. Width of the plot.
-#' @rdname e61_aes_labs
-#' @export
+#' text - String. Text to be measured.
+#' font_size - Numeric. Size of the font of the text.
+#' plot_width - Numeric. Width of the plot.
+#' @noRd
 get_lines <- function(text, font_size, plot_width){
 
-  # add a little more width for aesthetic reasons
-  plot_width <- plot_width * 1.1
+  plot_width <- plot_width * 1.075
 
   # split text into words and calculate the length of each word
   words <- split_text_into_words(text)
@@ -210,10 +203,9 @@ get_lines <- function(text, font_size, plot_width){
 }
 
 #' Calculate the width of text in ggplot titles, subtitles and footnotes
-#' @param text String. Text to be measured.
-#' @param font_size Numeric. Size of the font of the text.
-#' @rdname e61_aes_labs
-#' @export
+#' text - String. Text to be measured.
+#' font_size - Numeric. Size of the font of the text.
+#' @noRd
 get_text_width <- function(text, font_size = 10) {
 
   R.devices::devEval("nulldev", {
@@ -225,10 +217,9 @@ get_text_width <- function(text, font_size = 10) {
 }
 
 #' Calculate the height of text in ggplot titles, subtitles and footnotes
-#' @param text String. Text to be measured.
-#' @param font_size Numeric. Size of the font of the text.
-#' @rdname e61_aes_labs
-#' @export
+#' text - String. Text to be measured.
+#' font_size - Numeric. Size of the font of the text.
+#' @noRd
 get_text_height <- function(text, font_size = 10) {
 
   R.devices::devEval("nulldev", {
@@ -240,18 +231,16 @@ get_text_height <- function(text, font_size = 10) {
 }
 
 #' Split a character string into it's individual words
-#' @param text Text to be split into individual words.
-#' @rdname e61_aes_labs
-#' @export
+#' text - Text to be split into individual words.
+#' @noRd
 split_text_into_words <- function(text) {
   words <- strsplit(text, "\\s+")[[1]]
   data.frame(word = words, text = text, stringsAsFactors = FALSE)
 }
 
 #' Update y-axis label spacing so that they are aesthetic
-#' @param plot Plot object to adjust.
-#' @rdname e61_aes_labs
-#' @export
+#' plot - Plot object to adjust.
+#' @noRd
 update_y_axis_labels <- function(plot){
 
   # get the minimum and maximum y-axis values

@@ -1,60 +1,45 @@
-#' Create a multi-panel graph with e61 formatting
+#' Save a multi-panel graph with e61 formatting
 #'
-#' @description Wrapper around \link[cowplot]{plot_grid} and \code{labs_e61} to
-#'   create multi-panel graphs with appropriate title and footer formatting.
+#' @description Create multi-panel graphs in the e61 style.
 #'
-#'   This function is designed for creating 2x2 panel graphs, although it should
-#'   work for any arrangement of panels (e.g. 2x1, 3x2, etc.). Your mileage may
+#'   This function is designed for creating 2x2 and 2x1 panel graphs, although it
+#'   also work for any arrangement of panels (3x2 etc.). Your mileage may
 #'   vary.
-#'
-#'   When saving multi-panel graphs using \code{save_e61()} you will need to
-#'   change (increase) the width and height arguments to reflect the larger size
-#'   of multi-panel graphs.
-#'
-#' @details \strong{Read this if your titles and stuff are getting cut off.}
-#'
-#'   The function tries to be smart when setting the values for
-#'   \code{rel_heights}, but it can be incorrect due to differences in the
-#'   amount of text in each component.
-#'
-#'   The way \code{mpanel_e61} works is that the title, subtitle, graph panels
-#'   and footers are all separate components that are then put together after
-#'   they have been independently generated. The purpose of \code{rel_heights}
-#'   is to specify what proportion of the final plot each of these components
-#'   require. As a result, if the values are too small for a given component,
-#'   part of it will get visually cut off.
-#'
-#'   The function tries to increase the amount of space given to a component if,
-#'   for example, your title has two lines, or you write a really long footnote
-#'   that spans many lines of text. But this is an inexact science. In all
-#'   likelihood, you will need to specify your own values, which why this
-#'   paragraph of text tries to explain the underlying function so you aren't
-#'   just blindly inputting numbers.
-#'
-#'   The default values for \code{rel_heights} for a 1-line title, 1-line
-#'   subtitle, 1-line footnote and 1-line sources list is \code{c(0.05, 0.05, 1,
-#'   0.1)}. If you only have a title and footnotes/sources then only 3 values
-#'   are needed: \code{c(0.05, 1, 0.1)}.
-#'
-#'   These values are all relative ratios, meaning, in the second example, the
-#'   title gets \eqn{\frac{0.05}{1.15}}, or around 4 per cent of the total graph
-#'   height. This means that if your graph panels are really tall (e.g. you make
-#'   a 3x2 multi-panel), you will need to reduce the share of the space
-#'   allocated to the titles or you will have extra whitespace (I think? Haven't
-#'   actually tested this).
 #'
 #' @param ... Plot objects to put on the panel.
 #' @inheritParams labs_e61
 #' @inheritParams cowplot::plot_grid
+#' @param filename File name to create on disk. Providing the file format
+#'   extension (e.g. .svg) is optional. The file extension must be lowercase. If
+#'   you want to save multiple files with different formats, see the
+#'   \code{format} argument for details.
+#' @param plotlist List of plots to combine as an mpanel and save. You can also
+#'   enter the charts individually as arguments to the function.
+#' @param chart_type Type of chart. This is used to set sensible chart widths
+#'   based on the width of text in each document. Options include 'MN' (
+#'   for micronote charts), 'RN' (research notes), 'PPT' (powerpoints).
+#'   research note),'PPT
+#' @param auto_scale Logical. Should the y-axis be scaled automatically. Default is TRUE.
+#' @param width Plot width in cm. Defaults to NULL which means the width will
+#'   be set based on the chart type. Use if you want to increase the width of
+#'   the chart.
+#' @param height Plot height in cm. If you do not specify a height, the function
+#'   will calculate an appropriate height based on the information you have provided.
+#' @param max_height The maximum height of your plot. This is used to constrain
+#'   the plot resizing algorithm in cases where you want to limit the height of
+#'   your charts.
+#' @param format An optional vector of file formats to save as. For example
+#'   \code{c("svg", "pdf")} will save 2 files with the same name to the same
+#'   location to SVG and PDF formats. If the file format is specified in
+#'   \code{filename}, then this argument is ignored.
 #' @param title_adj Rescales the size of the title text to be slightly larger
 #'   than the titles of the subplots (default is 1.1). 2 doubles the font size.
+#' @param title_spacing_adj Rescales the size of the space give to the mpanel
+#'   title. Use if you think the title looks too cramped on the chart.
+#' @param subtitle_spacing_adj Rescales the size of the space give to the mpanel
+#'   subtitle. Use if you think the subtitle looks too cramped on the chart.
 #' @param rel_heights A numeric vector giving the relative proportions of each
-#'   graph component (title, plots, footer (optional)). See the Details for more
-#'   detail.
-#' @param auto_scale Logical. Should the y-axis be scaled manually. Default is TRUE.
-#' @param show_height Logical. Prints a message showing the \code{rel_heights}
-#'   used when producing the graph. Mostly used for testing. Defaults to FALSE.
-#'
+#'   graph component (title, plots, footer (optional)).
 #' @return ggplot2 object
 #' @export
 #' @examples
@@ -83,6 +68,8 @@ save_mpanel_e61 <-
            max_height = NULL, # manual control over the maximum height of the chart
            auto_scale = TRUE,
            title_adj = 1.1,
+           title_spacing_adj = 1, # adjust the amount of space given to the title
+           subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
            ncol = 2,
            nrow = NULL,
            align = c("v", "none", "h", "hv"),
@@ -152,7 +139,7 @@ save_mpanel_e61 <-
 
       temp_plot <- plots[[i]]
 
-      temp_plot <- suppressWarnings({
+      temp_plot <- suppressMessages({
         update_chart_scales(temp_plot, auto_scale = auto_scale)
       })
 
@@ -188,7 +175,7 @@ save_mpanel_e61 <-
 
       # if one of the y-variables is numeric, adjust the y-axis scale
       if(y_var_class == "numeric"){
-        suppressWarnings({temp_plot <- update_y_axis_labels(temp_plot)})
+        suppressMessages({temp_plot <- update_y_axis_labels(temp_plot)})
       }
 
       # save the plot
@@ -305,7 +292,7 @@ save_mpanel_e61 <-
     # title
     if(!is.null(title)){
 
-      mpanel_title <-
+      title <-
         rescale_text(
           text = title,
           text_type = "title",
@@ -316,7 +303,7 @@ save_mpanel_e61 <-
       lab_head$title <-
         cowplot::ggdraw() +
         cowplot::draw_label(
-          mpanel_title,
+          title,
           fontface = "bold",
           x = 0.5,
           hjust = 0.5,
@@ -326,7 +313,7 @@ save_mpanel_e61 <-
 
     # subtitle
     if(!is.null(subtitle)){
-      mpanel_subtitle <-
+      subtitle <-
         rescale_text(
           text = subtitle,
           text_type = "subtitle",
@@ -337,7 +324,7 @@ save_mpanel_e61 <-
       lab_head$subtitle <-
         cowplot::ggdraw() +
         cowplot::draw_label(
-          mpanel_subtitle,
+          subtitle,
           fontface = "plain",
           x = 0.5,
           hjust = 0.5,
@@ -365,10 +352,12 @@ save_mpanel_e61 <-
 
       lab_foot$footer <-
         cowplot::ggdraw() +
-        cowplot::draw_label(caption,
-                            x = 0,
-                            hjust = 0,
-                            size = 9) +
+        cowplot::draw_label(
+          caption,
+          x = 0,
+          hjust = 0,
+          size = 9
+        ) +
         ggplot2::theme(plot.margin = margin(0, 0, 0, 3))
     }
 
@@ -397,7 +386,7 @@ save_mpanel_e61 <-
     }
 
     if(nrow == 1) {
-      size_adj <- 1.1
+      size_adj <- 1.05
 
     } else if(nrow == 2) {
       size_adj <- 0.9
@@ -407,10 +396,10 @@ save_mpanel_e61 <-
     }
 
     # Space for title if required
-    t_h <- get_text_height(text = title, font_size = 11.5 * title_adj)
+    t_h <- get_text_height(text = title, font_size = 11.5 * title_adj) * 2 * title_spacing_adj
 
     # Space for subtitle if required
-    s_h <- get_text_height(text = subtitle, font_size = 10 * title_adj)
+    s_h <- get_text_height(text = subtitle, font_size = 10 * title_adj) * 1.5 * subtitle_spacing_adj
 
     # Adjust the footer height depending on how much text there is
     f_h <- get_text_height(text = caption, font_size = 9)
@@ -452,6 +441,74 @@ save_mpanel_e61 <-
     })
 }
 
+#' Create a multi-panel graph with e61 formatting
+#'
+#' @description Wrapper around \link[cowplot]{plot_grid} and \code{labs_e61} to
+#'   create multi-panel graphs with appropriate title and footer formatting.
+#'
+#'   This function is designed for creating 2x2 panel graphs, although it should
+#'   work for any arrangement of panels (e.g. 2x1, 3x2, etc.). Your mileage may
+#'   vary.
+#'
+#'   When saving multi-panel graphs make sure you use \code{save_mpanel_e61}.
+#'
+#' @details \strong{Read this if your titles and stuff are getting cut off.}
+#'
+#'   The function tries to be smart when setting the values for
+#'   \code{rel_heights}, but it can be incorrect due to differences in the
+#'   amount of text in each component.
+#'
+#'   The way \code{mpanel_e61} works is that the title, subtitle, graph panels
+#'   and footers are all separate components that are then put together after
+#'   they have been independently generated. The purpose of \code{rel_heights}
+#'   is to specify what proportion of the final plot each of these components
+#'   require. As a result, if the values are too small for a given component,
+#'   part of it will get visually cut off.
+#'
+#'   The function tries to increase the amount of space given to a component if,
+#'   for example, your title has two lines, or you write a really long footnote
+#'   that spans many lines of text. But this is an inexact science. In all
+#'   likelihood, you will need to specify your own values, which why this
+#'   paragraph of text tries to explain the underlying function so you aren't
+#'   just blindly inputting numbers.
+#'
+#'   The default values for \code{rel_heights} for a 1-line title, 1-line
+#'   subtitle, 1-line footnote and 1-line sources list is \code{c(0.05, 0.05, 1,
+#'   0.1)}. If you only have a title and footnotes/sources then only 3 values
+#'   are needed: \code{c(0.05, 1, 0.1)}.
+#'
+#'   These values are all relative ratios, meaning, in the second example, the
+#'   title gets \eqn{\frac{0.05}{1.15}}, or around 4 per cent of the total graph
+#'   height. This means that if your graph panels are really tall (e.g. you make
+#'   a 3x2 multi-panel), you will need to reduce the share of the space
+#'   allocated to the titles or you will have extra whitespace (I think? Haven't
+#'   actually tested this).
+#'
+#' @param ... Plot objects to put on the panel.
+#' @inheritParams labs_e61
+#' @inheritParams cowplot::plot_grid
+#' @param title_adj Rescales the size of the title text to be slightly larger
+#'   than the titles of the subplots (default is 1.1). 2 doubles the font size.
+#' @param rel_heights A numeric vector giving the relative proportions of each
+#'   graph component (title, plots, footer (optional)). See the Details for more
+#'   detail.
+#' @param auto_scale Logical. Should the y-axis of the charts be scaled manually. Default is TRUE.
+#' @param show_height Logical. Prints a message showing the \code{rel_heights}
+#'   used when producing the graph. Mostly used for testing. Defaults to FALSE.
+#'
+#' @return ggplot2 object
+#' @export
+#' @examples
+#'  gg <- ggplot2::ggplot() +
+#'    labs_e61(title = "Figure", y = "%") +
+#'    scale_y_continuous_e61(limits = c(0, 10, 2.5)) +
+#'    theme_e61()
+#'
+#'  mpanel_e61(gg, gg, gg, gg,
+#'    title = "Multi-panel graph title",
+#'    subtitle = "Graph subtitle",
+#'    footnotes = c("Footnote 1", "Footnote 2"),
+#'    sources = c("Source 1", "Source 2"))
 mpanel_e61 <-
   function(...,
            plotlist = NULL,

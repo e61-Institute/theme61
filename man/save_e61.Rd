@@ -34,7 +34,7 @@ based on the width of text in each document. Options include 'MN' (
 for micronote charts), 'RN' (research notes), 'PPT' (powerpoints).
 research note),'PPT}
 
-\item{auto_scale}{Logical. Should the y-axis be scaled manually. Default is TRUE.}
+\item{auto_scale}{Logical. Should the y-axis be scaled automatically. Default is TRUE.}
 
 \item{width}{Plot width in cm. Defaults to NULL which means the width will
 be set based on the chart type.}

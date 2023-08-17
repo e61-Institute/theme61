@@ -290,31 +290,19 @@ g1 <-
     y = "$b"
   )
 
-# g2 <- 
-#   ggplot(data_dual, aes(x = year)) + 
-#   geom_line(aes(y = `Food and Tobacco`), colour = e61_palette(2)[[1]]) +
-#   geom_line(aes(y = sec_rescale_inv(`Personal Care`, scale = 0.1)), 
-#             colour = e61_palette(2)[[2]]) +
-#   scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b",
-#                          sec_axis = sec_axis(~sec_rescale(.), name = "$b"), 
-#                          rescale_sec = TRUE) +
-#   mplot_label(c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
-#               c(1945, 1948),
-#               c(75, 40)) +
-#   labs_e61(
-#     title = "Selected Aggregates"
-#   )
-
-g2 <-
-  ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
-  geom_col(position = "dodge") +
-  mplot_label(c("1940", "1960"),
-              c(1.55, 2.05),
-              c(15, 50)) +
-  labs_e61(
-    title = "1940 to 1960 Change", 
-    y = "$b"
-  )
+g2 <- ggplot(data_dual, aes(x = year)) +
+    geom_line(aes(y = `Food and Tobacco`), colour = e61_palette(2)[[1]]) +
+    geom_line(aes(y = `Personal Care`), colour = e61_palette(2)[[2]]) +
+    scale_y_continuous_e61(
+      limits = c(0, 100, 25),
+      name = "$b"
+    ) +
+  mplot_label(
+    c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
+    c(1945, 1955),
+    c(75, 15)
+  ) +
+  labs_e61(title = "Selected Aggregates")
 
 g3 <-
   ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
@@ -345,16 +333,15 @@ g4 <-
 
 Then we use the `mpanel_e61()` function to put the graphs together.
 
-```{r}
+```{r, echo=FALSE}
 gg <-
-  mpanel_e61(
+  save_mpanel_e61(
     g1, g2, g3, g4,
+    filename = here::here("man/figures/g-multi.svg"),
     title = "US Personal Expenditures*",
     footnotes = "Data comes from the built-in USPersonalExpenditure dataset. Data comes from the built-in USPersonalExpenditure dataset. Data comes from the built-in USPersonalExpenditure dataset. Data comes from the built-in USPersonalExpenditure dataset. Data comes from the built-in USPersonalExpenditure dataset. Data comes from the built-in USPersonalExpenditure dataset.",
     sources = c("e61 Institute", "'datasets' package")
 )
-
-save_e61(filename = here::here("man/figures/g-multi.svg"))
 ```
 
 ```{r, echo=FALSE}
@@ -370,9 +357,7 @@ gg <-
   ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
   geom_col(position = "dodge") +
   coord_flip() +
-  theme_e61() +
-  scale_fill_e61(2) +
-  scale_y_continuous_e61(limits = c(0, 90, 30)) +
+  # scale_y_continuous_e61(limits = c(0, 90, 30)) +
   mplot_label(c("1940", "1960"),
               c(1.8, 2.2),
               c(15, 50)) +
@@ -397,9 +382,6 @@ Notice that `save_e61()` set the default dimensions for flipped graphs reasonabl
 gg <- 
   ggplot(data_3, aes(x = year, y = value, colour = category)) + 
   geom_line() +
-  theme_e61() +
-  scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b") +
-  scale_colour_e61(3) +
   mplot_label(c("Food and\nTobacco", "Household\nOperation", "Medical and\nHealth"),
               c(1944, 1954, 1953),
               c(65, 55, 25)) +
@@ -407,7 +389,8 @@ gg <-
     title = "US Personal Expenditures*",
     subtitle = "1940-1960",
     footnotes = "Data comes from the built-in USPersonalExpenditure dataset.",
-    sources = c("e61 Institute", "'datasets' package")
+    sources = c("e61 Institute", "'datasets' package"),
+    y = "$b"
   )
 save_e61(here::here("man/figures/g-post.svg"))
 ```

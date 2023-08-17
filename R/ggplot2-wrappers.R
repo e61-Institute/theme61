@@ -32,13 +32,18 @@ ggplot <-
     }
   }
 
-  fill_var_name <- ggplot2::quo_name(mapping$x)
-
-  # add the e61 colour palette
+  # scale fill variables
   if(!is.null(mapping$fill)){
 
     fill_var_name <- ggplot2::quo_name(mapping$fill)
-    fill_var_class <- data[[fill_var_name]] %>% class()
+
+    if(is.null(data[[fill_var_name]]) & stringr::str_detect(fill_var_name, "^factor\\(")){
+
+      fill_var_class <- "factor"
+
+    } else {
+      fill_var_class <- data[[fill_var_name]] %>% class()
+    }
 
     if(fill_var_class == "numeric"){
       p <- p + scale_fill_e61(discrete = F)
@@ -49,10 +54,18 @@ ggplot <-
     }
   }
 
+  # scale colours
   if(!is.null(mapping$colour)){
 
     colour_var_name <- ggplot2::quo_name(mapping$colour)
-    colour_var_class <- data[[colour_var_name]] %>% class()
+
+    if(is.null(data[[colour_var_name]]) & stringr::str_detect(colour_var_name, "^factor\\(")){
+
+      colour_var_class <- "factor"
+
+    } else {
+      colour_var_class <- data[[colour_var_name]] %>% class()
+    }
 
     if(colour_var_class == "numeric"){
       p <- p + scale_colour_e61(discrete = F)

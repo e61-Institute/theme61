@@ -1,8 +1,7 @@
 #' Get the known width of the plot
-#' @param plot The plot to find the heigh for
-#' @param is_mpanel Logical. Is the plot an mpanel chart.
-#' @rdname e61_aes_labs
-#' @export
+#' plot The plot to find the heigh for
+#' is_mpanel Logical. Is the plot an mpanel chart.
+#' @noRd
 get_known_width <- function(plot, is_mpanel){
   if(is_mpanel){
 
@@ -18,10 +17,9 @@ get_known_width <- function(plot, is_mpanel){
 }
 
 #' Get the known height of the plot
-#' @param plot The plot to find the heigh for.
-#' @param is_mpanel Logical. Is the plot an mpanel chart.
-#' @rdname e61_aes_labs
-#' @export
+#' plot The plot to find the heigh for.
+#' is_mpanel Logical. Is the plot an mpanel chart.
+#' @noRd
 get_known_height <- function(plot, is_mpanel){
 
   if(is_mpanel){

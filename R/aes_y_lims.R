@@ -1,8 +1,7 @@
 #' Given a ggplot object, update the y-axis scales
-#' @param plot ggplot object. This is the plot whose scales we want to update.
-#' @param auto_scale ggplot object. This is the plot whose scales we want to update.
-#' @rdname e61_aes_limits
-#' @export
+#' plot - ggplot object. This is the plot whose scales we want to update.
+#' auto_scale - ggplot object. This is the plot whose scales we want to update.
+#' @noRd
 update_chart_scales <- function(plot, auto_scale){
 
   # Returns the order of the first scale function used - how do we determine this
@@ -61,10 +60,9 @@ update_chart_scales <- function(plot, auto_scale){
 }
 
 #' Get an aesthetic number near the one supplied.
-#' @param y_val Numeric. Number for which we are going
-#' @param type String. Are we looking for the next smallest or next largest aesthetic value.
-#' @rdname e61_aes_limits
-#' @export
+#' y_val - Numeric. Number for which we are going
+#' type - String. Are we looking for the next smallest or next largest aesthetic value.
+#' @noRd
 get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
 
   # set the adjustment factor based on whether we are looking at a value above or below 1
@@ -102,10 +100,9 @@ get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
 }
 
 # Aesthetic ticks for a given pair of numbers
-#' @param min_y_val Double. Minimum y-axis value.
-#' @param max_y_val Double. Maximum y-axis value.
-#' @rdname e61_aes_limits
-#' @export
+#' min_y_val - Double. Minimum y-axis value.
+#' max_y_val - Double. Maximum y-axis value.
+#' @noRd
 get_aes_ticks <- function(min_y_val, max_y_val){
 
   if(min_y_val == max_y_val) return(NULL)
@@ -236,10 +233,9 @@ get_aes_ticks <- function(min_y_val, max_y_val){
 }
 
 # Return aesthetic number pairs for a given pair of y-axis numbers
-#' @param y_val_1 Double. Minimum y-axis value.
-#' @param y_val_2 Double. Maximum y-axis value.
-#' @rdname e61_aes_limits
-#' @export
+#' y_val_1 - Double. Minimum y-axis value.
+#' y_val_2 - Double. Maximum y-axis value.
+#' @noRd
 get_aes_pair <- function(y_val_1, y_val_2){
 
   # 1 - Start with the larger value - get an aesthic number for that one first
@@ -318,11 +314,10 @@ get_aes_pair <- function(y_val_1, y_val_2){
 }
 
 # Return aesthetic limits given a min and max y-axis values
-#' @param min_y_val Double. Minimum y-axis value.
-#' @param max_y_val Double. Maximum y-axis value.
-#' @param from_zero Logical. Should the limits start at zero or just below the minimum value?
-#' @rdname e61_aes_limits
-#' @export
+#' min_y_val - Double. Minimum y-axis value.
+#' max_y_val - Double. Maximum y-axis value.
+#' from_zero - Logical. Should the limits start at zero or just below the minimum value?
+#' @noRd
 get_aes_limits <- function(min_y_val, max_y_val, from_zero = F){
 
   if(is.null(min_y_val) | is.null(max_y_val)){

@@ -16,6 +16,7 @@ reference:
   - format_flipped_bar
   - mpanel_e61
   - save_e61
+  - save_mpanel_e61
   - square_legend_symbols
   - theme_e61
   - theme_e61_clean
@@ -38,20 +39,6 @@ reference:
   - e61_aus_colours
   - e61_boxback
   - matches("^e61_(blue|coral|grey|maroon|orange|sky|teal)")
-
-- title: Aesthetic y-axis limits
-  contents:
-  - get_aes_num
-  - get_aes_ticks
-  - get_aes_pair
-  - get_aes_limits
-
-- title: Aesthetic labels
-  contents:
-  - update_labs
-  - get_lines
-  - get_text_width
-  - split_text_into_words
 
 navbar:
   structure:

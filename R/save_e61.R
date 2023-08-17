@@ -41,7 +41,7 @@
 #'   based on the width of text in each document. Options include 'MN' (
 #'   for micronote charts), 'RN' (research notes), 'PPT' (powerpoints).
 #'   research note),'PPT
-#' @param auto_scale Logical. Should the y-axis be scaled manually. Default is TRUE.
+#' @param auto_scale Logical. Should the y-axis be scaled automatically. Default is TRUE.
 #' @param width Plot width in cm. Defaults to NULL which means the width will
 #'   be set based on the chart type.
 #' @param height Plot height in cm. If you do not specify a height, the function
@@ -219,7 +219,7 @@ save_e61 <- function(filename,
 
     # if the y-variable class is numeric, then update the chart scales
     if(y_var_class == "numeric"){
-      plot <- update_chart_scales(plot, auto_scale)
+      plot <- suppressMessages({update_chart_scales(plot, auto_scale)})
     }
   }
 
@@ -279,6 +279,8 @@ save_e61 <- function(filename,
   }
 
   # Update the size of the text used for titles, footnotes, axes etc.
+
+  p <- ggplot2::ggplotGrob(plot)
 
   # allow charts to be the width of the panels
   known_wd <- get_known_width(plot, is_mpanel)
