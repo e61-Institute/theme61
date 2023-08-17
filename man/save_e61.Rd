@@ -8,6 +8,7 @@ save_e61(
   filename,
   plot = ggplot2::last_plot(),
   chart_type = "MN",
+  auto_scale = TRUE,
   width = NULL,
   height = NULL,
   max_height = NULL,
@@ -32,6 +33,8 @@ usually you do not need to provide this explicitly.}
 based on the width of text in each document. Options include 'MN' (
 for micronote charts), 'RN' (research notes), 'PPT' (powerpoints).
 research note),'PPT}
+
+\item{auto_scale}{Logical. Should the y-axis be scaled manually. Default is TRUE.}
 
 \item{width}{Plot width in cm. Defaults to NULL which means the width will
 be set based on the chart type.}

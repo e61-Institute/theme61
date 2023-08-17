@@ -11,12 +11,11 @@ col_pal <- lapply(c("e61_bluedark", "e61_bluelight", "e61_tealdark", "e61_tealli
 col_pal <- rev(col_pal)
 col_pal <- unlist(col_pal)
 
-ggplot(inputs, aes(x = col, y = row, fill = value)) +
+p <- ggplot(inputs, aes(x = col, y = row, fill = value)) +
   geom_tile() +
   coord_fixed() +
   scale_fill_manual(values = col_pal) +
   scale_x_continuous_e61(n.breaks = 9) +
-  theme_e61() +
   labs_e61(title = "The e61 Institute Colour Palette", y = NULL)
 
 save_e61(here::here("man/figures/g-palette-colours.svg"), height = 6)

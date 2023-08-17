@@ -41,6 +41,7 @@
 #'   based on the width of text in each document. Options include 'MN' (
 #'   for micronote charts), 'RN' (research notes), 'PPT' (powerpoints).
 #'   research note),'PPT
+#' @param auto_scale Logical. Should the y-axis be scaled manually. Default is TRUE.
 #' @param width Plot width in cm. Defaults to NULL which means the width will
 #'   be set based on the chart type.
 #' @param height Plot height in cm. If you do not specify a height, the function
@@ -67,6 +68,7 @@
 save_e61 <- function(filename,
                      plot = ggplot2::last_plot(),
                      chart_type = "MN",
+                     auto_scale = TRUE, # manual control over whether y-axis is scaled
                      width = NULL, # manual control over the width of the chart
                      height = NULL, # manual control over the height of the chart
                      max_height = NULL, # manual control over the maximum height of the chart
@@ -160,71 +162,64 @@ save_e61 <- function(filename,
     stop("Invalid chart type. Please select from one of the following: 'MN' for micronotes, 'RN' for research notes, 'PPT' for powerpoint slides, or leave blank to use default maximum widths")
   }
 
+  plot_build <- ggplot2::ggplot_build(plot)
+
 
   # Update y-axis limits ----------------------------------------------------
 
-  plot_build <- ggplot2::ggplot_build(plot)
+  # check whether the plot is an mpanel plot or a regular plot
+  if(is.null(attr(plot, "plot_type"))){
+    is_mpanel <- FALSE
 
-  # Returns the order of the first scale function used - how do we determine this
-  y_scale_lims <- ggplot2::layer_scales(plot)$y$limits
+  } else if(attr(plot, "plot_type") == "mpanel"){
+    is_mpanel <- TRUE
 
-  # If no y-axis scale has been built
-  if(is.null(y_scale_lims)){
+  } else {
+    is_mpanel <- FALSE
+  }
 
-    # get the minimum and maximum y-axis values
-    min_y <- 0
-    max_y <- 0
-    chart_data <- ggplot2::ggplot_build(plot)$data
+  # update the chart scales if this is an auto_scaled chart
+  if(!is_mpanel) {
 
-    for(i in seq_along(chart_data)){
+    # check if the y-var is numeric
+    y_var_name <- ggplot2::quo_name(plot$mapping$y)
+    y_var_class <- plot$data[[y_var_name]] %>% class()
 
-      y_data <- chart_data[[i]]$y
+    if (y_var_name == "NULL") {
+      layers <- plot$layers
 
-      # skip if not numeric
-      if(!is.numeric(y_data)) next
+      for (j in seq_along(layers)) {
+        # don't get y-aesthetic for geom_text objects
+        layer_type <- layers[[j]]$geom %>% class()
 
-      temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
-      temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
+        if ("GeomText" %in% layer_type) next
 
-      if(is.finite(min_y) & temp_min_y < min_y) min_y <- temp_min_y
-      if(is.finite(max_y) & temp_max_y > max_y) max_y <- temp_max_y
-    }
+        # otherwise get the y-variable name and type
+        y_var_name <- ggplot2::quo_name(layers[[j]]$mapping$y)
 
-    # save whether the y-variable is numeric or not
-    if(min_y == max_y & max_y == 0) {
+        if (y_var_name == "NULL") next
 
-      y_numeric <- F
+        y_var_class <- plot$data[[y_var_name]] %>% class()
 
-    } else {
-
-      y_numeric <- T
-    }
-
-    if(y_numeric){
-
-      # Check whether the chart is a column chart
-      geoms <- plot$layers
-
-      check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
-
-      is_bar <- F
-
-      for (i in seq_along(geoms)) {
-        g <- geoms[[i]]
-
-        class <- class(g$geom)
-
-        if (any(class %in% check_geoms)) {
-          is_bar <- T
-
-          break
-        }
+        # if we found one numeric class, break because that all we need
+        if(y_var_class == "numeric") break
       }
 
-      # get aesthetic limits for the y-axis - if it is a bar chart, then include zero
-      aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
+    } else {
+      y_var_class <- plot$data[[y_var_name]] %>% class()
+    }
 
-      suppressWarnings({plot <- plot + scale_y_continuous_e61(limits = aes_lims)})
+    # if the y-variable name is not in the dataset, throw an error and force the user to actually create it properly
+    data_names <- names(plot$data)
+
+    # TODO - fix this issue if possible
+    if(!y_var_name %in% data_names) {
+      stop("Unable to determine y-axis variable. Please make sure it is a variable name in your dataset and you are not altering it within ggplot (e.g. you cannot do things like the following 'ggplot(data, aes(x = x_var, y = log(y_var))'")
+    }
+
+    # if the y-variable class is numeric, then update the chart scales
+    if(y_var_class == "numeric"){
+      plot <- update_chart_scales(plot, auto_scale)
     }
   }
 
@@ -274,40 +269,22 @@ save_e61 <- function(filename,
 
   # Update labels -----------------------------------------------------------
 
-  # calculate the number of significant figures to adjust the y-axis labels if necessary
-  if(y_numeric){
+  # update y-axis labels if the chart is not an mpanel chart
+  if (!is_mpanel) {
 
-    sig_fig_max_y <- str_extract(max_y, "^[^\\.]*") %>% nchar()
-    sig_fig_min_y <- str_extract(min_y, "^[^\\.]*") %>% nchar()
-
-    if(is.na(sig_fig_max_y)) sig_fig_max_y <- 0
-    if(is.na(sig_fig_min_y)) sig_fig_min_y <- 0
-
-    # Update the theme adjustment
-    sig_fig <- max(c(sig_fig_max_y, sig_fig_min_y), na.rm = T)
-
-    if(sig_fig == 1){
-      adj <- -5
-
-    } else if(sig_fig >= 2){
-      adj <- -5 + -5 * (sig_fig - 1)
+    # if one of the y-variables is numeric, adjust the y-axis scale
+    if (y_var_class == "numeric") {
+      plot <- update_y_axis_labels(plot)
     }
-
-    plot <- plot +
-      ggplot2::theme(
-        axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 5, r = adj), vjust = 1, angle = 0),
-        axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = adj, r = 5), vjust = 1, angle = 0)
-      )
   }
 
   # Update the size of the text used for titles, footnotes, axes etc.
-  p <- ggplotGrob(plot)
 
   # allow charts to be the width of the panels
-  known_wd <- sum(grid::convertWidth(p$widths, "cm", valueOnly = TRUE))
+  known_wd <- get_known_width(plot, is_mpanel)
   tot_panel_width <- width - known_wd
 
-  plot <- update_labs(plot = plot, plot_width = tot_panel_width)
+  plot <- update_labs(plot = plot, is_mpanel = is_mpanel, plot_width = tot_panel_width)
 
 
   # Height adjustments ----------------------------------------------------
@@ -315,12 +292,10 @@ save_e61 <- function(filename,
   if(is.null(height)){
 
     # Step 1 - Get the amount of free height and width we have to play with (what is not already used up by the set elements)
-    p <- ggplotGrob(plot)
+    p <- ggplot2::ggplotGrob(plot)
 
-    units <- "cm"
-
-    known_ht <- sum(grid::convertHeight(p$heights, units, valueOnly = TRUE))
-    known_wd <- sum(grid::convertWidth(p$widths, units, valueOnly = TRUE))
+    known_ht <- get_known_height(plot, is_mpanel)
+    known_wd <- get_known_width(plot, is_mpanel)
 
     # calculate the free width and height we have to play with
     free_ht <- if(!is.null(max_height)) {
@@ -459,22 +434,4 @@ unset_open_graph <- function() {
 #' @noRd
 n_count <- function(text) {
   nchar(text) - nchar(gsub("\n", "", text, fixed = TRUE))
-}
-
-#' Helper function used in save_e61() to automatically determine the graph
-#' height
-#'
-#' @param plot ggplot2 object
-#' @param mpanel Logical. Whether the graph was generated using
-#'   \code{mpanel_e61()} or not.
-#' @param width Graph width as supplied to \code{save_e61()}.
-#' @param height Graph height as supplied to \code{save_e61()}.
-#' @param incr The increment in cm to iterate the graph heights by.
-#' @return The height of the graph.
-#' @noRd
-auto_height_finder <- function(plot, mpanel, width, height, incr = 0.2) {
-
-
-
-
 }

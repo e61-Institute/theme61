@@ -5,6 +5,7 @@
 \alias{get_lines}
 \alias{get_text_width}
 \alias{split_text_into_words}
+\alias{update_y_axis_labels}
 \title{Get aesthetic titles, subtitles and footnotes.}
 \usage{
 update_labs(plot, plot_width)
@@ -14,6 +15,8 @@ get_lines(text, font_size, plot_width)
 get_text_width(text, font_size = 10)
 
 split_text_into_words(text)
+
+update_y_axis_labels(plot)
 }
 \arguments{
 \item{plot}{Plot object to adjust.}
@@ -32,4 +35,6 @@ Calculate break text up into aesthetically sized lines
 Calculate the width of text in ggplot titles, subtitles and footnotes
 
 Split a character string into it's individual words
+
+Update y-axis label spacing so that they are aesthetic
 }

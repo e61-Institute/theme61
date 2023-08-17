@@ -70,7 +70,7 @@ Then:
 We're going to turn a default ggplot2 graph into one that is correctly formatted in the e61 Institute style using the package features.
 
 ```{r}
-gg <- ggplot(data_3, aes(x = year, y = value, colour = category)) + 
+gg <- ggplot2::ggplot(data_3, aes(x = year, y = value, colour = category)) + 
   geom_line() + theme(legend.position = "bottom")
 ```
 
@@ -81,25 +81,24 @@ knitr::include_graphics(here::here("man/figures/g-prev.svg"))
 
 ## Applying the e61 theme to the graph {#theme}
 
-Most of the theming is done by the `theme_e61()` function. Simply add this to your plot and (if needed) set some arguments.
+Most of the theming is done by the `theme_e61()` function. This is included automatically in `theme61::ggplot()`.
 
 `theme_e61()` deliberately steers you away from long y-axis titles. The information required to interpret the graph should be contained in the title or subtitle.
 
 ```{r}
 gg <- 
   ggplot(data, aes(x = year, y = value, colour = category)) + 
-  geom_line() +
-  theme_e61()
+  geom_line()
 ```
 
 ```{r, echo=FALSE}
-save_e61(here::here("man/figures/g-start.svg"), height = 6.8)
+save_e61(here::here("man/figures/g-start.svg"))
 knitr::include_graphics(here::here("man/figures/g-start.svg"))
 ```
 
 ### The theme61 colour palette
 
-`theme61` comes with a comprehensive colour palette that you can use in your colour and fill scales. The colour palette is built into the `theme61` colour and fill functions (`scale_colour_e61()` and `scale_fill_e61()`).
+`theme61` comes with a comprehensive colour palette that you can use in your colour and fill scales. are automatically added when you use `theme61::ggplot()` and add either a fill or colour aesthetic variable. The colour palette also comes with colour and fill functions (`scale_colour_e61()` and `scale_fill_e61()`) if you want to add them to other plots or you do not define your colour and fill variables in the main `ggplot` call (e.g. if you were to define them within an `aes` call in `geom_line()`).
 
 In case you want to customise the chosen colours, all of the valid colours in the e61 colour palette are stored as named objects in the package, they can be accessed by name (see [here](https://e61-institute.github.io/theme61/reference/index.html#colours) for the full list of names). The colour name can be deduced from the position in the colour palette image below.
 
@@ -114,28 +113,24 @@ knitr::include_graphics(here::here("man/figures/g-palette-colours.svg"))
 
 ## Formatting graph colours {#colours}
 
-`scale_colour_e61()` and `scale_fill_e61()` provide access to the e61 colour palette.
-
-Generally you just need to specify how many colours are needed as an argument.
+`scale_colour_e61()` and `scale_fill_e61()` are automatically added when you use `theme61::ggplot()` and add either a fill or colour aesthetic variable.
 
 `e61_palette()` gives you manual access to the colour hex codes.
 
 ```{r}
 gg <- 
   ggplot(data, aes(x = year, y = value, colour = category)) + 
-  geom_line() +
-  theme_e61() +
-  scale_colour_e61(5)
+  geom_line()
 ```
 
 ```{r, echo=FALSE}
-save_e61(here::here("man/figures/g-colours.svg"), height = 6.8)
+save_e61(here::here("man/figures/g-colours.svg"))
 knitr::include_graphics(here::here("man/figures/g-colours.svg"))
 ```
 
 ## Formatting axis scales {#scales}
 
-`scale_y_continuous_e61()` is the preferred axis scale function for graphs. It duplicates the axis by default and allows you to specify the axis limits in the `limits` argument to ensure good aesthetics. You should manually specify the limits rather than relying on the defaults as they are likely to be a bit unaesthetic.
+`scale_y_continuous_e61()` is the preferred axis scale function for graphs. It duplicates the axis by default and allows you to specify the axis limits in the `limits` argument if you do not like the defaults applied in `save_e61()`.
 
 ### Axes labelling
 
@@ -143,7 +138,7 @@ As Greg's prime graph directive states, the title and subtitle of your graph sho
 
 Thus, there should be enough information in the title that your y-axis label does not need to repeat what the data are. Consequentially, the y-axis labels in `theme61` are designed to have space for short labels of 1-5 characters.
 
-The package also defaults to showing no x-axis. This is because the x-axis is usually very obvious. For example, if the x-axis is "2010, 2011, 2012, ...", then it is obviously a time series in years, which would be a waste of space to label. Save the x-axis labels for when the x-axis actually requires explanation.
+The package also defaults to showing no x-axis title. This is because the x-axis is usually very obvious. For example, if the x-axis is "2010, 2011, 2012, ...", then it is obviously a time series in years, which would be a waste of space to label. Save the x-axis labels for when the x-axis actually requires explanation.
 
 Some examples of y-axis labels:
 
@@ -154,13 +149,11 @@ Some examples of y-axis labels:
 gg <- 
   ggplot(data, aes(x = year, y = value, colour = category)) + 
   geom_line() +
-  theme_e61() +
-  scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b") +
-  scale_colour_e61(5)
+  labs_e61(y = "$b")
 ```
 
 ```{r, echo=FALSE}
-save_e61(here::here("man/figures/g-axis.svg"), height = 6.8)
+save_e61(here::here("man/figures/g-axis.svg"))
 knitr::include_graphics(here::here("man/figures/g-axis.svg"))
 ```
 
@@ -178,16 +171,16 @@ Graph labels put the label on the graph directly, near the data point that is be
 gg <- 
   ggplot(data_3, aes(x = year, y = value, colour = category)) + 
   geom_line() +
-  theme_e61() +
-  scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b") +
-  scale_colour_e61(3) +
-  mplot_label(c("Food and\nTobacco", "Household\nOperation", "Medical and\nHealth"),
-              c(1944, 1954, 1953),
-              c(65, 55, 25))
+  labs_e61(y = "$b") +
+  mplot_label(
+    c("Food and\nTobacco", "Household\nOperation", "Medical and\nHealth"),
+    c(1944, 1954, 1953),
+    c(65, 55, 25)
+  )
 ```
 
 ```{r, echo=FALSE}
-save_e61(here::here("man/figures/g-labels.svg"), height = 6.8)
+save_e61(here::here("man/figures/g-labels.svg"))
 knitr::include_graphics(here::here("man/figures/g-labels.svg"))
 ```
 
@@ -199,85 +192,32 @@ When adding titles, subtitles, captions and sources, use `labs_e61()`. Text is a
 gg <- 
   ggplot(data_3, aes(x = year, y = value, colour = category)) + 
   geom_line() +
-  theme_e61() +
-  scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b") +
-  scale_colour_e61(3) +
   mplot_label(c("Food and\nTobacco", "Household\nOperation", "Medical and\nHealth"),
               c(1944, 1954, 1953),
               c(65, 55, 25)) +
   labs_e61(
     title = "US Personal Expenditures*",
     subtitle = "1940-1960",
+    y = "$b",
     footnotes = "Data comes from the built-in 'USPersonalExpenditure' dataset.",
     sources = c("e61 Institute", "'datasets' package")
   )
 ```
 
 ```{r, echo=FALSE}
-save_e61(here::here("man/figures/g-titles.svg"), height = 8.3)
+save_e61(here::here("man/figures/g-titles.svg"))
 knitr::include_graphics(here::here("man/figures/g-titles.svg"))
 ```
 
 ## Saving graphs {#save}
 
-Use `save_e61()` when saving graphs at e61. `save_e61()` ensures that the relative size of your graph elements and text is appropriate by setting sensible defaults on the graph dimensions.
+Make sure you use `save_e61()` when saving graphs at e61. `save_e61()` ensures that the relative size of your graph elements and text is appropriate. It will also apply sensible limits and scales to your y-axis if you have not already added your own custom limits.
 
 You should save your graphs using a vector graphics format (SVG or PDF). SVGs are a modern vector graphics format, which is the highly recommended format because you can resize them to any size without pixelation. If you are making graphs for LaTeX documents, you will need to save the graphs in PDF format for them to render as LaTeX does not support SVGs. If for some reason you need to use a raster format, the package provides limited support for PNGs, although some customisation features may be unavailable.
 
-You do not need to supply the ggplot object when using `save_e61()` as it automatically saves the last-created graph. *However*, if you are saving a multi-panel graph and want the automatic width and height adjustment to work, you *do* need to supply the graph object as an argument, i.e. do this: `save_e61("filename.svg", graph_object)` rather than `save_e61("filename.svg")`.
+You do not need to supply the ggplot object when using `save_e61()` as it automatically saves the last-created graph.
 
 The `save_data` argument also lets you save a `.csv` file with the data used to create a graph.
-
-### Proper height selection when saving graphs
-
-Here I have made a graph with a pink background to show you the issues with height selection when saving graphs.
-
-```{r}
-gg <- 
-  ggplot(data_3, aes(x = year, y = value, colour = category)) + 
-  geom_line() +
-  theme_e61() +
-  scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b") +
-  scale_colour_e61(3) +
-  mplot_label(c("Food and\nTobacco", "Household\nOperation", "Medical and\nHealth"),
-              c(1944, 1954, 1953),
-              c(65, 55, 25)) +
-  labs_e61(
-    title = "US Personal Expenditures*",
-    subtitle = "1940-1960",
-    footnotes = "Data comes from the built-in USPersonalExpenditure dataset.",
-    sources = c("e61 Institute", "'datasets' package")
-  ) +
-  theme(plot.background = element_rect(fill = "lightpink"))
-
-```
-
-This graph is not 'tall' enough, `height` is too small. You can see the contents of the graph is squashed together and the footnote text spills past the graph border.
-
-```{r}
-save_e61(here::here("man/figures/g-save-wide.svg"), height = 6)
-knitr::include_graphics(here::here("man/figures/g-save-wide.svg"))
-```
-
-This graph is too 'tall', `height` is too large as you can see a lot of whitespace above and below the graph border.
-
-```{r}
-save_e61(here::here("man/figures/g-save-tall.svg"), height = 11)
-knitr::include_graphics(here::here("man/figures/g-save-tall.svg"))
-```
-
-This graph is just right, `height` is set correctly as there is no excess space around the graph.
-
-```{r}
-save_e61(here::here("man/figures/g-save-good.svg"), height = 8.5)
-knitr::include_graphics(here::here("man/figures/g-save-good.svg"))
-```
-
-### Automatic height setting feature (experimental)
-
-`save_e61()` has an experimental auto-height calculation feature. It has the goal of automatically getting the height 'just right' like in the previous slide. It works fairly well if your graph axes are in the 'normal' range (units are not too big or small, axis label is 1-3 characters). It kind of works with multi-panel graphs if you specify the graph object explicitly in the `save_e61()` function.
-
-The calculation gets fairly close but you may need to add a subtract a few fractions of a centimetre to get it just right. Conveniently the function will print the height setting it has chosen in the console so you can use that as a starting base. On publication-quality graphs it is probably a good idea to adjust the height from the automatic value.
 
 ## Additional features
 
@@ -320,14 +260,13 @@ gg <-
   scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b",
                          sec_axis = sec_axis(~sec_rescale(.), name = "$b"), 
                          rescale_sec = TRUE) +
-  theme_e61() +
   mplot_label(c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
               c(1945, 1948),
               c(75, 40))
 ```
 
 ```{r, echo=FALSE}
-save_e61(here::here("man/figures/g-dual.svg"), height = 6.8)
+save_e61(here::here("man/figures/g-dual.svg"))
 knitr::include_graphics(here::here("man/figures/g-dual.svg"))
 ```
 
@@ -340,59 +279,67 @@ Note that graph titles need to be done differently in multi-panels. Each individ
 First we make the sub-plots as their own graph.
 
 ```{r}
-g1 <- 
-  ggplot(data_3, aes(x = year, y = value, colour = category)) + 
+g1 <-
+  ggplot(data_3, aes(x = year, y = value, colour = category)) +
   geom_line() +
-  theme_e61() +
-  scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b") +
-  scale_colour_e61(3) +
   mplot_label(c("Food and\nTobacco", "Household\nOperation", "Medical and\nHealth"),
               c(1944, 1954, 1953),
               c(65, 55, 25)) +
   labs_e61(
-    title = "Aggregates"
+    title = "Aggregates",
+    y = "$b"
   )
 
-g2 <- 
-  ggplot(data_dual, aes(x = year)) + 
-  geom_line(aes(y = `Food and Tobacco`), colour = e61_palette(2)[[1]]) +
-  geom_line(aes(y = sec_rescale_inv(`Personal Care`, scale = 0.1)), 
-            colour = e61_palette(2)[[2]]) +
-  theme_e61() +
-  scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b",
-                         sec_axis = sec_axis(~sec_rescale(.), name = "$b"), 
-                         rescale_sec = TRUE) +
-  mplot_label(c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
-              c(1945, 1948),
-              c(75, 40)) +
+# g2 <- 
+#   ggplot(data_dual, aes(x = year)) + 
+#   geom_line(aes(y = `Food and Tobacco`), colour = e61_palette(2)[[1]]) +
+#   geom_line(aes(y = sec_rescale_inv(`Personal Care`, scale = 0.1)), 
+#             colour = e61_palette(2)[[2]]) +
+#   scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b",
+#                          sec_axis = sec_axis(~sec_rescale(.), name = "$b"), 
+#                          rescale_sec = TRUE) +
+#   mplot_label(c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
+#               c(1945, 1948),
+#               c(75, 40)) +
+#   labs_e61(
+#     title = "Selected Aggregates"
+#   )
+
+g2 <-
+  ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
+  geom_col(position = "dodge") +
+  mplot_label(c("1940", "1960"),
+              c(1.55, 2.05),
+              c(15, 50)) +
   labs_e61(
-    title = "Selected Aggregates"
+    title = "1940 to 1960 Change", 
+    y = "$b"
   )
 
 g3 <-
   ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
   geom_col(position = "dodge") +
-  theme_e61() +
-  scale_fill_e61(2) +
-  scale_y_continuous_e61(limits = c(0, 90, 30)) +
   mplot_label(c("1940", "1960"),
               c(1.55, 2.05),
               c(15, 50)) +
   labs_e61(
-    title = "1940 to 1960 Change", y = "$b"
+    title = "1940 to 1960 Change", 
+    y = "$b"
   )
 
 g4 <- 
   ggplot(data_chg[category == "Food and Tobacco"], aes(x = year)) +
   geom_line(aes(y = value), colour = e61_palette(2)[[1]]) +
   geom_col(aes(y = change), fill = e61_palette(2)[[2]]) +
-  theme_e61() +
-  scale_y_continuous_e61(limits = c(0, 90, 30)) +
-    mplot_label(c("Aggregate", "Change from\n5 years ago"),
-              c(1941, 1952),
-              c(55, 25)) +
+  scale_y_continuous_e61(limits = c(0, 100, 20)) +
+  mplot_label(
+    c("Aggregate", "Change from\n5 years ago"),
+    c(1941, 1952),
+    c(55, 25)
+  ) +
   labs_e61(
-    title = "Food and Tobacco Spending", y = "$b"
+    title = "Food and Tobacco Spending", 
+    y = "$b"
   )
 ```
 
@@ -403,12 +350,11 @@ gg <-
   mpanel_e61(
     g1, g2, g3, g4,
     title = "US Personal Expenditures*",
-    footnotes = "Data comes from the built-in USPersonalExpenditure dataset.",
-    sources = c("e61 Institute", "'datasets' package"
-    )
+    footnotes = "Data comes from the built-in USPersonalExpenditure dataset. Data comes from the built-in USPersonalExpenditure dataset. Data comes from the built-in USPersonalExpenditure dataset. Data comes from the built-in USPersonalExpenditure dataset. Data comes from the built-in USPersonalExpenditure dataset. Data comes from the built-in USPersonalExpenditure dataset.",
+    sources = c("e61 Institute", "'datasets' package")
 )
 
-save_e61(here::here("man/figures/g-multi.svg"), gg)
+save_e61(filename = here::here("man/figures/g-multi.svg"))
 ```
 
 ```{r, echo=FALSE}

@@ -1,3 +1,65 @@
+#' Given a ggplot object, update the y-axis scales
+#' @param plot ggplot object. This is the plot whose scales we want to update.
+#' @param auto_scale ggplot object. This is the plot whose scales we want to update.
+#' @rdname e61_aes_limits
+#' @export
+update_chart_scales <- function(plot, auto_scale){
+
+  # Returns the order of the first scale function used - how do we determine this
+  y_scale_lims <- ggplot2::layer_scales(plot)$y$limits
+
+  # If no y-axis scale is present and y is numeric, then add a default aesthetic scale
+  if(is.null(y_scale_lims) & auto_scale){
+
+    # get the minimum and maximum y-axis values
+    min_y <- 0
+    max_y <- 0
+    chart_data <- ggplot2::ggplot_build(plot)$data
+
+    for(i in seq_along(chart_data)){
+
+      y_data <- chart_data[[i]]$y
+
+      # skip if not numeric
+      if(!is.numeric(y_data)) next
+
+      temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
+      temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
+
+      if(is.finite(min_y) & temp_min_y < min_y) min_y <- temp_min_y
+      if(is.finite(max_y) & temp_max_y > max_y) max_y <- temp_max_y
+    }
+
+    # Check whether the chart is a column chart
+    geoms <- plot$layers
+
+    check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
+
+    is_bar <- F
+
+    for (i in seq_along(geoms)) {
+      g <- geoms[[i]]
+
+      class <- class(g$geom)
+
+      if (any(class %in% check_geoms)) {
+        is_bar <- T
+
+        break
+      }
+    }
+
+    # get aesthetic limits for the y-axis - if it is a bar chart, then include zero
+    aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
+
+    suppressWarnings({
+      plot <- plot + scale_y_continuous_e61(limits = aes_lims)
+    })
+  }
+
+  return(plot)
+}
+
 #' Get an aesthetic number near the one supplied.
 #' @param y_val Numeric. Number for which we are going
 #' @param type String. Are we looking for the next smallest or next largest aesthetic value.
@@ -105,15 +167,15 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   order_mag_max <- ceiling(log10(max_size))
 
   # if the difference is a factor of 5, use five ticks
-  if (any(unlist(lapply(aes_y_points$five_point, near, diff)))) {
+  if (any(unlist(lapply(aes_y_points$five_point, dplyr::near, diff)))) {
     band_val <- diff / 5
 
     # if a factor of 4
-  } else if (any(unlist(lapply(aes_y_points$four_point, near, diff)))) {
+  } else if (any(unlist(lapply(aes_y_points$four_point, dplyr::near, diff)))) {
     band_val <- diff / 4
 
     # else use a factor of 3
-  } else if (any(unlist(lapply(aes_y_points$three_point, near, diff)))) {
+  } else if (any(unlist(lapply(aes_y_points$three_point, dplyr::near, diff)))) {
     band_val <- diff / 3
 
     # Rule 1 - If the difference is not in any of the lists, then it isn't aesthetic and we should try the max size to begin with
@@ -123,7 +185,7 @@ get_aes_ticks <- function(min_y_val, max_y_val){
     aes_y_points <- aes_y_points %>% unlist()
 
     # adjust the order of magnitude if necessary
-    if(!any(unlist(lapply(aes_y_points, near, max_size / 10 ^ (order_mag_max - 2))))) {
+    if(!any(unlist(lapply(aes_y_points,  dplyr::near, max_size / 10 ^ (order_mag_max - 2))))) {
       return(NULL)
 
     } else {
@@ -234,20 +296,20 @@ get_aes_pair <- function(y_val_1, y_val_2){
 
     # adjust for the smallest aesthetic value
     ret_smallest_val <- temp_data %>%
-      mutate(diff = aes_small - aes_smallest_val) %>%
-      filter(diff <= 0, abs(aes_small) <= abs(smallest_val)) %>%
-      slice_max(diff, n = 1, with_ties = F) %>%
-      pull(aes_small)
+      dplyr::mutate(diff = aes_small - aes_smallest_val) %>%
+      dplyr::filter(diff <= 0, abs(aes_small) <= abs(smallest_val)) %>%
+      dplyr::slice_max(diff, n = 1, with_ties = F) %>%
+      dplyr::pull(aes_small)
 
   } else {
     aes_smallest_val <- get_aes_num(smallest_val, type = "next_largest")
 
     # adjust for the smallest aesthetic value
     ret_smallest_val <- temp_data %>%
-      mutate(diff = aes_small - aes_smallest_val) %>%
-      filter(diff <= 0) %>%
-      slice_max(diff, n = 1, with_ties = F) %>%
-      pull(aes_small)
+      dplyr::mutate(diff = aes_small - aes_smallest_val) %>%
+      dplyr::filter(diff <= 0) %>%
+      dplyr::slice_max(diff, n = 1, with_ties = F) %>%
+      dplyr::pull(aes_small)
   }
 
   if (length(ret_smallest_val) == 0) ret_smallest_val <- 0

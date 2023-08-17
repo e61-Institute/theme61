@@ -23,7 +23,8 @@ XX XXX 2023
 * Added sensible default chart widths that are different for micronotes, research notes and powerpoint presentations. These are based on the paragraph widths in each document and are chosen based on the `chart_type` argument supplied to `save_e61()`.
 * Added automatic colour and fill scaling. This means that your charts will use the e61 palette by default if you define a fill or colour variable in your main `ggplot` call (e.g. `ggplot(data, aes(x = x_var, y = y_var, fill = fill_var)))`). If you don't do this you can still take advantage of the new functionality when using `scale_fill_e61()` and `scale_colour_e61()` as you no longer need to state the number of colours you need (i.e. no more `n = 7`)
 * Added `theme61::ggplot()` which is a wrapper around ggplot that adds colour, fill and axis scaling by default. 
-* Fixed the adjustment of y-axis titles so they no longer overlap the chart panel or are too far away as the number of characters in y-axis labels changes. 
+* Fixed the adjustment of y-axis titles so they no longer overlap the chart panel or are too far away as the number of characters in y-axis labels changes.
+* Updated `mpanel_e61()` so that it leverages the above code.
 * Minor changes to theme61 so that x-axis ticks no longer point in.
 
 #### Bug fixes

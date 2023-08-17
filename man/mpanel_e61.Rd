@@ -11,12 +11,13 @@ mpanel_e61(
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
-  title_max_char = 90,
-  subtitle_max_char = 90,
-  footnote_max_char = 130,
+  title_max_char = 100,
+  subtitle_max_char = 120,
+  footnote_max_char = 140,
   title_wrap = TRUE,
   subtitle_wrap = TRUE,
   footnote_wrap = TRUE,
+  auto_scale = TRUE,
   title_adj = 1.1,
   ncol = 2,
   nrow = NULL,
@@ -50,6 +51,8 @@ dimensions in \code{\link[theme61]{e61_save}}.}
 
 \item{title_wrap, subtitle_wrap, footnote_wrap}{Logical. Enables text wrapping
 for the title, subtitle, sources or footnotes. Defaults to TRUE.}
+
+\item{auto_scale}{Logical. Should the y-axis be scaled manually. Default is TRUE.}
 
 \item{title_adj}{Rescales the size of the title text to be slightly larger
 than the titles of the subplots (default is 1.1). 2 doubles the font size.}
