@@ -264,7 +264,6 @@ theme_e61 <- function(y_top = TRUE,
   return(ret)
 }
 
-
 #' e61 themed graph options in an alternative style
 #'
 #' @param base_size Numeric. Chart font size. Default is 12.

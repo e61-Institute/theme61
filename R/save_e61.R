@@ -214,12 +214,22 @@ save_e61 <- function(filename,
 
     # TODO - fix this issue if possible
     if(!y_var_name %in% data_names) {
-      stop("Unable to determine y-axis variable. Please make sure it is a variable name in your dataset and you are not altering it within ggplot (e.g. you cannot do things like the following 'ggplot(data, aes(x = x_var, y = log(y_var))'")
+      stop("Unable to locate y-axis variable in dataset. Please make sure it is a valid variable name and in your dataset. Note that the auto scaler will not work with variables that are created within ggplot (e.g. you cannot do things like the following 'ggplot(data, aes(y = log(y_var))'. Please create all variables in your data set before using it to create a ggplot.")
     }
 
     # if the y-variable class is numeric, then update the chart scales
     if(y_var_class == "numeric"){
-      plot <- suppressMessages({update_chart_scales(plot, auto_scale)})
+
+      # first check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
+      grobs <- ggplot2::ggplotGrob(plot)
+
+      test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
+
+      # add a second axis if there is already one present
+      sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
+
+      # then update
+      suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
     }
   }
 
@@ -255,6 +265,8 @@ save_e61 <- function(filename,
 
       width <- max_width
 
+      plot <- plot + format_flipped_bar()
+
     # If it's only one panel, set the chart width to 2/3 of the max-width
     } else if(n_panel_cols == 1){
 
@@ -283,7 +295,11 @@ save_e61 <- function(filename,
   p <- ggplot2::ggplotGrob(plot)
 
   # allow charts to be the width of the panels
-  known_wd <- get_known_width(plot, is_mpanel)
+  right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r")) + 0.25 # this seems to just overshoot hence the extra 0.25cm
+  left_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-l"), get_grob_width(p, grob_name = "axis-l")) + 0.25 # this seems to just overshoot hence the extra 0.25cm
+
+  known_wd <- right_axis_width + left_axis_width
+
   tot_panel_width <- width - known_wd
 
   plot <- update_labs(plot = plot, is_mpanel = is_mpanel, plot_width = tot_panel_width)
@@ -297,7 +313,11 @@ save_e61 <- function(filename,
     p <- ggplot2::ggplotGrob(plot)
 
     known_ht <- get_known_height(plot, is_mpanel)
-    known_wd <- get_known_width(plot, is_mpanel)
+
+    right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r")) + 0.25 # this seems to just overshoot hence the extra 0.1cm
+    left_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-l"), get_grob_width(p, grob_name = "axis-l")) + 0.25 # this seems to just overshoot hence the extra 0.1cm
+
+    known_wd <- right_axis_width + left_axis_width
 
     # calculate the free width and height we have to play with
     free_ht <- if(!is.null(max_height)) {

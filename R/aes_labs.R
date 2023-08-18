@@ -80,6 +80,8 @@ update_labs <- function(plot, is_mpanel, plot_width){
 #' @noRd
 rescale_text <- function(text, text_type, font_size, plot_width){
 
+  if(length(plot_width) == 0) stop("Plot width is length 0.")
+
   # one rule for titles and subtitles
   if(text_type %in% c("title", "subtitle")){
 
@@ -162,8 +164,6 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 #' plot_width - Numeric. Width of the plot.
 #' @noRd
 get_lines <- function(text, font_size, plot_width){
-
-  plot_width <- plot_width * 1.075
 
   # split text into words and calculate the length of each word
   words <- split_text_into_words(text)

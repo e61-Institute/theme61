@@ -299,7 +299,7 @@ g2 <- ggplot(data_dual, aes(x = year)) +
     ) +
   mplot_label(
     c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
-    c(1945, 1955),
+    c(1945, 1952),
     c(75, 15)
   ) +
   labs_e61(title = "Selected Aggregates")

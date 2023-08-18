@@ -2,7 +2,7 @@
 #' plot - ggplot object. This is the plot whose scales we want to update.
 #' auto_scale - ggplot object. This is the plot whose scales we want to update.
 #' @noRd
-update_chart_scales <- function(plot, auto_scale){
+update_chart_scales <- function(plot, auto_scale, sec_axis){
 
   # Returns the order of the first scale function used - how do we determine this
   y_scale_lims <- ggplot2::layer_scales(plot)$y$limits
@@ -52,7 +52,12 @@ update_chart_scales <- function(plot, auto_scale){
     aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
 
     suppressWarnings({
-      plot <- plot + scale_y_continuous_e61(limits = aes_lims)
+      if(sec_axis){
+        plot <- plot + scale_y_continuous_e61(limits = aes_lims, sec_axis = ggplot2::dup_axis())
+
+      } else {
+        plot <- plot + scale_y_continuous_e61(limits = aes_lims)
+      }
     })
   }
 

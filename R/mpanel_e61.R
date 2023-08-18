@@ -133,15 +133,12 @@ save_mpanel_e61 <-
     known_height <- 0
     known_width <- 0
     max_panel_asps <- 0
-    sec_axis_width <- 0
+    max_left_axis_width <- 0
+    max_right_axis_width <- 0
 
     for(i in seq_along(plots)){
 
       temp_plot <- plots[[i]]
-
-      temp_plot <- suppressMessages({
-        update_chart_scales(temp_plot, auto_scale = auto_scale)
-      })
 
       # check if the y-var is numeric
       y_var_name <- ggplot2::quo_name(temp_plot$mapping$y)
@@ -175,6 +172,18 @@ save_mpanel_e61 <-
 
       # if one of the y-variables is numeric, adjust the y-axis scale
       if(y_var_class == "numeric"){
+
+        # first check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
+        grobs <- ggplot2::ggplotGrob(temp_plot)
+
+        test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
+
+        # add a second axis if there is already one present
+        sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
+
+        # then update
+        temp_plot <- suppressMessages({update_chart_scales(temp_plot, auto_scale, sec_axis)})
+
         suppressMessages({temp_plot <- update_y_axis_labels(temp_plot)})
       }
 
@@ -189,7 +198,7 @@ save_mpanel_e61 <-
       widths <- grid::convertWidth(p$widths, "cm", valueOnly = TRUE)
       temp_width <- sum(widths)
 
-      # get plot aspect ratio
+      # get max panel aspect ratio - this is found by looking at the number of null rows and cols (the panels)
       null_rowhts <- as.numeric(p$heights[grid::unitType(p$heights) == "null"])
       null_colwds <- as.numeric(p$widths[grid::unitType(p$widths) == "null"])
       panel_asps <- (
@@ -198,40 +207,18 @@ save_mpanel_e61 <-
 
       max_panel_asps <- pmax(max_panel_asps, panel_asps[1,1])
 
-      # get the widths of non-zero grobs
-      grob_widths <- rep(0, length(p$grobs))
-      a <- 1
+      # keep track of the max right axis and left axis widths as all charts are set to have the same dimensions
+      right_axis_width <- get_grob_width(p, grob_name = "ylab-r") + get_grob_width(p, grob_name = "axis-r")
+      max_right_axis_width <- pmax(max_right_axis_width, right_axis_width)
 
-      for(k in seq_along(p$grobs)){
-
-        grob_temp <- p$grobs[[k]]
-
-        # if it's a null grob or a zeroGrob then it has 0 width, otherwise get the width
-        if(grob_temp$name == "NULL" | stringr::str_detect(grob_temp$name, "zeroGrob")){
-
-          grob_widths[k] <- 0
-
-        } else {
-
-          grob_widths[k] <- widths[a]
-          a <- a + 1
-        }
-      }
-
-      # subtract the y-label widths from the total known width - we want to allocate more than just the panel width for the footnotes etc. because they span multiple charts
-      if(i < ncol) {
-        sec_axis_width <- sec_axis_width + grob_widths[p$layout$name == "ylab-l"]
-        sec_axis_width <- sec_axis_width + grob_widths[p$layout$name == "ylab-r"]
-      }
-
-      if(i == ncol) sec_axis_width <- sec_axis_width + grob_widths[p$layout$name == "ylab-l"]
+      left_axis_width <- get_grob_width(p, grob_name = "ylab-l") + get_grob_width(p, grob_name = "axis-l")
+      max_left_axis_width <- pmax(max_left_axis_width, left_axis_width)
 
       # add the total known width for the first row
-      if(i <= ncol) {
-        known_width <- known_width + temp_width
-      }
+      if(i <= ncol) known_width <- known_width + temp_width
 
-      if(is.null(sec_axis_width)) sec_axis_width <- 0
+      if(is.null(max_left_axis_width) | length(max_left_axis_width) == 0) max_left_axis_width <- 0
+      if(is.null(max_right_axis_width) | length(max_right_axis_width) == 0) max_right_axis_width <- 0
 
 
       # Calculate the known height of the chart ---------------------------------
@@ -286,6 +273,7 @@ save_mpanel_e61 <-
       }
     }
 
+    # browser()
 
     # Prepare titles, subtitles etc. --------------------------------------
 
@@ -297,7 +285,8 @@ save_mpanel_e61 <-
           text = title,
           text_type = "title",
           font_size = 11.5 * title_adj,
-          plot_width = width - (known_width - sec_axis_width)
+          # plot width is total width - outer axis width (we don't want to overlap those)
+          plot_width = width - (max_left_axis_width + max_right_axis_width)
         )
 
       lab_head$title <-
@@ -318,7 +307,8 @@ save_mpanel_e61 <-
           text = subtitle,
           text_type = "subtitle",
           font_size = 10 * title_adj,
-          plot_width = width - (known_width - sec_axis_width)
+          # plot width is total width - outer axis width (we don't want to overlap those)
+          plot_width = width - (max_left_axis_width + max_right_axis_width)
         )
 
       lab_head$subtitle <-
@@ -347,7 +337,8 @@ save_mpanel_e61 <-
           text = caption,
           text_type = "caption",
           font_size = 9,
-          plot_width = width - (known_width - sec_axis_width)
+          # plot width including the left axis
+          plot_width = width - max_right_axis_width
         )
 
       lab_foot$footer <-
@@ -395,11 +386,15 @@ save_mpanel_e61 <-
       size_adj <- 0.75
     }
 
-    # Space for title if required
-    t_h <- get_text_height(text = title, font_size = 11.5 * title_adj) * 2 * title_spacing_adj
+    # Space for title if required - size of text, plus a line of buffer (0.3cm), times the spacing adjustment
+    t_h <- (get_text_height(text = title, font_size = 11.5 * title_adj) + 0.3) * title_spacing_adj
 
-    # Space for subtitle if required
-    s_h <- get_text_height(text = subtitle, font_size = 10 * title_adj) * 1.5 * subtitle_spacing_adj
+    # Space for subtitle if required - size of text, plus half a line of buffer (0.14cm), times the spacing adjustment
+    if(!is.null(subtitle)){
+      s_h <- (get_text_height(text = subtitle, font_size = 10 * title_adj) + 0.14) * subtitle_spacing_adj
+    } else {
+      s_h <- 0
+    }
 
     # Adjust the footer height depending on how much text there is
     f_h <- get_text_height(text = caption, font_size = 9)
@@ -545,10 +540,6 @@ mpanel_e61 <-
     for(i in seq_along(plots)){
 
       temp_plot <- plots[[i]]
-
-      temp_plot <- suppressWarnings({
-        update_chart_scales(temp_plot, auto_scale = auto_scale)
-      })
 
       # check if the y-var is numeric
       y_var_name <- ggplot2::quo_name(temp_plot$mapping$y)
