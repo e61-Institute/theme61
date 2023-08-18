@@ -16,6 +16,15 @@ add_zeroline <- function(...) {
                             with = "add_baseline()")
 }
 
+#' Deprecated
+#' @export
+#' @noRd
+e61_palette <- function(...) {
+  lifecycle::deprecate_soft(when = "0.6.0",
+                            what = "e61_palette()",
+                            with = "palette_e61()")
+}
+
 # Defunct from vX.X -----------------------------------------------------
 
 # # Keep this as an example of a defunct function

@@ -35,7 +35,7 @@ reference:
 
 - title: Colours
   contents:
-  - e61_palette
+  - palette_e61
   - e61_aus_colours
   - e61_boxback
   - matches("^e61_(blue|coral|grey|maroon|orange|sky|teal)")
