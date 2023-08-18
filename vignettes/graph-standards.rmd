@@ -115,7 +115,7 @@ knitr::include_graphics(here::here("man/figures/g-palette-colours.svg"))
 
 `scale_colour_e61()` and `scale_fill_e61()` are automatically added when you use `theme61::ggplot()` and add either a fill or colour aesthetic variable.
 
-`e61_palette()` gives you manual access to the colour hex codes.
+`palette_e61()` gives you manual access to the colour hex codes.
 
 ```{r}
 gg <- 
@@ -235,7 +235,7 @@ Each series will also be plotted separately with its own `geom_line()` (or any o
 
 You need to then transform the `y` aesthetic in the series to be plotted on the secondary axis using the `sec_rescale_inv()` function (see the documentation for the required arguments).
 
-You also need to manually specify the colour to colour in the lines, using `e61_palette()`.
+You also need to manually specify the colour to colour in the lines, using `palette_e61()`.
 
 You must then specify the `sec_axis` argument in `scale_y_continuous_e61()` with `sec_axis(~sec_rescale(.), name = "name")`. Replace "name" with the y-axis label. This must be specified otherwise it will show up blank.
 
@@ -253,10 +253,10 @@ assign("sec_axis_shift", 0, envir = t61_env)
 ```{r}
 gg <- 
   ggplot(data_dual, aes(x = year)) + 
-  geom_line(aes(y = `Food and Tobacco`), colour = e61_palette(2)[[1]]) +
+  geom_line(aes(y = `Food and Tobacco`), colour = palette_e61(2)[[1]]) +
   # All the action is in the next two lines
   geom_line(aes(y = sec_rescale_inv(`Personal Care`, scale = 0.1, shift = 0)), 
-            colour = e61_palette(2)[[2]]) +
+            colour = palette_e61(2)[[2]]) +
   scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b",
                          sec_axis = sec_axis(~sec_rescale(.), name = "$b"), 
                          rescale_sec = TRUE) +
@@ -291,8 +291,8 @@ g1 <-
   )
 
 g2 <- ggplot(data_dual, aes(x = year)) +
-    geom_line(aes(y = `Food and Tobacco`), colour = e61_palette(2)[[1]]) +
-    geom_line(aes(y = `Personal Care`), colour = e61_palette(2)[[2]]) +
+    geom_line(aes(y = `Food and Tobacco`), colour = palette_e61(2)[[1]]) +
+    geom_line(aes(y = `Personal Care`), colour = palette_e61(2)[[2]]) +
     scale_y_continuous_e61(
       limits = c(0, 100, 25),
       name = "$b"
@@ -317,8 +317,8 @@ g3 <-
 
 g4 <- 
   ggplot(data_chg[category == "Food and Tobacco"], aes(x = year)) +
-  geom_line(aes(y = value), colour = e61_palette(2)[[1]]) +
-  geom_col(aes(y = change), fill = e61_palette(2)[[2]]) +
+  geom_line(aes(y = value), colour = palette_e61(2)[[1]]) +
+  geom_col(aes(y = change), fill = palette_e61(2)[[2]]) +
   scale_y_continuous_e61(limits = c(0, 100, 20)) +
   mplot_label(
     c("Aggregate", "Change from\n5 years ago"),
