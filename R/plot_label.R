@@ -40,7 +40,7 @@ plot_label <-
     if (is.na(colour) && (is.na(n_labs) || is.na(n)))
       stop("If 'colour' is not provided then you must specify values for 'n_labs' and 'n'.")
 
-    if (is.na(colour)) colour <- e61_palette(n_labs)[[n]]
+    if (is.na(colour)) colour <- palette_e61(n_labs)[[n]]
 
     # Automatically convert dates to dates if specified, so the user doesn't have
     # to wrap dates in as.Date() which saves some room.
