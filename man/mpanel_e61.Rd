@@ -11,12 +11,13 @@ mpanel_e61(
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
-  title_max_char = 90,
-  subtitle_max_char = 90,
-  footnote_max_char = 130,
+  title_max_char = 100,
+  subtitle_max_char = 120,
+  footnote_max_char = 140,
   title_wrap = TRUE,
   subtitle_wrap = TRUE,
   footnote_wrap = TRUE,
+  auto_scale = TRUE,
   title_adj = 1.1,
   ncol = 2,
   nrow = NULL,
@@ -51,6 +52,8 @@ dimensions in \code{\link[theme61]{e61_save}}.}
 \item{title_wrap, subtitle_wrap, footnote_wrap}{Logical. Enables text wrapping
 for the title, subtitle, sources or footnotes. Defaults to TRUE.}
 
+\item{auto_scale}{Logical. Should the y-axis of the charts be scaled manually. Default is TRUE.}
+
 \item{title_adj}{Rescales the size of the title text to be slightly larger
 than the titles of the subplots (default is 1.1). 2 doubles the font size.}
 
@@ -83,9 +86,7 @@ Wrapper around \link[cowplot]{plot_grid} and \code{labs_e61} to
   work for any arrangement of panels (e.g. 2x1, 3x2, etc.). Your mileage may
   vary.
 
-  When saving multi-panel graphs using \code{save_e61()} you will need to
-  change (increase) the width and height arguments to reflect the larger size
-  of multi-panel graphs.
+  When saving multi-panel graphs make sure you use \code{save_mpanel_e61}.
 }
 \details{
 \strong{Read this if your titles and stuff are getting cut off.}

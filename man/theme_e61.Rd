@@ -6,8 +6,8 @@
 \usage{
 theme_e61(
   y_top = TRUE,
-  adj = -12,
   fix_left = 0,
+  adj = 0,
   legend = c("none", "bottom", "top", "left", "right"),
   legend_title = FALSE,
   aspect_ratio = 0.75,
@@ -24,15 +24,15 @@ theme_e61(
 change this argument you also need to change the argument with the same
 name in \code{\link[theme61]{scale_y_continuous_e61}}.}
 
+\item{fix_left}{Optional. Sometimes if the value of the \code{adj} argument
+is too negative, the margins on the left side of the graph start to cut off
+some of the text. Provide a small positive value (5?) to correct this.}
+
 \item{adj}{Either a single numeric to adjust left and right axis titles
 simultaneously or a vector of 2 numerics to adjust each axis title
 separately. More negative values move the text closer to the graph panel.
 Defaults to -12 which seems to work well for y-axis with 1-3 character-wide
 values.}
-
-\item{fix_left}{Optional. Sometimes if the value of the \code{adj} argument
-is too negative, the margins on the left side of the graph start to cut off
-some of the text. Provide a small positive value (5?) to correct this.}
 
 \item{legend}{Character. Legend position, "none" (default) hides the legend.}
 

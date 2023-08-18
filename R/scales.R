@@ -5,8 +5,6 @@
 #' distinguish between values than a continuous scale. If a continuous scale is
 #' desired, the \code{discrete} argument can be set to \code{FALSE}.
 #'
-#' @param n Numeric. The number of colours in your colour scale, required for
-#'   discrete scales.
 #' @param reverse Logical. TRUE reverses the colour order. Defaults to FALSE.
 #' @param discrete Logical. Indicate whether to use a discrete scale. Defaults
 #'   to TRUE.
@@ -24,25 +22,23 @@
 #'
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 #'    geom_point() +
-#'    scale_colour_e61(n = 3) +
+#'    scale_colour_e61() +
 #'    theme_e61()
 
 scale_colour_e61 <- function(n = 0,
-                              reverse = FALSE,
-                              discrete = TRUE,
-                              palette = c("light", "dark", "diverging", "grey"),
-                              ...) {
+                             reverse = F,
+                             discrete = T,
+                             aesthetics = "colour",
+                             palette = c("light", "dark", "diverging", "grey"),
+                             ...) {
 
   palette <- match.arg(palette)
 
   if (discrete) {
+    retval <- discrete_scale(aesthetics, "e61 colours", get_palette, ...)
 
-    pal <- get_palette(n)
+  } else {
 
-    retval <- ggplot2::scale_colour_manual(values = pal, ...)
-  }
-
-  if (!discrete) {
     pal <- e61_pal(palette = palette, reverse = reverse)
     retval <- ggplot2::scale_color_gradientn(colours = pal(256), ...)
   }
@@ -54,21 +50,20 @@ scale_colour_e61 <- function(n = 0,
 
 #' @rdname scale_e61
 #' @export
-scale_fill_e61 <- function(n = 0, reverse = FALSE,
-                            discrete = TRUE,
-                            palette = c("light", "dark", "diverging", "grey"),
-                            ...) {
+scale_fill_e61 <- function(n = 0,
+                           reverse = FALSE,
+                           discrete = TRUE,
+                           aesthetics = "fill",
+                           palette = c("light", "dark", "diverging", "grey"),
+                           ...) {
 
   palette <- match.arg(palette)
 
   if (discrete) {
+    retval <- discrete_scale(aesthetics, "e61 colours", get_palette, ...)
 
-    pal <- get_palette(n)
+  } else {
 
-    retval <- ggplot2::scale_fill_manual(values = pal, ...)
-  }
-
-  if (!discrete) {
     pal <- e61_pal(palette = palette, reverse = reverse)
     retval <- ggplot2::scale_fill_gradientn(colours = pal(256), ...)
   }
@@ -76,7 +71,6 @@ scale_fill_e61 <- function(n = 0, reverse = FALSE,
   class(retval) <- c(class(retval), "scale_col_e61")
 
   return(retval)
-
 }
 
 #' A consistent set of colours for Australian states and territories for

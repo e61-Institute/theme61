@@ -37,26 +37,25 @@
 #'   \code{format} argument for details.
 #' @param plot Plot object to save. Defaults to the last plot displayed so
 #'   usually you do not need to provide this explicitly.
-#' @param width Plot width in cm. Defaults to 8.5.
-#' @param height Plot height in cm. The function will attempt to calculate an
-#'   appropriate height based on the labels you have provided, but this is
-#'   sensitive to small changes in the graph text so you should check if the
-#'   automatic value is aesthetically appropriate (no excess whitespace).
-#'   Otherwise, the function will default to a value of 9 but this is unlikely
-#'   to be appropriate.
+#' @param chart_type Type of chart. This is used to set sensible chart widths
+#'   based on the width of text in each document. Options include 'MN' (
+#'   for micronote charts), 'RN' (research notes), 'PPT' (powerpoints).
+#'   research note),'PPT
+#' @param auto_scale Logical. Should the y-axis be scaled automatically. Default is TRUE.
+#' @param width Plot width in cm. Defaults to NULL which means the width will
+#'   be set based on the chart type.
+#' @param height Plot height in cm. If you do not specify a height, the function
+#'   will calculate an appropriate height based on the labels you have provided.
+#' @param max_height The maximum height of your plot. This is used to constrain
+#'   the plot resizing algorithm in cases where you want to limit the height of
+#'   your charts.
 #' @param format An optional vector of file formats to save as. For example
 #'   \code{c("svg", "pdf")} will save 2 files with the same name to the same
 #'   location to SVG and PDF formats. If the file format is specified in
 #'   \code{filename}, then this argument is ignored.
-#' @param autoheight Automatically sets the graph height. Only works with vector
-#'   graphics formats. Defaults to TRUE.
-#' @param start_h Numeric. Optionally, supply a starting height for the
-#'   auto-height algorithm.
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
-#' @param dim_msg Logical. Set to TRUE if you want to know what dimensions the
-#'   graph was saved to (defaults to FALSE).
 #' @param resize Numeric. Only used when PNG is the file format. Resize the
 #'   graph width and height. You may also need to adjust the \code{pointsize}
 #'   and \code{res} to ensure the text is readable.
@@ -65,20 +64,53 @@
 #' @return Invisibly returns the file name.
 #' @export
 
-save_e61 <-  function(filename,
-                      plot = ggplot2::last_plot(),
-                      width = NULL,
-                      height = NULL,
-                      format = c("svg", "pdf", "eps", "png"),
-                      autoheight = TRUE,
-                      start_h = NULL,
-                      save_data = FALSE,
-                      dim_msg = FALSE,
-                      resize = NULL,
-                      pointsize = 12,
-                      res = 72,
-                      test = !isTRUE(getOption("test_save"))
-                      ) {
+
+save_e61 <- function(filename,
+                     plot = ggplot2::last_plot(),
+                     chart_type = "MN",
+                     auto_scale = TRUE, # manual control over whether y-axis is scaled
+                     width = NULL, # manual control over the width of the chart
+                     height = NULL, # manual control over the height of the chart
+                     max_height = NULL, # manual control over the maximum height of the chart
+                     format = c("svg", "pdf", "eps", "png"),
+                     save_data = FALSE,
+                     resize = NULL,
+                     pointsize = 12,
+                     res = 72,
+                     test = !isTRUE(getOption("test_save"))
+) {
+
+  # Advisory messages -------------------------------------------------------
+
+  # Note that the following checks don't apply when multi-panel graphs are created
+  print_msg <- TRUE
+
+  adv_msg <- c()
+  info_msg <- c()
+
+  # Message if theme function not used
+  if (print_msg && is.null(attr(plot$theme, "t61"))) {
+
+    adv_msg <- c(adv_msg, "Add 'theme_e61()' to your ggplot code to ensure the e61 theme is applied.")
+  }
+
+  # Message if colour/fill functions aren't used, message to appear only if a
+  # colour/fill mappping exists
+  if (print_msg && any(grepl("(colour|color|fill)", names(plot$mapping))) &&
+      !"scale_col_e61" %in% unlist(sapply(plot$scales$scales, class))) {
+
+    adv_msg <- c(adv_msg, "Add 'scale_colour/fill_e61()' to your ggplot code to ensure the e61 colour palette is used.")
+  }
+
+  # Message if the y-axis label text is missing
+  if (print_msg && (is.null(plot$labels$y) || nchar(plot$labels$y) == 0)) {
+    adv_msg <- c(adv_msg, "Your y-axis label is missing. Please provide the units of the axis for the reader. Specify the 'y' argument in 'labs_e61()'.")
+  }
+
+  # Message if the y-axis label text is too long
+  if (print_msg && isTRUE(nchar(plot$labels$y) > 5)) {
+    adv_msg <- c(adv_msg, "Your y-axis label may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label e.g. %, ppt, $b.")
+  }
 
 
   # Guard clauses and failing checks ----------------------------------------
@@ -103,211 +135,226 @@ save_e61 <-  function(filename,
   if (save_data && !is.data.frame(plot$data))
     stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
-  # Switches off autoheight is PNG is specified
-  if ("png" %in% format & autoheight == TRUE) {
-    autoheight <- FALSE
 
-    warning("autoheight has been set to FALSE as a .png file was requested.")
+  # Set maximum width based on output type ----------------------------------
 
-  }
+  if(is.null(chart_type)) chart_type <- "MN"
 
-  # Collate graph attributes -----------------------------------------------
+  # Set the maximum width based on the type of outputs
+  if(chart_type == "MN"){
 
-  # Build the plot object internally
-  # Could have wider applications in the future...
-  plot_build <- ggplot_build(plot)
+    max_width <- 18.59 # based on 215.9mm page width and 15mm margins either side
 
-  # Check if graph is horizontal
-  is_flip <- isTRUE("CoordFlip" %in% class(ggplot2::ggplot_build(plot)$layout$coord))
+  } else if(chart_type == "RN"){
 
-  # Check if the graph was generated with mpanel_e61 by checking for attributes
-  # added to mpanels
-  is_multi <- !is.null(attr(plot, "panel_rows"))
+    max_width <- 13.985 # based on 338.7mm page width, 20mm margins, 15mm column sep and 2 columns (i.e. divide the remainder by 2)
 
-  # Check if user supplied a height/width or we need the automation
-  user_h <- !is.null(height)
-  user_w <- !is.null(width)
+  } else if(chart_type == "PPT"){
 
-  # Get facet dimensions if applicable
-  if (is.null(plot$facet$params)) {
-    is_facet <- TRUE
+    max_height <- 13.25
+    max_width <- 31.32
 
-    facet_dims <- list()
-    facet_dims$cols <- plot_build$layout$layout$COL
-    facet_dims$rows <- plot_build$layout$layout$ROW
+  } else if(is.null(chart_type)){
+
+    max_width <- 20
 
   } else {
-    is_facet <- FALSE
+    stop("Invalid chart type. Please select from one of the following: 'MN' for micronotes, 'RN' for research notes, 'PPT' for powerpoint slides, or leave blank to use default maximum widths")
   }
 
-  # Advisory messages -------------------------------------------------------
+  plot_build <- ggplot2::ggplot_build(plot)
 
-  # Note that the following checks don't apply when multi-panel graphs are created
-  print_msg <-
-    if (is_multi || isTRUE(getOption("no_t61_style_msg"))) FALSE else TRUE
 
-  adv_msg <- c()
-  info_msg <- c()
+  # Update y-axis limits ----------------------------------------------------
 
-  # Message if theme function not used
-  if (print_msg && is.null(attr(plot$theme, "t61"))) {
+  # check whether the plot is an mpanel plot or a regular plot
+  if(is.null(attr(plot, "plot_type"))){
+    is_mpanel <- FALSE
 
-    adv_msg <- c(adv_msg, "Add 'theme_e61()' to your ggplot code to ensure the e61 theme is applied.")
+  } else if(attr(plot, "plot_type") == "mpanel"){
+    is_mpanel <- TRUE
+
+  } else {
+    is_mpanel <- FALSE
   }
 
-  # Message if package scale_x/y function not used
-  if (print_msg && !"scale_e61" %in% class(ggplot2::layer_scales(plot)$y) && "ScaleContinuous" %in% class(ggplot2::layer_scales(plot)$y)) {
+  # update the chart scales if this is an auto_scaled chart
+  if(!is_mpanel) {
 
-    adv_msg <- c(adv_msg, "Add 'scale_y_continuous_e61()' to your ggplot code to ensure the graph axes render correctly.")
-  }
+    # check if the y-var is numeric
+    y_var_name <- ggplot2::quo_name(plot$mapping$y)
+    y_var_class <- plot$data[[y_var_name]] %>% class()
 
-  # Message if colour/fill functions aren't used, message to appear only if a
-  # colour/fill mappping exists
-  if (print_msg && any(grepl("(colour|color|fill)", names(plot$mapping))) &&
-      !"scale_col_e61" %in% unlist(sapply(plot$scales$scales, class))) {
+    if (y_var_name == "NULL") {
+      layers <- plot$layers
 
-    adv_msg <- c(adv_msg, "Add 'scale_colour/fill_e61()' to your ggplot code to ensure the e61 colour palette is used.")
-  }
+      for (j in seq_along(layers)) {
+        # don't get y-aesthetic for geom_text objects
+        layer_type <- layers[[j]]$geom %>% class()
 
-  # Message if the y-axis label text is missing
-  if (print_msg && (is.null(plot$labels$y) || nchar(plot$labels$y) == 0)) {
-    adv_msg <- c(adv_msg, "Your y-axis label is missing. Please provide the units of the axis for the reader. Specify the 'y' argument in 'labs_e61()'.")
-  }
+        if ("GeomText" %in% layer_type) next
 
-  # Message if the y-axis label text is too long
-  if (print_msg && isTRUE(nchar(plot$labels$y) > 5)) {
-    adv_msg <- c(adv_msg, "Your y-axis label may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label e.g. %, ppt, $b.")
-  }
+        # otherwise get the y-variable name and type
+        y_var_name <- ggplot2::quo_name(layers[[j]]$mapping$y)
 
-  # Height and width setting ------------------------------------------------
+        if (y_var_name == "NULL") next
 
-  ## Fallback default dimensions ----
+        y_var_class <- plot$data[[y_var_name]] %>% class()
 
-  # Fallback default dimensions if not otherwise specified
-  if (!user_w && !is_flip) width <- 8.5
-  if (!user_h && !is_flip) height <- 9
+        # if we found one numeric class, break because that all we need
+        if(y_var_class == "numeric") break
+      }
 
-  # When coord_flip() is used to make a plot horizontal, the default dims are
-  # too small
-  if (!user_w && is_flip) width <- 17
-  if (!user_h && is_flip) height <- 12
-
-  ## Multi-panels ----
-
-  # Adjust the width to fit the extra panels and send out user message to
-  # specify the height
-
-  # Pull together mpanel attributes
-  mp_dims <- list(
-    cols = attr(plot, "panel_cols"),
-    rows = attr(plot, "panel_rows"),
-    head_dim = attr(plot, "panel_head"),
-    foot_dim = attr(plot, "panel_foot")
-  )
-
-  if (is_multi && !user_w) {
-    width <- 8.5 * mp_dims$cols
-  }
-
-  if (is_multi && !user_h) {
-    height <- 7.5 + 8 * (mp_dims$rows - 1) + 0.5 * mp_dims$head_dim + 0.35 * mp_dims$foot_dim
-
-    # Only add msg if autoheight will not run later
-    if (!autoheight) {
-      info_msg <- c(info_msg, paste0("You are saving a multi-panel graph, save_e61() has automatically set the height to ", round(height, 1), ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
+    } else {
+      y_var_class <- plot$data[[y_var_name]] %>% class()
     }
 
-  }
+    # if the y-variable name is not in the dataset, throw an error and force the user to actually create it properly
+    data_names <- names(plot$data)
 
-  ## Faceted regular graphs ----
+    # TODO - fix this issue if possible
+    if(!y_var_name %in% data_names) {
+      stop("Unable to locate y-axis variable in dataset. Please make sure it is a valid variable name and in your dataset. Note that the auto scaler will not work with variables that are created within ggplot (e.g. you cannot do things like the following 'ggplot(data, aes(y = log(y_var))'. Please create all variables in your data set before using it to create a ggplot.")
+    }
 
-  # Expand the width if the facet has multiple columns
-  if (is_facet && !user_w) {
-    width <- 8.5 * facet_dims$cols
-    height <- 9 * facet_dims$rows
-  }
+    # if the y-variable class is numeric, then update the chart scales
+    if(y_var_class == "numeric"){
 
-  ## Regular graphs ----
+      # first check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
+      grobs <- ggplot2::ggplotGrob(plot)
 
-  # Calculate graph height based on the graph labels for normal orientation graphs
-  if (!user_h && !is_flip && !is_multi) {
+      test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
 
-    h <- 6.5
+      # add a second axis if there is already one present
+      sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
 
-    # Calculate the height adjustment needed for...
-
-    # Titles
-    t_adj <-
-      if (!is.null(plot$labels$title)) 0.6 + n_count(plot$labels$title) * 0.3 else 0
-
-    # Subtitles
-    st_adj <-
-      if (!is.null(plot$labels$subtitle)) 0.5 + n_count(plot$labels$subtitle) * 0.3 else 0
-
-    # Captions
-    cp_adj <-
-      if (!is.null(plot$labels$caption)) 0.5 + n_count(plot$labels$caption) * 0.3 else 0
-
-    # Adjustment for width of y-axis label
-    y_adj <-
-      if (!is.null(plot$labels$y)) (nchar(plot$labels$y) - 1) * -0.2 else 0
-
-    height <- h + t_adj + st_adj + cp_adj + y_adj
-
-    # Only add msg if autoheight will not run later
-    if (!autoheight) {
-      info_msg <- c(info_msg, paste0("save_e61() has automatically set the height to ", height, ". Please open the saved graph file and check if this is actually appropriate for your graph. You may have to adjust the value if the y-axis is particularly wide."))
+      # then update
+      suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
     }
   }
 
-  # Message for the user to specify their own height to dimension graphs
-  # correctly. This message does not appear if autoheight functions are used.
-  if (!user_h && !autoheight) {
 
-    info_msg <- c(info_msg, paste0("When you use ", sQuote("save_e61()"), " to save images with defaults, you should set the ", sQuote("height"), " argument manually to your own value to avoid excess/insufficient whitespace on the rendered image. Unfortunately the only way to check this is to open the rendered graphic and inspect it visually."))
+  # Get the number of panel rows and columns ------------------------------
+
+  # Check if the graph was generated with mpanel_e61 by checking for attributes added to mpanels
+  if(!is.null(attr(plot, "panel_rows"))){
+
+    n_panel_cols = attr(plot, "panel_cols")
+    n_panel_rows = attr(plot, "panel_rows")
+
+  # Get facet dimensions if applicable
+  } else if (length(plot$facet$params) != 0) {
+
+    n_panel_cols <- max(plot_build$layout$layout$COL)
+    n_panel_rows <- max(plot_build$layout$layout$ROW)
+
+  # The default is just 1 row and 1 column - i.e. no facets or mpanel plots have been used
+  } else {
+    n_panel_cols <- 1
+    n_panel_rows <- 1
   }
 
-  # Resize elements if a png is to be output
-  if (!is.null(resize)) {
-    if (format != "png")
-      stop("The 'resize' argument is not supported unless the file format is .png")
-    if (!is.numeric(resize))
-      stop("'resize' must be numeric.")
 
-    # Rescale elements as required
-    width <- width * resize
-    height <- height * resize
+  # Set width -------------------------------------------------------------
+
+  # check whether the user has supplied a given width first (i.e. different to the default 8.5cm)
+  if(is.null(width)) {
+
+    # When coord_flip() is used to make a plot horizontal, the default dims are too small
+    if (isTRUE("CoordFlip" %in% class(ggplot2::ggplot_build(plot)$layout$coord))) {
+
+      width <- max_width
+
+      plot <- plot + format_flipped_bar()
+
+    # If it's only one panel, set the chart width to 2/3 of the max-width
+    } else if(n_panel_cols == 1){
+
+      width <- 2/3 * max_width
+
+    # Else use the whole width
+    } else {
+      width <- max_width
+    }
   }
 
-  # Trim excess height from graph ----------------------------------------------
 
-  if (!user_h && autoheight) {
+  # Update labels -----------------------------------------------------------
 
-    if (!is.null(start_h)) height <- start_h
+  # update y-axis labels if the chart is not an mpanel chart
+  if (!is_mpanel) {
 
-    # Autoheight function
-    retval <- auto_height_finder(plot = plot,
-                                 mpanel = is_multi,
-                                 width = width,
-                                 height = height)
-
-    height <- round(retval$height, 1)
-    iter <- retval$iter
-
-    info_msg <-
-      c(info_msg,
-        paste0("Autoheight has set the graph height and width to ",
-               height,
-               " cm and ",
-               width,
-               " cm (in ",
-               iter,
-               " iterations)."
-               )
-        )
+    # if one of the y-variables is numeric, adjust the y-axis scale
+    if (y_var_class == "numeric") {
+      plot <- update_y_axis_labels(plot)
+    }
   }
 
-  # Save --------------------------------------------------------------------
+  # Update the size of the text used for titles, footnotes, axes etc.
+
+  p <- ggplot2::ggplotGrob(plot)
+
+  # allow charts to be the width of the panels
+  right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r")) + 0.25 # this seems to just overshoot hence the extra 0.25cm
+  left_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-l"), get_grob_width(p, grob_name = "axis-l")) + 0.25 # this seems to just overshoot hence the extra 0.25cm
+
+  known_wd <- right_axis_width + left_axis_width
+
+  tot_panel_width <- width - known_wd
+
+  plot <- update_labs(plot = plot, is_mpanel = is_mpanel, plot_width = tot_panel_width)
+
+
+  # Height adjustments ----------------------------------------------------
+
+  if(is.null(height)){
+
+    # Step 1 - Get the amount of free height and width we have to play with (what is not already used up by the set elements)
+    p <- ggplot2::ggplotGrob(plot)
+
+    known_ht <- get_known_height(plot, is_mpanel)
+
+    right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r")) + 0.25 # this seems to just overshoot hence the extra 0.1cm
+    left_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-l"), get_grob_width(p, grob_name = "axis-l")) + 0.25 # this seems to just overshoot hence the extra 0.1cm
+
+    known_wd <- right_axis_width + left_axis_width
+
+    # calculate the free width and height we have to play with
+    free_ht <- if(!is.null(max_height)) {
+      max_height - known_ht
+
+    } else {
+      100 - known_ht
+    }
+
+    free_wd <- width - known_wd
+
+    # Step 2 - Find the number of panels (these have null rows and heights because they are flexible)
+    null_rowhts <- as.numeric(p$heights[grid::unitType(p$heights) == "null"])
+    null_colwds <- as.numeric(p$widths[grid::unitType(p$widths) == "null"])
+    panel_asps <- (
+      matrix(null_rowhts, ncol = 1)
+      %*% matrix(1 / null_colwds, nrow = 1))
+
+    # check that aspect ratios are consistent
+    # stop("Panel aspect ratios must be consistent")
+
+    # Step 3 - Divide the free width by the number of columns (panels) we have
+    panel_width <- free_wd / n_panel_cols # width of each panel
+    panel_height <- panel_width * max(panel_asps[1,]) # height of each panel (width * aspect ratio)
+
+    # Step 4 - Work out the best height of the plot
+
+    # Variable to adjust scale the total plot height as the estimated height grows - there seems to be a small amount of error in the above calculation
+    size_adj <- 1.05
+
+    # calculate height taking into account the various adjustments
+    height <- known_ht * size_adj + panel_height * n_panel_rows
+  }
+
+
+  # Save ------------------------------------------------------------------
+
   lapply(format, function(fmt) {
     file_i <- paste0(filename, ".", fmt)
 
@@ -322,18 +369,15 @@ save_e61 <-  function(filename,
     dev.off()
   })
 
-  # Post-saving messages and functions ---------------------
-  if (dim_msg) {
-    info_msg <- c(info_msg, paste0("The graph height and width have been set to ", height, " and ", width, "."))
-  }
+  # Post-saving messages and functions ------------------------------------
 
   # Compile the messages together
   print_adv <- function() {
     cli::cli_div(theme = list(".bad" = list(color = "#cc0000",
                                             before = paste0(cli::symbol$cross, " ")),
                               ".adv" = list(`background-color` = "#FBFF00")
-                              )
-                 )
+    )
+    )
     cli::cli_h1("--- Fix the following issues with your graph ----------------------------------------", class = "adv")
     cli::cli_ul()
     sapply(adv_msg, cli::cli_alert, class = "bad")
@@ -343,8 +387,8 @@ save_e61 <-  function(filename,
   print_info <- function() {
     cli::cli_div(theme = list(".info-head" = list(color = "#247700"),
                               ".just-info" = list(color = "#000000")
-                              )
-                 )
+    )
+    )
     cli::cli_h1("--- For information -----------------------", class = "info-head")
     cli::cli_ul()
     sapply(info_msg, cli::cli_alert_info, class = "just-info")
@@ -379,6 +423,7 @@ save_e61 <-  function(filename,
   invisible(retval)
 }
 
+
 #' Set option to automatically open files created by \code{save_e61}
 #'
 #' These functions set and unset a session-wide option to automatically open
@@ -411,96 +456,4 @@ unset_open_graph <- function() {
 #' @noRd
 n_count <- function(text) {
   nchar(text) - nchar(gsub("\n", "", text, fixed = TRUE))
-}
-
-#' Helper function used in save_e61() to automatically determine the graph
-#' height
-#'
-#' @param plot ggplot2 object
-#' @param mpanel Logical. Whether the graph was generated using
-#'   \code{mpanel_e61()} or not.
-#' @param width Graph width as supplied to \code{save_e61()}.
-#' @param height Graph height as supplied to \code{save_e61()}.
-#' @param incr The increment in cm to iterate the graph heights by.
-#' @return The height of the graph.
-#' @noRd
-auto_height_finder <- function(plot, mpanel, width, height, incr = 0.2) {
-  tmp_file <- tempfile(fileext = ".svg")
-
-  # add red fill/border to check for sizing
-  if (mpanel) {
-    plot2 <- plot + theme(plot.background = element_rect(colour = "red"))
-  } else {
-    plot2 <- plot + theme(plot.background = element_rect(fill = "red"))
-  }
-
-  new_h <- height
-  too_tall <- TRUE
-  iter <- 0
-
-  while (too_tall) {
-
-    # Prevent infinite loops
-    if (iter > 20) stop("Stopping as the autoheight algorithm has repeated 20 times without finding an optimal height. Try supplying a sensible starting height in the 'start_h' argument of save_e61() or manually set the 'height' argument in save_e61().")
-
-    iter <- iter + 1
-
-    # Save graph with test height
-    svglite::svglite(filename = tmp_file, width = cm_to_in(width), height = cm_to_in(new_h), bg = "transparent")
-    print(plot2)
-    dev.off()
-
-    # Read back in
-    img <- magick::image_read_svg(tmp_file)
-
-    # Convert image into array of pixel colours
-    data <- magick::image_data(img)
-
-    # The data comes as a 4-dim array for the RGBA hex code, this combines them
-    pixel_tab <- sapply(1:dim(data)[[3]], function(x) {
-      retval <- paste0(data[1, , x], data[2, , x], data[3, , x], data[4, , x])
-      invisible(retval)
-    })
-
-    # For some reason the array comes transposed. We want to check the first
-    # column of pixels in mpanels so we transpose the matrix so it is correctly
-    # orientated. But for normal graphs we care about the first row so we just
-    # leave the matrix untransposed.
-    if (mpanel) {
-      pixel_tab <- t(pixel_tab)
-    }
-
-    # How we check graph sizing:
-    # For normal graphs: see if the first row is white and shrink the height
-    # slightly if it is.
-    # For mpanels: see if the border runs down the left side of the graph. If it
-    # doesn't then we need to shrink the height slightly until it does.
-
-    # Get first row or col
-    chk_col <- pixel_tab[, 1]
-    chk_col <- chk_col[-c(1, length(chk_col))]
-
-    if (mpanel) {
-      # Checks for any not-red pixels
-      if (length(chk_col[chk_col != "78000078"]) > 0) {
-        new_h <- new_h - incr
-      } else {
-        height <- new_h + 0.1
-        too_tall <- FALSE
-      }
-    } else {
-      # Checks if all the pixels are white
-      if (length(chk_col[chk_col == "00000000"]) == length(chk_col)) {
-        new_h <- new_h - incr
-      } else {
-        height <- new_h + 0.1
-        too_tall <- FALSE
-      }
-    }
-  }
-
-  retval <- list(height = height, iter = iter)
-
-  return(retval)
-
 }

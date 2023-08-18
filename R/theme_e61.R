@@ -42,8 +42,8 @@
 #'
 
 theme_e61 <- function(y_top = TRUE,
-                      adj = -12,
                       fix_left = 0,
+                      adj = 0,
                       legend = c("none", "bottom", "top", "left", "right"),
                       legend_title = FALSE,
                       aspect_ratio = 0.75,
@@ -106,7 +106,7 @@ theme_e61 <- function(y_top = TRUE,
       axis.ticks = element_line(colour = "black"),
       axis.ticks.y = element_blank(),
       axis.ticks.length = unit(half_line / 2, "pt"),
-      axis.ticks.length.x = unit(-1*half_line / 2, "pt"), # Puts ticks inside graph
+      axis.ticks.length.x = unit(half_line / 2, "pt"), # Puts ticks inside graph
       axis.ticks.length.x.top = NULL,
       axis.ticks.length.x.bottom = NULL,
       axis.ticks.length.y = NULL,
@@ -264,7 +264,6 @@ theme_e61 <- function(y_top = TRUE,
   return(ret)
 }
 
-
 #' e61 themed graph options in an alternative style
 #'
 #' @param base_size Numeric. Chart font size. Default is 12.
@@ -381,6 +380,17 @@ cm_to_in <- function(cm, round = FALSE) {
   }
 }
 
+in_to_cm <- function(inches, round = FALSE) {
+  cm <- 2.54 * inches
+
+  if (isTRUE(round)) {
+    round(cm, 2)
+  } else {
+    cm
+  }
+}
+
+
 # Reposition y-axis titles to the top
 y_title_top <- function(adj, fix_left) {
 
@@ -406,5 +416,4 @@ y_title_top <- function(adj, fix_left) {
     )
 
   return(ret)
-
 }
