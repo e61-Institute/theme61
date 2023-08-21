@@ -2,6 +2,9 @@ test_that("Functionality in auto y-axis scaling works", {
 
   # Test aesthetic limits (combines all four functions) ----
 
+  # Bug specific tests - things that testers have broken
+  expect_equal(get_aes_limits(2.2, 4.01), list(0, 50, 10))
+
   # Test same side
   expect_equal(get_aes_limits(4, 44), list(0, 50, 10))
   expect_equal(get_aes_limits(11, 44), list(10, 50, 10))

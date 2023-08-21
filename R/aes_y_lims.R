@@ -11,8 +11,8 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   if(is.null(y_scale_lims) & auto_scale){
 
     # get the minimum and maximum y-axis values
-    min_y <- 0
-    max_y <- 0
+    min_y <- NA_real_
+    max_y <- NA_real_
     chart_data <- ggplot2::ggplot_build(plot)$data
 
     for(i in seq_along(chart_data)){
@@ -22,12 +22,52 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
       # skip if not numeric
       if(!is.numeric(y_data)) next
 
-      temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
-      temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
+      # check if the chart has ymin and ymax data
+      if(!is.null(chart_data[[i]]$ymax)){
+        temp_max_y <- chart_data[[i]]$ymax %>% max(na.rm = T)
 
-      if(is.finite(min_y) & temp_min_y < min_y) min_y <- temp_min_y
-      if(is.finite(max_y) & temp_max_y > max_y) max_y <- temp_max_y
+        test <- chart_data[[i]]$y %>% max(na.rm = T)
+
+        if(is.finite(temp_max_y) & is.finite(test) & temp_max_y < test) {
+          temp_max_y <- test
+        }
+
+      } else {
+        temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
+      }
+
+      if(!is.null(chart_data[[i]]$ymin)){
+        temp_min_y <- chart_data[[i]]$ymin %>% min(na.rm = T)
+
+        test <- chart_data[[i]]$y %>% min(na.rm = T)
+
+        if(is.finite(temp_min_y) & is.finite(test) & temp_min_y > test) {
+          temp_min_y <- test
+        }
+
+      } else {
+
+        temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
+      }
+
+      # update the current min and max values - if NA then it must be the first observation
+      if(is.na(min_y)){
+        min_y <- temp_min_y
+
+      } else if(is.finite(min_y) & temp_min_y < min_y) {
+        min_y <- temp_min_y
+      }
+
+      if(is.na(max_y)){
+        max_y <- temp_max_y
+
+      } else if(is.finite(max_y) & temp_max_y > max_y) {
+        max_y <- temp_max_y
+      }
     }
+
+    if(is.na(min_y)) min_y <- 0
+    if(is.na(max_y)) max_y <- 0
 
     # Check whether the chart is a column chart
     geoms <- plot$layers
