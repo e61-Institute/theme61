@@ -113,7 +113,7 @@ get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
   # set the adjustment factor based on whether we are looking at a value above or below 1
   if (y_val > 0) adj <- 1 else adj <- -1
 
-  aes_y_points <- data.frame(points = c(10, 12, 15, 16, 20, 25, 30, 40, 50, 60, 75, 80, 100))
+  aes_y_points <- data.frame(points = c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100))
 
   order_mag <- ceiling(log10(adj * y_val))
   aes_y_points <- aes_y_points %>% dplyr::mutate(points_adj = adj * points)
@@ -159,11 +159,15 @@ get_aes_ticks <- function(min_y_val, max_y_val){
     max_y_val <- temp_bot
   }
 
+  aes_band_sizes <- c(5, 10, 15, 20, 25, 30)
+
   # differences between points by the number of ticks to include
   aes_y_points <- list(
-    five_point = c(10, 15, 25, 50, 75, 100),
-    four_point = c(12, 16, 20, 40, 60, 80),
-    three_point = c(30, 45, 90)
+    five_point = c(10, 25, 50, 75, 100),
+    six_point = c(30, 60),
+    four_point = c(20, 40, 80),
+    seven_point = c(35, 70),
+    three_point = c(15, 45, 90)
   )
 
   # the maximum size of the tick spacing - set to max value (100 as we adjust based on the order of magnitude)
@@ -205,18 +209,23 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   order_mag <- ceiling(log10(diff))
 
   aes_y_points <- lapply(aes_y_points, function(x) x * 10 ^ (order_mag - 2))
+  aes_band_sizes <- aes_band_sizes * 10 ^ (order_mag - 2)
 
   order_mag_max <- ceiling(log10(max_size))
 
-  # if the difference is a factor of 5, use five ticks
+  # check whether the difference fits into any of the aesthetic groupings
   if (any(unlist(lapply(aes_y_points$five_point, dplyr::near, diff)))) {
     band_val <- diff / 5
 
-    # if a factor of 4
+  } else if (any(unlist(lapply(aes_y_points$six_point, dplyr::near, diff)))) {
+    band_val <- diff / 6
+
   } else if (any(unlist(lapply(aes_y_points$four_point, dplyr::near, diff)))) {
     band_val <- diff / 4
 
-    # else use a factor of 3
+  } else if (any(unlist(lapply(aes_y_points$seven_point, dplyr::near, diff)))) {
+    band_val <- diff / 7
+
   } else if (any(unlist(lapply(aes_y_points$three_point, dplyr::near, diff)))) {
     band_val <- diff / 3
 
@@ -270,9 +279,10 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   }
 
   # Rule 4 - there should not be more than 7 ticks (if the numbers are either side of 0 we may be forced to use this)
-  if(diff / band_val > 7) {
-    return(NULL)
-  }
+  if(diff / band_val > 7) return(NULL)
+
+  # Rule 5 - the band value should be in the list of aesthetic band values
+  if(!any(unlist(lapply(aes_band_sizes,  dplyr::near, band_val)))) return(NULL)
 
   return(band_val)
 }
@@ -282,6 +292,8 @@ get_aes_ticks <- function(min_y_val, max_y_val){
 #' y_val_2 - Double. Maximum y-axis value.
 #' @noRd
 get_aes_pair <- function(y_val_1, y_val_2){
+
+  aes_band_sizes <- c(5, 10, 15, 20, 25, 30)
 
   # 1 - Start with the larger value - get an aesthic number for that one first
   if(abs(y_val_1) > abs(y_val_2)){
@@ -293,67 +305,95 @@ get_aes_pair <- function(y_val_1, y_val_2){
     smallest_val <- y_val_1
   }
 
-  aes_largest_val <- get_aes_num(largest_val, type = "next_largest")
+  first_aes_largest_val <- get_aes_num(largest_val, type = "next_largest")
 
-  # 2 - Then find all the aesthetic pairs
-  aes_y_points <- c(10, 12, 15, 16, 20, 25, 30, 40, 50, 60, 75, 80, 100)
+  aes_largest_val <- first_aes_largest_val
+  keep_going <- T
 
-  # adjust to the right order of magnitude for the smallest value
-  order_mag_large <- ceiling(log10(abs(aes_largest_val)))
-  order_mag_small <- ceiling(log10(abs(smallest_val)))
+  # check whether we can get a good match with this aesthetic value - otherwise we may need to go higher
+  while(keep_going == T){
 
-  # If the numbers are more than one order of magnitude different, they'll never make a good pair
-  if(order_mag_large > order_mag_small + 1){
-    order_mag <- order_mag_large - 1
+    # 2 - Then find all the aesthetic pairs
+    aes_y_points <- c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100)
 
-  } else {
-    order_mag <- order_mag_small
+    # adjust to the right order of magnitude for the smallest value
+    order_mag_large <- ceiling(log10(abs(aes_largest_val)))
+    order_mag_small <- ceiling(log10(abs(smallest_val)))
+
+    # If the numbers are more than one order of magnitude different, they'll never make a good pair
+    if(order_mag_large > order_mag_small + 1){
+      order_mag <- order_mag_large - 1
+
+    } else {
+      order_mag <- order_mag_small
+    }
+
+    aes_y_points <- aes_y_points * 10 ^ (order_mag - 2)
+
+    # multiply by -1 if we're looking for a negative aesthetic pair
+    if(smallest_val < 0) aes_y_points <- -1 * aes_y_points
+
+    # if the order of magnitude is 1 - i.e. numbers from 0-9, then add 0 to the mix
+    if(order_mag <= 1) aes_y_points <- c(0, aes_y_points)
+
+    aes_pairs <- c()
+
+    for(i in seq_along(aes_y_points)){
+
+      test_val <- aes_y_points[i]
+
+      # the test value must be closer to zero than the smallest value if they both values are on the same side, otherwise it must be further from 0
+      if((smallest_val <= 0 & largest_val <= 0) | (smallest_val >= 0 & largest_val >= 0)){
+
+        if(abs(test_val) > abs(smallest_val)) next
+
+      } else {
+        if(abs(test_val) < abs(smallest_val)) next
+      }
+
+      ticks <- get_aes_ticks(test_val, aes_largest_val)
+
+      if(!is.null(ticks)) aes_pairs <- c(aes_pairs, test_val)
+    }
+
+    # if there are no aesthetic pairs, then try the next highest aesthetic value for the top
+    if(is.null(aes_pairs)) {
+
+      aes_largest_val <- get_aes_num(aes_largest_val, type = "next_largest")
+
+      # repeat the process
+      next
+    }
+
+    temp_data <- expand.grid(aes_large = aes_largest_val, aes_small = aes_pairs)
+
+    # 3 - get the pair that is closest to the aesthetic value of the smaller number
+    # For the aesthetic number, if they are both positive or both negative we want the value just below the smallest number
+    if((y_val_1 < 0 & y_val_2 < 0) | (y_val_1 > 0 & y_val_2 > 0)){
+      aes_smallest_val <- get_aes_num(smallest_val, type = "next_smallest")
+
+      # adjust for the smallest aesthetic value
+      ret_smallest_val <- temp_data %>%
+        dplyr::mutate(diff = aes_small - aes_smallest_val) %>%
+        dplyr::filter(diff <= 0, abs(aes_small) <= abs(smallest_val)) %>%
+        dplyr::slice_max(diff, n = 1, with_ties = F) %>%
+        dplyr::pull(aes_small)
+
+    } else {
+      aes_smallest_val <- get_aes_num(smallest_val, type = "next_largest")
+
+      # adjust for the smallest aesthetic value
+      ret_smallest_val <- temp_data %>%
+        dplyr::mutate(diff = aes_small - aes_smallest_val) %>%
+        dplyr::filter(diff <= 0) %>%
+        dplyr::slice_max(diff, n = 1, with_ties = F) %>%
+        dplyr::pull(aes_small)
+    }
+
+    if (length(ret_smallest_val) == 0) ret_smallest_val <- 0
+
+    break
   }
-
-  aes_y_points <- aes_y_points * 10 ^ (order_mag - 2)
-
-  # multiply by -1 if we're looking for a negative aesthetic pair
-  if(smallest_val < 0) aes_y_points <- -1 * aes_y_points
-
-  aes_pairs <- c()
-
-  for(i in seq_along(aes_y_points)){
-
-    test_val <- aes_y_points[i]
-
-    ticks <- get_aes_ticks(test_val, aes_largest_val)
-
-    if(!is.null(ticks)) aes_pairs <- c(aes_pairs, test_val)
-  }
-
-  if(is.null(aes_pairs)) return(list(0, aes_largest_val))
-
-  temp_data <- expand.grid(aes_large = aes_largest_val, aes_small = aes_pairs)
-
-  # 3 - get the pair that is closest to the aesthetic value of the smaller number
-  # For the aesthetic number, if they are both positive or both negative we want the value just below the smallest number
-  if((y_val_1 < 0 & y_val_2 < 0) | (y_val_1 > 0 & y_val_2 > 0)){
-    aes_smallest_val <- get_aes_num(smallest_val, type = "next_smallest")
-
-    # adjust for the smallest aesthetic value
-    ret_smallest_val <- temp_data %>%
-      dplyr::mutate(diff = aes_small - aes_smallest_val) %>%
-      dplyr::filter(diff <= 0, abs(aes_small) <= abs(smallest_val)) %>%
-      dplyr::slice_max(diff, n = 1, with_ties = F) %>%
-      dplyr::pull(aes_small)
-
-  } else {
-    aes_smallest_val <- get_aes_num(smallest_val, type = "next_largest")
-
-    # adjust for the smallest aesthetic value
-    ret_smallest_val <- temp_data %>%
-      dplyr::mutate(diff = aes_small - aes_smallest_val) %>%
-      dplyr::filter(diff <= 0) %>%
-      dplyr::slice_max(diff, n = 1, with_ties = F) %>%
-      dplyr::pull(aes_small)
-  }
-
-  if (length(ret_smallest_val) == 0) ret_smallest_val <- 0
 
   return(list(ret_smallest_val, aes_largest_val))
 }
