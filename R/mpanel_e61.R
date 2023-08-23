@@ -182,7 +182,7 @@ save_mpanel_e61 <-
         sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
 
         # then update
-        temp_plot <- suppressMessages({update_chart_scales(temp_plot, auto_scale, sec_axis)})
+        suppressMessages({temp_plot <- update_chart_scales(temp_plot, auto_scale, sec_axis)})
 
         suppressMessages({temp_plot <- update_y_axis_labels(temp_plot)})
       }
@@ -296,6 +296,7 @@ save_mpanel_e61 <-
           fontface = "bold",
           x = 0.5,
           hjust = 0.5,
+          vjust = 0.5,
           size = 11.5 * title_adj
         )
     }
@@ -318,6 +319,7 @@ save_mpanel_e61 <-
           fontface = "plain",
           x = 0.5,
           hjust = 0.5,
+          vjust = 0.5,
           size = 10 * title_adj
         )
     }
@@ -347,9 +349,10 @@ save_mpanel_e61 <-
           caption,
           x = 0,
           hjust = 0,
+          vjust = 0.5,
           size = 9
         ) +
-        ggplot2::theme(plot.margin = margin(0, 0, 0, 3))
+        ggplot2::theme(plot.margin = margin(t = 0, r = 0, b = 3, l = 3))
     }
 
 
@@ -387,7 +390,13 @@ save_mpanel_e61 <-
     }
 
     # Space for title if required - size of text, plus a line of buffer (0.3cm), times the spacing adjustment
-    t_h <- (get_text_height(text = title, font_size = 11.5 * title_adj) + 0.3) * title_spacing_adj
+    if(!is.null(subtitle)){
+      t_h <- (get_text_height(text = title, font_size = 11.5 * title_adj) + 0.3) * title_spacing_adj
+
+    # if there is no subtitle, remove the extra 0.3 padding
+    } else {
+      t_h <- (get_text_height(text = title, font_size = 11.5 * title_adj)) * title_spacing_adj
+    }
 
     # Space for subtitle if required - size of text, plus half a line of buffer (0.14cm), times the spacing adjustment
     if(!is.null(subtitle)){
@@ -415,7 +424,6 @@ save_mpanel_e61 <-
       ncol = 1,
       rel_heights = rel_heights
     )
-
 
     # Save the mpanel --------------------------------------------------------
 
