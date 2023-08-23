@@ -125,7 +125,25 @@ save_mpanel_e61 <-
     }
 
 
+    # Set width -------------------------------------------------------------
+
+    # check whether the user has supplied a given width first (i.e. different to the default 8.5cm)
+    if(is.null(width)) {
+
+      # If it's only one panel, set the chart width to 2/3 of the max-width
+      if(ncol == 1){
+
+        width <- 2/3 * max_width
+
+        # Else use the whole width
+      } else {
+        width <- max_width
+      }
+    }
+
     # Format each plot in the plotlist and get dimensions ----------------------------------------
+
+    # browser()
 
     # for each plot update the y-axis scales
     clean_plotlist <- list()
@@ -186,6 +204,9 @@ save_mpanel_e61 <-
 
         suppressMessages({temp_plot <- update_y_axis_labels(temp_plot)})
       }
+
+      # update the titles and subtitles of the plots
+      suppressMessages({temp_plot <- update_labs(plot = temp_plot, is_mpanel = F, plot_width = (0.95 * width) / ncol)})
 
       # save the plot
       clean_plotlist[[i]] <- temp_plot
@@ -256,25 +277,6 @@ save_mpanel_e61 <-
     lab_head <- list()
     lab_foot <- list()
 
-
-    # Set width -------------------------------------------------------------
-
-    # check whether the user has supplied a given width first (i.e. different to the default 8.5cm)
-    if(is.null(width)) {
-
-      # If it's only one panel, set the chart width to 2/3 of the max-width
-      if(ncol == 1){
-
-        width <- 2/3 * max_width
-
-        # Else use the whole width
-      } else {
-        width <- max_width
-      }
-    }
-
-    # browser()
-
     # Prepare titles, subtitles etc. --------------------------------------
 
     # title
@@ -285,8 +287,8 @@ save_mpanel_e61 <-
           text = title,
           text_type = "title",
           font_size = 11.5 * title_adj,
-          # plot width is total width - outer axis width (we don't want to overlap those)
-          plot_width = width - (max_left_axis_width + max_right_axis_width)
+          # plot width is total width
+          plot_width = width * 0.95
         )
 
       lab_head$title <-
@@ -362,11 +364,11 @@ save_mpanel_e61 <-
     if(is.null(height)){
 
       # calculate the free width and height we have to play with
-      free_ht <- if(!is.null(max_height)) {
-        max_height - known_height
+      if(!is.null(max_height)) {
+        free_ht <- max_height - known_height
 
       } else {
-        100 - known_height
+        free_ht <- 100 - known_height
       }
 
       free_wd <- width - known_width
