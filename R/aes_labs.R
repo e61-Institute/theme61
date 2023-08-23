@@ -121,37 +121,64 @@ rescale_text <- function(text, text_type, font_size, plot_width){
     # number footnotes and then split into words
     footnote_data <- footnote_data %>% dplyr::mutate(footnote_num = dplyr::row_number())
 
-    # split into words to calculate line lengths
-    text_lines <- list()
+    if(nrow(footnote_data) > 0){
 
-    for(i in 1:nrow(footnote_data)){
+      # split into words to calculate line lengths
+      text_lines <- list()
 
-      text_lines[[i]] <- get_lines(footnote_data$footnote_text[i], font_size, plot_width)
+      for(i in 1:nrow(footnote_data)){
 
-      text_lines[[i]] <- text_lines[[i]] %>% dplyr::mutate(footnote_num = i)
+        text_lines[[i]] <- get_lines(footnote_data$footnote_text[i], font_size, plot_width)
+
+        text_lines[[i]] <- text_lines[[i]] %>% dplyr::mutate(footnote_num = i)
+      }
+
+      text_lines <- text_lines %>% dplyr::bind_rows()
+
+      # combine text into a caption along with the sources
+      footnote_data <- text_lines %>%
+        dplyr::group_by(footnote_num) %>%
+        dplyr::summarise(footnote = paste(collapsed_text, collapse = "\n"))
+
+      footnote_data <- footnote_data %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(footnote = paste(strrep("*", as.numeric(footnote_num)), footnote)) %>%
+        dplyr::summarise(footnotes = paste(footnote, collapse = "\n"))
+
+      footnote_text <- footnote_data$footnotes[1]
+
+    # Otherwise we didn't have any footnotes to begin with, so set as an empty string
+    } else {
+      footnote_text <- NULL
     }
 
-    text_lines <- text_lines %>% dplyr::bind_rows()
-
-    # combine text into a caption along with the sources
-    footnote_data <- text_lines %>%
-      dplyr::group_by(footnote_num) %>%
-      dplyr::summarise(footnote = paste(collapsed_text, collapse = "\n"))
-
-    footnote_data <- footnote_data %>%
-      dplyr::ungroup() %>%
-      dplyr::mutate(footnote = paste(strrep("*", as.numeric(footnote_num)), footnote)) %>%
-      dplyr::summarise(footnotes = paste(footnote, collapse = "\n"))
-
-    footnote_text <- footnote_data$footnotes[1]
-
+    # Check whether we have sources to add and how many
     if(length(sources) > 1) {
 
-      text <- paste(footnote_text, "\nSources:", paste(sources, collapse = "; "))
+      if(is.null(footnote_text)){
+        text <- paste("Sources:", paste(sources, collapse = "; "))
 
+      } else {
+        text <- paste(footnote_text, "\nSources:", paste(sources, collapse = "; "))
+      }
+
+    } else if(length(sources) == 1){
+
+      if(is.null(footnote_text)){
+        text <- paste("\nSource:", sources)
+
+      } else {
+        text <- paste(footnote_text, "\nSource:", sources)
+      }
+
+    # No sources
     } else {
+      if(is.null(footnote_text)){
+        text <- NULL
 
-      text <- paste(footnote_text, "\nSource:", sources)
+      } else {
+        text <- footnote_text
+      }
     }
   }
 
