@@ -276,6 +276,9 @@ save_e61 <- function(filename,
     } else {
       width <- max_width
     }
+
+  } else if(width == "col_width"){
+    width <- max_width
   }
 
 
