@@ -48,7 +48,7 @@ ggplot <-
     if(fill_var_class == "numeric"){
       p <- p + scale_fill_e61(discrete = F)
 
-    } else if(fill_var_class == "factor" | fill_var_class == "factor") {
+    } else if(fill_var_class == "factor" | fill_var_class == "character") {
 
       p <- p + scale_fill_e61()
     }
@@ -70,7 +70,7 @@ ggplot <-
     if(colour_var_class == "numeric"){
       p <- p + scale_colour_e61(discrete = F)
 
-    } else if(colour_var_class == "factor" | colour_var_class == "factor") {
+    } else if(colour_var_class == "factor" | colour_var_class == "character") {
 
       p <- p + scale_colour_e61()
     }
