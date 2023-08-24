@@ -267,10 +267,10 @@ save_e61 <- function(filename,
 
       plot <- plot + format_flipped_bar()
 
-    # If it's only one panel, set the chart width to 2/3 of the max-width
+    # If it's only one panel, set the chart width to 1/2 of the max-width
     } else if(n_panel_cols == 1){
 
-      width <- 2/3 * max_width
+      width <- 1/2 * max_width
 
     # Else use the whole width
     } else {
