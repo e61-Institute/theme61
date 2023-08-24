@@ -34,6 +34,9 @@
 #'   \code{filename}, then this argument is ignored.
 #' @param title_adj Rescales the size of the title text to be slightly larger
 #'   than the titles of the subplots (default is 1.1). 2 doubles the font size.
+#' @param height_adj Rescales the height of the mpanel. The function sets sensible
+#'   defaults but this provides you with manial control if you need it.
+#' @param base_size Numeric. Chart font size. Default is 8.
 #' @param title_spacing_adj Rescales the size of the space give to the mpanel
 #'   title. Use if you think the title looks too cramped on the chart.
 #' @param subtitle_spacing_adj Rescales the size of the space give to the mpanel
@@ -70,6 +73,8 @@ save_mpanel_e61 <-
            title_adj = 1.1,
            title_spacing_adj = 1, # adjust the amount of space given to the title
            subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
+           base_size = 8, # set the base size for the theme61 font size call
+           height_adj = NULL,
            ncol = 2,
            nrow = NULL,
            align = c("v", "none", "h", "hv"),
@@ -143,8 +148,6 @@ save_mpanel_e61 <-
 
     # Format each plot in the plotlist and get dimensions ----------------------------------------
 
-    # browser()
-
     # for each plot update the y-axis scales
     clean_plotlist <- list()
 
@@ -157,6 +160,9 @@ save_mpanel_e61 <-
     for(i in seq_along(plots)){
 
       temp_plot <- plots[[i]]
+
+      # update the text sizes
+      temp_plot <- temp_plot + theme_e61(base_size = base_size)
 
       # check if the y-var is numeric
       y_var_name <- ggplot2::quo_name(temp_plot$mapping$y)
@@ -286,7 +292,7 @@ save_mpanel_e61 <-
         rescale_text(
           text = title,
           text_type = "title",
-          font_size = 11.5 * title_adj,
+          font_size = base_size * 1.15 * title_adj,
           # plot width is total width
           plot_width = width * 0.95
         )
@@ -299,7 +305,7 @@ save_mpanel_e61 <-
           x = 0.5,
           hjust = 0.5,
           vjust = 0.5,
-          size = 11.5 * title_adj
+          size = base_size * 1.15 * title_adj
         )
     }
 
@@ -309,7 +315,7 @@ save_mpanel_e61 <-
         rescale_text(
           text = subtitle,
           text_type = "subtitle",
-          font_size = 10 * title_adj,
+          font_size = base_size * title_adj,
           # plot width is total width - outer axis width (we don't want to overlap those)
           plot_width = width - (max_left_axis_width + max_right_axis_width)
         )
@@ -322,7 +328,7 @@ save_mpanel_e61 <-
           x = 0.5,
           hjust = 0.5,
           vjust = 0.5,
-          size = 10 * title_adj
+          size = base_size * title_adj
         )
     }
 
@@ -340,7 +346,7 @@ save_mpanel_e61 <-
         rescale_text(
           text = caption,
           text_type = "caption",
-          font_size = 9,
+          font_size = base_size - 1,
           # plot width including the left axis
           plot_width = width - max_right_axis_width
         )
@@ -352,7 +358,7 @@ save_mpanel_e61 <-
           x = 0,
           hjust = 0,
           vjust = 0.5,
-          size = 9
+          size = base_size - 1
         ) +
         ggplot2::theme(plot.margin = margin(t = 0, r = 0, b = 3, l = 3))
     }
@@ -381,18 +387,23 @@ save_mpanel_e61 <-
       height <- (known_height + panel_height) * nrow
     }
 
-    if(nrow == 1) {
-      size_adj <- 1.05
+    if(is.null(height_adj)){
+      if(nrow == 1) {
+        height_adj <- 1.05
 
-    } else if(nrow == 2) {
-      size_adj <- 0.9
+      } else if(nrow == 2) {
+        height_adj <- 0.90
 
-    } else if(nrow >= 3) {
-      size_adj <- 0.75
+      } else if(nrow >= 3) {
+        height_adj <- 0.75
+      }
     }
 
     # Space for title if required - size of text, plus a line of buffer (0.3cm), times the spacing adjustment
-    if(!is.null(subtitle)){
+    if(is.null(title)){
+      t_h <- 0
+
+    } else if(!is.null(subtitle)){
       t_h <- (get_text_height(text = title, font_size = 11.5 * title_adj) + 0.3) * title_spacing_adj
 
     # if there is no subtitle, remove the extra 0.3 padding
@@ -411,10 +422,10 @@ save_mpanel_e61 <-
     f_h <- get_text_height(text = caption, font_size = 9)
 
     # calculate the total height and panel height
-    p_h <- height * size_adj
+    p_h <- height * height_adj
     tot_height <- p_h + sum(t_h + s_h + f_h)
 
-    if (t_h == 0) t_h <- 0.001
+    if (t_h == 0) t_h <- NULL
     if (s_h == 0) s_h <- NULL
     if (f_h == 0) f_h <- NULL
 

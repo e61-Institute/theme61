@@ -20,6 +20,8 @@ save_mpanel_e61(
   title_adj = 1.1,
   title_spacing_adj = 1,
   subtitle_spacing_adj = 1,
+  base_size = 8,
+  height_adj = NULL,
   ncol = 2,
   nrow = NULL,
   align = c("v", "none", "h", "hv"),
@@ -75,6 +77,11 @@ title. Use if you think the title looks too cramped on the chart.}
 
 \item{subtitle_spacing_adj}{Rescales the size of the space give to the mpanel
 subtitle. Use if you think the subtitle looks too cramped on the chart.}
+
+\item{base_size}{Numeric. Chart font size. Default is 8.}
+
+\item{height_adj}{Rescales the height of the mpanel. The function sets sensible
+defaults but this provides you with manial control if you need it.}
 
 \item{ncol}{(optional) Number of columns in the plot grid.}
 
