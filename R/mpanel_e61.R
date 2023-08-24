@@ -385,7 +385,7 @@ save_mpanel_e61 <-
       size_adj <- 1.05
 
     } else if(nrow == 2) {
-      size_adj <- 0.9
+      size_adj <- 0.90
 
     } else if(nrow >= 3) {
       size_adj <- 0.75

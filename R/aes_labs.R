@@ -93,6 +93,15 @@ rescale_text <- function(text, text_type, font_size, plot_width){
       dplyr::summarise(text = paste(collapsed_text, collapse = "\n")) %>%
       dplyr::pull(text)
 
+    # if it is a title, make sure we don't have only one word hanging on the last line
+    if(text_type == "title" & stringr::str_detect(text, "\\\n\\S+$")){
+
+      last_two_words <- stringr::str_extract(text, "\\S+\\\n\\S+$") %>% stringr::str_replace_all("\\\n", " ")
+      text <- stringr::str_remove(text, "\\S+\\\n\\S+$")
+
+      text <- paste(text, "\n", last_two_words)
+    }
+
   # another rule for footnotes
   } else if(text_type == "caption"){
 
