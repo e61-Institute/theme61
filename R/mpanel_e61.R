@@ -82,7 +82,26 @@ save_mpanel_e61 <-
            rel_heights = NULL
            ) {
 
+
+    # Combine and clean plot list ---------------------------------------------
+
     plots <- c(list(...), plotlist)
+
+    temp_list <- list()
+
+    for(i in seq_along(plots)){
+      temp_plot <- plots[[i]]
+
+      if(is.ggplot(temp_plot)) {
+        temp_list[[length(temp_list) + 1]] <- temp_plot
+      } else {
+        warning("Some elements of the plotlist are not ggplot objects.")
+      }
+    }
+
+    plots <- temp_list
+    rm(temp_list)
+
 
     # Guard clauses and failing checks ----------------------------------------
 
@@ -205,7 +224,7 @@ save_mpanel_e61 <-
         # add a second axis if there is already one present
         sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
 
-        # then update
+        # then update the chart scales
         suppressMessages({temp_plot <- update_chart_scales(temp_plot, auto_scale, sec_axis)})
 
         suppressMessages({temp_plot <- update_y_axis_labels(temp_plot)})
