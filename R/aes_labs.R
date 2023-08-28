@@ -308,10 +308,10 @@ update_y_axis_labels <- function(plot){
   sig_fig <- max(c(sig_fig_max_y, sig_fig_min_y), na.rm = T)
 
   if(sig_fig == 1){
-    adj <- -5
+    adj <- -4
 
   } else if(sig_fig >= 2){
-    adj <- -5 + -5 * (sig_fig - 1)
+    adj <- -4 * sig_fig
   }
 
   plot <- plot +
