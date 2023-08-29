@@ -403,7 +403,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
 #' max_y_val - Double. Maximum y-axis value.
 #' from_zero - Logical. Should the limits start at zero or just below the minimum value?
 #' @noRd
-get_aes_limits <- function(min_y_val, max_y_val, from_zero = F){
+get_aes_limits <- function(min_y_val, max_y_val, from_zero = F, include_vals = F){
 
   if(is.null(min_y_val) | is.null(max_y_val)){
     stop("Y-axis limits could not be determined. Please check your y-axis variable is numeric.")
@@ -420,7 +420,7 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F){
 
     min_y_val <- 0
 
-  } else {
+  } else if (!include_vals) {
     min_y_val <- min_y_val - (0.01 * abs(min_y_val))
   }
 
@@ -428,7 +428,7 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F){
 
     max_y_val <- 0
 
-  } else {
+  } else if (!include_vals) {
     max_y_val <- max_y_val + (0.01 * abs(max_y_val))
   }
 

@@ -278,33 +278,28 @@ split_text_into_words <- function(text) {
 #' plot - Plot object to adjust.
 #' adj_width - User supplied adjustment.
 #' @noRd
-update_y_axis_labels <- function(plot, adj_width = NULL, max_y_axis = NULL){
+update_y_axis_labels <- function(plot, adj_width = NULL, max_y_lab = NA_real_, max_break_width = NA_real_){
 
-  if(is.null(adj_width)) adj_width <- get_y_break_width(plot)
+  if(is.null(adj_width)) {
 
-  if(!is.null(max_y_axis)){
+    # get the break widths
+    break_width <- get_y_break_width(plot)
 
+    # get the difference in the label size
     y_font_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
-    y_lab_size <- get_text_width(plot$labels$y, font_size = y_font_size)
+    y_lab_width <- get_text_width(plot$labels$y, font_size = y_font_size) * 10 * ggplot2:::.pt
+    max_y_lab <- max_y_lab * 10 * ggplot2:::.pt
 
-    # get the difference between this chart's width and the maximum width - and convert it from cm to point width
-    size_diff <- (max_y_axis - y_lab_size) * 10 * ggplot2:::.pt
-
-    # add the break adjustment to the plot
-    plot <- plot +
-      ggplot2::theme(
-        axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 2, r = -(adj_width + size_diff)), vjust = 1, hjust = 0, angle = 0),
-        axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = -(adj_width + size_diff), r = 2), vjust = 1, hjust = 0, angle = 0)
-      )
-
-  } else {
-    # add the break adjustment to the plot
-    plot <- plot +
-      ggplot2::theme(
-        axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 2, r = -adj_width), vjust = 1, hjust = 0, angle = 0),
-        axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = -adj_width, r = 2), vjust = 1, hjust = 0, angle = 0)
-      )
+    max_width <- pmax(max_y_lab, max_break_width, na.rm = T)
+    diff <- max_width - y_lab_width
   }
+
+  # add the break adjustment to the plot
+  plot <- plot +
+    ggplot2::theme(
+      axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 2, r = 2 - (12 + diff)), vjust = 1, hjust = 1, angle = 0),
+      axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = 2 - (12 + diff), r = 2), vjust = 1, hjust = 0, angle = 0)
+    )
 
   return(plot)
 }
@@ -320,53 +315,91 @@ get_y_break_width <- function(plot){
   break_text_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
 
   # check what the y-axis breaks are - this will show up if the user has specified the breaks
-  breaks <- p_build$layout$panel_scales_y[[1]]$breaks
+  breaks <- p_build$layout$panel_scales_y[[1]]$labels
+
+  if(is.null(breaks) | length(breaks) == 0) breaks <- p_build$layout$panel_scales_y[[1]]$breaks
 
   # if there are no breaks use the scale y-continuous function to find them instead
-  if(is.null(breaks) | length(breaks) > 0 | !is.function(breaks)){
+  if(is.null(breaks) | length(breaks) == 0 | is.function(breaks)){
 
-    # get the minimum and maximum y-axis values
-    min_y <- 0
-    max_y <- 0
-    chart_data <- ggplot2::ggplot_build(plot)$data
+    # save the existing limits - if there are any
+    y_scale_lims <- ggplot2::layer_scales(plot)$y$limits
 
-    for(i in seq_along(chart_data)){
+    # check if we already have a proper e61 scale - no need to redo the work and get it wrong
+    if(length(y_scale_lims) == 3){
 
-      y_data <- chart_data[[i]]$y
+      aes_lims <- y_scale_lims
 
-      # skip if not numeric
-      if(!is.numeric(y_data)) next
+    # otherwise we'll need to re calculate what the aesthetic limits will look like
+    } else {
 
-      temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
-      temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
+      # Check whether the chart is a column chart
+      geoms <- plot$layers
 
-      if(is.finite(min_y) & temp_min_y < min_y) min_y <- temp_min_y
-      if(is.finite(max_y) & temp_max_y > max_y) max_y <- temp_max_y
-    }
+      check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
 
-    # Check whether the chart is a column chart
-    geoms <- plot$layers
+      is_bar <- F
 
-    check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
+      for (i in seq_along(geoms)) {
+        g <- geoms[[i]]
 
-    is_bar <- F
+        class <- class(g$geom)
 
-    for (i in seq_along(geoms)) {
-      g <- geoms[[i]]
+        if (any(class %in% check_geoms)) {
+          is_bar <- T
 
-      class <- class(g$geom)
+          break
+        }
+      }
 
-      if (any(class %in% check_geoms)) {
-        is_bar <- T
+      # if there are existing limits - use those first
+      if(!is.null(y_scale_lims)){
 
-        break
+        min_y <- y_scale_lims[1]
+        max_y <- y_scale_lims[2]
+
+        aes_lims <- c(min_y, max_y, get_aes_ticks(min_y, max_y))
+
+        # otherwise have a look at the data
+      } else {
+
+        # get the minimum and maximum y-axis values
+        min_y <- 0
+        max_y <- 0
+        chart_data <- ggplot2::ggplot_build(plot)$data
+
+        for(i in seq_along(chart_data)){
+
+          y_data <- chart_data[[i]]$y
+
+          # skip if not numeric
+          if(!is.numeric(y_data)) next
+
+          temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
+          temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
+
+          if(is.finite(min_y) & temp_min_y < min_y) min_y <- temp_min_y
+          if(is.finite(max_y) & temp_max_y > max_y) max_y <- temp_max_y
+        }
+
+        # get aesthetic limits for the y-axis - if it is a bar chart, then include zero
+        aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
       }
     }
 
-    # get aesthetic limits for the y-axis - if it is a bar chart, then include zero
-    aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
+    # check whether the y-title is at the top - then we want the max break to be smaller
+    y_angle <- plot$theme$axis.title.y.left$angle
+    y_vjust <- plot$theme$axis.title.y.left$vjust
 
-    breaks <- seq(aes_lims[[1]], aes_lims[[2]], aes_lims[[3]])
+    if(length(y_angle) != 0 & length(y_vjust) != 0 & y_angle == 0 & y_vjust == 1) {
+
+      # then define the breaks
+      breaks <- seq(aes_lims[[1]], aes_lims[[2]] - aes_lims[[3]], aes_lims[[3]])
+    } else {
+
+      # then define the breaks
+      breaks <- seq(aes_lims[[1]], aes_lims[[2]], aes_lims[[3]])
+    }
   }
 
   # get the width of the breaks - find the maximum width

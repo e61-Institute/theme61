@@ -70,11 +70,11 @@ save_mpanel_e61 <-
            height = NULL, # manual control over the height of the chart
            max_height = NULL, # manual control over the maximum height of the chart
            auto_scale = TRUE,
-           title_adj = 1.1,
+           title_adj = 1,
            title_spacing_adj = 1, # adjust the amount of space given to the title
            subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
            base_size = 8, # set the base size for the theme61 font size call
-           height_adj = NULL,
+           height_adj = 1, # adjust the vertical spacing of the mpanel charts
            ncol = 2,
            nrow = NULL,
            align = c("v", "none", "h", "hv"),
@@ -172,12 +172,14 @@ save_mpanel_e61 <-
     # for each plot update the y-axis scales
     clean_plotlist <- list()
 
+    # keep track of various aspects of the charts
     known_height <- 0
     known_width <- 0
     max_panel_asps <- 0
     max_left_axis_width <- 0
     max_right_axis_width <- 0
     y_lab_max_size <- 0
+    max_break_width <- 0
 
     for(i in seq_along(plots)){
 
@@ -260,6 +262,10 @@ save_mpanel_e61 <-
       y_lab_size <- get_text_width(temp_plot$labels$y, font_size = y_font_size)
       y_lab_max_size <- pmax(y_lab_size, y_lab_max_size, na.rm = T)
 
+      # keep track of the maximum break size
+      break_width <- get_y_break_width(temp_plot)
+      max_break_width <- pmax(break_width, max_break_width, na.rm = T)
+
       # keep track of the max right axis and left axis widths as all charts are set to have the same dimensions
       right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r"))
       max_right_axis_width <- pmax(max_right_axis_width, right_axis_width)
@@ -293,7 +299,12 @@ save_mpanel_e61 <-
 
       temp_plot <- clean_plotlist[[i]]
 
-      suppressMessages({temp_plot <- update_y_axis_labels(temp_plot, max_y_axis = y_lab_max_size)})
+      suppressMessages({
+        temp_plot <-
+          update_y_axis_labels(temp_plot,
+                               max_y_lab = y_lab_max_size,
+                               max_break_width = max_break_width)
+      })
 
       # save the plot
       clean_plotlist[[i]] <- temp_plot
@@ -324,6 +335,10 @@ save_mpanel_e61 <-
 
     # Prepare titles, subtitles etc. --------------------------------------
 
+    # define text sizes
+    title_text_size <- base_size * 1.25 * title_adj
+    subtitle_text_size <- base_size * 1.125 * title_adj
+
     # title
     if(!is.null(title)){
 
@@ -331,7 +346,7 @@ save_mpanel_e61 <-
         rescale_text(
           text = title,
           text_type = "title",
-          font_size = base_size * 1.15 * title_adj,
+          font_size = title_text_size,
           # plot width is total width
           plot_width = width * 0.95
         )
@@ -344,7 +359,7 @@ save_mpanel_e61 <-
           x = 0.5,
           hjust = 0.5,
           vjust = 0.5,
-          size = base_size * 1.15 * title_adj
+          size = title_text_size
         )
     }
 
@@ -354,7 +369,7 @@ save_mpanel_e61 <-
         rescale_text(
           text = subtitle,
           text_type = "subtitle",
-          font_size = base_size * title_adj,
+          font_size = subtitle_text_size,
           # plot width is total width - outer axis width (we don't want to overlap those)
           plot_width = width - (max_left_axis_width + max_right_axis_width)
         )
@@ -367,7 +382,7 @@ save_mpanel_e61 <-
           x = 0.5,
           hjust = 0.5,
           vjust = 0.5,
-          size = base_size * title_adj
+          size = subtitle_text_size
         )
     }
 
@@ -426,9 +441,10 @@ save_mpanel_e61 <-
       height <- (known_height + panel_height) * nrow
     }
 
+    # TODO - fix this crude height adjustment
     if(is.null(height_adj)){
       if(nrow == 1) {
-        height_adj <- 1.05
+        height_adj <- 1
 
       } else if(nrow == 2) {
         height_adj <- 0.90
@@ -443,16 +459,16 @@ save_mpanel_e61 <-
       t_h <- 0
 
     } else if(!is.null(subtitle)){
-      t_h <- (get_text_height(text = title, font_size = 11.5 * title_adj) + 0.3) * title_spacing_adj
+      t_h <- (get_text_height(text = title, font_size = title_text_size) + 0.3) * title_spacing_adj
 
     # if there is no subtitle, remove the extra 0.3 padding
     } else {
-      t_h <- (get_text_height(text = title, font_size = 11.5 * title_adj)) * title_spacing_adj
+      t_h <- (get_text_height(text = title, font_size = title_text_size)) * title_spacing_adj
     }
 
     # Space for subtitle if required - size of text, plus half a line of buffer (0.14cm), times the spacing adjustment
     if(!is.null(subtitle)){
-      s_h <- (get_text_height(text = subtitle, font_size = 10 * title_adj) + 0.14) * subtitle_spacing_adj
+      s_h <- (get_text_height(text = subtitle, font_size = subtitle_text_size) + 0.14) * subtitle_spacing_adj
     } else {
       s_h <- 0
     }
@@ -461,8 +477,8 @@ save_mpanel_e61 <-
     f_h <- get_text_height(text = caption, font_size = 9)
 
     # calculate the total height and panel height
-    p_h <- height * height_adj
-    tot_height <- p_h + sum(t_h + s_h + f_h)
+    p_h <- height
+    tot_height <- (p_h + sum(t_h + s_h + f_h)) * height_adj
 
     if (t_h == 0) t_h <- NULL
     if (s_h == 0) s_h <- NULL
@@ -589,8 +605,6 @@ mpanel_e61 <-
 
     # for each plot update the y-axis scales
     plots <- c(list(...), plotlist)
-
-    # plots <- list(g1, g2, g3, g4)
 
     clean_plotlist <- list()
 
