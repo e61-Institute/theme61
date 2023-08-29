@@ -79,7 +79,9 @@ save_mpanel_e61 <-
            nrow = NULL,
            align = c("v", "none", "h", "hv"),
            axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-           rel_heights = NULL
+           rel_heights = NULL,
+           pointsize = 12,
+           res = 300
            ) {
 
 
@@ -95,7 +97,7 @@ save_mpanel_e61 <-
       if(is.ggplot(temp_plot)) {
         temp_list[[length(temp_list) + 1]] <- temp_plot
       } else {
-        warning("Some elements of the plotlist are not ggplot objects.")
+        warning("Some elements of the plotlist are not ggplot objects. Check you have supplied the wrong object or used an incorrect argument.")
       }
     }
 
@@ -175,6 +177,7 @@ save_mpanel_e61 <-
     max_panel_asps <- 0
     max_left_axis_width <- 0
     max_right_axis_width <- 0
+    y_lab_max_size <- 0
 
     for(i in seq_along(plots)){
 
@@ -226,8 +229,6 @@ save_mpanel_e61 <-
 
         # then update the chart scales
         suppressMessages({temp_plot <- update_chart_scales(temp_plot, auto_scale, sec_axis)})
-
-        suppressMessages({temp_plot <- update_y_axis_labels(temp_plot)})
       }
 
       # update the titles and subtitles of the plots
@@ -253,11 +254,17 @@ save_mpanel_e61 <-
 
       max_panel_asps <- pmax(max_panel_asps, panel_asps[1,1])
 
+      # keep track of the maximum y-axis title size in cm
+      y_font_size <- get_font_size(temp_plot, elem = "axis.text.y", parent = "axis.text")
+
+      y_lab_size <- get_text_width(temp_plot$labels$y, font_size = y_font_size)
+      y_lab_max_size <- pmax(y_lab_size, y_lab_max_size, na.rm = T)
+
       # keep track of the max right axis and left axis widths as all charts are set to have the same dimensions
-      right_axis_width <- get_grob_width(p, grob_name = "ylab-r") + get_grob_width(p, grob_name = "axis-r")
+      right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r"))
       max_right_axis_width <- pmax(max_right_axis_width, right_axis_width)
 
-      left_axis_width <- get_grob_width(p, grob_name = "ylab-l") + get_grob_width(p, grob_name = "axis-l")
+      left_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-l"), get_grob_width(p, grob_name = "axis-l"))
       max_left_axis_width <- pmax(max_left_axis_width, left_axis_width)
 
       # add the total known width for the first row
@@ -278,6 +285,19 @@ save_mpanel_e61 <-
     }
 
     if(max_panel_asps == 0) max_panel_asps <- 0.75
+
+
+    # Update the y-axis scales ------------------------------------------------
+
+    for(i in seq_along(clean_plotlist)){
+
+      temp_plot <- clean_plotlist[[i]]
+
+      suppressMessages({temp_plot <- update_y_axis_labels(temp_plot, max_y_axis = y_lab_max_size)})
+
+      # save the plot
+      clean_plotlist[[i]] <- temp_plot
+    }
 
 
     # Gather the plots ----------------------------------------------------

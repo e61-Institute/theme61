@@ -276,49 +276,147 @@ split_text_into_words <- function(text) {
 
 #' Update y-axis label spacing so that they are aesthetic
 #' plot - Plot object to adjust.
+#' adj_width - User supplied adjustment.
 #' @noRd
-update_y_axis_labels <- function(plot){
+update_y_axis_labels <- function(plot, adj_width = NULL, max_y_axis = NULL){
 
-  # get the minimum and maximum y-axis values
-  min_y <- 0
-  max_y <- 0
-  chart_data <- ggplot2::ggplot_build(plot)$data
+  if(is.null(adj_width)) adj_width <- get_y_break_width(plot)
 
-  for(i in seq_along(chart_data)){
+  if(!is.null(max_y_axis)){
 
-    y_data <- chart_data[[i]]$y
+    y_font_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
+    y_lab_size <- get_text_width(plot$labels$y, font_size = y_font_size)
 
-    # skip if not numeric
-    if(!is.numeric(y_data)) next
+    # get the difference between this chart's width and the maximum width - and convert it from cm to point width
+    size_diff <- (max_y_axis - y_lab_size) * 10 * ggplot2:::.pt
 
-    temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
-    temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
+    # add the break adjustment to the plot
+    plot <- plot +
+      ggplot2::theme(
+        axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 2, r = -(adj_width + size_diff)), vjust = 1, hjust = 0, angle = 0),
+        axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = -(adj_width + size_diff), r = 2), vjust = 1, hjust = 0, angle = 0)
+      )
 
-    if(is.finite(min_y) & temp_min_y < min_y) min_y <- temp_min_y
-    if(is.finite(max_y) & temp_max_y > max_y) max_y <- temp_max_y
+  } else {
+    # add the break adjustment to the plot
+    plot <- plot +
+      ggplot2::theme(
+        axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 2, r = -adj_width), vjust = 1, hjust = 0, angle = 0),
+        axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = -adj_width, r = 2), vjust = 1, hjust = 0, angle = 0)
+      )
   }
-
-  sig_fig_max_y <- stringr::str_extract(max_y, "^[^\\.]*") %>% nchar()
-  sig_fig_min_y <- stringr::str_extract(min_y, "^[^\\.]*") %>% nchar()
-
-  if(is.na(sig_fig_max_y)) sig_fig_max_y <- 0
-  if(is.na(sig_fig_min_y)) sig_fig_min_y <- 0
-
-  # Update the theme adjustment
-  sig_fig <- max(c(sig_fig_max_y, sig_fig_min_y), na.rm = T)
-
-  if(sig_fig == 1){
-    adj <- -4
-
-  } else if(sig_fig >= 2){
-    adj <- -4 * sig_fig
-  }
-
-  plot <- plot +
-    ggplot2::theme(
-      axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 5, r = adj), vjust = 1, angle = 0),
-      axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = adj, r = 5), vjust = 1, angle = 0)
-    )
 
   return(plot)
+}
+
+#' Get the width of y-axis break labels
+#' plot - Plot object to adjust.
+#' @noRd
+get_y_break_width <- function(plot){
+
+  # get the break text size
+  p_build <- ggplot2::ggplot_build(plot)
+
+  break_text_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
+
+  # check what the y-axis breaks are - this will show up if the user has specified the breaks
+  breaks <- p_build$layout$panel_scales_y[[1]]$breaks
+
+  # if there are no breaks use the scale y-continuous function to find them instead
+  if(is.null(breaks) | length(breaks) > 0 | !is.function(breaks)){
+
+    # get the minimum and maximum y-axis values
+    min_y <- 0
+    max_y <- 0
+    chart_data <- ggplot2::ggplot_build(plot)$data
+
+    for(i in seq_along(chart_data)){
+
+      y_data <- chart_data[[i]]$y
+
+      # skip if not numeric
+      if(!is.numeric(y_data)) next
+
+      temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
+      temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
+
+      if(is.finite(min_y) & temp_min_y < min_y) min_y <- temp_min_y
+      if(is.finite(max_y) & temp_max_y > max_y) max_y <- temp_max_y
+    }
+
+    # Check whether the chart is a column chart
+    geoms <- plot$layers
+
+    check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
+
+    is_bar <- F
+
+    for (i in seq_along(geoms)) {
+      g <- geoms[[i]]
+
+      class <- class(g$geom)
+
+      if (any(class %in% check_geoms)) {
+        is_bar <- T
+
+        break
+      }
+    }
+
+    # get aesthetic limits for the y-axis - if it is a bar chart, then include zero
+    aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
+
+    breaks <- seq(aes_lims[[1]], aes_lims[[2]], aes_lims[[3]])
+  }
+
+  # get the width of the breaks - find the maximum width
+  break_text_widths <- get_text_width(breaks, font_size = break_text_size)
+
+  max_break_width <- max(break_text_widths) # this is in cm
+
+  break_width_pt <- ggplot2:::.pt * max_break_width * 10 # so convert to points
+
+  return(break_width_pt)
+}
+
+#' Get the font size of text from a particular aspect of a ggplot
+#' plot - Plot object to adjust.
+#' elem - the element you want to get the size of
+#' parent - the parent element of the element you want to get the size of (used as a fall back option)
+#' @noRd
+get_font_size <- function(plot, elem = "text", parent = "text"){
+
+  # get the text sizes of the elements we're interested in and the main text size of the plot
+  main_text_size <- plot$theme$text$size
+  elem_text_size <- plot$theme[[elem]]$size
+  parent_text_size <- plot$theme[[parent]]$size
+
+  # if the element does not have a text size, look at the parent
+  if(is.null(elem_text_size)){
+
+    # check whether it is a relative text size of numeric
+    if(class(parent_text_size) == "rel"){
+      text_size <- eval(parse(text = paste(parent_text_size, " * ", main_text_size)))
+
+    } else if (class(parent_text_size) == "numeric")(
+      text_size <- parent_text_size
+    )
+
+    # if we have the element text size, then use that
+  } else {
+
+    if(class(elem_text_size) == "rel" & class(parent_text_size) == "rel"){
+      text_size <- eval(parse(text = paste(parent_text_size, " * ", elem_text_size, " * ", main_text_size)))
+
+    } else if (class(elem_text_size) == "numeric")(
+      text_size <- elem_text_size
+
+    ) else if (class(elem_text_size) == "rel" & class(parent_text_size) == "numeric")(
+      text_size <- eval(parse(text = paste(elem_text_size, " * ", parent_text_size)))
+    )
+  }
+
+  if(is.null(text_size) | !is.numeric(text_size) | is.na(text_size)) text_size <- main_text_size
+
+  return(text_size)
 }
