@@ -338,6 +338,7 @@ save_mpanel_e61 <-
     # define text sizes
     title_text_size <- base_size * 1.25 * title_adj
     subtitle_text_size <- base_size * 1.125 * title_adj
+    footer_text_size <- base_size - 1
 
     # title
     if(!is.null(title)){
@@ -400,7 +401,7 @@ save_mpanel_e61 <-
         rescale_text(
           text = caption,
           text_type = "caption",
-          font_size = base_size - 1,
+          font_size = footer_text_size,
           # plot width including the left axis
           plot_width = width - max_right_axis_width
         )
@@ -412,9 +413,9 @@ save_mpanel_e61 <-
           x = 0,
           hjust = 0,
           vjust = 0.5,
-          size = base_size - 1
+          size = footer_text_size
         ) +
-        ggplot2::theme(plot.margin = margin(t = 0, r = 0, b = 3, l = 3))
+        ggplot2::theme(plot.margin = margin(t = 5, r = 0, b = 3, l = 5))
     }
 
 
@@ -444,7 +445,7 @@ save_mpanel_e61 <-
     # TODO - fix this crude height adjustment
     if(is.null(height_adj)){
       if(nrow == 1) {
-        height_adj <- 1
+        height_adj <- 1.1
 
       } else if(nrow == 2) {
         height_adj <- 0.90
@@ -474,11 +475,15 @@ save_mpanel_e61 <-
     }
 
     # Adjust the footer height depending on how much text there is
-    f_h <- get_text_height(text = caption, font_size = 9)
+    if(!is.null(caption)){
+      f_h <- get_text_height(text = caption, font_size = footer_text_size) + 0.3
+    } else {
+      f_h <- 0
+    }
 
     # calculate the total height and panel height
     p_h <- height
-    tot_height <- (p_h + sum(t_h + s_h + f_h)) * height_adj
+    tot_height <- p_h * height_adj + sum(t_h + s_h + f_h)
 
     if (t_h == 0) t_h <- NULL
     if (s_h == 0) s_h <- NULL
