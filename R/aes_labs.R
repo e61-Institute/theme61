@@ -288,10 +288,17 @@ update_y_axis_labels <- function(plot, adj_width = NULL, max_y_lab = NA_real_, m
     # get the difference in the label size
     y_font_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
     y_lab_width <- get_text_width(plot$labels$y, font_size = y_font_size) * 10 * ggplot2:::.pt
-    max_y_lab <- max_y_lab * 10 * ggplot2:::.pt
 
-    max_width <- pmax(max_y_lab, max_break_width, na.rm = T)
-    diff <- max_width - y_lab_width
+    if(!is.na(max_y_lab)){
+
+      max_y_lab <- max_y_lab * 10 * ggplot2:::.pt
+      max_width <- pmax(max_y_lab, max_break_width, na.rm = T)
+      diff <- max_width - y_lab_width
+
+    } else {
+
+      diff <- break_width - 10
+    }
   }
 
   # add the break adjustment to the plot

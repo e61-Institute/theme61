@@ -656,8 +656,8 @@ mpanel_e61 <-
       # save the known width and height of the chart
       p <- ggplot2::ggplotGrob(temp_plot)
 
-      known_width <- sum(grid::convertWidth(p$widths, "cm", valueOnly = TRUE))
-      known_height <- sum(grid::convertHeight(p$heights, "cm", valueOnly = TRUE))
+      known_width <- sum(grid::convertWidth(p$widths, "cm", valueOnly = TRUE), na.rm = T)
+      known_height <- sum(grid::convertHeight(p$heights, "cm", valueOnly = TRUE), na.rm = T)
 
       tot_width <- tot_width + known_width
       tot_height <- tot_height + known_height

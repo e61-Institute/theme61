@@ -10,7 +10,7 @@ get_known_width <- function(plot, is_mpanel){
   } else {
     p <- ggplot2::ggplotGrob(plot)
 
-    width <- sum(grid::convertWidth(p$widths, "cm", valueOnly = TRUE))
+    width <- sum(grid::convertWidth(p$widths, "cm", valueOnly = TRUE), na.rm = T)
   }
 
   return(width)
@@ -50,10 +50,10 @@ get_grob_width <- function(ggplotGrob, grob_name){
       width <- 0
 
     } else if(!is.null(grob$width)){
-      width <- sum(grid::convertWidth(grob$width, "cm", valueOnly = TRUE))
+      width <- sum(grid::convertWidth(grob$width, "cm", valueOnly = TRUE), na.rm = T)
 
     } else if(!is.null(grob$widths)){
-      width <- sum(grid::convertWidth(grob$widths, "cm", valueOnly = TRUE))
+      width <- sum(grid::convertWidth(grob$widths, "cm", valueOnly = TRUE), na.rm = T)
 
     } else {
       width <- 0
@@ -72,10 +72,10 @@ get_grob_width <- function(ggplotGrob, grob_name){
         width <- 0
 
       } else if(!is.null(temp_grob$width)){
-        width <- sum(grid::convertWidth(temp_grob$width, "cm", valueOnly = TRUE))
+        width <- sum(grid::convertWidth(temp_grob$width, "cm", valueOnly = TRUE), na.rm = T)
 
       } else if(!is.null(temp_grob$widths)){
-        width <- sum(grid::convertWidth(temp_grob$widths, "cm", valueOnly = TRUE))
+        width <- sum(grid::convertWidth(temp_grob$widths, "cm", valueOnly = TRUE), na.rm = T)
 
       } else {
         width <- 0
