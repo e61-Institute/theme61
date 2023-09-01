@@ -64,7 +64,6 @@
 #' @return Invisibly returns the file name.
 #' @export
 
-
 save_e61 <- function(filename,
                      plot = ggplot2::last_plot(),
                      chart_type = "MN",
