@@ -181,6 +181,8 @@ save_mpanel_e61 <-
     y_lab_max_size <- 0
     max_break_width <- 0
 
+    warn <- F
+
     for(i in seq_along(plots)){
 
       temp_plot <- plots[[i]]
@@ -231,6 +233,12 @@ save_mpanel_e61 <-
 
         # then update the chart scales
         suppressMessages({temp_plot <- update_chart_scales(temp_plot, auto_scale, sec_axis)})
+
+      # if the y-var class is NULL, send a warning message about the auto updating of chart scales
+      } else if(y_var_class == "NULL" & warn == F){
+
+        warning("Could not identify the class of the y variable. This prevents the y-axis scales from being automatically updated to aesthetic values. To address this issue check that you have not edited the variable within your ggplot call (e.g. aes(y = 100 * var)). Instead make any changes before passing the dataset to ggplot (e.g. data %>% mutate(new_var = 100 * var) %>% ggplot(...)).")
+        warn <- T
       }
 
       # update the titles and subtitles of the plots
@@ -445,7 +453,7 @@ save_mpanel_e61 <-
     # TODO - fix this crude height adjustment
     if(is.null(height_adj)){
       if(nrow == 1) {
-        height_adj <- 1.1
+        height_adj <- 1.15
 
       } else if(nrow == 2) {
         height_adj <- 0.90
@@ -483,7 +491,7 @@ save_mpanel_e61 <-
 
     # calculate the total height and panel height
     p_h <- height
-    tot_height <- p_h * height_adj + sum(t_h + s_h + f_h)
+    tot_height <- (p_h + sum(t_h + s_h + f_h)) * height_adj
 
     if (t_h == 0) t_h <- NULL
     if (s_h == 0) s_h <- NULL
