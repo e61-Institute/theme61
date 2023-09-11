@@ -30,7 +30,6 @@
 #'   \code{mpanel_e61} by doubling the default width to 17, but you will need to
 #'   make adjustments to the dimensions to ensure the graph is sized
 #'   appropriately.
-#'
 #' @param filename File name to create on disk. Providing the file format
 #'   extension (e.g. .svg) is optional. The file extension must be lowercase. If
 #'   you want to save multiple files with different formats, see the
@@ -60,6 +59,23 @@
 #'   graph width and height. You may also need to adjust the \code{pointsize}
 #'   and \code{res} to ensure the text is readable.
 #' @param test For development use only.
+#' @param ... (Mpanel specific) Plot objects to put on the panel.
+#' @param plotlist (Mpanel specific) List of plots to combine as an mpanel and save. You can also
+#'   enter the charts individually as arguments to the function.
+#' @param title_adj (Mpanel specific) Rescales the size of the title text to be slightly larger
+#'   than the titles of the subplots (default is 1.1). 2 doubles the font size.
+#' @param height_adj (Mpanel specific) Rescales the height of the mpanel. The function sets sensible
+#'   defaults but this provides you with manial control if you need it.
+#' @param base_size (Mpanel specific) Numeric. Chart font size. Default is 8.
+#' @param title_spacing_adj (Mpanel specific) Rescales the size of the space give to the mpanel
+#'   title. Use if you think the title looks too cramped on the chart.
+#' @param subtitle_spacing_adj (Mpanel specific) Rescales the size of the space give to the mpanel
+#'   subtitle. Use if you think the subtitle looks too cramped on the chart.
+#' @param rel_heights (Mpanel specific) A numeric vector giving the relative proportions of each
+#'   graph component (title, plots, footer (optional)).
+#' @return ggplot2 object
+#' @inheritParams labs_e61
+#' @inheritParams cowplot::plot_grid
 #' @inheritParams grDevices::png
 #' @return Invisibly returns the file name.
 #' @export
@@ -76,8 +92,97 @@ save_e61 <- function(filename,
                      resize = NULL,
                      pointsize = 12,
                      res = 72,
-                     test = !isTRUE(getOption("test_save"))
+                     test = !isTRUE(getOption("test_save")),
+                     # mpanel specific arguments
+                     ...,
+                     plotlist = NULL,
+                     title = NULL,
+                     subtitle = NULL,
+                     footnotes = NULL,
+                     sources = NULL,
+                     title_adj = 1,
+                     title_spacing_adj = 1, # adjust the amount of space given to the title
+                     subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
+                     base_size = 8, # set the base size for the theme61 font size call
+                     height_adj = 1, # adjust the vertical spacing of the mpanel charts
+                     ncol = 2,
+                     nrow = NULL,
+                     align = c("v", "none", "h", "hv"),
+                     axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
+                     rel_heights = NULL
 ) {
+
+  # Check whether to save an mpanel or a single planel chart - these require different approaches
+
+  plots <- c(list(...), plotlist)
+
+  # check whether the plots are ggplot2 objects
+  plots <- check_plots(plots)
+
+  if(length(plots) > 1){
+
+    save_mpanel_e61(
+      filename,
+      plotlist = plots,
+      chart_type = chart_type,
+      title = title,
+      subtitle = subtitle,
+      footnotes = footnotes,
+      sources = sources,
+      width = width, # manual control over the width of the chart
+      height = height, # manual control over the height of the chart
+      max_height = max_height, # manual control over the maximum height of the chart
+      auto_scale = auto_scale,
+      title_adj = title_adj,
+      title_spacing_adj = title_spacing_adj, # adjust the amount of space given to the title
+      subtitle_spacing_adj = subtitle_spacing_adj, # adjust the amount of space given to the subtitle
+      base_size = base_size, # set the base size for the theme61 font size call
+      height_adj = height_adj, # adjust the vertical spacing of the mpanel charts
+      ncol = ncol,
+      nrow = nrow,
+      align = align,
+      axis = axis,
+      rel_heights = rel_heights,
+      pointsize = pointsize,
+      res = res
+    )
+
+  } else {
+
+    save_spanel_e61(
+      filename = filename,
+      plot = plot,
+      chart_type = chart_type,
+      auto_scale = auto_scale, # manual control over whether y-axis is scaled
+      width = width, # manual control over the width of the chart
+      height = height, # manual control over the height of the chart
+      max_height = max_height, # manual control over the maximum height of the chart
+      format = format,
+      save_data = save_data,
+      resize = resize,
+      pointsize = pointsize,
+      res = res,
+      test = test
+    )
+  }
+}
+
+#' Save a single-panel chart with e61 formatting
+#' @noRd
+save_spanel_e61 <- function(
+    filename,
+    plot = ggplot2::last_plot(),
+    chart_type = "MN",
+    auto_scale = TRUE, # manual control over whether y-axis is scaled
+    width = NULL, # manual control over the width of the chart
+    height = NULL, # manual control over the height of the chart
+    max_height = NULL, # manual control over the maximum height of the chart
+    format = c("svg", "pdf", "eps", "png"),
+    save_data = FALSE,
+    resize = NULL,
+    pointsize = 12,
+    res = 72,
+    test = !isTRUE(getOption("test_save"))){
 
   # Advisory messages -------------------------------------------------------
 
@@ -178,57 +283,59 @@ save_e61 <- function(filename,
   }
 
   # update the chart scales if this is an auto_scaled chart
-  if(!is_mpanel) {
+  if(auto_scale){
 
-    # check if the y-var is numeric
-    y_var_name <- ggplot2::quo_name(plot$mapping$y)
-    y_var_class <- plot$data[[y_var_name]] %>% class()
+    if(!is_mpanel) {
 
-    if (y_var_name == "NULL") {
-      layers <- plot$layers
+      # check if the y-var is numeric
+      y_var_name <- ggplot2::quo_name(plot$mapping$y)
+      y_var_class <- plot$data[[y_var_name]] %>% class()
 
-      for (j in seq_along(layers)) {
-        # don't get y-aesthetic for geom_text objects
-        layer_type <- layers[[j]]$geom %>% class()
+      if (y_var_name == "NULL") {
+        layers <- plot$layers
 
-        if ("GeomText" %in% layer_type) next
+        for (j in seq_along(layers)) {
+          # don't get y-aesthetic for geom_text objects
+          layer_type <- layers[[j]]$geom %>% class()
 
-        # otherwise get the y-variable name and type
-        y_var_name <- ggplot2::quo_name(layers[[j]]$mapping$y)
+          if ("GeomText" %in% layer_type) next
 
-        if (y_var_name == "NULL") next
+          # otherwise get the y-variable name and type
+          y_var_name <- ggplot2::quo_name(layers[[j]]$mapping$y)
 
+          if (y_var_name == "NULL") next
+
+          y_var_class <- plot$data[[y_var_name]] %>% class()
+
+          # if we found one numeric class, break because that all we need
+          if(y_var_class == "numeric") break
+        }
+
+      } else {
         y_var_class <- plot$data[[y_var_name]] %>% class()
-
-        # if we found one numeric class, break because that all we need
-        if(y_var_class == "numeric") break
       }
 
-    } else {
-      y_var_class <- plot$data[[y_var_name]] %>% class()
-    }
+      # if the y-variable name is not in the dataset, throw an error and force the user to actually create it properly
+      data_names <- names(plot$data)
 
-    # if the y-variable name is not in the dataset, throw an error and force the user to actually create it properly
-    data_names <- names(plot$data)
+      # if the y-variable class is numeric, then update the chart scales
+      if(y_var_class == "numeric"){
 
-    # TODO - fix this issue if possible
-    if(!y_var_name %in% data_names) {
-      stop("Unable to locate y-axis variable in dataset. Please make sure it is a valid variable name and in your dataset. Note that the auto scaler will not work with variables that are created within ggplot (e.g. you cannot do things like the following 'ggplot(data, aes(y = log(y_var))'. Please create all variables in your data set before using it to create a ggplot.")
-    }
+        # first check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
+        grobs <- ggplot2::ggplotGrob(plot)
 
-    # if the y-variable class is numeric, then update the chart scales
-    if(y_var_class == "numeric"){
+        test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
 
-      # first check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
-      grobs <- ggplot2::ggplotGrob(plot)
+        # add a second axis if there is already one present
+        sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
 
-      test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
+        # then update
+        suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
 
-      # add a second axis if there is already one present
-      sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
+      } else if(y_var_class == "NULL"){
 
-      # then update
-      suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
+        warning("Could not identify the class of the y variable. This prevents the y-axis scales from being automatically updated to aesthetic values. To address this issue check that you have not edited the variable within your ggplot call (e.g. aes(y = 100 * var)). Instead make any changes before passing the dataset to ggplot (e.g. data %>% mutate(new_var = 100 * var) %>% ggplot(...)).")
+      }
     }
   }
 
@@ -241,13 +348,13 @@ save_e61 <- function(filename,
     n_panel_cols = attr(plot, "panel_cols")
     n_panel_rows = attr(plot, "panel_rows")
 
-  # Get facet dimensions if applicable
+    # Get facet dimensions if applicable
   } else if (length(plot$facet$params) != 0) {
 
     n_panel_cols <- max(plot_build$layout$layout$COL)
     n_panel_rows <- max(plot_build$layout$layout$ROW)
 
-  # The default is just 1 row and 1 column - i.e. no facets or mpanel plots have been used
+    # The default is just 1 row and 1 column - i.e. no facets or mpanel plots have been used
   } else {
     n_panel_cols <- 1
     n_panel_rows <- 1
@@ -266,12 +373,12 @@ save_e61 <- function(filename,
 
       plot <- plot + format_flipped_bar()
 
-    # If it's only one panel, set the chart width to 1/2 of the max-width
+      # If it's only one panel, set the chart width to 1/2 of the max-width
     } else if(n_panel_cols == 1){
 
       width <- 1/2 * max_width
 
-    # Else use the whole width
+      # Else use the whole width
     } else {
       width <- max_width
     }
@@ -423,6 +530,26 @@ save_e61 <- function(filename,
   retval <- paste(filename, format, sep = ".")
 
   invisible(retval)
+}
+
+
+#' Check plots are ggplot objects and return a list of only ggplot objects
+#' @noRd
+check_plots <- function(plots){
+
+  temp_list <- list()
+
+  for(i in seq_along(plots)){
+    temp_plot <- plots[[i]]
+
+    if(is.ggplot(temp_plot)) {
+      temp_list[[length(temp_list) + 1]] <- temp_plot
+    } else {
+      warning("Some elements of the plotlist are not ggplot objects. Check you have not supplied the wrong object or used an incorrect argument.")
+    }
+  }
+
+  return(temp_list)
 }
 
 
