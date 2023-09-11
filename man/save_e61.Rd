@@ -6,6 +6,7 @@
 \usage{
 save_e61(
   filename,
+  ...,
   plot = ggplot2::last_plot(),
   chart_type = "MN",
   auto_scale = TRUE,
@@ -17,7 +18,22 @@ save_e61(
   resize = NULL,
   pointsize = 12,
   res = 72,
-  test = !isTRUE(getOption("test_save"))
+  test = !isTRUE(getOption("test_save")),
+  plotlist = NULL,
+  title = NULL,
+  subtitle = NULL,
+  footnotes = NULL,
+  sources = NULL,
+  title_adj = 1,
+  title_spacing_adj = 1,
+  subtitle_spacing_adj = 1,
+  base_size = 8,
+  height_adj = 1,
+  ncol = 2,
+  nrow = NULL,
+  align = c("v", "none", "h", "hv"),
+  axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
+  rel_heights = NULL
 )
 }
 \arguments{
@@ -25,6 +41,8 @@ save_e61(
 extension (e.g. .svg) is optional. The file extension must be lowercase. If
 you want to save multiple files with different formats, see the
 \code{format} argument for details.}
+
+\item{...}{(Mpanel specific) Plot objects to put on the panel.}
 
 \item{plot}{Plot object to save. Defaults to the last plot displayed so
 usually you do not need to provide this explicitly.}
@@ -68,8 +86,52 @@ and \code{res} to ensure the text is readable.}
     text and line widths.}
 
 \item{test}{For development use only.}
+
+\item{plotlist}{(Mpanel specific) List of plots to combine as an mpanel and save. You can also
+enter the charts individually as arguments to the function.}
+
+\item{title}{The text for the title.}
+
+\item{subtitle}{The text for the subtitle.}
+
+\item{footnotes}{A vector of footnote text strings. Each new string will be
+prepended with *, **, ***, etc. Note you'll need to include the asterisks
+in the title/subtitle yourself. Please be sensible with the number of
+separate points you include in the graph.}
+
+\item{sources}{String vector providing the names of sources for the graph.}
+
+\item{title_adj}{(Mpanel specific) Rescales the size of the title text to be slightly larger
+than the titles of the subplots (default is 1.1). 2 doubles the font size.}
+
+\item{title_spacing_adj}{(Mpanel specific) Rescales the size of the space give to the mpanel
+title. Use if you think the title looks too cramped on the chart.}
+
+\item{subtitle_spacing_adj}{(Mpanel specific) Rescales the size of the space give to the mpanel
+subtitle. Use if you think the subtitle looks too cramped on the chart.}
+
+\item{base_size}{(Mpanel specific) Numeric. Chart font size. Default is 8.}
+
+\item{height_adj}{(Mpanel specific) Rescales the height of the mpanel. The function sets sensible
+defaults but this provides you with manial control if you need it.}
+
+\item{ncol}{(optional) Number of columns in the plot grid.}
+
+\item{nrow}{(optional) Number of rows in the plot grid.}
+
+\item{align}{(optional) Specifies whether graphs in the grid should be horizontally ("h") or
+vertically ("v") aligned. Options are "none" (default), "hv" (align in both directions), "h", and "v".}
+
+\item{axis}{(optional) Specifies whether graphs should be aligned by the left ("l"), right ("r"), top ("t"), or bottom ("b")
+margins. Options are "none" (default), or a string of any combination of l, r, t, and b in any order (e.g. "tblr" or "rlbt" for aligning all margins).
+Must be specified if any of the graphs are complex (e.g. faceted) and alignment is specified and desired. See \code{\link[cowplot:align_plots]{align_plots()}} for details.}
+
+\item{rel_heights}{(Mpanel specific) A numeric vector giving the relative proportions of each
+graph component (title, plots, footer (optional)).}
 }
 \value{
+ggplot2 object
+
 Invisibly returns the file name.
 }
 \description{

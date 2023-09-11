@@ -17,7 +17,7 @@ ggplot <-
     y_var_class <- data[[y_var_name]] %>% class()
 
     if(y_var_class == "numeric"){
-      p <- p + scale_y_continuous_e61()
+      p <- p + scale_y_continuous_e61(y_top = T)
     }
   }
 

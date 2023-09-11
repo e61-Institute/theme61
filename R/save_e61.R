@@ -81,6 +81,7 @@
 #' @export
 
 save_e61 <- function(filename,
+                     ..., # specific for mpanel plots
                      plot = ggplot2::last_plot(),
                      chart_type = "MN",
                      auto_scale = TRUE, # manual control over whether y-axis is scaled
@@ -94,7 +95,6 @@ save_e61 <- function(filename,
                      res = 72,
                      test = !isTRUE(getOption("test_save")),
                      # mpanel specific arguments
-                     ...,
                      plotlist = NULL,
                      title = NULL,
                      subtitle = NULL,
@@ -113,7 +113,6 @@ save_e61 <- function(filename,
 ) {
 
   # Check whether to save an mpanel or a single planel chart - these require different approaches
-
   plots <- c(list(...), plotlist)
 
   # check whether the plots are ggplot2 objects
