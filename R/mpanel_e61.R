@@ -121,59 +121,63 @@ save_mpanel_e61 <-
       # update the text sizes
       temp_plot <- temp_plot + theme_e61(base_size = base_size)
 
-      # check if the y-var is numeric
-      y_var_name <- ggplot2::quo_name(temp_plot$mapping$y)
-      y_var_class <- temp_plot$data[[y_var_name]] %>% class()
+      # check whether to apply the autoscaler or not
+      if(auto_scale){
 
-      if(y_var_name == "NULL"){
+        # check if the y-var is numeric
+        y_var_name <- ggplot2::quo_name(temp_plot$mapping$y)
+        y_var_class <- temp_plot$data[[y_var_name]] %>% class()
 
-        layers <- temp_plot$layers
+        if(y_var_name == "NULL"){
 
-        for(j in seq_along(layers)){
+          layers <- temp_plot$layers
 
-          # don't get y-aesthetic for geom_text objects
-          layer_type <- layers[[j]]$geom %>% class()
+          for(j in seq_along(layers)){
 
-          if("GeomText" %in% layer_type) next
+            # don't get y-aesthetic for geom_text objects
+            layer_type <- layers[[j]]$geom %>% class()
 
-          # otherwise get the y-variable name and type
-          y_var_name <- ggplot2::quo_name(layers[[j]]$mapping$y)
+            if("GeomText" %in% layer_type) next
 
-          if(y_var_name == "NULL") next
+            # otherwise get the y-variable name and type
+            y_var_name <- ggplot2::quo_name(layers[[j]]$mapping$y)
 
+            if(y_var_name == "NULL") next
+
+            y_var_class <- temp_plot$data[[y_var_name]] %>% class()
+
+            # if we found one numeric class, break because that all we need
+            if(y_var_class == "numeric") break
+          }
+
+        } else {
           y_var_class <- temp_plot$data[[y_var_name]] %>% class()
-
-          # if we found one numeric class, break because that all we need
-          if(y_var_class == "numeric") break
         }
 
-      } else {
-        y_var_class <- temp_plot$data[[y_var_name]] %>% class()
+        # if one of the y-variables is numeric, adjust the y-axis scale
+        if(y_var_class == "numeric"){
+
+          # first check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
+          grobs <- ggplot2::ggplotGrob(temp_plot)
+
+          test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
+
+          # add a second axis if there is already one present
+          sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
+
+          # then update the chart scales
+          suppressMessages({temp_plot <- update_chart_scales(temp_plot, auto_scale, sec_axis)})
+
+          # if the y-var class is NULL, send a warning message about the auto updating of chart scales
+        } else if(y_var_class == "NULL" & warn == F){
+
+          warning("Could not identify the class of the y variable. This prevents the y-axis scales from being automatically updated to aesthetic values. To address this issue check that you have not edited the variable within your ggplot call (e.g. aes(y = 100 * var)). Instead make any changes before passing the dataset to ggplot (e.g. data %>% mutate(new_var = 100 * var) %>% ggplot(...)).")
+          warn <- T
+        }
+
+        # update the titles and subtitles of the plots
+        suppressMessages({temp_plot <- update_labs(plot = temp_plot, is_mpanel = F, plot_width = (0.95 * width) / ncol)})
       }
-
-      # if one of the y-variables is numeric, adjust the y-axis scale
-      if(y_var_class == "numeric"){
-
-        # first check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
-        grobs <- ggplot2::ggplotGrob(temp_plot)
-
-        test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
-
-        # add a second axis if there is already one present
-        sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
-
-        # then update the chart scales
-        suppressMessages({temp_plot <- update_chart_scales(temp_plot, auto_scale, sec_axis)})
-
-      # if the y-var class is NULL, send a warning message about the auto updating of chart scales
-      } else if(y_var_class == "NULL" & warn == F){
-
-        warning("Could not identify the class of the y variable. This prevents the y-axis scales from being automatically updated to aesthetic values. To address this issue check that you have not edited the variable within your ggplot call (e.g. aes(y = 100 * var)). Instead make any changes before passing the dataset to ggplot (e.g. data %>% mutate(new_var = 100 * var) %>% ggplot(...)).")
-        warn <- T
-      }
-
-      # update the titles and subtitles of the plots
-      suppressMessages({temp_plot <- update_labs(plot = temp_plot, is_mpanel = F, plot_width = (0.95 * width) / ncol)})
 
       # save the plot
       clean_plotlist[[i]] <- temp_plot
@@ -234,19 +238,23 @@ save_mpanel_e61 <-
 
     # Update the y-axis scales ------------------------------------------------
 
-    for(i in seq_along(clean_plotlist)){
+    if(auto_scale){
 
-      temp_plot <- clean_plotlist[[i]]
+      for(i in seq_along(clean_plotlist)){
 
-      suppressMessages({
-        temp_plot <-
-          update_y_axis_labels(temp_plot,
-                               max_y_lab = y_lab_max_size,
-                               max_break_width = max_break_width)
-      })
+        temp_plot <- clean_plotlist[[i]]
 
-      # save the plot
-      clean_plotlist[[i]] <- temp_plot
+        suppressMessages({
+          temp_plot <-
+            update_y_axis_labels(temp_plot,
+                                 max_y_lab = y_lab_max_size,
+                                 max_break_width = max_break_width)
+        })
+
+        # save the plot
+        clean_plotlist[[i]] <- temp_plot
+      }
+
     }
 
 
@@ -282,14 +290,17 @@ save_mpanel_e61 <-
     # title
     if(!is.null(title)){
 
-      title <-
-        rescale_text(
-          text = title,
-          text_type = "title",
-          font_size = title_text_size,
-          # plot width is total width
-          plot_width = width * 0.95
-        )
+      if(auto_scale){
+
+        title <-
+          rescale_text(
+            text = title,
+            text_type = "title",
+            font_size = title_text_size,
+            # plot width is total width
+            plot_width = width * 0.95
+          )
+      }
 
       lab_head$title <-
         cowplot::ggdraw() +
@@ -305,14 +316,17 @@ save_mpanel_e61 <-
 
     # subtitle
     if(!is.null(subtitle)){
-      subtitle <-
-        rescale_text(
-          text = subtitle,
-          text_type = "subtitle",
-          font_size = subtitle_text_size,
-          # plot width is total width - outer axis width (we don't want to overlap those)
-          plot_width = width - (max_left_axis_width + max_right_axis_width)
-        )
+
+      if(auto_scale){
+        subtitle <-
+          rescale_text(
+            text = subtitle,
+            text_type = "subtitle",
+            font_size = subtitle_text_size,
+            # plot width is total width - outer axis width (we don't want to overlap those)
+            plot_width = width - (max_left_axis_width + max_right_axis_width)
+          )
+      }
 
       lab_head$subtitle <-
         cowplot::ggdraw() +
@@ -336,14 +350,16 @@ save_mpanel_e61 <-
 
     if (!is.null(caption)) {
 
-      caption <-
-        rescale_text(
-          text = caption,
-          text_type = "caption",
-          font_size = footer_text_size,
-          # plot width including the left axis
-          plot_width = width - max_right_axis_width
-        )
+      if(auto_scale){
+        caption <-
+          rescale_text(
+            text = caption,
+            text_type = "caption",
+            font_size = footer_text_size,
+            # plot width including the left axis
+            plot_width = width - max_right_axis_width
+          )
+      }
 
       lab_foot$footer <-
         cowplot::ggdraw() +
