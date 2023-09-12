@@ -398,6 +398,8 @@ save_spanel_e61 <- function(
     }
   }
 
+  # browser()
+
   # Update the size of the text used for titles, footnotes, axes etc.
 
   p <- ggplot2::ggplotGrob(plot)

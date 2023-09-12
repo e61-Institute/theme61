@@ -113,8 +113,13 @@ rescale_text <- function(text, text_type, font_size, plot_width){
       unlist() %>%
       stringr::str_squish()
 
-    # remove sources
-    footnote_text <- stringr::str_extract(footnote_text, "^.*(?=Source.*:.+)")
+    # remove sources - if we have them
+    if(stringr::str_detect(footnote_text, "Source")){
+      footnote_text <- stringr::str_extract(footnote_text, "^.*(?=Source.*:.+)")
+
+    } else {
+      footnote_text <- footnote_text
+    }
 
     # split footnotes up if there are multiple and drop those with length 0
     footnote_text <- stringr::str_split(footnote_text, "\\*+\\s*")
@@ -162,31 +167,33 @@ rescale_text <- function(text, text_type, font_size, plot_width){
     }
 
     # Check whether we have sources to add and how many
-    if(length(sources) > 1) {
-
-      if(is.null(footnote_text)){
-        text <- paste("Sources:", paste(sources, collapse = "; "))
-
-      } else {
-        text <- paste(footnote_text, "\nSources:", paste(sources, collapse = "; "))
-      }
-
-    } else if(length(sources) == 1){
-
-      if(is.null(footnote_text)){
-        text <- paste("\nSource:", sources)
-
-      } else {
-        text <- paste(footnote_text, "\nSource:", sources)
-      }
-
-    # No sources
-    } else {
+    if(is.na(sources) | is.null(sources)){
       if(is.null(footnote_text)){
         text <- NULL
 
       } else {
         text <- footnote_text
+      }
+
+    # we have sources - check how many
+    } else {
+      if(length(sources) > 1) {
+
+        if(is.null(footnote_text)){
+          text <- paste("Sources:", paste(sources, collapse = "; "))
+
+        } else {
+          text <- paste(footnote_text, "\nSources:", paste(sources, collapse = "; "))
+        }
+
+      } else if(length(sources) == 1){
+
+        if(is.null(footnote_text)){
+          text <- paste("\nSource:", sources)
+
+        } else {
+          text <- paste(footnote_text, "\nSource:", sources)
+        }
       }
     }
   }
