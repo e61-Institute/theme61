@@ -307,7 +307,7 @@ save_spanel_e61 <- function(
           y_var_class <- plot$data[[y_var_name]] %>% class()
 
           # if we found one numeric class, break because that all we need
-          if(y_var_class == "numeric") break
+          if(y_var_class == "numeric" | y_var_class == "integer") break
         }
 
       } else {
@@ -318,7 +318,7 @@ save_spanel_e61 <- function(
       data_names <- names(plot$data)
 
       # if the y-variable class is numeric, then update the chart scales
-      if(y_var_class == "numeric"){
+      if(y_var_class == "numeric" | y_var_class == "integer"){
 
         # first check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
         grobs <- ggplot2::ggplotGrob(plot)
@@ -393,7 +393,7 @@ save_spanel_e61 <- function(
   if (!is_mpanel) {
 
     # if one of the y-variables is numeric, adjust the y-axis scale
-    if (y_var_class == "numeric") {
+    if (y_var_class == "numeric" | y_var_class == "integer") {
       plot <- update_y_axis_labels(plot)
     }
   }

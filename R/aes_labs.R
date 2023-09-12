@@ -167,7 +167,7 @@ rescale_text <- function(text, text_type, font_size, plot_width){
     }
 
     # Check whether we have sources to add and how many
-    if(is.na(sources) | is.null(sources)){
+    if(any(is.na(sources)) | is.null(sources)){
       if(is.null(footnote_text)){
         text <- NULL
 

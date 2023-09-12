@@ -16,7 +16,9 @@ ggplot <-
     y_var_name <- ggplot2::quo_name(mapping$y)
     y_var_class <- data[[y_var_name]] %>% class()
 
-    if(y_var_class == "numeric"){
+    browser()
+
+    if(y_var_class == "numeric" | y_var_class == "integer"){
       p <- p + scale_y_continuous_e61(y_top = T)
     }
   }
@@ -27,7 +29,7 @@ ggplot <-
     x_var_name <- ggplot2::quo_name(mapping$x)
     x_var_class <- data[[x_var_name]] %>% class()
 
-    if(x_var_class == "numeric"){
+    if(x_var_class == "numeric" | x_var_class == "integer"){
       p <- p + scale_x_continuous_e61()
     }
   }

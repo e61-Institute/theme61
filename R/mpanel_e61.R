@@ -147,7 +147,7 @@ save_mpanel_e61 <-
             y_var_class <- temp_plot$data[[y_var_name]] %>% class()
 
             # if we found one numeric class, break because that all we need
-            if(y_var_class == "numeric") break
+            if(y_var_class == "numeric" | y_var_class == "integer") break
           }
 
         } else {
@@ -155,7 +155,7 @@ save_mpanel_e61 <-
         }
 
         # if one of the y-variables is numeric, adjust the y-axis scale
-        if(y_var_class == "numeric"){
+        if(y_var_class == "numeric" | y_var_class == "integer"){
 
           # first check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
           grobs <- ggplot2::ggplotGrob(temp_plot)
@@ -598,7 +598,7 @@ mpanel_e61 <-
           y_var_class <- temp_plot$data[[y_var_name]] %>% class()
 
           # if we found one numeric class, break because that all we need
-          if(y_var_class == "numeric") break
+          if(y_var_class == "numeric" | y_var_class == "integer") break
         }
 
       } else {
@@ -606,7 +606,7 @@ mpanel_e61 <-
       }
 
       # if one of the y-variables is numeric, adjust the y-axis scale
-      if(y_var_class == "numeric"){
+      if(y_var_class == "numeric" | y_var_class == "integer"){
         temp_plot <- update_y_axis_labels(temp_plot)
       }
 
