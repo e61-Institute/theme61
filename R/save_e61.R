@@ -390,7 +390,7 @@ save_spanel_e61 <- function(
   # Update labels -----------------------------------------------------------
 
   # update y-axis labels if the chart is not an mpanel chart
-  if (!is_mpanel) {
+  if (!is_mpanel & auto_scale) {
 
     # if one of the y-variables is numeric, adjust the y-axis scale
     if (y_var_class == "numeric" | y_var_class == "integer") {
