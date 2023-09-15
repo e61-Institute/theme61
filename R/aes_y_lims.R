@@ -17,11 +17,6 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
 
     for(i in seq_along(chart_data)){
 
-      y_data <- chart_data[[i]]$y
-
-      # skip if not numeric
-      if(!is.numeric(y_data)) next
-
       # check if the chart has ymin and ymax data
       if(!is.null(chart_data[[i]]$ymax)){
         temp_max_y <- chart_data[[i]]$ymax %>% max(na.rm = T)
@@ -32,7 +27,8 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
           temp_max_y <- test
         }
 
-      } else {
+      } else if(is.numeric(chart_data[[i]]$y)){
+
         temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
       }
 
@@ -45,7 +41,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
           temp_min_y <- test
         }
 
-      } else {
+      } else if(is.numeric(chart_data[[i]]$y)) {
 
         temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
       }
