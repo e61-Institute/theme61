@@ -26,7 +26,7 @@
 #'   note boxes, set the colour to e61_skylight8.
 #' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #' @param base_size Numeric. Chart font size. Default is 10.
-#' @param base_family Character. Chart font family. Default is Arial.
+#' @param base_family Character. Chart font family. Default is PT-SANS (research notes).
 #' @param base_line_size Numeric. Default line width.
 #' @param base_rect_size Numeric. Default rect width.
 #'
@@ -260,6 +260,99 @@ theme_e61 <- function(y_top = TRUE,
 
   # Add attribute to identify it as a theme61 object
   attr(ret, "t61_obj") <- TRUE
+
+  return(ret)
+}
+
+#' e61 themed spatial maps options
+#'
+#' Applies the e61 theme to ggplot spatial maps to adjust graph
+#' appearance. If you are looking to change the appearance of titles or labels,
+#' check the arguments in \code{\link[theme61]{labs_e61}}, which are probably
+#' what you are looking for.
+#'
+#' @param legend Character. Legend position, "none" (default) hides the legend.
+#' @param legend_title Logical. Include Legend title? Defaults to FALSE.
+#' @param aspect_ratio Numeric. Sets the aspect ratio of the graph panel.
+#' @param base_size Numeric. Chart font size. Default is 10.
+#' @param base_family Character. Chart font family. Default is PT-SANS (research notes).
+#'
+#' @return ggplot2 object
+#' @import ggplot2
+#' @export
+#'
+#' @examples
+#'
+#' sa3_shp <- strayr::read_absmap("sa32016")
+#'
+#' sydney_map <- sa3_shp %>%
+#'    mutate(gcc_code_2016 == "1GSYD")
+#'
+#' ggplot(data = sydney_map) +
+#'   geom_sf(aes(fill = gcc_name_2016 , col = gcc_name_2016 )) +
+#'   theme61_sf() +
+#'
+
+theme_e61_spatial <- function(
+  legend = c("none", "bottom", "top", "left", "right"),
+  legend_title = FALSE,
+  aspect_ratio = 0.75,
+  base_size = 10,
+  base_family = "pt-sans"
+){
+
+  half_line <- base_size / 2
+
+  ret <-
+    theme_void() +
+    theme(
+      text = element_text(
+        colour = "black",
+        family = base_family,
+        face = "plain",
+        hjust = 0.5,
+        vjust = 0.5,
+        angle = 0,
+        lineheight = 0.9,
+        debug = FALSE,
+        margin = margin(),
+        size = base_size
+      ),
+      plot.title = element_text(
+        size = rel(1.15),
+        hjust = 0.5,
+        vjust = 1,
+        colour = "black",
+        face = "bold",
+        margin = margin(b = half_line)
+      ),
+      plot.subtitle = element_text(
+        size = rel(1),
+        colour = "black",
+        hjust = 0.5,
+        vjust = 1,
+        margin = margin(
+          t = 0, r = 0, b = base_size * .5, l = 0,
+          unit = "pt"
+        )
+      ),
+      plot.caption = element_text(
+        family = base_family,
+        size = rel(0.8),
+        hjust = 0,
+        vjust = 1,
+        colour = "black",
+        margin = margin(t = 15)
+      ),
+      legend.position = legend,
+      axis.text = element_blank(),
+      axis.ticks = element_blank(),
+      axis.line = element_blank(),
+      panel.border = element_blank(),
+      aspect.ratio = aspect_ratio
+    )
+
+  if(legend_title) ret <- ret + theme(legend.title = element_text())
 
   return(ret)
 }
