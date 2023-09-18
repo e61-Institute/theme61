@@ -277,8 +277,17 @@ get_text_height <- function(text, font_size = 10) {
 #' text - Text to be split into individual words.
 #' @noRd
 split_text_into_words <- function(text) {
+
   words <- strsplit(text, "\\s+")[[1]]
-  data.frame(word = words, text = text, stringsAsFactors = FALSE)
+
+  # if we have been pased an empty string, return an empty string
+  if(length(words) == 0){
+
+    data.frame(word = "", text = text, stringsAsFactors = FALSE)
+
+  } else {
+    data.frame(word = words, text = text, stringsAsFactors = FALSE)
+  }
 }
 
 #' Update y-axis label spacing so that they are aesthetic
