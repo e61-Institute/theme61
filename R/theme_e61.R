@@ -348,8 +348,7 @@ theme_e61_spatial <- function(
       axis.text = element_blank(),
       axis.ticks = element_blank(),
       axis.line = element_blank(),
-      panel.border = element_blank(),
-      aspect.ratio = aspect_ratio
+      panel.border = element_blank()
     )
 
   if(legend_title) ret <- ret + theme(legend.title = element_text())
