@@ -65,24 +65,8 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
     if(is.na(min_y)) min_y <- 0
     if(is.na(max_y)) max_y <- 0
 
-    # Check whether the chart is a column chart
-    geoms <- plot$layers
-
-    check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
-
-    is_bar <- F
-
-    for (i in seq_along(geoms)) {
-      g <- geoms[[i]]
-
-      class <- class(g$geom)
-
-      if (any(class %in% check_geoms)) {
-        is_bar <- T
-
-        break
-      }
-    }
+    # check whether the chart is a bar chart or not
+    is_bar <- is_barchart(plot)
 
     # get aesthetic limits for the y-axis - if it is a bar chart, then include zero
     aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
@@ -95,9 +79,64 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
         plot <- plot + scale_y_continuous_e61(limits = aes_lims)
       }
     })
+
+  # otherwise check if the limits didn't provide a break - this is basically user error
+  } else if(length(y_scale_lims) == 2 & auto_scale){
+
+    # use the first two supplied limits as the min and max
+    min_y <- y_scale_lims[1]
+    max_y <- y_scale_lims[2]
+
+    # check whether the chart is a bar chart or not
+    is_bar <- is_barchart(plot)
+
+    # check whether the tick mark with the given limits is null, if it is we'll need to calculate all three from scratch
+    tick <- get_aes_ticks(min_y, max_y)
+
+    if(is.null(tick)){
+      aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
+
+    } else {
+      aes_lims <- c(min_y, max_y, tick)
+    }
+
+    # rescale the axis
+    suppressWarnings({
+      if(sec_axis){
+        plot <- plot + scale_y_continuous_e61(limits = aes_lims, sec_axis = ggplot2::dup_axis())
+
+      } else {
+        plot <- plot + scale_y_continuous_e61(limits = aes_lims)
+      }
+    })
   }
 
   return(plot)
+}
+
+#' Check whether a ggplot is a barchart or not
+#' @noRd
+is_barchart <- function(plot){
+  # Check whether the chart is a column chart
+  geoms <- plot$layers
+
+  check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
+
+  is_bar <- F
+
+  for (i in seq_along(geoms)) {
+    g <- geoms[[i]]
+
+    class <- class(g$geom)
+
+    if (any(class %in% check_geoms)) {
+      is_bar <- T
+
+      break
+    }
+  }
+
+  return(is_bar)
 }
 
 #' Get an aesthetic number near the one supplied.
@@ -140,7 +179,7 @@ get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
   return(y_aes_adj * 10 ^ (order_mag - 2))
 }
 
-# Aesthetic ticks for a given pair of numbers
+#' Aesthetic ticks for a given pair of numbers
 #' min_y_val - Double. Minimum y-axis value.
 #' max_y_val - Double. Maximum y-axis value.
 #' @noRd
