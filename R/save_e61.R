@@ -282,73 +282,14 @@ save_spanel_e61 <- function(
   }
 
   # update the chart scales if this is an auto_scaled chart
-  if(auto_scale){
-
-    if(!is_mpanel) {
-
-      # check if the y-var is numeric
-      y_var_name <- ggplot2::quo_name(plot$mapping$y)
-      y_var_class <- plot$data[[y_var_name]] %>% class()
-
-      if (y_var_name == "NULL") {
-        layers <- plot$layers
-
-        for (j in seq_along(layers)) {
-          # don't get y-aesthetic for geom_text objects
-          layer_type <- layers[[j]]$geom %>% class()
-
-          if ("GeomText" %in% layer_type) next
-
-          # otherwise get the y-variable name and type
-          y_var_name <- ggplot2::quo_name(layers[[j]]$mapping$y)
-
-          if (y_var_name == "NULL") next
-
-          y_var_class <- plot$data[[y_var_name]] %>% class()
-
-          # if we found one numeric class, break because that all we need
-          if(y_var_class == "numeric" | y_var_class == "integer") break
-        }
-
-      } else {
-        y_var_class <- plot$data[[y_var_name]] %>% class()
-      }
-
-      # if the y-variable name is not in the dataset, throw an error and force the user to actually create it properly
-      data_names <- names(plot$data)
-
-      # if the y-variable class is numeric, then update the chart scales
-      if(y_var_class == "numeric" | y_var_class == "integer"){
-
-        # first check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
-        grobs <- ggplot2::ggplotGrob(plot)
-
-        test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
-
-        # add a second axis if there is already one present
-        sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
-
-        # then update
-        suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
-
-      } else if(y_var_class == "NULL"){
-
-        warning("Could not identify the class of the y variable. This prevents the y-axis scales from being automatically updated to aesthetic values. To address this issue check that you have not edited the variable within your ggplot call (e.g. aes(y = 100 * var)). Instead make any changes before passing the dataset to ggplot (e.g. data %>% mutate(new_var = 100 * var) %>% ggplot(...)).")
-      }
-    }
-  }
+  if(auto_scale) plot <- update_scales(plot, auto_scale)
 
 
   # Get the number of panel rows and columns ------------------------------
 
-  # Check if the graph was generated with mpanel_e61 by checking for attributes added to mpanels
-  if(!is.null(attr(plot, "panel_rows"))){
 
-    n_panel_cols = attr(plot, "panel_cols")
-    n_panel_rows = attr(plot, "panel_rows")
-
-    # Get facet dimensions if applicable
-  } else if (length(plot$facet$params) != 0) {
+  # Get facet dimensions if applicable
+  if (length(plot$facet$params) != 0) {
 
     n_panel_cols <- max(plot_build$layout$layout$COL)
     n_panel_rows <- max(plot_build$layout$layout$ROW)
@@ -389,17 +330,6 @@ save_spanel_e61 <- function(
 
   # Update labels -----------------------------------------------------------
 
-  # update y-axis labels if the chart is not an mpanel chart
-  if (!is_mpanel & auto_scale) {
-
-    # if one of the y-variables is numeric, adjust the y-axis scale
-    if (y_var_class == "numeric" | y_var_class == "integer") {
-      plot <- update_y_axis_labels(plot)
-    }
-  }
-
-  # browser()
-
   # Update the size of the text used for titles, footnotes, axes etc.
 
   p <- ggplot2::ggplotGrob(plot)
@@ -413,6 +343,12 @@ save_spanel_e61 <- function(
   tot_panel_width <- width - known_wd
 
   plot <- update_labs(plot = plot, is_mpanel = is_mpanel, plot_width = tot_panel_width)
+
+
+  # Update the y-axis labels ------------------------------------------------
+
+  # update y-axis labels
+  plot <- update_y_axis_labels(plot)
 
 
   # Height adjustments ----------------------------------------------------
@@ -534,6 +470,54 @@ save_spanel_e61 <- function(
 }
 
 
+#' Aesthetically update the y-axis scales and labels
+#' @noRd
+update_scales <- function(plot, auto_scale, warn = F){
+
+  # check if we have a numeric y-variable
+  check_y_var <- check_for_y_var(plot)
+
+  # if we don't have a numeric y-variable then check whether the plot contains ageom_density or geom_histogram (GeomBar without a y-variable)
+  if (!check_y_var) {
+    layers <- plot$layers
+
+    for (j in seq_along(layers)){
+
+      # don't get y-aesthetic for geom_text objects
+      layer_type <- layers[[j]]$geom %>% class()
+
+      # if there isn't one but it is a density plot or a bar chart then it is either a density chart or a histogram so go ahead
+      if ("GeomDensity" %in% layer_type | "GeomBar" %in% layer_type) {
+
+        check_y_var <- T
+
+        break
+      }
+    }
+  }
+
+  # check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
+  grobs <- ggplot2::ggplotGrob(plot)
+
+  test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
+
+  sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
+
+  # if the y-variable class is numeric, or the plot is a density or histogram, then update the chart scales
+  if(check_y_var){
+
+    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
+
+  # if the y-var class is NULL, send a warning message about the auto updating of chart scales
+  } else if(!check_y_var & warn == F){
+
+    warning("Could not identify the class of the y variable. This prevents the y-axis scales from being automatically updated to aesthetic values. To address this issue check that you have not edited the variable within your ggplot call (e.g. aes(y = 100 * var)). Instead make any changes before passing the dataset to ggplot (e.g. data %>% mutate(new_var = 100 * var) %>% ggplot(...)).")
+    warn <<- T
+  }
+
+  return(plot)
+}
+
 #' Check plots are ggplot objects and return a list of only ggplot objects
 #' @noRd
 check_plots <- function(plots){
@@ -551,6 +535,33 @@ check_plots <- function(plots){
   }
 
   return(temp_list)
+}
+
+#' Check whether the dataset has a y-variable that can be used for scaling
+#'@noRd
+
+check_for_y_var <- function(plot){
+
+  chart_data <- ggplot2::ggplot_build(plot)$data
+
+  check <- F
+
+  for(i in seq_along(chart_data)){
+
+    # check the y-variable first
+    if(!is.null(chart_data[[i]]$y) & is.numeric(chart_data[[i]]$y)){
+      check <- T
+      break
+    }
+
+    if(!is.null(chart_data[[i]]$ymax) | !is.null(chart_data[[i]]$ymin)){
+
+      check <- T
+      break
+    }
+  }
+
+  return(check)
 }
 
 

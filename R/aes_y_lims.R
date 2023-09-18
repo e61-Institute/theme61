@@ -320,6 +320,9 @@ get_aes_pair <- function(y_val_1, y_val_2){
     if(order_mag_large > order_mag_small + 1){
       order_mag <- order_mag_large - 1
 
+      # add 0 as a point because chances are we'll need it
+      aes_y_points <- c(0, aes_y_points)
+
     } else {
       order_mag <- order_mag_small
     }
