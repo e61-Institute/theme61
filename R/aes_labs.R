@@ -356,24 +356,8 @@ get_y_break_width <- function(plot){
     # otherwise we'll need to re calculate what the aesthetic limits will look like
     } else {
 
-      # Check whether the chart is a column chart
-      geoms <- plot$layers
-
-      check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
-
-      is_bar <- F
-
-      for (i in seq_along(geoms)) {
-        g <- geoms[[i]]
-
-        class <- class(g$geom)
-
-        if (any(class %in% check_geoms)) {
-          is_bar <- T
-
-          break
-        }
-      }
+      # check whether the chart is a bar chart or not
+      is_bar <- is_barchart(plot)
 
       # if there are existing limits - use those first
       if(!is.null(y_scale_lims)){
@@ -381,7 +365,15 @@ get_y_break_width <- function(plot){
         min_y <- y_scale_lims[1]
         max_y <- y_scale_lims[2]
 
-        aes_lims <- c(min_y, max_y, get_aes_ticks(min_y, max_y))
+        # check whether the tick mark with the given limits is null, if it is we'll need to calculate all three from scratch
+        tick <- get_aes_ticks(min_y, max_y)
+
+        if(is.null(tick)){
+          aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
+
+        } else {
+          aes_lims <- c(min_y, max_y, tick)
+        }
 
         # otherwise have a look at the data
       } else {
