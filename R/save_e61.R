@@ -539,7 +539,6 @@ check_plots <- function(plots){
 
 #' Check whether the dataset has a y-variable that can be used for scaling
 #'@noRd
-
 check_for_y_var <- function(plot){
 
   chart_data <- ggplot2::ggplot_build(plot)$data
@@ -554,7 +553,13 @@ check_for_y_var <- function(plot){
       break
     }
 
-    if(!is.null(chart_data[[i]]$ymax) | !is.null(chart_data[[i]]$ymin)){
+    if(!is.null(chart_data[[i]]$ymax) & is.finite(chart_data[[i]]$ymax)){
+
+      check <- T
+      break
+    }
+
+    if(!is.null(chart_data[[i]]$ymin) & is.finite(chart_data[[i]]$ymin)){
 
       check <- T
       break
@@ -563,7 +568,6 @@ check_for_y_var <- function(plot){
 
   return(check)
 }
-
 
 #' Set option to automatically open files created by \code{save_e61}
 #'

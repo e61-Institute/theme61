@@ -10,60 +10,11 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   # If no y-axis scale is present and y is numeric, then add a default aesthetic scale
   if(is.null(y_scale_lims) & auto_scale){
 
-    # get the minimum and maximum y-axis values
-    min_y <- NA_real_
-    max_y <- NA_real_
-    chart_data <- ggplot2::ggplot_build(plot)$data
+    # get the minimum and maximum y-axis values from the chart data
+    minmax <- get_y_minmax(plot)
 
-    for(i in seq_along(chart_data)){
-
-      # check if the chart has ymin and ymax data
-      if(!is.null(chart_data[[i]]$ymax)){
-        temp_max_y <- chart_data[[i]]$ymax %>% max(na.rm = T)
-
-        test <- chart_data[[i]]$y %>% max(na.rm = T)
-
-        if(is.finite(temp_max_y) & is.finite(test) & temp_max_y < test) {
-          temp_max_y <- test
-        }
-
-      } else if(is.numeric(chart_data[[i]]$y)){
-
-        temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
-      }
-
-      if(!is.null(chart_data[[i]]$ymin)){
-        temp_min_y <- chart_data[[i]]$ymin %>% min(na.rm = T)
-
-        test <- chart_data[[i]]$y %>% min(na.rm = T)
-
-        if(is.finite(temp_min_y) & is.finite(test) & temp_min_y > test) {
-          temp_min_y <- test
-        }
-
-      } else if(is.numeric(chart_data[[i]]$y)) {
-
-        temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
-      }
-
-      # update the current min and max values - if NA then it must be the first observation
-      if(is.na(min_y)){
-        min_y <- temp_min_y
-
-      } else if(is.finite(min_y) & temp_min_y < min_y) {
-        min_y <- temp_min_y
-      }
-
-      if(is.na(max_y)){
-        max_y <- temp_max_y
-
-      } else if(is.finite(max_y) & temp_max_y > max_y) {
-        max_y <- temp_max_y
-      }
-    }
-
-    if(is.na(min_y)) min_y <- 0
-    if(is.na(max_y)) max_y <- 0
+    min_y <- minmax[[1]]
+    max_y <- minmax[[2]]
 
     # check whether the chart is a bar chart or not
     is_bar <- is_barchart(plot)
@@ -112,6 +63,88 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   }
 
   return(plot)
+}
+
+#' Get the minimum and maximum y-axis data in the chart data
+#' @noRd
+get_y_minmax <- function(plot){
+
+  min_y <- NA_real_
+  max_y <- NA_real_
+  chart_data <- ggplot2::ggplot_build(plot)$data
+
+  for(i in seq_along(chart_data)){
+
+    # find the maximum y-axis variable
+    temp_max_y <- NA_real_
+
+    # suppress messages as this will frequently warn about no non missing values
+    suppressMessages({
+      temp_ymax <- chart_data[[i]]$ymax %>% max(na.rm = T)
+      temp_y <- chart_data[[i]]$y %>% max(na.rm = T)
+    })
+
+    # if its finite then it it exists (max of a null variable returns -Inf)
+    if(is.finite(temp_ymax)){
+
+      # if the y variable has a higher maximum, then use that instead
+      if(is.finite(temp_y) & temp_ymax < temp_y) {
+        temp_max_y <- temp_y
+
+      } else {
+        temp_max_y <- temp_ymax
+      }
+
+    # otherwise return the max of the y-variable
+    } else if(is.numeric(temp_y) & is.finite(temp_y)){
+      temp_max_y <- temp_y
+    }
+
+    # find the minimum y-axis variable
+    temp_min_y <- NA_real_
+
+    # suppress messages as this will frequently warn about no non missing values
+    suppressMessages({
+      temp_ymin <- chart_data[[i]]$ymin %>% min(na.rm = T)
+      temp_y <- chart_data[[i]]$y %>% min(na.rm = T)
+    })
+
+    # if its finite then it it exists (min of a null variable returns -Inf)
+    if(is.finite(temp_ymin)){
+
+      # if the y variable has a lower minimum, then use that instead
+      if(is.finite(temp_y) & temp_ymin > temp_y) {
+        temp_min_y <- temp_y
+
+      } else {
+        temp_min_y <- temp_ymin
+      }
+
+      # otherwise return the min of the y-variable
+    } else if(is.numeric(temp_y) & is.finite(temp_y)){
+      temp_min_y <- temp_y
+    }
+
+    # update the current min and max values - if NA then it must be the first observation
+    if(is.na(min_y) & !is.na(temp_min_y)){
+      min_y <- temp_min_y
+
+    } else if(is.finite(min_y) & !is.na(temp_min_y) & temp_min_y < min_y) {
+      min_y <- temp_min_y
+    }
+
+    if(is.na(max_y) & !is.na(temp_max_y)){
+      max_y <- temp_max_y
+
+    } else if(is.finite(max_y) & !is.na(temp_max_y) & temp_max_y > max_y) {
+      max_y <- temp_max_y
+    }
+  }
+
+  if(is.na(min_y)) min_y <- 0
+  if(is.na(max_y)) max_y <- 0
+
+  return(list(min_y, max_y))
 }
 
 #' Check whether a ggplot is a barchart or not
