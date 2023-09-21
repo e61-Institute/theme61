@@ -1,6 +1,80 @@
 #' Given a ggplot object, update the y-axis scales
 #' plot - ggplot object. This is the plot whose scales we want to update.
-#' auto_scale - ggplot object. This is the plot whose scales we want to update.
+#' auto_scale - should the chart be auto-scaled or should we leave it as is
+#' @noRd
+update_scales <- function(plot, auto_scale, warn = F){
+
+  # check if we have a numeric y-variable
+  check_y_var <- check_for_y_var(plot)
+
+  # if we don't have a numeric y-variable then check whether the plot contains ageom_density or geom_histogram (GeomBar without a y-variable)
+  if (!check_y_var) {
+    layers <- plot$layers
+
+    for (j in seq_along(layers)){
+
+      # don't get y-aesthetic for geom_text objects
+      layer_type <- layers[[j]]$geom %>% class()
+
+      # if there isn't one but it is a density plot or a bar chart then it is either a density chart or a histogram so go ahead
+      if ("GeomDensity" %in% layer_type | "GeomBar" %in% layer_type) {
+
+        check_y_var <- T
+
+        break
+      }
+    }
+  }
+
+  # check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
+  grobs <- ggplot2::ggplotGrob(plot)
+
+  test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
+
+  sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
+
+  # if the y-variable class is numeric, or the plot is a density or histogram, then update the chart scales
+  if(check_y_var){
+
+    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
+
+    # if the y-var class is NULL, send a warning message about the auto updating of chart scales
+  } else if(!check_y_var & warn == F){
+
+    warning("Could not identify the class of the y variable. This prevents the y-axis scales from being automatically updated to aesthetic values. To address this issue check that you have not edited the variable within your ggplot call (e.g. aes(y = 100 * var)). Instead make any changes before passing the dataset to ggplot (e.g. data %>% mutate(new_var = 100 * var) %>% ggplot(...)).")
+    warn <<- T
+  }
+
+  return(plot)
+}
+
+#' Check whether the dataset has a y-variable that can be used for scaling
+#'@noRd
+check_for_y_var <- function(plot){
+
+  chart_data <- ggplot2::ggplot_build(plot)$data
+
+  check <- F
+
+  # check whether there are any non-missing values for y, ymax and ymin. Note min will return -Inf if the variable doesn't exist or is all missing
+  for(i in seq_along(chart_data)){
+
+    suppressMessages({suppressWarnings({
+      check_y <- chart_data[[i]]$y %>% min(na.rm = T)
+      check_ymax <- chart_data[[i]]$ymax %>% min(na.rm = T)
+      check_ymin <- chart_data[[i]]$ymin %>% min(na.rm = T)
+    })})
+
+    if(is.finite(check_y) | is.finite(check_ymax) | is.finite(check_ymin)){
+      check <- T
+      break
+    }
+  }
+
+  return(check)
+}
+
+#' Aesthetically update the y-axis scales and labels
 #' @noRd
 update_chart_scales <- function(plot, auto_scale, sec_axis){
 
@@ -10,60 +84,11 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   # If no y-axis scale is present and y is numeric, then add a default aesthetic scale
   if(is.null(y_scale_lims) & auto_scale){
 
-    # get the minimum and maximum y-axis values
-    min_y <- NA_real_
-    max_y <- NA_real_
-    chart_data <- ggplot2::ggplot_build(plot)$data
+    # get the minimum and maximum y-axis values from the chart data
+    minmax <- get_y_minmax(plot)
 
-    for(i in seq_along(chart_data)){
-
-      # check if the chart has ymin and ymax data
-      if(!is.null(chart_data[[i]]$ymax)){
-        temp_max_y <- chart_data[[i]]$ymax %>% max(na.rm = T)
-
-        test <- chart_data[[i]]$y %>% max(na.rm = T)
-
-        if(is.finite(temp_max_y) & is.finite(test) & temp_max_y < test) {
-          temp_max_y <- test
-        }
-
-      } else if(is.numeric(chart_data[[i]]$y)){
-
-        temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
-      }
-
-      if(!is.null(chart_data[[i]]$ymin)){
-        temp_min_y <- chart_data[[i]]$ymin %>% min(na.rm = T)
-
-        test <- chart_data[[i]]$y %>% min(na.rm = T)
-
-        if(is.finite(temp_min_y) & is.finite(test) & temp_min_y > test) {
-          temp_min_y <- test
-        }
-
-      } else if(is.numeric(chart_data[[i]]$y)) {
-
-        temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
-      }
-
-      # update the current min and max values - if NA then it must be the first observation
-      if(is.na(min_y)){
-        min_y <- temp_min_y
-
-      } else if(is.finite(min_y) & temp_min_y < min_y) {
-        min_y <- temp_min_y
-      }
-
-      if(is.na(max_y)){
-        max_y <- temp_max_y
-
-      } else if(is.finite(max_y) & temp_max_y > max_y) {
-        max_y <- temp_max_y
-      }
-    }
-
-    if(is.na(min_y)) min_y <- 0
-    if(is.na(max_y)) max_y <- 0
+    min_y <- minmax[[1]]
+    max_y <- minmax[[2]]
 
     # check whether the chart is a bar chart or not
     is_bar <- is_barchart(plot)
@@ -112,6 +137,88 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   }
 
   return(plot)
+}
+
+#' Get the minimum and maximum y-axis data in the chart data
+#' @noRd
+get_y_minmax <- function(plot){
+
+  min_y <- NA_real_
+  max_y <- NA_real_
+  chart_data <- ggplot2::ggplot_build(plot)$data
+
+  for(i in seq_along(chart_data)){
+
+    # find the maximum y-axis variable
+    temp_max_y <- NA_real_
+
+    # suppress messages as this will frequently warn about no non missing values
+    suppressMessages({suppressWarnings({
+      temp_ymax <- chart_data[[i]]$ymax %>% max(na.rm = T)
+      temp_y <- chart_data[[i]]$y %>% max(na.rm = T)
+    })})
+
+    # if its finite then it it exists (max of a null variable returns -Inf)
+    if(is.finite(temp_ymax)){
+
+      # if the y variable has a higher maximum, then use that instead
+      if(is.finite(temp_y) & temp_ymax < temp_y) {
+        temp_max_y <- temp_y
+
+      } else {
+        temp_max_y <- temp_ymax
+      }
+
+    # otherwise return the max of the y-variable
+    } else if(is.numeric(temp_y) & is.finite(temp_y)){
+      temp_max_y <- temp_y
+    }
+
+    # find the minimum y-axis variable
+    temp_min_y <- NA_real_
+
+    # suppress messages as this will frequently warn about no non missing values
+    suppressMessages({suppressWarnings({
+      temp_ymin <- chart_data[[i]]$ymin %>% min(na.rm = T)
+      temp_y <- chart_data[[i]]$y %>% min(na.rm = T)
+    })})
+
+    # if its finite then it it exists (min of a null variable returns -Inf)
+    if(is.finite(temp_ymin)){
+
+      # if the y variable has a lower minimum, then use that instead
+      if(is.finite(temp_y) & temp_ymin > temp_y) {
+        temp_min_y <- temp_y
+
+      } else {
+        temp_min_y <- temp_ymin
+      }
+
+      # otherwise return the min of the y-variable
+    } else if(is.numeric(temp_y) & is.finite(temp_y)){
+      temp_min_y <- temp_y
+    }
+
+    # update the current min and max values - if NA then it must be the first observation
+    if(is.na(min_y) & !is.na(temp_min_y)){
+      min_y <- temp_min_y
+
+    } else if(is.finite(min_y) & !is.na(temp_min_y) & temp_min_y < min_y) {
+      min_y <- temp_min_y
+    }
+
+    if(is.na(max_y) & !is.na(temp_max_y)){
+      max_y <- temp_max_y
+
+    } else if(is.finite(max_y) & !is.na(temp_max_y) & temp_max_y > max_y) {
+      max_y <- temp_max_y
+    }
+  }
+
+  if(is.na(min_y)) min_y <- 0
+  if(is.na(max_y)) max_y <- 0
+
+  return(list(min_y, max_y))
 }
 
 #' Check whether a ggplot is a barchart or not

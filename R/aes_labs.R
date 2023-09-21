@@ -2,7 +2,7 @@
 #' plot - Plot object to adjust.
 #' plot_width - Numeric. Width of the plot.
 #' @noRd
-update_labs <- function(plot, is_mpanel, plot_width){
+update_labs <- function(plot, plot_width){
 
   p <- ggplot2::ggplotGrob(plot)
 
@@ -222,11 +222,25 @@ get_lines <- function(text, font_size, plot_width){
 
   while(check_lines){
 
-    text_lines[[i]] <- words %>%
-      dplyr::filter(cumsum_word_width <= 1) %>%
-      dplyr::mutate(line = i)
+    # check whether we can create a line (i.e. some words are under the limit), otherwise take the first word and try again
+    temp_line <- words %>% dplyr::filter(cumsum_word_width <= 1)
 
-    words <- words %>% dplyr::filter(cumsum_word_width > 1)
+    if(nrow(temp_line) == 0){
+
+      text_lines[[i]] <- words %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(dplyr::row_number() == 1) %>%
+        dplyr::mutate(line = i)
+
+      words <- words %>% dplyr::ungroup() %>% dplyr::filter(dplyr::row_number() > 1)
+
+    } else {
+      text_lines[[i]] <- words %>%
+        dplyr::filter(cumsum_word_width <= 1) %>%
+        dplyr::mutate(line = i)
+
+      words <- words %>% dplyr::filter(cumsum_word_width > 1)
+    }
 
     words <- words %>% dplyr::mutate(cumsum_word_width = cumsum(word_width) / plot_width)
 
@@ -375,27 +389,14 @@ get_y_break_width <- function(plot){
           aes_lims <- c(min_y, max_y, tick)
         }
 
-        # otherwise have a look at the data
+      # otherwise have a look at the data
       } else {
 
-        # get the minimum and maximum y-axis values
-        min_y <- 0
-        max_y <- 0
-        chart_data <- ggplot2::ggplot_build(plot)$data
+        # this looks at the underlying chart data and returns the min and the max y values
+        minmax <- get_y_minmax(plot)
 
-        for(i in seq_along(chart_data)){
-
-          y_data <- chart_data[[i]]$y
-
-          # skip if not numeric
-          if(!is.numeric(y_data)) next
-
-          temp_max_y <- chart_data[[i]]$y %>% max(na.rm = T)
-          temp_min_y <- chart_data[[i]]$y %>% min(na.rm = T)
-
-          if(is.finite(min_y) & temp_min_y < min_y) min_y <- temp_min_y
-          if(is.finite(max_y) & temp_max_y > max_y) max_y <- temp_max_y
-        }
+        min_y <- minmax[[1]]
+        max_y <- minmax[[2]]
 
         # get aesthetic limits for the y-axis - if it is a bar chart, then include zero
         aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
