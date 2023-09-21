@@ -2,7 +2,7 @@
 #' plot - Plot object to adjust.
 #' plot_width - Numeric. Width of the plot.
 #' @noRd
-update_labs <- function(plot, is_mpanel, plot_width){
+update_labs <- function(plot, plot_width){
 
   p <- ggplot2::ggplotGrob(plot)
 
@@ -222,11 +222,25 @@ get_lines <- function(text, font_size, plot_width){
 
   while(check_lines){
 
-    text_lines[[i]] <- words %>%
-      dplyr::filter(cumsum_word_width <= 1) %>%
-      dplyr::mutate(line = i)
+    # check whether we can create a line (i.e. some words are under the limit), otherwise take the first word and try again
+    temp_line <- words %>% dplyr::filter(cumsum_word_width <= 1)
 
-    words <- words %>% dplyr::filter(cumsum_word_width > 1)
+    if(nrow(temp_line) == 0){
+
+      text_lines[[i]] <- words %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(dplyr::row_number() == 1) %>%
+        dplyr::mutate(line = i)
+
+      words <- words %>% dplyr::ungroup() %>% dplyr::filter(dplyr::row_number() > 1)
+
+    } else {
+      text_lines[[i]] <- words %>%
+        dplyr::filter(cumsum_word_width <= 1) %>%
+        dplyr::mutate(line = i)
+
+      words <- words %>% dplyr::filter(cumsum_word_width > 1)
+    }
 
     words <- words %>% dplyr::mutate(cumsum_word_width = cumsum(word_width) / plot_width)
 

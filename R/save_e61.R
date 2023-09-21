@@ -350,7 +350,7 @@ save_spanel_e61 <- function(
 
   tot_panel_width <- width - known_wd
 
-  plot <- update_labs(plot = plot, is_mpanel = is_mpanel, plot_width = tot_panel_width)
+  plot <- update_labs(plot, tot_panel_width)
 
 
   # Update the y-axis labels ------------------------------------------------

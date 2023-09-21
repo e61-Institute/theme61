@@ -194,12 +194,18 @@ save_mpanel_e61 <-
 
         temp_plot <- clean_plotlist[[i]]
 
+        # update y-axis labels
         suppressMessages({
           temp_plot <-
-            update_y_axis_labels(temp_plot,
-                                 max_y_lab = y_lab_max_size,
-                                 max_break_width = max_break_width)
+            update_y_axis_labels(
+              temp_plot,
+              max_y_lab = y_lab_max_size,
+              max_break_width = max_break_width
+            )
         })
+
+        # update labels - for each set the limit as width - knowwidth (axis labels etc.) divided by the number of columns we have
+        temp_plot <- update_labs(temp_plot, (width - known_width) / ncol)
 
         # save the plot
         clean_plotlist[[i]] <- temp_plot
