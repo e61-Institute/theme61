@@ -378,7 +378,7 @@ get_y_break_width <- function(plot){
       # otherwise have a look at the data
       } else {
 
-        # this looks at the underlying chart data and returns the min and the max
+        # this looks at the underlying chart data and returns the min and the max y values
         minmax <- get_y_minmax(plot)
 
         min_y <- minmax[[1]]

@@ -180,6 +180,7 @@ save_spanel_e61 <- function(
     save_data = FALSE,
     resize = NULL,
     pointsize = 12,
+    base_size = 10,
     res = 72,
     test = !isTRUE(getOption("test_save"))){
 
@@ -252,14 +253,21 @@ save_spanel_e61 <- function(
 
     max_width <- 13.985 # based on 338.7mm page width, 20mm margins, 15mm column sep and 2 columns (i.e. divide the remainder by 2)
 
+    # decrease the text size for research note charts
+    plot <- plot + theme_e61(base_size = base_size * 13.985 / 18.59)
+
   } else if(chart_type == "PPT"){
 
     max_height <- 13.25
     max_width <- 31.32
 
+    # increase the text size for powerpoint charts
+    plot <- plot + theme_e61(base_size = base_size * 31.32 / 18.59)
+
   } else if(is.null(chart_type)){
 
     max_width <- 20
+    plot <- plot + theme_e61(base_size = base_size * 20 / 18.59)
 
   } else {
     stop("Invalid chart type. Please select from one of the following: 'MN' for micronotes, 'RN' for research notes, 'PPT' for powerpoint slides, or leave blank to use default maximum widths")
@@ -382,9 +390,6 @@ save_spanel_e61 <- function(
       matrix(null_rowhts, ncol = 1)
       %*% matrix(1 / null_colwds, nrow = 1))
 
-    # check that aspect ratios are consistent
-    # stop("Panel aspect ratios must be consistent")
-
     # Step 3 - Divide the free width by the number of columns (panels) we have
     panel_width <- free_wd / n_panel_cols # width of each panel
     panel_height <- panel_width * max(panel_asps[1,]) # height of each panel (width * aspect ratio)
@@ -469,55 +474,6 @@ save_spanel_e61 <- function(
   invisible(retval)
 }
 
-
-#' Aesthetically update the y-axis scales and labels
-#' @noRd
-update_scales <- function(plot, auto_scale, warn = F){
-
-  # check if we have a numeric y-variable
-  check_y_var <- check_for_y_var(plot)
-
-  # if we don't have a numeric y-variable then check whether the plot contains ageom_density or geom_histogram (GeomBar without a y-variable)
-  if (!check_y_var) {
-    layers <- plot$layers
-
-    for (j in seq_along(layers)){
-
-      # don't get y-aesthetic for geom_text objects
-      layer_type <- layers[[j]]$geom %>% class()
-
-      # if there isn't one but it is a density plot or a bar chart then it is either a density chart or a histogram so go ahead
-      if ("GeomDensity" %in% layer_type | "GeomBar" %in% layer_type) {
-
-        check_y_var <- T
-
-        break
-      }
-    }
-  }
-
-  # check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
-  grobs <- ggplot2::ggplotGrob(plot)
-
-  test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
-
-  sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
-
-  # if the y-variable class is numeric, or the plot is a density or histogram, then update the chart scales
-  if(check_y_var){
-
-    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
-
-  # if the y-var class is NULL, send a warning message about the auto updating of chart scales
-  } else if(!check_y_var & warn == F){
-
-    warning("Could not identify the class of the y variable. This prevents the y-axis scales from being automatically updated to aesthetic values. To address this issue check that you have not edited the variable within your ggplot call (e.g. aes(y = 100 * var)). Instead make any changes before passing the dataset to ggplot (e.g. data %>% mutate(new_var = 100 * var) %>% ggplot(...)).")
-    warn <<- T
-  }
-
-  return(plot)
-}
-
 #' Check plots are ggplot objects and return a list of only ggplot objects
 #' @noRd
 check_plots <- function(plots){
@@ -535,38 +491,6 @@ check_plots <- function(plots){
   }
 
   return(temp_list)
-}
-
-#' Check whether the dataset has a y-variable that can be used for scaling
-#'@noRd
-check_for_y_var <- function(plot){
-
-  chart_data <- ggplot2::ggplot_build(plot)$data
-
-  check <- F
-
-  for(i in seq_along(chart_data)){
-
-    # check the y-variable first
-    if(!is.null(chart_data[[i]]$y) & is.numeric(chart_data[[i]]$y)){
-      check <- T
-      break
-    }
-
-    if(!is.null(chart_data[[i]]$ymax) & is.finite(chart_data[[i]]$ymax)){
-
-      check <- T
-      break
-    }
-
-    if(!is.null(chart_data[[i]]$ymin) & is.finite(chart_data[[i]]$ymin)){
-
-      check <- T
-      break
-    }
-  }
-
-  return(check)
 }
 
 #' Set option to automatically open files created by \code{save_e61}

@@ -17,7 +17,7 @@ save_mpanel_e61 <-
            title_adj = 1,
            title_spacing_adj = 1, # adjust the amount of space given to the title
            subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
-           base_size = 8, # set the base size for the theme61 font size call
+           base_size = 10, # set the base size for the theme61 font size call
            height_adj = 1, # adjust the vertical spacing of the mpanel charts
            ncol = 2,
            nrow = NULL,
@@ -54,7 +54,6 @@ save_mpanel_e61 <-
       format <- match.arg(format, several.ok = TRUE)
     }
 
-
     # Set maximum width based on output type ----------------------------------
 
     if(is.null(chart_type)) chart_type <- "MN"
@@ -68,19 +67,25 @@ save_mpanel_e61 <-
 
       max_width <- 13.985 # based on 338.7mm page width, 20mm margins, 15mm column sep and 2 columns (i.e. divide the remainder by 2)
 
+      # decrease the text size for research note charts
+      plot <- plot + theme_e61(base_size = base_size * 13.985 / 18.59)
+
     } else if(chart_type == "PPT"){
 
       max_height <- 13.25
       max_width <- 31.32
 
+      # increase the text size for powerpoint charts
+      plot <- plot + theme_e61(base_size = base_size * 31.32 / 18.59)
+
     } else if(is.null(chart_type)){
 
       max_width <- 20
+      plot <- plot + theme_e61(base_size = base_size * 20 / 18.59)
 
     } else {
       stop("Invalid chart type. Please select from one of the following: 'MN' for micronotes, 'RN' for research notes, 'PPT' for powerpoint slides, or leave blank to use default maximum widths")
     }
-
 
     # Set width -------------------------------------------------------------
 

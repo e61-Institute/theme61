@@ -1,6 +1,80 @@
 #' Given a ggplot object, update the y-axis scales
 #' plot - ggplot object. This is the plot whose scales we want to update.
-#' auto_scale - ggplot object. This is the plot whose scales we want to update.
+#' auto_scale - should the chart be auto-scaled or should we leave it as is
+#' @noRd
+update_scales <- function(plot, auto_scale, warn = F){
+
+  # check if we have a numeric y-variable
+  check_y_var <- check_for_y_var(plot)
+
+  # if we don't have a numeric y-variable then check whether the plot contains ageom_density or geom_histogram (GeomBar without a y-variable)
+  if (!check_y_var) {
+    layers <- plot$layers
+
+    for (j in seq_along(layers)){
+
+      # don't get y-aesthetic for geom_text objects
+      layer_type <- layers[[j]]$geom %>% class()
+
+      # if there isn't one but it is a density plot or a bar chart then it is either a density chart or a histogram so go ahead
+      if ("GeomDensity" %in% layer_type | "GeomBar" %in% layer_type) {
+
+        check_y_var <- T
+
+        break
+      }
+    }
+  }
+
+  # check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
+  grobs <- ggplot2::ggplotGrob(plot)
+
+  test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
+
+  sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
+
+  # if the y-variable class is numeric, or the plot is a density or histogram, then update the chart scales
+  if(check_y_var){
+
+    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
+
+    # if the y-var class is NULL, send a warning message about the auto updating of chart scales
+  } else if(!check_y_var & warn == F){
+
+    warning("Could not identify the class of the y variable. This prevents the y-axis scales from being automatically updated to aesthetic values. To address this issue check that you have not edited the variable within your ggplot call (e.g. aes(y = 100 * var)). Instead make any changes before passing the dataset to ggplot (e.g. data %>% mutate(new_var = 100 * var) %>% ggplot(...)).")
+    warn <<- T
+  }
+
+  return(plot)
+}
+
+#' Check whether the dataset has a y-variable that can be used for scaling
+#'@noRd
+check_for_y_var <- function(plot){
+
+  chart_data <- ggplot2::ggplot_build(plot)$data
+
+  check <- F
+
+  # check whether there are any non-missing values for y, ymax and ymin. Note min will return -Inf if the variable doesn't exist or is all missing
+  for(i in seq_along(chart_data)){
+
+    suppressMessages({suppressWarnings({
+      check_y <- chart_data[[i]]$y %>% min(na.rm = T)
+      check_ymax <- chart_data[[i]]$ymax %>% min(na.rm = T)
+      check_ymin <- chart_data[[i]]$ymin %>% min(na.rm = T)
+    })})
+
+    if(is.finite(check_y) | is.finite(check_ymax) | is.finite(check_ymin)){
+      check <- T
+      break
+    }
+  }
+
+  return(check)
+}
+
+#' Aesthetically update the y-axis scales and labels
 #' @noRd
 update_chart_scales <- function(plot, auto_scale, sec_axis){
 
@@ -79,10 +153,10 @@ get_y_minmax <- function(plot){
     temp_max_y <- NA_real_
 
     # suppress messages as this will frequently warn about no non missing values
-    suppressMessages({
+    suppressMessages({suppressWarnings({
       temp_ymax <- chart_data[[i]]$ymax %>% max(na.rm = T)
       temp_y <- chart_data[[i]]$y %>% max(na.rm = T)
-    })
+    })})
 
     # if its finite then it it exists (max of a null variable returns -Inf)
     if(is.finite(temp_ymax)){
@@ -104,10 +178,10 @@ get_y_minmax <- function(plot){
     temp_min_y <- NA_real_
 
     # suppress messages as this will frequently warn about no non missing values
-    suppressMessages({
+    suppressMessages({suppressWarnings({
       temp_ymin <- chart_data[[i]]$ymin %>% min(na.rm = T)
       temp_y <- chart_data[[i]]$y %>% min(na.rm = T)
-    })
+    })})
 
     # if its finite then it it exists (min of a null variable returns -Inf)
     if(is.finite(temp_ymin)){
