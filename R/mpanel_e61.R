@@ -205,7 +205,7 @@ save_mpanel_e61 <-
         })
 
         # update labels - for each set the limit as width - knowwidth (axis labels etc.) divided by the number of columns we have
-        temp_plot <- update_labs(temp_plot, (width - known_width) / ncol)
+        temp_plot <- update_labs(temp_plot, width / ncol)
 
         # save the plot
         clean_plotlist[[i]] <- temp_plot
