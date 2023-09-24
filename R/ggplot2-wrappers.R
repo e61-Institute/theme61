@@ -14,52 +14,54 @@ ggplot <-
   if(!is.null(mapping$y)) {
 
     y_var_name <- ggplot2::quo_name(mapping$y)
-    y_var_class <- data[[y_var_name]] %>% class()
+    y_var_class <- class(data[[y_var_name]])
 
-    if(y_var_class == "numeric" | y_var_class == "integer"){
+    if (any(y_var_class %in% c("numeric", "integer"))) {
       p <- p + scale_y_continuous_e61(y_top = T)
     }
   }
 
   # add e61 x-axis scale if the x-variable is numeric
-  if(!is.null(mapping$x)) {
+  if (!is.null(mapping$x)) {
 
     x_var_name <- ggplot2::quo_name(mapping$x)
-    x_var_class <- data[[x_var_name]] %>% class()
+    x_var_class <- class(data[[x_var_name]])
 
-    if(x_var_class == "numeric" | x_var_class == "integer"){
+    if (any(x_var_class %in% c("numeric", "integer"))) {
       p <- p + scale_x_continuous_e61()
     }
   }
 
   # scale fill variables
-  if(!is.null(mapping$fill)){
+  if (!is.null(mapping$fill)) {
 
     fill_var_name <- ggplot2::quo_name(mapping$fill)
 
-    if(is.null(data[[fill_var_name]]) & stringr::str_detect(fill_var_name, "^factor\\(")){
+    if (is.null(data[[fill_var_name]]) && stringr::str_detect(fill_var_name, "^factor\\(")){
 
       fill_var_class <- "factor"
 
     } else {
-      fill_var_class <- data[[fill_var_name]] %>% class()
+
+      fill_var_class <- class(data[[fill_var_name]])
     }
 
-    if(fill_var_class == "numeric"){
-      p <- p + scale_fill_e61(discrete = F)
+    if (any(fill_var_class %in% "numeric")) {
 
-    } else if(fill_var_class == "factor" | fill_var_class == "character") {
+      p <- p + scale_fill_e61(discrete = FALSE)
+
+    } else if (any(fill_var_class %in% c("factor", "character"))) {
 
       p <- p + scale_fill_e61()
     }
   }
 
   # scale colours
-  if(!is.null(mapping$colour)){
+  if (!is.null(mapping$colour)) {
 
     colour_var_name <- ggplot2::quo_name(mapping$colour)
 
-    if(is.null(data[[colour_var_name]]) & stringr::str_detect(colour_var_name, "^factor\\(")){
+    if (is.null(data[[colour_var_name]]) & stringr::str_detect(colour_var_name, "^factor\\(")) {
 
       colour_var_class <- "factor"
 
@@ -67,10 +69,10 @@ ggplot <-
       colour_var_class <- data[[colour_var_name]] %>% class()
     }
 
-    if(colour_var_class == "numeric"){
-      p <- p + scale_colour_e61(discrete = F)
+    if (any(colour_var_class %in% "numeric")) {
+      p <- p + scale_colour_e61(discrete = FALSE)
 
-    } else if(colour_var_class == "factor" | colour_var_class == "character") {
+    } else if (any(colour_var_class %in% c("factor", "character"))) {
 
       p <- p + scale_colour_e61()
     }
