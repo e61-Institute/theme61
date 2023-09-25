@@ -3,6 +3,7 @@
 
 save_mpanel_e61 <-
   function(filename,
+           format = c("svg", "pdf", "eps", "png"),
            ...,
            plotlist = NULL,
            chart_type = "MN",
@@ -426,6 +427,28 @@ save_mpanel_e61 <-
       print(gg)
       dev.off()
     })
+
+
+    # Post-save functions -----------------------------------------------------
+
+    # Opens the graph file if the option is set
+    if (as.logical(getOption("open_e61_graph", FALSE))) {
+      # Put filename back together
+      filename <- paste0(filename, ".", format[[1]])
+
+      file_to_open <- shQuote(here::here(filename))
+      out <- try(system2("open", file_to_open))
+
+      if (out != 0) warning("Graph file could not be opened.")
+    }
+
+    # Invisibly returns the filename (or vector of filenames). Currently some of
+    # the tests rely on the filename being returned so maybe don't change this
+    # without a good reason.
+    retval <- paste(filename, format, sep = ".")
+
+    invisible(retval)
+
 }
 
 #' Create a multi-panel graph with e61 formatting

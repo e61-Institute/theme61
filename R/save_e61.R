@@ -122,6 +122,7 @@ save_e61 <- function(filename,
 
     save_mpanel_e61(
       filename,
+      format = format,
       plotlist = plots,
       chart_type = chart_type,
       title = title,
