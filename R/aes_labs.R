@@ -9,7 +9,7 @@ update_labs <- function(plot, plot_width){
   # Title ----
 
   # First check whether the title has already been manually wrapped
-  if(!is.null(attr(plot, "title_wrap"))){
+  if(is.null(attr(plot$labels$title, "title_wrap"))){
 
     # check if the title exists
     title_grob <- p$grobs[[which(p$layout$name == "title")]]
@@ -31,7 +31,7 @@ update_labs <- function(plot, plot_width){
   }
 
   # Subtitle ----
-  if(!is.null(attr(plot, "subtitle_wrap"))){
+  if(is.null(attr(plot$labels$subtitle, "subtitle_wrap"))){
     subtitle_grob <- p$grobs[[which(p$layout$name == "subtitle")]]
     subtitle_text <- NULL
 
@@ -51,7 +51,7 @@ update_labs <- function(plot, plot_width){
 
   # Footnotes ----
 
-  if(!is.null(attr(plot, "caption_wrap"))){
+  if(is.null(attr(plot$labels$caption, "caption_wrap"))){
     footnote_grob <- p$grobs[[which(p$layout$name == "caption")]]
     caption_text <- NULL
 

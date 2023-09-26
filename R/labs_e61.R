@@ -57,7 +57,7 @@ labs_e61 <- function(title = NULL,
                      ...
                      ) {
 
-  # check the titles as characters
+  # check the title and subtitle are strings
   sapply(list(title, subtitle), function(x){
     if (!is.null(x) && !is.character(x)){
       stop("title and subtitle must be a string.")
@@ -115,12 +115,15 @@ labs_e61 <- function(title = NULL,
 
     # Wrap the subtitle text
     caption_text <- caption_wrap(footnotes, sources, max_char = footnote_max_char)
-
     wrap_subtitle <- T
 
   } else {
     caption_text <- caption_wrap(footnotes, sources, max_char = 120)
   }
+
+  if(wrap_title) attr(title_text, "title_wrap") <- TRUE
+  if(wrap_subtitle) attr(subtitle_text, "subtitle_wrap") <- TRUE
+  if(wrap_caption) attr(caption_text, "caption_wrap") <- TRUE
 
   # add to a ggplot object and return
   label <-
@@ -132,10 +135,6 @@ labs_e61 <- function(title = NULL,
       y = y,
       ...
     )
-
-  if(wrap_title) attr(label, "title_wrap") <- TRUE
-  if(wrap_subtitle) attr(label, "subtitle_wrap") <- TRUE
-  if(wrap_caption) attr(label, "caption_wrap") <- TRUE
 
   return(label)
 }
@@ -152,6 +151,7 @@ caption_wrap <- function(
     max_char = 120,
     caption_wrap = T
   ){
+
   # Footnotes
   if (!is.null(footnotes)) {
 
@@ -172,7 +172,6 @@ caption_wrap <- function(
     footnotes <- data.frame(n = seq(1, length(footnotes)), text = footnotes)
     footnotes$n <- strrep("*", footnotes$n)
     footnotes <- paste0(footnotes$n, " ", footnotes$text)
-
   }
 
   # Sources
