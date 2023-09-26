@@ -48,8 +48,9 @@ plot_label <-
       x <- as.Date(x)
     }
 
-    annotate(geom = geom, label = label, x = x, y = y, size = size, colour = colour, hjust = hjust, angle = angle)
+    attr(label, "mplot_label") <- TRUE
 
+    annotate(geom = geom, label = label, x = x, y = y, size = size, colour = colour, hjust = hjust, angle = angle)
   }
 
 #' Add multiple on-graph labels to graphs

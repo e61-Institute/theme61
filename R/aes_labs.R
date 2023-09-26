@@ -482,3 +482,27 @@ get_font_size <- function(plot, elem = "text", parent = "text"){
 
   return(text_size)
 }
+
+#' Update the size of mplot labels
+#' @noRd
+update_mplot_label <- function(plot, size = 2.5){
+
+  for (i in seq_along(plot$layers)){
+
+    # 1 - check whether it is a
+    layer_class <- plot$layers[[i]]$geom %>% class()
+
+    if("GeomText" %in% layer_class){
+      # 2 - check whether it is an mplot_label
+      label <- plot$layers[[i]]$aes_params$label
+
+      if(!is.null(attr(label, "mplot_label"))){
+
+        # 3 - update the size
+        plot$layers[[i]]$aes_params$size <- size
+      }
+    }
+  }
+
+  return(plot)
+}
