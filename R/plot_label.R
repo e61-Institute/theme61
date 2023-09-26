@@ -48,7 +48,10 @@ plot_label <-
       x <- as.Date(x)
     }
 
-    attr(label, "mplot_label") <- TRUE
+    # Only add the functionality to adjust the size of the mplot labels if the user did not manually enter a size
+    if(size == 3.5){
+      attr(label, "adj_mplot_label") <- TRUE
+    }
 
     annotate(geom = geom, label = label, x = x, y = y, size = size, colour = colour, hjust = hjust, angle = angle)
   }

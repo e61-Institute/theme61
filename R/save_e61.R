@@ -103,7 +103,7 @@ save_e61 <- function(filename,
                      title_adj = 1,
                      title_spacing_adj = 1, # adjust the amount of space given to the title
                      subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
-                     base_size = 8, # set the base size for the theme61 font size call
+                     base_size = 10, # set the base size for the theme61 font size call
                      height_adj = NULL, # adjust the vertical spacing of the mpanel charts
                      ncol = 2,
                      nrow = NULL,
@@ -136,8 +136,8 @@ save_e61 <- function(filename,
       title_adj = title_adj,
       title_spacing_adj = title_spacing_adj, # adjust the amount of space given to the title
       subtitle_spacing_adj = subtitle_spacing_adj, # adjust the amount of space given to the subtitle
-      base_size = base_size, # set the base size for the theme61 font size call
       height_adj = height_adj, # adjust the vertical spacing of the mpanel charts
+      base_size = base_size,
       ncol = ncol,
       nrow = nrow,
       align = align,
@@ -158,6 +158,7 @@ save_e61 <- function(filename,
       height = height, # manual control over the height of the chart
       max_height = max_height, # manual control over the maximum height of the chart
       format = format,
+      base_size = base_size,
       save_data = save_data,
       resize = resize,
       pointsize = pointsize,
@@ -245,57 +246,21 @@ save_spanel_e61 <- function(
 
   if(is.null(chart_type)) chart_type <- "MN"
 
-  # Set the maximum width based on the type of outputs
-  if(chart_type == "MN"){
+  max_width <- get_plot_width(chart_type, max_height)$max_width
+  max_height <- get_plot_width(chart_type, max_height)$max_height
 
-    max_width <- 18.59 # based on 215.9mm page width and 15mm margins either side
-
-  } else if(chart_type == "RN"){
-
-    max_width <- 13.985 # based on 338.7mm page width, 20mm margins, 15mm column sep and 2 columns (i.e. divide the remainder by 2)
-
-    # decrease the text size for research note charts
-    plot <- plot + theme_e61(base_size = base_size * 13.985 / 18.59)
-
-  } else if(chart_type == "PPT"){
-
-    max_height <- 13.25
-    max_width <- 31.32
-
-    # increase the text size for powerpoint charts
-    plot <- plot + theme_e61(base_size = base_size * 31.32 / 18.59)
-
-  } else if(is.null(chart_type)){
-
-    max_width <- 20
-    plot <- plot + theme_e61(base_size = base_size * 20 / 18.59)
-
-  } else {
-    stop("Invalid chart type. Please select from one of the following: 'MN' for micronotes, 'RN' for research notes, 'PPT' for powerpoint slides, or leave blank to use default maximum widths")
-  }
+  plot <- plot + theme_e61(base_size = base_size * max_width / 18.59)
 
   plot_build <- ggplot2::ggplot_build(plot)
 
 
   # Update y-axis limits ----------------------------------------------------
 
-  # check whether the plot is an mpanel plot or a regular plot
-  if(is.null(attr(plot, "plot_type"))){
-    is_mpanel <- FALSE
-
-  } else if(attr(plot, "plot_type") == "mpanel"){
-    is_mpanel <- TRUE
-
-  } else {
-    is_mpanel <- FALSE
-  }
-
   # update the chart scales if this is an auto_scaled chart
   if(auto_scale) plot <- update_scales(plot, auto_scale)
 
 
   # Get the number of panel rows and columns ------------------------------
-
 
   # Get facet dimensions if applicable
   if (length(plot$facet$params) != 0) {
@@ -340,7 +305,6 @@ save_spanel_e61 <- function(
   # Update labels -----------------------------------------------------------
 
   # Update the size of the text used for titles, footnotes, axes etc.
-
   p <- ggplot2::ggplotGrob(plot)
 
   # allow charts to be the width of the panels
@@ -353,11 +317,11 @@ save_spanel_e61 <- function(
 
   plot <- update_labs(plot, tot_panel_width)
 
-
-  # Update the y-axis labels ------------------------------------------------
+  # update the mplot_labels
+  plot <- update_mplot_label(plot, is_mpanel = F, plot_width = tot_panel_width, chart_type, base_size)
 
   # update y-axis labels
-  plot <- update_y_axis_labels(plot)
+  plot <- update_y_axis_labels(plot, base_size = base_size)
 
 
   # Height adjustments ----------------------------------------------------
@@ -367,7 +331,7 @@ save_spanel_e61 <- function(
     # Step 1 - Get the amount of free height and width we have to play with (what is not already used up by the set elements)
     p <- ggplot2::ggplotGrob(plot)
 
-    known_ht <- get_known_height(plot, is_mpanel)
+    known_ht <- get_known_height(plot, is_mpanel = FALSE)
 
     right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r")) + 0.25 # this seems to just overshoot hence the extra 0.1cm
     left_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-l"), get_grob_width(p, grob_name = "axis-l")) + 0.25 # this seems to just overshoot hence the extra 0.1cm
@@ -397,13 +361,9 @@ save_spanel_e61 <- function(
 
     # Step 4 - Work out the best height of the plot
 
-    # Variable to adjust scale the total plot height as the estimated height grows - there seems to be a small amount of error in the above calculation
-    size_adj <- 1.05
-
     # calculate height taking into account the various adjustments
-    height <- known_ht * size_adj + panel_height * n_panel_rows
+    height <- known_ht + panel_height * n_panel_rows
   }
-
 
   # Save ------------------------------------------------------------------
 
@@ -492,6 +452,35 @@ check_plots <- function(plots){
   }
 
   return(temp_list)
+}
+
+#' Get the correct plot width, base text size and maximum height based on the chart type
+#' @noRd
+get_plot_width <- function(chart_type, max_height){
+
+  # Set the maximum width based on the type of outputs
+  if(chart_type == "MN"){
+
+    max_width <- 18.59 # based on 215.9mm page width and 15mm margins either side
+
+  } else if(chart_type == "RN"){
+
+    max_width <- 13.985 # based on 338.7mm page width, 20mm margins, 15mm column sep and 2 columns (i.e. divide the remainder by 2)
+
+  } else if(chart_type == "PPT"){
+
+    max_height <- 13.25
+    max_width <- 31.32
+
+  } else if(is.null(chart_type)){
+
+    max_width <- 20
+
+  } else {
+    stop("Invalid chart type. Please select from one of the following: 'MN' for micronotes, 'RN' for research notes, 'PPT' for powerpoint slides, or leave blank to use default maximum widths")
+  }
+
+  return(list("max_width" = max_width, "max_height" = max_height))
 }
 
 #' Set option to automatically open files created by \code{save_e61}
