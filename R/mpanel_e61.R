@@ -59,44 +59,21 @@ save_mpanel_e61 <-
 
     if(is.null(chart_type)) chart_type <- "MN"
 
-    # Set the maximum width based on the type of outputs
-    if(chart_type == "MN"){
+    max_width <- get_plot_width(chart_type, max_height)$max_width
+    max_height <- get_plot_width(chart_type, max_height)$max_height
 
-      max_width <- 18.59 # based on 215.9mm page width and 15mm margins either side
-
-    } else if(chart_type == "RN"){
-
-      max_width <- 13.985 # based on 338.7mm page width, 20mm margins, 15mm column sep and 2 columns (i.e. divide the remainder by 2)
-
-      # decrease the text size for research note charts
-      plot <- plot + theme_e61(base_size = base_size * 13.985 / 18.59)
-
-    } else if(chart_type == "PPT"){
-
-      max_height <- 13.25
-      max_width <- 31.32
-
-      # increase the text size for powerpoint charts
-      plot <- plot + theme_e61(base_size = base_size * 31.32 / 18.59)
-
-    } else if(is.null(chart_type)){
-
-      max_width <- 20
-      plot <- plot + theme_e61(base_size = base_size * 20 / 18.59)
-
-    } else {
-      stop("Invalid chart type. Please select from one of the following: 'MN' for micronotes, 'RN' for research notes, 'PPT' for powerpoint slides, or leave blank to use default maximum widths")
-    }
+    # Update the base size based on the type of chart (MN, RN etc.) being produced
+    base_size <- base_size * max_width / 18.59
 
     # Set width -------------------------------------------------------------
 
     # check whether the user has supplied a given width first (i.e. different to the default 8.5cm)
     if(is.null(width)) {
 
-      # If it's only one panel, set the chart width to 2/3 of the max-width
+      # If it's only one panel, set the chart width to 1/2 of the max-width
       if(ncol == 1){
 
-        width <- 2/3 * max_width
+        width <- 1/2 * max_width
 
         # Else use the whole width
       } else {
@@ -195,7 +172,7 @@ save_mpanel_e61 <-
     panel_height <- panel_width * max_panel_asps # height of each panel (width * aspect ratio)
 
 
-    # Update the y-axis scales ------------------------------------------------
+    # Update the labels -------------------------------------------------------
 
     if(auto_scale){
 
@@ -209,7 +186,8 @@ save_mpanel_e61 <-
             update_y_axis_labels(
               temp_plot,
               max_y_lab = y_lab_max_size,
-              max_break_width = max_break_width
+              max_break_width = max_break_width,
+              base_size = base_size
             )
         })
 
@@ -217,7 +195,7 @@ save_mpanel_e61 <-
         temp_plot <- update_labs(temp_plot, panel_width)
 
         # update any mplot label sizes
-        temp_plot <- update_mplot_label(temp_plot)
+        temp_plot <- update_mplot_label(temp_plot, is_mpanel = T, plot_width = panel_width, chart_type, base_size)
 
         # save the plot
         clean_plotlist[[i]] <- temp_plot

@@ -321,7 +321,7 @@ split_text_into_words <- function(text) {
 #' plot - Plot object to adjust.
 #' adj_width - User supplied adjustment.
 #' @noRd
-update_y_axis_labels <- function(plot, adj_width = NULL, max_y_lab = NA_real_, max_break_width = NA_real_){
+update_y_axis_labels <- function(plot, adj_width = NULL, max_y_lab = NA_real_, max_break_width = NA_real_, base_size){
 
   if(is.null(adj_width)) {
 
@@ -347,8 +347,8 @@ update_y_axis_labels <- function(plot, adj_width = NULL, max_y_lab = NA_real_, m
   # add the break adjustment to the plot
   plot <- plot +
     ggplot2::theme(
-      axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 2, r = 2 - (12 + diff)), vjust = 1, hjust = 1, angle = 0),
-      axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = 2 - (12 + diff), r = 2), vjust = 1, hjust = 0, angle = 0)
+      axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 2, r = -(base_size + diff)), vjust = 1, hjust = 1, angle = 0),
+      axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = -(base_size + diff), r = 2), vjust = 1, hjust = 0, angle = 0)
     )
 
   return(plot)
@@ -485,21 +485,41 @@ get_font_size <- function(plot, elem = "text", parent = "text"){
 
 #' Update the size of mplot labels
 #' @noRd
-update_mplot_label <- function(plot, size = 2.5){
+update_mplot_label <- function(plot, is_mpanel, plot_width, chart_type, text_base_size){
 
   for (i in seq_along(plot$layers)){
 
-    # 1 - check whether it is a
+    # 1 - check whether it has geom_text or geom_label arguments (this is what mplot labels are)
     layer_class <- plot$layers[[i]]$geom %>% class()
 
-    if("GeomText" %in% layer_class){
-      # 2 - check whether it is an mplot_label
+    if("GeomText" %in% layer_class | "GeomLabel" %in% layer_class){
+
+      # 2 - check whether it is an mplot_label that can be adjusted
       label <- plot$layers[[i]]$aes_params$label
 
-      if(!is.null(attr(label, "mplot_label"))){
+      if(!is.null(attr(label, "adj_mplot_label"))){
 
-        # 3 - update the size
-        plot$layers[[i]]$aes_params$size <- size
+        plot_base_size <- 8
+
+        # set the base plot width based on the chart type
+        if(chart_type == "RN"){
+
+          plot_base_size <- plot_base_size * 13.985 / 18.59
+
+        } else if(chart_type == "PPT"){
+          plot_base_size <- plot_base_size * 31.32 / 18.59
+
+        } else {
+          plot_base_size <- plot_base_size * 20 / 18.59
+        }
+
+        # 3 - update the size - this will depend on the chart width and whether the charts is an mpanel or not
+        if(is_mpanel){
+          plot$layers[[i]]$aes_params$size <- 3 * (text_base_size + plot_width) / (10 + plot_base_size)
+
+        } else {
+          plot$layers[[i]]$aes_params$size <- 4 * (text_base_size + plot_width) / (10 + plot_base_size)
+        }
       }
     }
   }
