@@ -104,7 +104,7 @@ save_e61 <- function(filename,
                      title_spacing_adj = 1, # adjust the amount of space given to the title
                      subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
                      base_size = 8, # set the base size for the theme61 font size call
-                     height_adj = 1, # adjust the vertical spacing of the mpanel charts
+                     height_adj = NULL, # adjust the vertical spacing of the mpanel charts
                      ncol = 2,
                      nrow = NULL,
                      align = c("v", "none", "h", "hv"),
