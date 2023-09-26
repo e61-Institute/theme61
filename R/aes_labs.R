@@ -8,53 +8,66 @@ update_labs <- function(plot, plot_width){
 
   # Title ----
 
-  # check if the title exists
-  title_grob <- p$grobs[[which(p$layout$name == "title")]]
-  title_text <- NULL
+  # First check whether the title has already been manually wrapped
+  if(!is.null(attr(plot, "title_wrap"))){
 
-  if(!is.null(title_grob$children)){
-    title_size <- title_grob$children[[1]]$gp$fontsize
+    # check if the title exists
+    title_grob <- p$grobs[[which(p$layout$name == "title")]]
+    title_text <- NULL
 
-    title_text <-
-      rescale_text(
-        text = plot$labels$title,
-        text_type = "title",
-        font_size = title_size,
-        plot_width = plot_width
-      )
+    if(!is.null(title_grob$children)){
+      title_size <- title_grob$children[[1]]$gp$fontsize
+
+      title_text <-
+        rescale_text(
+          text = plot$labels$title,
+          text_type = "title",
+          font_size = title_size,
+          plot_width = plot_width
+        )
+    }
+  } else {
+    title_text <- plot$labels$title
   }
 
   # Subtitle ----
+  if(!is.null(attr(plot, "subtitle_wrap"))){
+    subtitle_grob <- p$grobs[[which(p$layout$name == "subtitle")]]
+    subtitle_text <- NULL
 
-  subtitle_grob <- p$grobs[[which(p$layout$name == "subtitle")]]
-  subtitle_text <- NULL
-
-  if(!is.null(subtitle_grob$children)){
-    subtitle_size <- subtitle_grob$children[[1]]$gp$fontsize
-    subtitle_text <-
-      rescale_text(
-        text = plot$labels$subtitle,
-        text_type = "subtitle",
-        font_size = subtitle_size,
-        plot_width = plot_width
-      )
+    if(!is.null(subtitle_grob$children)){
+      subtitle_size <- subtitle_grob$children[[1]]$gp$fontsize
+      subtitle_text <-
+        rescale_text(
+          text = plot$labels$subtitle,
+          text_type = "subtitle",
+          font_size = subtitle_size,
+          plot_width = plot_width
+        )
+    }
+  } else {
+    subtitle_text <- plot$labels$subtitle
   }
 
   # Footnotes ----
 
-  footnote_grob <- p$grobs[[which(p$layout$name == "caption")]]
-  caption_text <- NULL
+  if(!is.null(attr(plot, "caption_wrap"))){
+    footnote_grob <- p$grobs[[which(p$layout$name == "caption")]]
+    caption_text <- NULL
 
-  if(!is.null(footnote_grob$children)){
+    if(!is.null(footnote_grob$children)){
 
-    footnote_size <- footnote_grob$children[[1]]$gp$fontsize
-    caption_text <-
-      rescale_text(
-        text = plot$labels$caption,
-        text_type = "caption",
-        font_size = footnote_size,
-        plot_width = plot_width
-      )
+      footnote_size <- footnote_grob$children[[1]]$gp$fontsize
+      caption_text <-
+        rescale_text(
+          text = plot$labels$caption,
+          text_type = "caption",
+          font_size = footnote_size,
+          plot_width = plot_width
+        )
+    }
+  } else {
+    caption_text <- plot$labels$caption
   }
 
   # add a new labs function to override the old one
@@ -93,8 +106,8 @@ rescale_text <- function(text, text_type, font_size, plot_width){
       dplyr::summarise(text = paste(collapsed_text, collapse = "\n")) %>%
       dplyr::pull(text)
 
-    # if it is a title, make sure we don't have only one word hanging on the last line
-    if(text_type == "title" & stringr::str_detect(text, "\\\n\\S+$")){
+    # make sure we don't have only one word hanging on the last line
+    if(stringr::str_detect(text, "\\\n\\S+$")){
 
       last_two_words <- stringr::str_extract(text, "\\S+\\\n\\S+$") %>% stringr::str_replace_all("\\\n", " ")
       text <- stringr::str_remove(text, "\\S+\\\n\\S+$")
