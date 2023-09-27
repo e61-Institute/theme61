@@ -208,7 +208,7 @@ theme_e61 <- function(y_top = TRUE,
         family = base_family,
         size = rel(0.8),
         hjust = 0,
-        vjust = 1,
+        vjust = 0.5,
         colour = "black",
         margin = margin(t = 15)
       ),

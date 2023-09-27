@@ -30,6 +30,13 @@ update_labs <- function(plot, plot_width){
     title_text <- plot$labels$title
   }
 
+  # set the title to element blank if it is not required - otherwise it leaves a useless space
+  if(is.null(title_text)){
+    plot <- plot + theme(plot.title = element_blank())
+  } else if(title_text == ""){
+    plot <- plot + theme(plot.title = element_blank())
+  }
+
   # Subtitle ----
   if(is.null(attr(plot$labels$subtitle, "subtitle_wrap"))){
     subtitle_grob <- p$grobs[[which(p$layout$name == "subtitle")]]
@@ -47,6 +54,13 @@ update_labs <- function(plot, plot_width){
     }
   } else {
     subtitle_text <- plot$labels$subtitle
+  }
+
+  # set the title to element blank if it is not required - otherwise it leaves a useless space
+  if(is.null(subtitle_text)){
+    plot <- plot + theme(plot.subtitle = element_blank())
+  } else if(subtitle_text == ""){
+    plot <- plot + theme(plot.subtitle = element_blank())
   }
 
   # Footnotes ----
@@ -68,6 +82,14 @@ update_labs <- function(plot, plot_width){
     }
   } else {
     caption_text <- plot$labels$caption
+  }
+
+  # Update the x-axis label spacing if there is no x-axis label ----
+
+  if(is.null(plot$labels$x)){
+    plot <- plot + theme(axis.title.x = element_blank())
+  } else if(plot$labels$x == ""){
+    plot <- plot + theme(axis.title.x = element_blank())
   }
 
   # add a new labs function to override the old one
@@ -485,7 +507,7 @@ get_font_size <- function(plot, elem = "text", parent = "text"){
 
 #' Update the size of mplot labels
 #' @noRd
-update_mplot_label <- function(plot, is_mpanel, plot_width, chart_type, text_base_size){
+update_mplot_label <- function(plot, plot_width, chart_type, text_base_size){
 
   for (i in seq_along(plot$layers)){
 
@@ -513,13 +535,8 @@ update_mplot_label <- function(plot, is_mpanel, plot_width, chart_type, text_bas
           plot_base_size <- plot_base_size * 20 / 18.59
         }
 
-        # 3 - update the size - this will depend on the chart width and whether the charts is an mpanel or not
-        if(is_mpanel){
-          plot$layers[[i]]$aes_params$size <- 3 * (text_base_size + plot_width) / (10 + plot_base_size)
-
-        } else {
-          plot$layers[[i]]$aes_params$size <- 4 * (text_base_size + plot_width) / (10 + plot_base_size)
-        }
+        # 3 - update the size - this will depend on the chart width and base text size
+        plot$layers[[i]]$aes_params$size <- 3 * (text_base_size + plot_width) / (10 + plot_base_size)
       }
     }
   }

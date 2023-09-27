@@ -9,12 +9,9 @@ labs_e61(
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
-  title_max_char = 100,
-  subtitle_max_char = 120,
-  footnote_max_char = 140,
-  title_wrap = TRUE,
-  subtitle_wrap = TRUE,
-  footnote_wrap = TRUE,
+  title_max_char = NULL,
+  subtitle_max_char = NULL,
+  footnote_max_char = NULL,
   x = NULL,
   y = ggplot2::waiver(),
   ...
@@ -37,13 +34,13 @@ maximum number of characters per line in the title, subtitle, sources or
 footnotes. The default is roughly appropriate for the default graph
 dimensions in \code{\link[theme61]{e61_save}}.}
 
-\item{title_wrap, subtitle_wrap, footnote_wrap}{Logical. Enables text wrapping
-for the title, subtitle, sources or footnotes. Defaults to TRUE.}
-
 \item{x, y}{String to set the x- and y-axis titles. Note that the x-axis title
 is blank (NULL) by default.}
 
 \item{...}{Additional graph component titles (optional).}
+
+\item{title_wrap, subtitle_wrap, footnote_wrap}{Logical. Enables text wrapping
+for the title, subtitle, sources or footnotes. Defaults to TRUE.}
 }
 \description{
 Provides support for well-formatted titles and footer text with minimal user
