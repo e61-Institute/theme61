@@ -16,10 +16,8 @@ reference:
   - format_flipped_bar
   - mpanel_e61
   - save_e61
-  - save_mpanel_e61
   - square_legend_symbols
-  - theme_e61
-  - theme_e61_clean
+  - starts_with("theme_e61")
 
 - title: Scales
   contents:
