@@ -7,7 +7,6 @@
 theme_e61_spatial(
   legend = c("none", "bottom", "top", "left", "right"),
   legend_title = FALSE,
-  aspect_ratio = 0.75,
   base_size = 10,
   base_family = "pt-sans"
 )
@@ -17,11 +16,11 @@ theme_e61_spatial(
 
 \item{legend_title}{Logical. Include Legend title? Defaults to FALSE.}
 
-\item{aspect_ratio}{Numeric. Sets the aspect ratio of the graph panel.}
-
 \item{base_size}{Numeric. Chart font size. Default is 10.}
 
 \item{base_family}{Character. Chart font family. Default is PT-SANS (research notes).}
+
+\item{aspect_ratio}{Numeric. Sets the aspect ratio of the graph panel.}
 }
 \value{
 ggplot2 object
