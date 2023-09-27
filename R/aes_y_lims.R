@@ -425,7 +425,7 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   if(diff / band_val > 7) return(NULL)
 
   # Rule 5 - the band value should be in the list of aesthetic band values
-  if(!any(unlist(lapply(aes_band_sizes,  dplyr::near, band_val)))) return(NULL)
+  if(!any(unlist(lapply(aes_band_sizes, dplyr::near, band_val)))) return(NULL)
 
   return(band_val)
 }
@@ -489,7 +489,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
       test_val <- aes_y_points[i]
 
       # the test value must be closer to zero than the smallest value if they both values are on the same side, otherwise it must be further from 0
-      if((smallest_val <= 0 & largest_val <= 0) | (smallest_val >= 0 & largest_val >= 0)){
+      if((smallest_val <= 0 & largest_val <= 0) || (smallest_val >= 0 & largest_val >= 0)){
 
         if(abs(test_val) > abs(smallest_val)) next
 
