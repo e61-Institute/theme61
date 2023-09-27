@@ -5,9 +5,6 @@
 #' check the arguments in \code{\link[theme61]{labs_e61}}, which are probably
 #' what you are looking for.
 #'
-#' \code{scale_y_continuous_e61()} should be used in conjunction with this
-#' function to ensure that theming and axes are applied correctly.
-#'
 #' @param y_top Defaults to TRUE. Puts the y-axis title at the top. If you
 #'   change this argument you also need to change the argument with the same
 #'   name in \code{\link[theme61]{scale_y_continuous_e61}}.
@@ -26,7 +23,8 @@
 #'   note boxes, set the colour to e61_skylight8.
 #' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #' @param base_size Numeric. Chart font size. Default is 10.
-#' @param base_family Character. Chart font family. Default is PT-SANS (research notes).
+#' @param base_family Character. Chart font family. Default for notes is PT
+#'   Sans.
 #' @param base_line_size Numeric. Default line width.
 #' @param base_rect_size Numeric. Default rect width.
 #'
