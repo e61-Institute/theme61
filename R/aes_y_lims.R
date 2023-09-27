@@ -60,9 +60,9 @@ check_for_y_var <- function(plot){
   for(i in seq_along(chart_data)){
 
     suppressMessages({suppressWarnings({
-      check_y <- chart_data[[i]]$y %>% min(na.rm = T)
-      check_ymax <- chart_data[[i]]$ymax %>% min(na.rm = T)
-      check_ymin <- chart_data[[i]]$ymin %>% min(na.rm = T)
+      check_y <- min(chart_data[[i]]$y, na.rm = T)
+      check_ymax <- min(chart_data[[i]]$ymax, na.rm = T)
+      check_ymin <- min(chart_data[[i]]$ymin, na.rm = T)
     })})
 
     if(is.finite(check_y) || is.finite(check_ymax) || is.finite(check_ymin)){
