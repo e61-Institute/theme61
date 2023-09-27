@@ -296,7 +296,6 @@ theme_e61 <- function(y_top = TRUE,
 theme_e61_spatial <- function(
   legend = c("none", "bottom", "top", "left", "right"),
   legend_title = FALSE,
-  aspect_ratio = 0.75,
   base_size = 10,
   base_family = "pt-sans"
 ){
@@ -348,8 +347,7 @@ theme_e61_spatial <- function(
       axis.text = element_blank(),
       axis.ticks = element_blank(),
       axis.line = element_blank(),
-      panel.border = element_blank(),
-      aspect.ratio = aspect_ratio
+      panel.border = element_blank()
     )
 
   if(legend_title) ret <- ret + theme(legend.title = element_text())
