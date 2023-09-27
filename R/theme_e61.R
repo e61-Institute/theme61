@@ -423,7 +423,7 @@ theme_e61_alt <- function(
 #'
 
 square_legend_symbols <- function() {
-  ggplot2::guides(colour = ggplot2::guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))
 }
 
 #' Applies changes to the theme for horizontal bar graphs
