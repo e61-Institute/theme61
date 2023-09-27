@@ -370,10 +370,10 @@ theme_e61_spatial <- function(
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 #' geom_point() +
 #' e61_colour_manual(n = 3) +
-#' theme_e61_clean()
+#' theme_e61_alt()
 
-theme_e61_clean <- function(
-    base_family = "Arial",
+theme_e61_alt <- function(
+    base_family = "pt-sans",
     base_size = 12
   ){
   ggthemes::theme_clean() +
