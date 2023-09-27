@@ -105,7 +105,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
       }
     })
 
-  # otherwise check if the limits didn't provide a break - this is basically user error
+  # otherwise check if the limits didn't provide a break
   } else if(length(y_scale_lims) == 2 && auto_scale){
 
     # use the first two supplied limits as the min and max
