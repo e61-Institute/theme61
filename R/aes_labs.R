@@ -4,7 +4,7 @@
 #' @noRd
 update_labs <- function(plot, plot_width){
 
-  p <- ggplot2::ggplotGrob(plot)
+  p <- ggplotGrob(plot)
 
   # Title ----
 
@@ -346,11 +346,11 @@ update_y_axis_labels <- function(plot, adj_width = NULL, max_y_lab = NA_real_, m
 
     # get the difference in the label size
     y_font_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
-    y_lab_width <- get_text_width(plot$labels$y, font_size = y_font_size) * 10 * ggplot2:::.pt
+    y_lab_width <- get_text_width(plot$labels$y, font_size = y_font_size) * 10 * .pt
 
     if(!is.na(max_y_lab)){
 
-      max_y_lab <- max_y_lab * 10 * ggplot2:::.pt
+      max_y_lab <- max_y_lab * 10 * .pt
       max_width <- pmax(max_y_lab, max_break_width, na.rm = T)
       diff <- max_width - y_lab_width
 
@@ -362,9 +362,9 @@ update_y_axis_labels <- function(plot, adj_width = NULL, max_y_lab = NA_real_, m
 
   # add the break adjustment to the plot
   plot <- plot +
-    ggplot2::theme(
-      axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 2, r = -(base_size + diff)), vjust = 1, hjust = 1, angle = 0),
-      axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = -(base_size + diff), r = 2), vjust = 1, hjust = 0, angle = 0)
+    theme(
+      axis.title.y.left = element_text(margin = margin(l = 2, r = -(base_size + diff)), vjust = 1, hjust = 1, angle = 0),
+      axis.title.y.right = element_text(margin = margin(l = -(base_size + diff), r = 2), vjust = 1, hjust = 0, angle = 0)
     )
 
   return(plot)
@@ -376,7 +376,7 @@ update_y_axis_labels <- function(plot, adj_width = NULL, max_y_lab = NA_real_, m
 get_y_break_width <- function(plot){
 
   # get the break text size
-  p_build <- ggplot2::ggplot_build(plot)
+  p_build <- ggplot_build(plot)
 
   break_text_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
 
@@ -390,7 +390,7 @@ get_y_break_width <- function(plot){
   if(is.null(breaks) || length(breaks) == 0 || is.function(breaks)){
 
     # save the existing limits - if there are any
-    y_scale_lims <- ggplot2::layer_scales(plot)$y$limits
+    y_scale_lims <- layer_scales(plot)$y$limits
 
     # check if we already have a proper e61 scale - no need to redo the work and get it wrong
     if(length(y_scale_lims) == 3){
@@ -453,7 +453,7 @@ get_y_break_width <- function(plot){
 
   max_break_width <- max(break_text_widths) # this is in cm
 
-  break_width_pt <- ggplot2:::.pt * max_break_width * 10 # so convert to points
+  break_width_pt <- .pt * max_break_width * 10 # so convert to points
 
   return(break_width_pt)
 }
