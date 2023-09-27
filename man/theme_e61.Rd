@@ -47,7 +47,7 @@ note boxes, set the colour to e61_skylight8.}
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
 
-\item{base_family}{Character. Chart font family. Default is Arial.}
+\item{base_family}{Character. Chart font family. Default is PT-SANS (research notes).}
 
 \item{base_line_size}{Numeric. Default line width.}
 

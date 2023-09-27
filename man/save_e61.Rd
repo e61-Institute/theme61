@@ -27,8 +27,8 @@ save_e61(
   title_adj = 1,
   title_spacing_adj = 1,
   subtitle_spacing_adj = 1,
-  base_size = 8,
-  height_adj = 1,
+  base_size = 10,
+  height_adj = NULL,
   ncol = 2,
   nrow = NULL,
   align = c("v", "none", "h", "hv"),
@@ -81,9 +81,8 @@ and \code{res} to ensure the text is readable.}
     big points (1/72 inch) at \code{res} ppi.}
 
 \item{res}{The nominal resolution in ppi which will be recorded in the
-    bitmap file, if a positive integer.  Also used for units other than
-    the default.  If not specified, taken as 72 ppi to set the size of
-    text and line widths.}
+    bitmap file, if a positive integer.  Also used for \code{units}
+    other than the default, and to convert points to pixels.}
 
 \item{test}{For development use only.}
 
