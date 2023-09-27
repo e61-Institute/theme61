@@ -31,9 +31,7 @@ update_labs <- function(plot, plot_width){
   }
 
   # set the title to element blank if it is not required - otherwise it leaves a useless space
-  if(is.null(title_text)){
-    plot <- plot + theme(plot.title = element_blank())
-  } else if(title_text == ""){
+  if(is.null(title_text) || title_text == ""){
     plot <- plot + theme(plot.title = element_blank())
   }
 
@@ -57,9 +55,7 @@ update_labs <- function(plot, plot_width){
   }
 
   # set the title to element blank if it is not required - otherwise it leaves a useless space
-  if(is.null(subtitle_text)){
-    plot <- plot + theme(plot.subtitle = element_blank())
-  } else if(subtitle_text == ""){
+  if(is.null(subtitle_text) || subtitle_text == ""){
     plot <- plot + theme(plot.subtitle = element_blank())
   }
 
@@ -86,9 +82,7 @@ update_labs <- function(plot, plot_width){
 
   # Update the x-axis label spacing if there is no x-axis label ----
 
-  if(is.null(plot$labels$x)){
-    plot <- plot + theme(axis.title.x = element_blank())
-  } else if(plot$labels$x == ""){
+  if(is.null(plot$labels$x) || plot$labels$x == ""){
     plot <- plot + theme(axis.title.x = element_blank())
   }
 
@@ -202,7 +196,7 @@ rescale_text <- function(text, text_type, font_size, plot_width){
     }
 
     # Check whether we have sources to add and how many
-    if(any(is.na(sources)) | is.null(sources)){
+    if(any(is.na(sources)) || is.null(sources)){
       if(is.null(footnote_text)){
         text <- NULL
 
@@ -389,10 +383,11 @@ get_y_break_width <- function(plot){
   # check what the y-axis breaks are - this will show up if the user has specified the breaks
   breaks <- p_build$layout$panel_scales_y[[1]]$labels
 
-  if(is.null(breaks) | length(breaks) == 0) breaks <- p_build$layout$panel_scales_y[[1]]$breaks
+  if(is.null(breaks) || length(breaks) == 0)
+    breaks <- p_build$layout$panel_scales_y[[1]]$breaks
 
   # if there are no breaks use the scale y-continuous function to find them instead
-  if(is.null(breaks) | length(breaks) == 0 | is.function(breaks)){
+  if(is.null(breaks) || length(breaks) == 0 || is.function(breaks)){
 
     # save the existing limits - if there are any
     y_scale_lims <- ggplot2::layer_scales(plot)$y$limits
@@ -442,7 +437,7 @@ get_y_break_width <- function(plot){
     y_angle <- plot$theme$axis.title.y.left$angle
     y_vjust <- plot$theme$axis.title.y.left$vjust
 
-    if(length(y_angle) != 0 & length(y_vjust) != 0 & y_angle == 0 & y_vjust == 1) {
+    if(length(y_angle) != 0 && length(y_vjust) != 0 && y_angle == 0 && y_vjust == 1) {
 
       # then define the breaks
       breaks <- seq(aes_lims[[1]], aes_lims[[2]] - aes_lims[[3]], aes_lims[[3]])
@@ -489,18 +484,19 @@ get_font_size <- function(plot, elem = "text", parent = "text"){
     # if we have the element text size, then use that
   } else {
 
-    if(class(elem_text_size) == "rel" & class(parent_text_size) == "rel"){
+    if(class(elem_text_size) == "rel" && class(parent_text_size) == "rel"){
       text_size <- eval(parse(text = paste(parent_text_size, " * ", elem_text_size, " * ", main_text_size)))
 
     } else if (class(elem_text_size) == "numeric")(
       text_size <- elem_text_size
 
-    ) else if (class(elem_text_size) == "rel" & class(parent_text_size) == "numeric")(
+    ) else if (class(elem_text_size) == "rel" && class(parent_text_size) == "numeric")(
       text_size <- eval(parse(text = paste(elem_text_size, " * ", parent_text_size)))
     )
   }
 
-  if(is.null(text_size) | !is.numeric(text_size) | is.na(text_size)) text_size <- main_text_size
+  if(is.null(text_size) || !is.numeric(text_size) || is.na(text_size))
+    text_size <- main_text_size
 
   return(text_size)
 }
@@ -514,7 +510,7 @@ update_mplot_label <- function(plot, plot_width, chart_type, text_base_size){
     # 1 - check whether it has geom_text or geom_label arguments (this is what mplot labels are)
     layer_class <- plot$layers[[i]]$geom %>% class()
 
-    if("GeomText" %in% layer_class | "GeomLabel" %in% layer_class){
+    if("GeomText" %in% layer_class || "GeomLabel" %in% layer_class){
 
       # 2 - check whether it is an mplot_label that can be adjusted
       label <- plot$layers[[i]]$aes_params$label
