@@ -295,6 +295,11 @@ get_aes_ticks <- function(min_y_val, max_y_val){
 
   if(min_y_val == max_y_val) return(NULL)
 
+  # Helper function for checking if a list of values is the same as a given scalar
+  chk_diff <- function(value, compare) {
+    any(unlist(lapply(value, function(x) isTRUE(all.equal(x, compare)))))
+  }
+
   # check the argments are correctly ordered, otherwise adjust
   if(max_y_val < min_y_val) {
     temp_bot <- min_y_val
@@ -357,19 +362,19 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   order_mag_max <- ceiling(log10(max_size))
 
   # check whether the difference fits into any of the aesthetic groupings
-  if (any(unlist(lapply(aes_y_points$five_point, all.equal, diff)))) {
+  if (chk_diff(aes_y_points$five_point, diff)) {
     band_val <- diff / 5
 
-  } else if (any(unlist(lapply(aes_y_points$six_point, all.equal, diff)))) {
+  } else if (chk_diff(aes_y_points$six_point, diff)) {
     band_val <- diff / 6
 
-  } else if (any(unlist(lapply(aes_y_points$four_point, all.equal, diff)))) {
+  } else if (chk_diff(aes_y_points$four_point, diff)) {
     band_val <- diff / 4
 
-  } else if (any(unlist(lapply(aes_y_points$seven_point, all.equal, diff)))) {
+  } else if (chk_diff(aes_y_points$seven_point, diff)) {
     band_val <- diff / 7
 
-  } else if (any(unlist(lapply(aes_y_points$three_point, all.equal, diff)))) {
+  } else if (chk_diff(aes_y_points$three_point, diff)) {
     band_val <- diff / 3
 
     # Rule 1 - If the difference is not in any of the lists, then it isn't aesthetic and we should try the max size to begin with
@@ -379,7 +384,7 @@ get_aes_ticks <- function(min_y_val, max_y_val){
     aes_y_points <- unlist(aes_y_points)
 
     # adjust the order of magnitude if necessary
-    if(!any(unlist(lapply(aes_y_points,  all.equal, max_size / 10 ^ (order_mag_max - 2))))) {
+    if(!chk_diff(aes_y_points, max_size / 10 ^ (order_mag_max - 2))) {
       return(NULL)
 
     } else {
@@ -425,7 +430,7 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   if(diff / band_val > 7) return(NULL)
 
   # Rule 5 - the band value should be in the list of aesthetic band values
-  if(!any(unlist(lapply(aes_band_sizes, all.equal, band_val)))) return(NULL)
+  if(!chk_diff(aes_band_sizes, band_val)) return(NULL)
 
   return(band_val)
 }
