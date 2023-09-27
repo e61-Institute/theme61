@@ -179,8 +179,8 @@ get_y_minmax <- function(plot){
 
     # suppress messages as this will frequently warn about no non missing values
     suppressMessages({suppressWarnings({
-      temp_ymin <- chart_data[[i]]$ymin %>% min(na.rm = T)
-      temp_y <- chart_data[[i]]$y %>% min(na.rm = T)
+      temp_ymin <- min(chart_data[[i]]$ymin, na.rm = T)
+      temp_y <- min(chart_data[[i]]$y, na.rm = T)
     })})
 
     # if its finite then it it exists (min of a null variable returns -Inf)
@@ -255,27 +255,28 @@ get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
   # set the adjustment factor based on whether we are looking at a value above or below 1
   if (y_val > 0) adj <- 1 else adj <- -1
 
-  aes_y_points <- data.frame(points = c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100))
+  aes_y_points <- data.table::data.table(points = c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100))
 
   order_mag <- ceiling(log10(adj * y_val))
-  aes_y_points <- aes_y_points %>% dplyr::mutate(points_adj = adj * points)
-  aes_y_points <- aes_y_points %>% dplyr::mutate(points_diff = points_adj - (y_val / 10 ^ (order_mag - 2)))
+  aes_y_points[, points_adj := adj * points]
+  aes_y_points[, points_diff := points_adj - (y_val / 10 ^ (order_mag - 2))]
 
-  if(type == "next_smallest") aes_y_points <- aes_y_points %>% dplyr::mutate(points_diff = -1 * points_diff)
+  if(type == "next_smallest")
+    aes_y_points[, points_diff := -1 * points_diff]
 
   if (y_val > 0) {
-    aes_y_points <- aes_y_points %>% dplyr::filter(points_diff > 0)
+    aes_y_points <- aes_y_points[points_diff > 0]
 
     if(nrow(aes_y_points) != 0) {
-      aes_y_points <- aes_y_points %>% dplyr::filter(points_diff == min(points_diff))
+      aes_y_points <- aes_y_points[points_diff == min(points_diff)]
     }
 
   } else {
 
-    aes_y_points <- aes_y_points %>% dplyr::filter(points_diff < 0)
+    aes_y_points <- aes_y_points[points_diff < 0]
 
     if(nrow(aes_y_points) != 0) {
-      aes_y_points <- aes_y_points %>% dplyr::filter(points_diff == max(points_diff))
+      aes_y_points <- aes_y_points[points_diff == max(points_diff)]
     }
   }
 
@@ -375,7 +376,7 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   } else {
 
     # But first check the max value is aesthetic itself - it should be most of the time
-    aes_y_points <- aes_y_points %>% unlist()
+    aes_y_points <- unlist(aes_y_points)
 
     # adjust the order of magnitude if necessary
     if(!any(unlist(lapply(aes_y_points,  dplyr::near, max_size / 10 ^ (order_mag_max - 2))))) {
