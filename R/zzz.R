@@ -1,3 +1,5 @@
+.datatable.aware = TRUE
+
 t61_env <- NULL
 
 .onLoad <- function(libname, pkgname) {
