@@ -52,11 +52,8 @@ save_single <- function(
 
   # Guard clauses and failing checks ----------------------------------------
 
-  # Enforce file format requirements if a file extension is provided (quietly
-  # permits eps files too)
-  if (grepl("\\..{3}$", filename) && !grepl("\\.(png|svg|pdf|eps)$", filename)) {
-    stop("You must provide a file extension. Only PDF, SVG and PNG file formats are currently supported.")
-  }
+  # Enforce file format requirements if a file extension is provided
+  save_guard(filename)
 
   # Determine which file formats to save
   if (grepl("\\..{3}$", filename)) {
