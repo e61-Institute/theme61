@@ -6,7 +6,7 @@ save_multi <-
            format = c("svg", "pdf", "eps", "png"),
            ...,
            plotlist = NULL,
-           chart_type = "MN",
+           chart_type = NULL,
            title = NULL,
            subtitle = NULL,
            footnotes = NULL,

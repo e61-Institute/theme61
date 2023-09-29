@@ -4,7 +4,7 @@
 save_single <- function(
     filename,
     plot = ggplot2::last_plot(),
-    chart_type = "MN",
+    chart_type = NULL,
     auto_scale = TRUE, # manual control over whether y-axis is scaled
     width = NULL, # manual control over the width of the chart
     height = NULL, # manual control over the height of the chart

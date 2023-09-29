@@ -106,6 +106,9 @@ save_e61 <- function(filename,
   # check whether the plots are ggplot2 objects
   plots <- check_plots(plots)
 
+  # Enforce chart type
+  chart_type <- match.arg(chart_type)
+
   # Check whether to save an mpanel or a single planel chart - these require
   # different approaches
   if(length(plots) > 1) {
