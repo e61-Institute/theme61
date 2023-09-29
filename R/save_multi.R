@@ -372,7 +372,7 @@ save_multi <-
 
     # Save the mpanel --------------------------------------------------------
 
-    save_graph(gg, format, filename, width, tot_height, pointsize, res)
+    save_graph(graph = gg, format, filename, width, height = tot_height, pointsize, res)
 
     # Post-save functions -----------------------------------------------------
 

@@ -197,7 +197,7 @@ save_single <- function(
 
   # Save ------------------------------------------------------------------
 
-  save_graph(gg, format, filename, width, tot_height, pointsize, res)
+  save_graph(graph = plot, format, filename, width, height, pointsize, res)
 
   # Post-saving messages and functions ------------------------------------
 
