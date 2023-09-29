@@ -143,9 +143,11 @@ save_multi <-
       # temp_width <- sum(widths)
       # if(i <= ncol) known_width <- known_width + temp_width
 
-      if(is.null(max_left_axis_width) | length(max_left_axis_width) == 0) max_left_axis_width <- 0
-      if(is.null(max_right_axis_width) | length(max_right_axis_width) == 0) max_right_axis_width <- 0
+      if(is.null(max_left_axis_width) || length(max_left_axis_width) == 0)
+        max_left_axis_width <- 0
 
+      if(is.null(max_right_axis_width) || length(max_right_axis_width) == 0)
+        max_right_axis_width <- 0
 
       # Calculate the known height of the chart ---------------------------------
 
@@ -370,22 +372,7 @@ save_multi <-
 
     # Save the mpanel --------------------------------------------------------
 
-    lapply(format, function(fmt) {
-
-      file_i <- paste0(filename, ".", fmt)
-
-      switch(
-        fmt,
-        svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(tot_height), bg = "transparent"),
-        eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(tot_height), bg = "transparent"),
-        pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(tot_height), bg = "transparent"),
-        png = png(filename = file_i, width = width, height = tot_height, units = "cm", pointsize = pointsize, res = res, bg = "transparent")
-      )
-
-      print(gg)
-      dev.off()
-    })
-
+    save_graph(gg, format, filename, width, tot_height, pointsize, res)
 
     # Post-save functions -----------------------------------------------------
 

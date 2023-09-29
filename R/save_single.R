@@ -197,19 +197,7 @@ save_single <- function(
 
   # Save ------------------------------------------------------------------
 
-  lapply(format, function(fmt) {
-    file_i <- paste0(filename, ".", fmt)
-
-    switch(
-      fmt,
-      svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
-      eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
-      pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
-      png = png(filename = file_i, width = width, height = height, units = "cm", pointsize = pointsize, res = res, bg = "transparent")
-    )
-    print(plot)
-    dev.off()
-  })
+  save_graph(gg, format, filename, width, tot_height, pointsize, res)
 
   # Post-saving messages and functions ------------------------------------
 

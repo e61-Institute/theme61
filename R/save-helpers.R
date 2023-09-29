@@ -65,3 +65,24 @@ check_plots <- function(plots){
 
   return(temp_list)
 }
+
+#' Helper function to actually perform the saving functionality
+#' @noRd
+save_graph <- function(gg, format, filename, width, tot_height, pointsize, res) {
+  lapply(format, function(fmt) {
+
+    file_i <- paste0(filename, ".", fmt)
+
+    switch(
+      fmt,
+      svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(tot_height), bg = "transparent"),
+      eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(tot_height), bg = "transparent"),
+      pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(tot_height), bg = "transparent"),
+      png = png(filename = file_i, width = width, height = tot_height, units = "cm", pointsize = pointsize, res = res, bg = "transparent")
+    )
+
+    print(gg)
+    dev.off()
+  })
+
+}
