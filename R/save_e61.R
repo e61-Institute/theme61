@@ -118,9 +118,9 @@ save_e61 <- function(filename,
   # check whether the plots are ggplot2 objects
   plots <- check_plots(plots)
 
-  if(length(plots) > 1){
+  if(length(plots) > 1) {
 
-    save_mpanel_e61(
+    save_multi(
       filename,
       format = format,
       plotlist = plots,
@@ -149,7 +149,7 @@ save_e61 <- function(filename,
 
   } else {
 
-    save_spanel_e61(
+    save_single(
       filename = filename,
       plot = plot,
       chart_type = chart_type,

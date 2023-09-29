@@ -1,7 +1,7 @@
 
 #' Save a single-panel chart with e61 formatting
 #' @noRd
-save_spanel_e61 <- function(
+save_single <- function(
     filename,
     plot = ggplot2::last_plot(),
     chart_type = "MN",

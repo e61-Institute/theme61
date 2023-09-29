@@ -1,7 +1,7 @@
 #' Save a multi-panel chart with e61 formatting
 #' @noRd
 
-save_mpanel_e61 <-
+save_multi <-
   function(filename,
            format = c("svg", "pdf", "eps", "png"),
            ...,
