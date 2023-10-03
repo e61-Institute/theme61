@@ -15,7 +15,6 @@ save_mpanel_e61 <-
            height = NULL, # manual control over the height of the chart
            max_height = NULL, # manual control over the maximum height of the chart
            auto_scale = TRUE,
-           title_adj = 1,
            title_spacing_adj = 1, # adjust the amount of space given to the title
            subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
            base_size = 10, # set the base size for the theme61 font size call
@@ -59,11 +58,12 @@ save_mpanel_e61 <-
 
     if(is.null(chart_type)) chart_type <- "MN"
 
-    max_width <- get_plot_width(chart_type, max_height)$max_width
-    max_height <- get_plot_width(chart_type, max_height)$max_height
+    max_width <- get_plot_dims(chart_type, max_height)$max_width
+    max_height <- get_plot_dims(chart_type, max_height)$max_height
 
     # Update the base size based on the type of chart (MN, RN etc.) being produced
-    base_size <- base_size * max_width / 18.59
+    base_size <- base_size * max_width / get_plot_dims("MN")$max_width
+
 
     # Set width -------------------------------------------------------------
 
@@ -113,7 +113,7 @@ save_mpanel_e61 <-
 
       # Calculate the known width of the chart ----
 
-      p <- ggplot2::ggplotGrob(temp_plot)
+      p <- ggplotGrob(temp_plot)
 
       # get max panel aspect ratio - this is found by looking at the number of null rows and cols (the panels)
       null_rowhts <- as.numeric(p$heights[grid::unitType(p$heights) == "null"])
@@ -228,9 +228,9 @@ save_mpanel_e61 <-
     # Prepare titles, subtitles etc. --------------------------------------
 
     # define text sizes
-    title_text_size <- base_size * 1.25 * title_adj
-    subtitle_text_size <- base_size * 1.125 * title_adj
-    footer_text_size <- base_size - 1
+    title_text_size <- base_size * 1.15
+    subtitle_text_size <- base_size
+    footer_text_size <- base_size * 0.8
 
     # title
     if(!is.null(title)){
@@ -243,7 +243,7 @@ save_mpanel_e61 <-
             text_type = "title",
             font_size = title_text_size,
             # plot width is total width
-            plot_width = width * 0.95
+            plot_width = width - (max_left_axis_width + max_right_axis_width + 2 * points_to_mm(10) / 10)
           )
       }
 
@@ -269,7 +269,7 @@ save_mpanel_e61 <-
             text_type = "subtitle",
             font_size = subtitle_text_size,
             # plot width is total width - outer axis width (we don't want to overlap those)
-            plot_width = width - (max_left_axis_width + max_right_axis_width)
+            plot_width = width - (max_left_axis_width + max_right_axis_width + 2 * points_to_mm(10) / 10)
           )
       }
 
@@ -302,7 +302,7 @@ save_mpanel_e61 <-
             text_type = "caption",
             font_size = footer_text_size,
             # plot width including the left axis
-            plot_width = width - max_right_axis_width
+            plot_width = width - (max_right_axis_width + points_to_mm(10) / 10)
           )
       }
 
@@ -315,7 +315,7 @@ save_mpanel_e61 <-
           vjust = 0.5,
           size = footer_text_size
         ) +
-        ggplot2::theme(plot.margin = margin(t = 5, r = 0, b = 3, l = 5))
+        theme(plot.margin = margin(t = 5, r = 0, b = 3, l = 5))
     }
 
 
@@ -371,42 +371,10 @@ save_mpanel_e61 <-
       rel_heights = rel_heights
     )
 
-    # Save the mpanel --------------------------------------------------------
 
-    lapply(format, function(fmt) {
+    # Save the chart --------------------------------------------------------
 
-      file_i <- paste0(filename, ".", fmt)
+    retval <- save_e61_sub(plot = gg, width = width, height = tot_height, format, filename)
 
-      switch(
-        fmt,
-        svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(tot_height), bg = "transparent"),
-        eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(tot_height), bg = "transparent"),
-        pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(tot_height), bg = "transparent"),
-        png = png(filename = file_i, width = width, height = tot_height, units = "cm", pointsize = pointsize, res = res, bg = "transparent")
-      )
-
-      print(gg)
-      dev.off()
-    })
-
-
-    # Post-save functions -----------------------------------------------------
-
-    # Opens the graph file if the option is set
-    if (as.logical(getOption("open_e61_graph", FALSE))) {
-      # Put filename back together
-      filename <- paste0(filename, ".", format[[1]])
-
-      file_to_open <- shQuote(here::here(filename))
-      out <- try(system2("open", file_to_open))
-
-      if (out != 0) warning("Graph file could not be opened.")
-    }
-
-    # Invisibly returns the filename (or vector of filenames). Currently some of
-    # the tests rely on the filename being returned so maybe don't change this
-    # without a good reason.
-    retval <- paste(filename, format, sep = ".")
-
-    invisible(retval)
+    return(invisible(retval))
 }
