@@ -3,12 +3,12 @@
 #' @noRd
 save_spanel_e61 <- function(
     filename,
-    plot = ggplot2::last_plot(),
+    plot = last_plot(),
     chart_type = "MN",
     auto_scale = TRUE, # manual control over whether y-axis is scaled
     width = NULL, # manual control over the width of the chart
     height = NULL, # manual control over the height of the chart
-    max_height = NULL, # manual control over the maximum height of the chart
+    max_height = 100, # manual control over the maximum height of the chart
     format = c("svg", "pdf", "eps", "png"),
     save_data = FALSE,
     resize = NULL,
@@ -73,16 +73,52 @@ save_spanel_e61 <- function(
     stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
 
+  # Check if we have a spatial chart, if we do save without editing ---------
+
+  is_spatial_chart <- F
+
+  for(i in seq_along(plot$layers)){
+
+    layer_class <- class(plot$layers[[i]]$geom)
+
+    if("GeomSf" %in% layer_class) {
+      is_spatial_chart <- T
+
+      break
+    }
+  }
+
+  # if it's a spatial plot, turn of autoscaling
+  if(is_spatial_chart) auto_scale <- F
+
+
   # Set maximum width based on output type ----------------------------------
 
   if(is.null(chart_type)) chart_type <- "MN"
 
-  max_width <- get_plot_width(chart_type, max_height)$max_width
-  max_height <- get_plot_width(chart_type, max_height)$max_height
+  max_width <- get_plot_dims(chart_type, max_height)$max_width
+  max_height <- get_plot_dims(chart_type, max_height)$max_height
 
-  plot <- plot + theme_e61(base_size = base_size * max_width / 18.59)
+  # update the base size without removing the legend
+  if(is_spatial_chart){
+    plot <- plot + theme_e61_spatial(base_size = base_size * max_width / get_plot_dims("MN")$max_width)
 
-  plot_build <- ggplot2::ggplot_build(plot)
+  } else {
+
+    legend_position <- plot$theme$legend.position
+
+    plot <- plot +
+      theme_e61(
+        keep_legend = T,
+        base_size = base_size * max_width / get_plot_dims("MN")$max_width
+      )
+
+    if(!is.null(legend_position)){
+      plot <- plot + theme(legend.position = legend_position)
+    }
+  }
+
+  plot_build <- ggplot_build(plot)
 
 
   # Update y-axis limits ----------------------------------------------------
@@ -108,13 +144,17 @@ save_spanel_e61 <- function(
 
   # Set width -------------------------------------------------------------
 
+  # set to a dummy value initially
+  max_panel_width <- 1e10
+
   # check whether the user has supplied a given width first (i.e. different to the default 8.5cm)
   if(is.null(width)) {
 
     # When coord_flip() is used to make a plot horizontal, the default dims are too small
-    if (isTRUE("CoordFlip" %in% class(ggplot2::ggplot_build(plot)$layout$coord))) {
+    if (isTRUE("CoordFlip" %in% class(ggplot_build(plot)$layout$coord))) {
 
       width <- max_width
+      max_panel_width <- max_width / 2 # only allow the panel to be at most half the column consistent with other chart types
 
       plot <- plot + format_flipped_bar()
 
@@ -136,7 +176,7 @@ save_spanel_e61 <- function(
   # Update labels -----------------------------------------------------------
 
   # Update the size of the text used for titles, footnotes, axes etc.
-  p <- ggplot2::ggplotGrob(plot)
+  p <- ggplotGrob(plot)
 
   # allow charts to be the width of the panels
   right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r"))
@@ -145,6 +185,12 @@ save_spanel_e61 <- function(
   known_wd <- right_axis_width + left_axis_width
 
   tot_panel_width <- width - known_wd
+
+  # check that the total panel width isn't over the maximum, again this is only an issue for the coord flipped charts
+  if(tot_panel_width > max_panel_width) tot_panel_width <- max_panel_width
+
+  # update the width after this check
+  width <- tot_panel_width + known_wd
 
   plot <- update_labs(plot, tot_panel_width)
 
@@ -160,63 +206,47 @@ save_spanel_e61 <- function(
   if(is.null(height)){
 
     # Step 1 - Get the amount of free height and width we have to play with (what is not already used up by the set elements)
-    p <- ggplot2::ggplotGrob(plot)
+    p <- ggplotGrob(plot)
 
     known_ht <- sum(grid::convertHeight(p$heights, "cm", valueOnly = TRUE))
 
-    right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r"))
-    left_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-l"), get_grob_width(p, grob_name = "axis-l"))
-
-    known_wd <- right_axis_width + left_axis_width
-
-    # calculate the free width and height we have to play with
-    free_ht <- if(!is.null(max_height)) {
-      max_height - known_ht
-
-    } else {
-      100 - known_ht
-    }
-
+    # calculate the total free width and height we have to play with
+    free_ht <- max_height - known_ht
     free_wd <- width - known_wd
 
     # Step 2 - Find the number of panels (these have null rows and heights because they are flexible)
     null_rowhts <- as.numeric(p$heights[grid::unitType(p$heights) == "null"])
     null_colwds <- as.numeric(p$widths[grid::unitType(p$widths) == "null"])
+
     panel_asps <- (
       matrix(null_rowhts, ncol = 1)
       %*% matrix(1 / null_colwds, nrow = 1))
 
     # Step 3 - Divide the free width by the number of columns (panels) we have
-    panel_width <- free_wd / n_panel_cols # width of each panel
+    panel_width <- free_wd / n_panel_cols # width of each individual panel
+
+    # Check that the panel width does not exceed the max panel width
+    # - this will only happen for flipped bar charts and is designed to let them
+    # - take up more space if they have long y-axis titles, but not take up
+    # - excessive space with the panel
+    if(panel_width > max_panel_width) panel_width <- max_panel_width
+
+    # panel height is just the panel width * the aspect ratio
     panel_height <- panel_width * max(panel_asps[1,]) # height of each panel (width * aspect ratio)
 
     # Step 4 - Work out the best height of the plot - if it can be achieved under the maximum height
     if(panel_height * n_panel_rows < free_ht){
+
       height <- known_ht + panel_height * n_panel_rows
+
     } else {
       height <- max_height
     }
   }
 
-  # Save ------------------------------------------------------------------
 
-  lapply(format, function(fmt) {
-    file_i <- paste0(filename, ".", fmt)
+  # Compile the save messages together --------------------------------------
 
-    switch(
-      fmt,
-      svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
-      eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
-      pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
-      png = png(filename = file_i, width = width, height = height, units = "cm", pointsize = pointsize, res = res, bg = "transparent")
-    )
-    print(plot)
-    dev.off()
-  })
-
-  # Post-saving messages and functions ------------------------------------
-
-  # Compile the messages together
   print_adv <- function() {
     cli::cli_div(theme = list(".bad" = list(color = "#cc0000",
                                             before = paste0(cli::symbol$cross, " ")),
@@ -249,21 +279,11 @@ save_spanel_e61 <- function(
     data.table::fwrite(plot$data, data_name)
   }
 
-  # Opens the graph file if the option is set
-  if (as.logical(getOption("open_e61_graph", FALSE))) {
-    # Put filename back together
-    filename <- paste0(filename, ".", format[[1]])
 
-    file_to_open <- shQuote(here::here(filename))
-    out <- try(system2("open", file_to_open))
+  # Save the chart --------------------------------------------------------
 
-    if (out != 0) warning("Graph file could not be opened.")
-  }
+  retval <- save_e61_sub(plot, width, height, format, filename)
 
-  # Invisibly returns the filename (or vector of filenames). Currently some of
-  # the tests rely on the filename being returned so maybe don't change this
-  # without a good reason.
-  retval <- paste(filename, format, sep = ".")
-
-  invisible(retval)
+  return(invisible(retval))
 }
+

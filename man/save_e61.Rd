@@ -24,7 +24,6 @@ save_e61(
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
-  title_adj = 1,
   title_spacing_adj = 1,
   subtitle_spacing_adj = 1,
   base_size = 10,
@@ -99,9 +98,6 @@ in the title/subtitle yourself. Please be sensible with the number of
 separate points you include in the graph.}
 
 \item{sources}{String vector providing the names of sources for the graph.}
-
-\item{title_adj}{(Mpanel specific) Rescales the size of the title text to be slightly larger
-than the titles of the subplots (default is 1.1). 2 doubles the font size.}
 
 \item{title_spacing_adj}{(Mpanel specific) Rescales the size of the space give to the mpanel
 title. Use if you think the title looks too cramped on the chart.}
