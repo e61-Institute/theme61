@@ -1,7 +1,7 @@
 #' Save a multi-panel chart with e61 formatting
 #' @noRd
 
-save_mpanel_e61 <-
+save_multi <-
   function(filename,
            format = c("svg", "pdf", "eps", "png"),
            ...,
@@ -38,11 +38,7 @@ save_mpanel_e61 <-
 
     # Guard clauses and failing checks ----------------------------------------
 
-    # Enforce file format requirements if a file extension is provided (quietly
-    # permits eps files too)
-    if (grepl("\\..{3}$", filename) && !grepl("\\.(png|svg|pdf|eps)$", filename)) {
-      stop("You must provide a file extension. Only PDF, SVG and PNG file formats are currently supported.")
-    }
+    save_guard(filename)
 
     # Determine which file formats to save
     if (grepl("\\..{3}$", filename)) {
@@ -146,8 +142,11 @@ save_mpanel_e61 <-
       # temp_width <- sum(widths)
       # if(i <= ncol) known_width <- known_width + temp_width
 
-      if(is.null(max_left_axis_width) | length(max_left_axis_width) == 0) max_left_axis_width <- 0
-      if(is.null(max_right_axis_width) | length(max_right_axis_width) == 0) max_right_axis_width <- 0
+      if(is.null(max_left_axis_width) || length(max_left_axis_width) == 0)
+        max_left_axis_width <- 0
+
+      if(is.null(max_right_axis_width) || length(max_right_axis_width) == 0)
+        max_right_axis_width <- 0
 
 
       # Calculate the known height of the chart ---------------------------------
@@ -374,7 +373,28 @@ save_mpanel_e61 <-
 
     # Save the chart --------------------------------------------------------
 
-    retval <- save_e61_sub(plot = gg, width = width, height = tot_height, format, filename)
+    save_graph(graph = gg, format, filename, width, height = tot_height, pointsize, res)
 
-    return(invisible(retval))
+
+    # Post-save functions -----------------------------------------------------
+
+    # Opens the graph file if the option is set
+    if (as.logical(getOption("open_e61_graph", FALSE))) {
+
+      # Put filename back together
+      filename <- paste0(filename, ".", format[[1]])
+
+      file_to_open <- shQuote(here::here(filename))
+
+      out <- try(system2("open", file_to_open))
+
+      if (out != 0) warning("Graph file could not be opened.")
+    }
+
+    # Invisibly returns the filename (or vector of filenames). Currently some of
+    # the tests rely on the filename being returned so maybe don't change this
+    # without a good reason.
+    retval <- paste(filename, format, sep = ".")
+
+    invisible(retval)
 }

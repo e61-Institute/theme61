@@ -1,10 +1,10 @@
 
 #' Save a single-panel chart with e61 formatting
 #' @noRd
-save_spanel_e61 <- function(
+save_single <- function(
     filename,
     plot = last_plot(),
-    chart_type = "MN",
+    chart_type = NULL,
     auto_scale = TRUE, # manual control over whether y-axis is scaled
     width = NULL, # manual control over the width of the chart
     height = NULL, # manual control over the height of the chart
@@ -244,9 +244,11 @@ save_spanel_e61 <- function(
     }
   }
 
+  save_graph(graph = plot, format, filename, width, height, pointsize, res)
 
-  # Compile the save messages together --------------------------------------
+  # Post-saving messages and functions ------------------------------------
 
+  # Compile the messages together
   print_adv <- function() {
     cli::cli_div(theme = list(".bad" = list(color = "#cc0000",
                                             before = paste0(cli::symbol$cross, " ")),
@@ -271,6 +273,7 @@ save_spanel_e61 <- function(
   }
 
   if (length(adv_msg) > 0 && test) print_adv()
+
   if (length(info_msg) > 0 && test) print_info()
 
   # Save the data used to make the graph
@@ -279,11 +282,24 @@ save_spanel_e61 <- function(
     data.table::fwrite(plot$data, data_name)
   }
 
+  # Opens the graph file if the option is set
+  if (as.logical(getOption("open_e61_graph", FALSE))) {
 
-  # Save the chart --------------------------------------------------------
+    # Put filename back together
+    filename <- paste0(filename, ".", format[[1]])
 
-  retval <- save_e61_sub(plot, width, height, format, filename)
+    file_to_open <- shQuote(here::here(filename))
 
-  return(invisible(retval))
+    out <- try(system2("open", file_to_open))
+
+    if (out != 0) warning("Graph file could not be opened.")
+  }
+
+  # Invisibly returns the filename (or vector of filenames). Currently some of
+  # the tests rely on the filename being returned so maybe don't change this
+  # without a good reason.
+  retval <- paste(filename, format, sep = ".")
+
+  invisible(retval)
 }
 
