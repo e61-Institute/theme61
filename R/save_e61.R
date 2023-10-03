@@ -1,53 +1,24 @@
 #' Saves ggplot graphs with sensible defaults
 #'
-#' @description Designed to save ggplot graphs made with the e61 theme with
-#'   sensible defaults that ensure the text size is appropriately proportioned
-#'   given default sizing.
-#'
-#'   Currently the only file formats supported are \code{.pdf} or \code{.svg}
-#'   (preferred), and \code{.png}. PDF and SVG are modern vector graphics file
-#'   formats which can be scaled up and down in size without blurring or
-#'   becoming pixelated. Use the PNG file format in the rare case that vector
-#'   graphics are not supported.
-#'
-#'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
-#'
-#' @details Setting the correct height and width parameters is quite difficult
-#'   due to the way that ggplot translates ggplot objects from pixels into
-#'   physical dimensions (inches or centimetres). Font sizes are also
-#'   transformed differently to other graph elements which adds another
-#'   dimension of difficulty. This is why \code{save_e61} generally requires you
-#'   to provide your own height and width arguments after some trial and error,
-#'   and produces loud messages if you stick to the defaults, which I have tried
-#'   to make not terrible.
-#'
-#'   If the width/height arguments are off, then the file you output will have
-#'   excess space on the left/right or top/bottom (if the values are too high),
-#'   or the graph itself will be shrunk and look weird (if the values are too
-#'   low).
-#'
-#'   This function tries to support multi-panel graphs generated using
-#'   \code{mpanel_e61} by doubling the default width to 17, but you will need to
-#'   make adjustments to the dimensions to ensure the graph is sized
-#'   appropriately.
 #' @param filename File name to create on disk. Providing the file format
 #'   extension (e.g. .svg) is optional. The file extension must be lowercase. If
 #'   you want to save multiple files with different formats, see the
 #'   \code{format} argument for details.
 #' @param plot Plot object to save. Defaults to the last plot displayed so
 #'   usually you do not need to provide this explicitly.
-#' @param chart_type Type of chart. This is used to set sensible chart widths
-#'   based on the width of text in each document. Options include 'MN' (
-#'   for micronote charts), 'RN' (research notes), 'PPT' (powerpoints).
-#'   research note),'PPT
-#' @param auto_scale Logical. Should the y-axis be scaled automatically. Default is TRUE.
-#' @param width Plot width in cm. Defaults to NULL which means the width will
-#'   be set based on the chart type.
-#' @param height Plot height in cm. If you do not specify a height, the function
-#'   will calculate an appropriate height based on the labels you have provided.
-#' @param max_height The maximum height of your plot. This is used to constrain
-#'   the plot resizing algorithm in cases where you want to limit the height of
-#'   your charts.
+#' @param ... (multi-panel specific) Plot objects to put on the panel.
+#' @param chart_type String. Type of chart. This is used to set sensible chart
+#'   widths based on the width of text in each document. Options are 'MN' ( for
+#'   micronotes), 'RN' (research notes), 'PPT' (PowerPoints).
+#' @param auto_scale Logical. Should the y-axis be scaled automatically. Default
+#'   is TRUE.
+#' @param width Numeric. Plot width in cm. Defaults to NULL which means the
+#'   width will be set based on the chart type.
+#' @param height Numeric. Plot height in cm. If you do not specify a height, the
+#'   function will calculate an appropriate height.
+#' @param max_height Numeric. The maximum height of your plot in cm. This is
+#'   used to constrain the plot resizing algorithm in cases where you want to
+#'   limit the height of your charts.
 #' @param format An optional vector of file formats to save as. For example
 #'   \code{c("svg", "pdf")} will save 2 files with the same name to the same
 #'   location to SVG and PDF formats. If the file format is specified in
@@ -58,19 +29,27 @@
 #' @param resize Numeric. Only used when PNG is the file format. Resize the
 #'   graph width and height. You may also need to adjust the \code{pointsize}
 #'   and \code{res} to ensure the text is readable.
+#' @param plotlist (multi-panel specific) List of plots to combine as an
+#'   multi-panel and save. You can also enter the charts individually as
+#'   arguments to the function.
+#' @param title_adj (multi-panel specific) Rescales the size of the title text
+#'   to be slightly larger than the titles of the subplots (default is 1.1). 2
+#'   doubles the font size.
+#' @param height_adj (multi-panel specific) Rescales the height of the
+#'   multi-panel. The function sets sensible defaults but this provides you with
+#'   manual control if you need it.
+#' @param base_size (multi-panel specific) Numeric. Chart font size. Default is
+#'   8.
+#' @param title_spacing_adj (multi-panel specific) Rescales the size of the
+#'   space give to the multi-panel title. Use if you think the title looks too
+#'   cramped on the chart.
+#' @param subtitle_spacing_adj (multi-panel specific) Rescales the size of the
+#'   space give to the multi-panel subtitle. Use if you think the subtitle looks
+#'   too cramped on the chart.
+#' @param rel_heights (multi-panel specific) A numeric vector giving the
+#'   relative proportions of each graph component (title, plots, footer
+#'   (optional)).
 #' @param test For development use only.
-#' @param ... (Mpanel specific) Plot objects to put on the panel.
-#' @param plotlist (Mpanel specific) List of plots to combine as an mpanel and save. You can also
-#'   enter the charts individually as arguments to the function.
-#' @param height_adj (Mpanel specific) Rescales the height of the mpanel. The function sets sensible
-#'   defaults but this provides you with manial control if you need it.
-#' @param base_size (Mpanel specific) Numeric. Chart font size. Default is 8.
-#' @param title_spacing_adj (Mpanel specific) Rescales the size of the space give to the mpanel
-#'   title. Use if you think the title looks too cramped on the chart.
-#' @param subtitle_spacing_adj (Mpanel specific) Rescales the size of the space give to the mpanel
-#'   subtitle. Use if you think the subtitle looks too cramped on the chart.
-#' @param rel_heights (Mpanel specific) A numeric vector giving the relative proportions of each
-#'   graph component (title, plots, footer (optional)).
 #' @return ggplot2 object
 #' @inheritParams labs_e61
 #' @inheritParams cowplot::plot_grid
@@ -81,7 +60,7 @@
 save_e61 <- function(filename,
                      ..., # specific for mpanel plots
                      plot = ggplot2::last_plot(),
-                     chart_type = "MN",
+                     chart_type = c("MN", "RN", "PPT"),
                      auto_scale = TRUE, # manual control over whether y-axis is scaled
                      width = NULL, # manual control over the width of the chart
                      height = NULL, # manual control over the height of the chart
@@ -115,9 +94,11 @@ save_e61 <- function(filename,
   # check whether the plots are ggplot2 objects
   plots <- check_plots(plots)
 
+  chart_type <- match.arg(chart_type)
+
   if(length(plots) > 1){
 
-    save_mpanel_e61(
+    save_multi(
       filename,
       format = format,
       plotlist = plots,
@@ -145,7 +126,7 @@ save_e61 <- function(filename,
 
   } else {
 
-    save_spanel_e61(
+    save_single(
       filename = filename,
       plot = plot,
       chart_type = chart_type,

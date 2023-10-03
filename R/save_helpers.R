@@ -1,10 +1,19 @@
-#' Save charts of various formats and run the post saving messages and functions
+# Helper functions that are used across save_single, save_multi or save_e61
+
+
+#' Enforce file format requirements if a file extension is provided
 #' @noRd
-save_e61_sub <- function(plot, width, height, format, filename){
+save_guard <- function(filename) {
+  if (grepl("\\..{3}$", filename) && !grepl("\\.(png|svg|pdf|eps)$", filename)) {
+    stop("You must provide a file extension. Only PDF, SVG and PNG file formats are currently supported.")
+  }
+}
 
-  # Save ------------------------------------------------------------------
-
+#' Helper function to actually perform the saving functionality
+#' @noRd
+save_graph <- function(graph, format, filename, width, height, pointsize, res) {
   lapply(format, function(fmt) {
+
     file_i <- paste0(filename, ".", fmt)
 
     switch(
@@ -14,31 +23,12 @@ save_e61_sub <- function(plot, width, height, format, filename){
       pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
       png = png(filename = file_i, width = width, height = height, units = "cm", pointsize = pointsize, res = res, bg = "transparent")
     )
-    print(plot)
+
+    print(graph)
     dev.off()
   })
 
-  # Post-saving messages and functions ------------------------------------
-
-  # Opens the graph file if the option is set
-  if (as.logical(getOption("open_e61_graph", FALSE))) {
-    # Put filename back together
-    filename <- paste0(filename, ".", format[[1]])
-
-    file_to_open <- shQuote(here::here(filename))
-    out <- try(system2("open", file_to_open))
-
-    if (out != 0) warning("Graph file could not be opened.")
-  }
-
-  # Invisibly returns the filename (or vector of filenames). Currently some of
-  # the tests rely on the filename being returned so maybe don't change this
-  # without a good reason.
-  retval <- paste(filename, format, sep = ".")
-
-  return(retval)
 }
-
 #' Check plots are ggplot objects and return a list of only ggplot objects
 #' @noRd
 check_plots <- function(plots){
