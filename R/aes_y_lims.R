@@ -105,7 +105,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
       }
     })
 
-  # otherwise check if the limits didn't provide a break
+    # otherwise check if the limits didn't provide a break
   } else if(length(y_scale_lims) == 2 && auto_scale){
 
     # use the first two supplied limits as the min and max
@@ -169,7 +169,7 @@ get_y_minmax <- function(plot){
         temp_max_y <- temp_ymax
       }
 
-    # otherwise return the max of the y-variable
+      # otherwise return the max of the y-variable
     } else if(is.numeric(temp_y) && is.finite(temp_y)){
       temp_max_y <- temp_y
     }
@@ -588,7 +588,7 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F, include_vals = F
 
     aes_num <- get_aes_num(y_val = min_y_val, type = "next_largest")
 
-  # if we want to scale from from_zero then only use one value for the limits
+    # if we want to scale from from_zero then only use one value for the limits
   } else if(from_zero){
 
     if(min_y_val < 0 && max_y_val > 0){
@@ -605,7 +605,7 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F, include_vals = F
       limits <- list(0, get_aes_num(max_y_val, type = "next_largest"))
     }
 
-  # otherwise just get an aesthetic pair (not equal and not a bar chart)
+    # otherwise just get an aesthetic pair (not equal and not a bar chart)
   } else {
 
     limits <- get_aes_pair(min_y_val, max_y_val)

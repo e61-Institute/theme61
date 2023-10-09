@@ -15,7 +15,6 @@ save_multi <-
            height = NULL, # manual control over the height of the chart
            max_height = NULL, # manual control over the maximum height of the chart
            auto_scale = TRUE,
-           title_adj = 1,
            title_spacing_adj = 1, # adjust the amount of space given to the title
            subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
            base_size = 10, # set the base size for the theme61 font size call
@@ -36,10 +35,9 @@ save_multi <-
 
     plots <- check_plots(plots)
 
-
     # Guard clauses and failing checks ----------------------------------------
 
-    # Enforce file format requirements if a file extension is provided
+    # Check against guard clauses common to single/multi-panel
     save_guard(filename)
 
     # Determine which file formats to save
@@ -56,11 +54,12 @@ save_multi <-
 
     if(is.null(chart_type)) chart_type <- "MN"
 
-    max_width <- get_plot_width(chart_type, max_height)$max_width
-    max_height <- get_plot_width(chart_type, max_height)$max_height
+    max_width <- get_plot_dims(chart_type, max_height)$max_width
+    max_height <- get_plot_dims(chart_type, max_height)$max_height
 
     # Update the base size based on the type of chart (MN, RN etc.) being produced
-    base_size <- base_size * max_width / 18.59
+    base_size <- base_size * max_width / get_plot_dims("MN")$max_width
+
 
     # Set width -------------------------------------------------------------
 
@@ -110,7 +109,7 @@ save_multi <-
 
       # Calculate the known width of the chart ----
 
-      p <- ggplot2::ggplotGrob(temp_plot)
+      p <- ggplotGrob(temp_plot)
 
       # get max panel aspect ratio - this is found by looking at the number of null rows and cols (the panels)
       null_rowhts <- as.numeric(p$heights[grid::unitType(p$heights) == "null"])
@@ -227,9 +226,9 @@ save_multi <-
     # Prepare titles, subtitles etc. --------------------------------------
 
     # define text sizes
-    title_text_size <- base_size * 1.25 * title_adj
-    subtitle_text_size <- base_size * 1.125 * title_adj
-    footer_text_size <- base_size - 1
+    title_text_size <- base_size * 1.15
+    subtitle_text_size <- base_size
+    footer_text_size <- base_size * 0.8
 
     # title
     if(!is.null(title)){
@@ -242,7 +241,7 @@ save_multi <-
             text_type = "title",
             font_size = title_text_size,
             # plot width is total width
-            plot_width = width * 0.95
+            plot_width = width - (max_left_axis_width + max_right_axis_width + 2 * points_to_mm(10) / 10)
           )
       }
 
@@ -268,7 +267,7 @@ save_multi <-
             text_type = "subtitle",
             font_size = subtitle_text_size,
             # plot width is total width - outer axis width (we don't want to overlap those)
-            plot_width = width - (max_left_axis_width + max_right_axis_width)
+            plot_width = width - (max_left_axis_width + max_right_axis_width + 2 * points_to_mm(10) / 10)
           )
       }
 
@@ -301,7 +300,7 @@ save_multi <-
             text_type = "caption",
             font_size = footer_text_size,
             # plot width including the left axis
-            plot_width = width - max_right_axis_width
+            plot_width = width - (max_right_axis_width + points_to_mm(10) / 10)
           )
       }
 
@@ -314,7 +313,7 @@ save_multi <-
           vjust = 0.5,
           size = footer_text_size
         ) +
-        ggplot2::theme(plot.margin = margin(t = 5, r = 0, b = 3, l = 5))
+        theme(plot.margin = margin(t = 5, r = 0, b = 3, l = 5))
     }
 
 
@@ -370,18 +369,20 @@ save_multi <-
       rel_heights = rel_heights
     )
 
-    # Save the mpanel --------------------------------------------------------
 
+    # Save the chart --------------------------------------------------------
     save_graph(graph = gg, format, filename, width, height = tot_height, pointsize, res)
 
     # Post-save functions -----------------------------------------------------
 
     # Opens the graph file if the option is set
     if (as.logical(getOption("open_e61_graph", FALSE))) {
+
       # Put filename back together
       filename <- paste0(filename, ".", format[[1]])
 
       file_to_open <- shQuote(here::here(filename))
+
       out <- try(system2("open", file_to_open))
 
       if (out != 0) warning("Graph file could not be opened.")

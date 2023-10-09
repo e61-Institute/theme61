@@ -8,7 +8,7 @@ save_e61(
   filename,
   ...,
   plot = ggplot2::last_plot(),
-  chart_type = "MN",
+  chart_type = c("MN", "RN", "PPT"),
   auto_scale = TRUE,
   width = NULL,
   height = NULL,
@@ -24,7 +24,6 @@ save_e61(
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
-  title_adj = 1,
   title_spacing_adj = 1,
   subtitle_spacing_adj = 1,
   base_size = 10,
@@ -42,27 +41,27 @@ extension (e.g. .svg) is optional. The file extension must be lowercase. If
 you want to save multiple files with different formats, see the
 \code{format} argument for details.}
 
-\item{...}{(Mpanel specific) Plot objects to put on the panel.}
+\item{...}{(multi-panel specific) Plot objects to put on the panel.}
 
 \item{plot}{Plot object to save. Defaults to the last plot displayed so
 usually you do not need to provide this explicitly.}
 
-\item{chart_type}{Type of chart. This is used to set sensible chart widths
-based on the width of text in each document. Options include 'MN' (
-for micronote charts), 'RN' (research notes), 'PPT' (powerpoints).
-research note),'PPT}
+\item{chart_type}{String. Type of chart. This is used to set sensible chart
+widths based on the width of text in each document. Options are 'MN' ( for
+micronotes), 'RN' (research notes), 'PPT' (PowerPoints).}
 
-\item{auto_scale}{Logical. Should the y-axis be scaled automatically. Default is TRUE.}
+\item{auto_scale}{Logical. Should the y-axis be scaled automatically. Default
+is TRUE.}
 
-\item{width}{Plot width in cm. Defaults to NULL which means the width will
-be set based on the chart type.}
+\item{width}{Numeric. Plot width in cm. Defaults to NULL which means the
+width will be set based on the chart type.}
 
-\item{height}{Plot height in cm. If you do not specify a height, the function
-will calculate an appropriate height based on the labels you have provided.}
+\item{height}{Numeric. Plot height in cm. If you do not specify a height, the
+function will calculate an appropriate height.}
 
-\item{max_height}{The maximum height of your plot. This is used to constrain
-the plot resizing algorithm in cases where you want to limit the height of
-your charts.}
+\item{max_height}{Numeric. The maximum height of your plot in cm. This is
+used to constrain the plot resizing algorithm in cases where you want to
+limit the height of your charts.}
 
 \item{format}{An optional vector of file formats to save as. For example
 \code{c("svg", "pdf")} will save 2 files with the same name to the same
@@ -87,8 +86,9 @@ and \code{res} to ensure the text is readable.}
 
 \item{test}{For development use only.}
 
-\item{plotlist}{(Mpanel specific) List of plots to combine as an mpanel and save. You can also
-enter the charts individually as arguments to the function.}
+\item{plotlist}{(multi-panel specific) List of plots to combine as an
+multi-panel and save. You can also enter the charts individually as
+arguments to the function.}
 
 \item{title}{The text for the title.}
 
@@ -101,19 +101,20 @@ separate points you include in the graph.}
 
 \item{sources}{String vector providing the names of sources for the graph.}
 
-\item{title_adj}{(Mpanel specific) Rescales the size of the title text to be slightly larger
-than the titles of the subplots (default is 1.1). 2 doubles the font size.}
+\item{title_spacing_adj}{(multi-panel specific) Rescales the size of the
+space give to the multi-panel title. Use if you think the title looks too
+cramped on the chart.}
 
-\item{title_spacing_adj}{(Mpanel specific) Rescales the size of the space give to the mpanel
-title. Use if you think the title looks too cramped on the chart.}
+\item{subtitle_spacing_adj}{(multi-panel specific) Rescales the size of the
+space give to the multi-panel subtitle. Use if you think the subtitle looks
+too cramped on the chart.}
 
-\item{subtitle_spacing_adj}{(Mpanel specific) Rescales the size of the space give to the mpanel
-subtitle. Use if you think the subtitle looks too cramped on the chart.}
+\item{base_size}{(multi-panel specific) Numeric. Chart font size. Default is
+8.}
 
-\item{base_size}{(Mpanel specific) Numeric. Chart font size. Default is 8.}
-
-\item{height_adj}{(Mpanel specific) Rescales the height of the mpanel. The function sets sensible
-defaults but this provides you with manial control if you need it.}
+\item{height_adj}{(multi-panel specific) Rescales the height of the
+multi-panel. The function sets sensible defaults but this provides you with
+manual control if you need it.}
 
 \item{ncol}{(optional) Number of columns in the plot grid.}
 
@@ -126,8 +127,13 @@ vertically ("v") aligned. Options are "none" (default), "hv" (align in both dire
 margins. Options are "none" (default), or a string of any combination of l, r, t, and b in any order (e.g. "tblr" or "rlbt" for aligning all margins).
 Must be specified if any of the graphs are complex (e.g. faceted) and alignment is specified and desired. See \code{\link[cowplot:align_plots]{align_plots()}} for details.}
 
-\item{rel_heights}{(Mpanel specific) A numeric vector giving the relative proportions of each
-graph component (title, plots, footer (optional)).}
+\item{rel_heights}{(multi-panel specific) A numeric vector giving the
+relative proportions of each graph component (title, plots, footer
+(optional)).}
+
+\item{title_adj}{(multi-panel specific) Rescales the size of the title text
+to be slightly larger than the titles of the subplots (default is 1.1). 2
+doubles the font size.}
 }
 \value{
 ggplot2 object
@@ -135,35 +141,5 @@ ggplot2 object
 Invisibly returns the file name.
 }
 \description{
-Designed to save ggplot graphs made with the e61 theme with
-  sensible defaults that ensure the text size is appropriately proportioned
-  given default sizing.
-
-  Currently the only file formats supported are \code{.pdf} or \code{.svg}
-  (preferred), and \code{.png}. PDF and SVG are modern vector graphics file
-  formats which can be scaled up and down in size without blurring or
-  becoming pixelated. Use the PNG file format in the rare case that vector
-  graphics are not supported.
-
-  See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
-}
-\details{
-Setting the correct height and width parameters is quite difficult
-  due to the way that ggplot translates ggplot objects from pixels into
-  physical dimensions (inches or centimetres). Font sizes are also
-  transformed differently to other graph elements which adds another
-  dimension of difficulty. This is why \code{save_e61} generally requires you
-  to provide your own height and width arguments after some trial and error,
-  and produces loud messages if you stick to the defaults, which I have tried
-  to make not terrible.
-
-  If the width/height arguments are off, then the file you output will have
-  excess space on the left/right or top/bottom (if the values are too high),
-  or the graph itself will be shrunk and look weird (if the values are too
-  low).
-
-  This function tries to support multi-panel graphs generated using
-  \code{mpanel_e61} by doubling the default width to 17, but you will need to
-  make adjustments to the dimensions to ensure the graph is sized
-  appropriately.
+Saves ggplot graphs with sensible defaults
 }

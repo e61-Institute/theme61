@@ -89,7 +89,6 @@ save_e61 <- function(filename,
                      subtitle = NULL,
                      footnotes = NULL,
                      sources = NULL,
-                     title_adj = 1,
                      title_spacing_adj = 1, # adjust the amount of space given to the title
                      subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
                      base_size = 10, # set the base size for the theme61 font size call
@@ -112,7 +111,6 @@ save_e61 <- function(filename,
   # Check whether to save an mpanel or a single planel chart - these require
   # different approaches
   if(length(plots) > 1) {
-
     save_multi(
       filename,
       format = format,
@@ -126,7 +124,6 @@ save_e61 <- function(filename,
       height = height, # manual control over the height of the chart
       max_height = max_height, # manual control over the maximum height of the chart
       auto_scale = auto_scale,
-      title_adj = title_adj,
       title_spacing_adj = title_spacing_adj, # adjust the amount of space given to the title
       subtitle_spacing_adj = subtitle_spacing_adj, # adjust the amount of space given to the subtitle
       height_adj = height_adj, # adjust the vertical spacing of the mpanel charts
@@ -185,4 +182,3 @@ unset_open_graph <- function() {
 
   invisible(FALSE)
 }
-

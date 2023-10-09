@@ -44,6 +44,7 @@ theme_e61 <- function(y_top = TRUE,
                       adj = 0,
                       legend = c("none", "bottom", "top", "left", "right"),
                       legend_title = FALSE,
+                      keep_legend = FALSE,
                       aspect_ratio = 0.75,
                       panel_borders = TRUE,
                       background = "white",
@@ -126,7 +127,6 @@ theme_e61 <- function(y_top = TRUE,
         vjust = 0
       ),
       legend.background = element_rect(colour = NA),
-      legend.title = element_blank(),
       legend.spacing = unit(half_line, "pt"),
       legend.spacing.x = NULL,
       legend.spacing.y = NULL,
@@ -143,7 +143,6 @@ theme_e61 <- function(y_top = TRUE,
       ),
       legend.text.align = 0,
       legend.title.align = NULL,
-      legend.position = legend,
       legend.justification = "center",
       legend.box = "vertical",
       legend.box.margin = margin(0, 0,
@@ -220,17 +219,28 @@ theme_e61 <- function(y_top = TRUE,
       complete = TRUE
     )
 
-  # add panel borders if the user requests them
-  if (legend_title) {
-    ret <- ret %+replace%
-      theme(legend.title = element_text(size = rel(1),
-                           margin = margin(l = 0,
-                           r = base_size / 4, unit = "pt")))
-  }
+  # updates to the legend - only do this if keep_legend is set to false
+  if(!keep_legend){
 
-  # adjust legend direction based on legend position
-  if (data.table::like(legend, "bottom|top", ignore.case = TRUE)) {
-    ret <- ret + theme(legend.direction = "horizontal")
+    # add the basics of the legend
+    ret <- ret +
+      theme(
+        legend.position = legend,
+        legend.title = element_blank()
+      )
+
+    # add panel borders if the user requests them
+    if (legend_title) {
+      ret <- ret %+replace%
+        theme(legend.title = element_text(size = rel(1),
+                                          margin = margin(l = 0,
+                                                          r = base_size / 4, unit = "pt")))
+    }
+
+    # adjust legend direction based on legend position
+    if (data.table::like(legend, "bottom|top", ignore.case = TRUE)) {
+      ret <- ret + theme(legend.direction = "horizontal")
+    }
   }
 
   # Remove panel borders if requested
@@ -294,7 +304,6 @@ theme_e61 <- function(y_top = TRUE,
 theme_e61_spatial <- function(
   legend = c("none", "bottom", "top", "left", "right"),
   legend_title = FALSE,
-  aspect_ratio = 0.75,
   base_size = 10,
   base_family = "pt-sans"
 ){
@@ -346,8 +355,7 @@ theme_e61_spatial <- function(
       axis.text = element_blank(),
       axis.ticks = element_blank(),
       axis.line = element_blank(),
-      panel.border = element_blank(),
-      aspect.ratio = aspect_ratio
+      panel.border = element_blank()
     )
 
   if(legend_title) ret <- ret + theme(legend.title = element_text())

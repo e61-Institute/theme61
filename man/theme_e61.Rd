@@ -10,6 +10,7 @@ theme_e61(
   adj = 0,
   legend = c("none", "bottom", "top", "left", "right"),
   legend_title = FALSE,
+  keep_legend = FALSE,
   aspect_ratio = 0.75,
   panel_borders = TRUE,
   background = "white",
