@@ -26,9 +26,10 @@
 #' @param sources String vector providing the names of sources for the graph.
 #' @param x,y String to set the x- and y-axis titles. Note that the x-axis title
 #'   is blank (NULL) by default.
-#' @param title_max_char,subtitle_max_char,footnote_max_char Numeric. Set the
-#'   maximum number of characters per line in the title, subtitle, sources or
-#'   footnotes. The default is roughly appropriate for the default graph
+#' @param title_wrap_char,subtitle_wrap_char,footnote_wrap_char Numeric or
+#'   logical. Set the maximum number of characters per line in the title,
+#'   subtitle and footer text. Set to \code{FALSE} if you want to turn off text
+#'   wrapping. The default is usually appropriate for the default graph
 #'   dimensions in \code{\link[theme61]{e61_save}}.
 #' @param title_wrap,subtitle_wrap,footnote_wrap Logical. Enables text wrapping
 #'   for the title, subtitle, sources or footnotes. Defaults to TRUE.
@@ -65,9 +66,14 @@ labs_e61 <- function(title = NULL,
   })
 
   # Track whether a label has been wrapped
-  wrap_title <- F
-  wrap_subtitle <- F
-  wrap_caption <- F
+  wrap_title <- FALSE
+  wrap_subtitle <- FALSE
+  wrap_caption <- FALSE
+
+  # Turn off text wrapping is FALSE is the argument
+  if (isFALSE(title_max_char)) title_max_char <- 9999
+  if (isFALSE(subtitle_max_char)) subtitle_max_char <- 9999
+  if (isFALSE(footnote_wrap_max_char)) footnote_wrap_max_char <- 9999
 
   # For each label check whether to wrap the title
   if(!is.null(title_max_char)){
@@ -80,7 +86,7 @@ labs_e61 <- function(title = NULL,
     # Wrap the title text
     title_text <- paste(strwrap(title, width = title_max_char), collapse = "\n")
 
-    wrap_title <- T
+    wrap_title <- TRUE
 
   } else {
     title_text <- paste(strwrap(title, width = 120), collapse = "\n")
@@ -100,7 +106,7 @@ labs_e61 <- function(title = NULL,
     # Wrap the subtitle text
     subtitle_text <- paste(strwrap(subtitle, width = subtitle_max_char), collapse = "\n")
 
-    wrap_subtitle <- T
+    wrap_subtitle <- TRUE
 
   } else {
     subtitle_text <- paste(strwrap(subtitle, width = 120), collapse = "\n")
@@ -115,7 +121,7 @@ labs_e61 <- function(title = NULL,
 
     # Wrap the subtitle text
     caption_text <- caption_wrap(footnotes, sources, max_char = footnote_max_char)
-    wrap_subtitle <- T
+    wrap_subtitle <- TRUE
 
   } else {
     caption_text <- caption_wrap(footnotes, sources, max_char = 120)
