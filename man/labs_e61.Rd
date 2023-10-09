@@ -9,9 +9,9 @@ labs_e61(
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
-  title_wrap_char = NULL,
-  subtitle_wrap_char = NULL,
-  footnote_wrap_char = NULL,
+  title_wrap = NULL,
+  subtitle_wrap = NULL,
+  footnote_wrap = NULL,
   x = NULL,
   y = ggplot2::waiver(),
   ...
@@ -29,7 +29,7 @@ separate points you include in the graph.}
 
 \item{sources}{String vector providing the names of sources for the graph.}
 
-\item{title_wrap_char, subtitle_wrap_char, footnote_wrap_char}{Numeric or
+\item{title_wrap, subtitle_wrap, footnote_wrap}{Numeric or
 logical. Set the maximum number of characters per line in the title,
 subtitle and footer text. Set to \code{FALSE} if you want to turn off text
 wrapping. The default is usually appropriate for the default graph
@@ -39,9 +39,6 @@ dimensions in \code{\link[theme61]{e61_save}}.}
 is blank (NULL) by default.}
 
 \item{...}{Additional graph component titles (optional).}
-
-\item{title_wrap, subtitle_wrap, footnote_wrap}{Logical. Enables text wrapping
-for the title, subtitle, sources or footnotes. Defaults to TRUE.}
 }
 \description{
 Provides support for well-formatted titles and footer text with minimal user
