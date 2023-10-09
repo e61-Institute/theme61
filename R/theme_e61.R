@@ -440,8 +440,8 @@ square_legend_symbols <- function() {
 #' code, after theming functions such as \code{theme_e61()} have been called.
 #'
 #' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
-#' the default (-9) works for most graphs. A more negative value moves the
-#' title up, a less negative value moves the title down.
+#' the default works for most graphs. A negative value moves the
+#' title up, a positive value moves the title down.
 #'
 #' @return ggplot object
 #' @import ggplot2
@@ -454,9 +454,10 @@ format_flipped_bar <- function(x_adj = -9) {
     axis.text.x.top = element_blank(),
     axis.ticks.x.top = element_blank(),
     axis.title.x.top = element_blank(),
-    axis.title.x.bottom = element_text(margin = margin(t = x_adj, b = 5),
-                                       hjust = 1, angle = 0)
-
+    axis.title.x.bottom = element_text(margin = margin(t = -9 + x_adj, b = 5),
+                                       hjust = 1, angle = 0),
+    plot.title.position = "plot",
+    plot.caption.position = "plot"
   )
 
 }
