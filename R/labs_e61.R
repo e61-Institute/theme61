@@ -119,7 +119,7 @@ labs_e61 <- function(title = NULL,
 
     # Wrap the subtitle text
     caption_text <- caption_wrap(footnotes, sources, max_char = footnote_wrap)
-    wrap_subtitle_trk <- TRUE
+    wrap_caption_trk <- TRUE
 
   } else {
     caption_text <- caption_wrap(footnotes, sources, max_char = 120)
