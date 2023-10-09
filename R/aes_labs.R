@@ -503,7 +503,7 @@ get_font_size <- function(plot, elem = "text", parent = "text"){
 
 #' Update the size of mplot labels
 #' @noRd
-update_mplot_label <- function(plot, plot_width, chart_type, text_base_size){
+update_mplot_label <- function(plot, chart_type, base_size){
 
   for (i in seq_along(plot$layers)){
 
@@ -515,24 +515,16 @@ update_mplot_label <- function(plot, plot_width, chart_type, text_base_size){
       # 2 - check whether it is an mplot_label that can be adjusted
       label <- plot$layers[[i]]$aes_params$label
 
+      label_size <- plot$layers[[i]]$aes_params$size
+
+      # 3 - check that it has the adjustment attribute
       if(!is.null(attr(label, "adj_mplot_label"))){
 
-        plot_base_size <- 8
+        # 4 - get the base size of a micronote
+        mn_base_size <- get_base_size(chart_type = "MN")
 
-        # set the base plot width based on the chart type
-        if(chart_type == "RN"){
-
-          plot_base_size <- plot_base_size * 13.985 / 18.59
-
-        } else if(chart_type == "PPT"){
-          plot_base_size <- plot_base_size * 31.32 / 18.59
-
-        } else {
-          plot_base_size <- plot_base_size * 20 / 18.59
-        }
-
-        # 3 - update the size - this will depend on the chart width and base text size
-        plot$layers[[i]]$aes_params$size <- 3 * (text_base_size + plot_width) / (10 + plot_base_size)
+        # 5 - update the size - this will depend on the chart width and base text size
+        plot$layers[[i]]$aes_params$size <- 3.5 * base_size / mn_base_size
       }
     }
   }

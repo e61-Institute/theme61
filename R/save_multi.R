@@ -193,7 +193,7 @@ save_multi <-
         temp_plot <- update_labs(temp_plot, panel_width)
 
         # update any mplot label sizes
-        temp_plot <- update_mplot_label(temp_plot, plot_width = panel_width, chart_type, base_size)
+        temp_plot <- update_mplot_label(temp_plot, chart_type, base_size)
 
         # save the plot
         clean_plotlist[[i]] <- temp_plot

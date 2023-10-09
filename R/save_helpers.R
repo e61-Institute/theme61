@@ -79,6 +79,27 @@ get_plot_dims <- function(chart_type, max_height = 20){
   return(list("max_width" = max_width, "max_height" = max_height))
 }
 
+#' Get the base size of the plot
+#' @noRd
+get_base_size <- function(chart_type, plot_base_size = 10){
+
+  # update the base size if the chart is not for a micronote
+  if(chart_type == "RN"){
+
+    plot_base_size <- plot_base_size * get_plot_dims("RN")$max_width / get_plot_dims("MN")$max_width
+
+  } else if(chart_type == "PPT"){
+
+    plot_base_size <- plot_base_size * get_plot_dims("PPT")$max_width / get_plot_dims("MN")$max_width
+
+  } else {
+    plot_base_size <- plot_base_size * 20 / get_plot_dims("MN")$max_width
+  }
+
+  return(plot_base_size)
+}
+
+
 #' Set option to automatically open files created by \code{save_e61}
 #'
 #' These functions set and unset a session-wide option to automatically open
