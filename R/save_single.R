@@ -192,7 +192,7 @@ save_single <- function(
   plot <- update_labs(plot, tot_panel_width)
 
   # update the mplot_labels
-  plot <- update_mplot_label(plot, plot_width = tot_panel_width, chart_type, base_size)
+  plot <- update_mplot_label(plot, chart_type, base_size)
 
   # update y-axis labels
   plot <- update_y_axis_labels(plot, base_size = base_size)
@@ -300,4 +300,3 @@ save_single <- function(
 
   invisible(retval)
 }
-
