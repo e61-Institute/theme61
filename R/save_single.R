@@ -153,7 +153,7 @@ save_single <- function(
       width <- max_width
       max_panel_width <- max_width / 2 # only allow the panel to be at most half the column consistent with other chart types
 
-      plot <- plot + format_flipped_bar()
+      plot <- plot + format_flip()
 
       # If it's only one panel, set the chart width to 1/2 of the max-width
     } else if(n_panel_cols == 1){

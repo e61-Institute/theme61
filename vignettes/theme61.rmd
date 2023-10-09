@@ -220,7 +220,7 @@ graph <- ggplot(col_data, aes(x = factor(index), y = hp, fill = hp)) +
   scale_x_discrete(breaks = 1:8) +
   scale_y_continuous_e61(limits = c(0, 250)) +
   scale_fill_e61(discrete = FALSE, palette = "light") + 
-  format_flipped_bar()
+  format_flip()
 
 save_e61(here::here("man/figures/fig-6.svg"), graph)
 

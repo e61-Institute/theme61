@@ -447,7 +447,7 @@ square_legend_symbols <- function() {
 #' @import ggplot2
 #' @export
 
-format_flipped_bar <- function(x_adj = -9) {
+format_flip <- function(x_adj = -9) {
   theme(
     panel.grid.major.x = element_line(colour = e61_greylight6, linewidth = points_to_mm(0.5)),
     panel.grid.major.y = element_blank(),

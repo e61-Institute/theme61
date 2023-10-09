@@ -350,7 +350,7 @@ knitr::include_graphics(here::here("man/figures/g-multi.svg"))
 
 ### Flipped bar graphs
 
-Flipped bar graphs can be useful, especially if the categories have long names. There are some changes to the `theme()` and `coords` that are required for the flipping to look successful, so I've added a function that does most of the tinkering for you. I called it `format_flipped_bar()`.
+Flipped bar graphs can be useful, especially if the categories have long names. There are some changes to the `theme()` and `coords` that are required for the flipping to look successful, so I've added a function that does most of the tinkering for you. I called it `format_flip()`.
 
 ```{r}
 gg <-
@@ -364,7 +364,7 @@ gg <-
   labs_e61(
     title = "1940 to 1960 Change", y = "$b"
   ) +
-  format_flipped_bar()
+  format_flip()
 
 save_e61(here::here("man/figures/g-flip.svg"))
 

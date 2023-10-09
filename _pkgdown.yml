@@ -13,7 +13,7 @@ reference:
 
 - title: Formatting
   contents:
-  - format_flipped_bar
+  - format_flip
   - mpanel_e61
   - save_e61
   - square_legend_symbols
