@@ -17,7 +17,7 @@ update_scales <- function(plot, auto_scale, warn = F){
       layer_type <- layers[[j]]$geom %>% class()
 
       # if there isn't one but it is a density plot or a bar chart then it is either a density chart or a histogram so go ahead
-      if ("GeomDensity" %in% layer_type | "GeomBar" %in% layer_type) {
+      if ("GeomDensity" %in% layer_type || "GeomBar" %in% layer_type) {
 
         check_y_var <- T
 
@@ -31,7 +31,7 @@ update_scales <- function(plot, auto_scale, warn = F){
 
   test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
 
-  sec_axis <- !(is.null(test_sec_axis) | test_sec_axis == 0)
+  sec_axis <- !(is.null(test_sec_axis) || test_sec_axis == 0)
 
   # if the y-variable class is numeric, or the plot is a density or histogram, then update the chart scales
   if(check_y_var){
@@ -39,7 +39,7 @@ update_scales <- function(plot, auto_scale, warn = F){
     suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
 
     # if the y-var class is NULL, send a warning message about the auto updating of chart scales
-  } else if(!check_y_var & warn == F){
+  } else if(!check_y_var & warn == FALSE){
 
     warning("Could not identify the class of the y variable. This prevents the y-axis scales from being automatically updated to aesthetic values. To address this issue check that you have not edited the variable within your ggplot call (e.g. aes(y = 100 * var)). Instead make any changes before passing the dataset to ggplot (e.g. data %>% mutate(new_var = 100 * var) %>% ggplot(...)).")
     warn <<- T
@@ -60,12 +60,12 @@ check_for_y_var <- function(plot){
   for(i in seq_along(chart_data)){
 
     suppressMessages({suppressWarnings({
-      check_y <- chart_data[[i]]$y %>% min(na.rm = T)
-      check_ymax <- chart_data[[i]]$ymax %>% min(na.rm = T)
-      check_ymin <- chart_data[[i]]$ymin %>% min(na.rm = T)
+      check_y <- min(chart_data[[i]]$y, na.rm = T)
+      check_ymax <- min(chart_data[[i]]$ymax, na.rm = T)
+      check_ymin <- min(chart_data[[i]]$ymin, na.rm = T)
     })})
 
-    if(is.finite(check_y) | is.finite(check_ymax) | is.finite(check_ymin)){
+    if(is.finite(check_y) || is.finite(check_ymax) || is.finite(check_ymin)){
       check <- T
       break
     }
@@ -82,7 +82,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   y_scale_lims <- ggplot2::layer_scales(plot)$y$limits
 
   # If no y-axis scale is present and y is numeric, then add a default aesthetic scale
-  if(is.null(y_scale_lims) & auto_scale){
+  if(is.null(y_scale_lims) && auto_scale){
 
     # get the minimum and maximum y-axis values from the chart data
     minmax <- get_y_minmax(plot)
@@ -105,8 +105,8 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
       }
     })
 
-  # otherwise check if the limits didn't provide a break - this is basically user error
-  } else if(length(y_scale_lims) == 2 & auto_scale){
+    # otherwise check if the limits didn't provide a break
+  } else if(length(y_scale_lims) == 2 && auto_scale){
 
     # use the first two supplied limits as the min and max
     min_y <- y_scale_lims[1]
@@ -162,15 +162,15 @@ get_y_minmax <- function(plot){
     if(is.finite(temp_ymax)){
 
       # if the y variable has a higher maximum, then use that instead
-      if(is.finite(temp_y) & temp_ymax < temp_y) {
+      if(is.finite(temp_y) && temp_ymax < temp_y) {
         temp_max_y <- temp_y
 
       } else {
         temp_max_y <- temp_ymax
       }
 
-    # otherwise return the max of the y-variable
-    } else if(is.numeric(temp_y) & is.finite(temp_y)){
+      # otherwise return the max of the y-variable
+    } else if(is.numeric(temp_y) && is.finite(temp_y)){
       temp_max_y <- temp_y
     }
 
@@ -179,15 +179,15 @@ get_y_minmax <- function(plot){
 
     # suppress messages as this will frequently warn about no non missing values
     suppressMessages({suppressWarnings({
-      temp_ymin <- chart_data[[i]]$ymin %>% min(na.rm = T)
-      temp_y <- chart_data[[i]]$y %>% min(na.rm = T)
+      temp_ymin <- min(chart_data[[i]]$ymin, na.rm = T)
+      temp_y <- min(chart_data[[i]]$y, na.rm = T)
     })})
 
     # if its finite then it it exists (min of a null variable returns -Inf)
     if(is.finite(temp_ymin)){
 
       # if the y variable has a lower minimum, then use that instead
-      if(is.finite(temp_y) & temp_ymin > temp_y) {
+      if(is.finite(temp_y) && temp_ymin > temp_y) {
         temp_min_y <- temp_y
 
       } else {
@@ -195,22 +195,22 @@ get_y_minmax <- function(plot){
       }
 
       # otherwise return the min of the y-variable
-    } else if(is.numeric(temp_y) & is.finite(temp_y)){
+    } else if(is.numeric(temp_y) && is.finite(temp_y)){
       temp_min_y <- temp_y
     }
 
     # update the current min and max values - if NA then it must be the first observation
-    if(is.na(min_y) & !is.na(temp_min_y)){
+    if(is.na(min_y) && !is.na(temp_min_y)){
       min_y <- temp_min_y
 
-    } else if(is.finite(min_y) & !is.na(temp_min_y) & temp_min_y < min_y) {
+    } else if(is.finite(min_y) && !is.na(temp_min_y) && temp_min_y < min_y) {
       min_y <- temp_min_y
     }
 
-    if(is.na(max_y) & !is.na(temp_max_y)){
+    if(is.na(max_y) && !is.na(temp_max_y)){
       max_y <- temp_max_y
 
-    } else if(is.finite(max_y) & !is.na(temp_max_y) & temp_max_y > max_y) {
+    } else if(is.finite(max_y) && !is.na(temp_max_y) && temp_max_y > max_y) {
       max_y <- temp_max_y
     }
   }
@@ -255,27 +255,28 @@ get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
   # set the adjustment factor based on whether we are looking at a value above or below 1
   if (y_val > 0) adj <- 1 else adj <- -1
 
-  aes_y_points <- data.frame(points = c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100))
+  aes_y_points <- data.table::data.table(points = c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100))
 
   order_mag <- ceiling(log10(adj * y_val))
-  aes_y_points <- aes_y_points %>% dplyr::mutate(points_adj = adj * points)
-  aes_y_points <- aes_y_points %>% dplyr::mutate(points_diff = points_adj - (y_val / 10 ^ (order_mag - 2)))
+  aes_y_points[, points_adj := adj * points]
+  aes_y_points[, points_diff := points_adj - (y_val / 10 ^ (order_mag - 2))]
 
-  if(type == "next_smallest") aes_y_points <- aes_y_points %>% dplyr::mutate(points_diff = -1 * points_diff)
+  if(type == "next_smallest")
+    aes_y_points[, points_diff := -1 * points_diff]
 
   if (y_val > 0) {
-    aes_y_points <- aes_y_points %>% dplyr::filter(points_diff > 0)
+    aes_y_points <- aes_y_points[points_diff > 0]
 
     if(nrow(aes_y_points) != 0) {
-      aes_y_points <- aes_y_points %>% dplyr::filter(points_diff == min(points_diff))
+      aes_y_points <- aes_y_points[points_diff == min(points_diff)]
     }
 
   } else {
 
-    aes_y_points <- aes_y_points %>% dplyr::filter(points_diff < 0)
+    aes_y_points <- aes_y_points[points_diff < 0]
 
     if(nrow(aes_y_points) != 0) {
-      aes_y_points <- aes_y_points %>% dplyr::filter(points_diff == max(points_diff))
+      aes_y_points <- aes_y_points[points_diff == max(points_diff)]
     }
   }
 
@@ -293,6 +294,11 @@ get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
 get_aes_ticks <- function(min_y_val, max_y_val){
 
   if(min_y_val == max_y_val) return(NULL)
+
+  # Helper function for checking if a list of values is the same as a given scalar
+  chk_diff <- function(value, compare) {
+    any(unlist(lapply(value, function(x) isTRUE(all.equal(x, compare)))))
+  }
 
   # check the argments are correctly ordered, otherwise adjust
   if(max_y_val < min_y_val) {
@@ -316,11 +322,11 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   max_size <- 100
 
   # determine the difference between the two points
-  if (min_y_val <= 0 & max_y_val >= 0){
+  if (min_y_val <= 0 && max_y_val >= 0){
     diff <- max_y_val + abs(min_y_val)
 
     # both not equal to 0 - gap spans 0
-    if(min_y_val != 0 & max_y_val != 0){
+    if(min_y_val != 0 && max_y_val != 0){
       min_val <- min(c(max_y_val, abs(min_y_val)))
       max_val <- min(c(max_y_val, abs(min_y_val)))
 
@@ -335,7 +341,7 @@ get_aes_ticks <- function(min_y_val, max_y_val){
       max_size <- max_y_val / 2
     }
 
-  } else if (min_y_val < 0 & max_y_val < 0) {
+  } else if (min_y_val < 0 && max_y_val < 0) {
 
     diff <- abs(min_y_val) - abs(max_y_val)
 
@@ -356,29 +362,29 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   order_mag_max <- ceiling(log10(max_size))
 
   # check whether the difference fits into any of the aesthetic groupings
-  if (any(unlist(lapply(aes_y_points$five_point, dplyr::near, diff)))) {
+  if (chk_diff(aes_y_points$five_point, diff)) {
     band_val <- diff / 5
 
-  } else if (any(unlist(lapply(aes_y_points$six_point, dplyr::near, diff)))) {
+  } else if (chk_diff(aes_y_points$six_point, diff)) {
     band_val <- diff / 6
 
-  } else if (any(unlist(lapply(aes_y_points$four_point, dplyr::near, diff)))) {
+  } else if (chk_diff(aes_y_points$four_point, diff)) {
     band_val <- diff / 4
 
-  } else if (any(unlist(lapply(aes_y_points$seven_point, dplyr::near, diff)))) {
+  } else if (chk_diff(aes_y_points$seven_point, diff)) {
     band_val <- diff / 7
 
-  } else if (any(unlist(lapply(aes_y_points$three_point, dplyr::near, diff)))) {
+  } else if (chk_diff(aes_y_points$three_point, diff)) {
     band_val <- diff / 3
 
     # Rule 1 - If the difference is not in any of the lists, then it isn't aesthetic and we should try the max size to begin with
   } else {
 
     # But first check the max value is aesthetic itself - it should be most of the time
-    aes_y_points <- aes_y_points %>% unlist()
+    aes_y_points <- unlist(aes_y_points)
 
     # adjust the order of magnitude if necessary
-    if(!any(unlist(lapply(aes_y_points,  dplyr::near, max_size / 10 ^ (order_mag_max - 2))))) {
+    if(!chk_diff(aes_y_points, max_size / 10 ^ (order_mag_max - 2))) {
       return(NULL)
 
     } else {
@@ -399,7 +405,7 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   adj_max_y_val <- max_y_val / 10 ^ (order_mag_max - 2)
 
   # Rule 3 - If both the top and bottom value are not factors of the band size then it will not be aesthetic!! (if they are either side of 0)
-  if(min_y_val < 0 & max_y_val > 0){
+  if(min_y_val < 0 && max_y_val > 0){
     if(adj_max_size %% adj_band_val != 0){
 
       if(adj_max_size %% 2 == 0) {
@@ -415,7 +421,7 @@ get_aes_ticks <- function(min_y_val, max_y_val){
 
     adj_band_val <- band_val / 10 ^ (order_mag_max - 2)
 
-    if(adj_max_y_val %% adj_band_val != 0 | adj_min_y_val %% adj_band_val != 0) {
+    if(adj_max_y_val %% adj_band_val != 0 || adj_min_y_val %% adj_band_val != 0) {
       return(NULL)
     }
   }
@@ -424,7 +430,7 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   if(diff / band_val > 7) return(NULL)
 
   # Rule 5 - the band value should be in the list of aesthetic band values
-  if(!any(unlist(lapply(aes_band_sizes,  dplyr::near, band_val)))) return(NULL)
+  if(!chk_diff(aes_band_sizes, band_val)) return(NULL)
 
   return(band_val)
 }
@@ -488,7 +494,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
       test_val <- aes_y_points[i]
 
       # the test value must be closer to zero than the smallest value if they both values are on the same side, otherwise it must be further from 0
-      if((smallest_val <= 0 & largest_val <= 0) | (smallest_val >= 0 & largest_val >= 0)){
+      if((smallest_val <= 0 & largest_val <= 0) || (smallest_val >= 0 & largest_val >= 0)){
 
         if(abs(test_val) > abs(smallest_val)) next
 
@@ -514,7 +520,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
 
     # 3 - get the pair that is closest to the aesthetic value of the smaller number
     # For the aesthetic number, if they are both positive or both negative we want the value just below the smallest number
-    if((y_val_1 < 0 & y_val_2 < 0) | (y_val_1 > 0 & y_val_2 > 0)){
+    if((y_val_1 < 0 && y_val_2 < 0) || (y_val_1 > 0 && y_val_2 > 0)){
       aes_smallest_val <- get_aes_num(smallest_val, type = "next_smallest")
 
       # adjust for the smallest aesthetic value
@@ -550,7 +556,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
 #' @noRd
 get_aes_limits <- function(min_y_val, max_y_val, from_zero = F, include_vals = F){
 
-  if(is.null(min_y_val) | is.null(max_y_val)){
+  if(is.null(min_y_val) || is.null(max_y_val)){
     stop("Y-axis limits could not be determined. Please check your y-axis variable is numeric.")
   }
 
@@ -561,7 +567,7 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F, include_vals = F
   }
 
   # increase the size of each value to provide some buffer around the points
-  if(min_y_val > 0 & (min_y_val - (0.01 * abs(min_y_val))) < 0){
+  if(min_y_val > 0 && (min_y_val - (0.01 * abs(min_y_val))) < 0){
 
     min_y_val <- 0
 
@@ -569,7 +575,7 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F, include_vals = F
     min_y_val <- min_y_val - (0.01 * abs(min_y_val))
   }
 
-  if(max_y_val < 0 & (max_y_val + (0.01 * abs(max_y_val))) > 0){
+  if(max_y_val < 0 && (max_y_val + (0.01 * abs(max_y_val))) > 0){
 
     max_y_val <- 0
 
@@ -582,10 +588,10 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F, include_vals = F
 
     aes_num <- get_aes_num(y_val = min_y_val, type = "next_largest")
 
-  # if we want to scale from from_zero then only use one value for the limits
+    # if we want to scale from from_zero then only use one value for the limits
   } else if(from_zero){
 
-    if(min_y_val < 0 & max_y_val > 0){
+    if(min_y_val < 0 && max_y_val > 0){
 
       limits <- get_aes_pair(min_y_val, max_y_val)
 
@@ -599,7 +605,7 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F, include_vals = F
       limits <- list(0, get_aes_num(max_y_val, type = "next_largest"))
     }
 
-  # otherwise just get an aesthetic pair (not equal and not a bar chart)
+    # otherwise just get an aesthetic pair (not equal and not a bar chart)
   } else {
 
     limits <- get_aes_pair(min_y_val, max_y_val)

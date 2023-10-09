@@ -52,11 +52,8 @@ save_single <- function(
 
   # Guard clauses and failing checks ----------------------------------------
 
-  # Enforce file format requirements if a file extension is provided (quietly
-  # permits eps files too)
-  if (grepl("\\..{3}$", filename) && !grepl("\\.(png|svg|pdf|eps)$", filename)) {
-    stop("You must provide a file extension. Only PDF, SVG and PNG file formats are currently supported.")
-  }
+  # Enforce file format requirements if a file extension is provided
+  save_guard(filename)
 
   # Determine which file formats to save
   if (grepl("\\..{3}$", filename)) {
@@ -156,7 +153,7 @@ save_single <- function(
       width <- max_width
       max_panel_width <- max_width / 2 # only allow the panel to be at most half the column consistent with other chart types
 
-      plot <- plot + format_flipped_bar()
+      plot <- plot + format_flip()
 
       # If it's only one panel, set the chart width to 1/2 of the max-width
     } else if(n_panel_cols == 1){
@@ -244,6 +241,7 @@ save_single <- function(
     }
   }
 
+  # Save ------------------------------------------------------------------
   save_graph(graph = plot, format, filename, width, height, pointsize, res)
 
   # Post-saving messages and functions ------------------------------------

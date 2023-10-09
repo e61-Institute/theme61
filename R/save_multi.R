@@ -6,7 +6,7 @@ save_multi <-
            format = c("svg", "pdf", "eps", "png"),
            ...,
            plotlist = NULL,
-           chart_type = "MN",
+           chart_type = NULL,
            title = NULL,
            subtitle = NULL,
            footnotes = NULL,
@@ -35,9 +35,9 @@ save_multi <-
 
     plots <- check_plots(plots)
 
-
     # Guard clauses and failing checks ----------------------------------------
 
+    # Check against guard clauses common to single/multi-panel
     save_guard(filename)
 
     # Determine which file formats to save
@@ -147,7 +147,6 @@ save_multi <-
 
       if(is.null(max_right_axis_width) || length(max_right_axis_width) == 0)
         max_right_axis_width <- 0
-
 
       # Calculate the known height of the chart ---------------------------------
 
@@ -372,9 +371,7 @@ save_multi <-
 
 
     # Save the chart --------------------------------------------------------
-
     save_graph(graph = gg, format, filename, width, height = tot_height, pointsize, res)
-
 
     # Post-save functions -----------------------------------------------------
 

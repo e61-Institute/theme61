@@ -5,9 +5,6 @@
 #' check the arguments in \code{\link[theme61]{labs_e61}}, which are probably
 #' what you are looking for.
 #'
-#' \code{scale_y_continuous_e61()} should be used in conjunction with this
-#' function to ensure that theming and axes are applied correctly.
-#'
 #' @param y_top Defaults to TRUE. Puts the y-axis title at the top. If you
 #'   change this argument you also need to change the argument with the same
 #'   name in \code{\link[theme61]{scale_y_continuous_e61}}.
@@ -26,7 +23,8 @@
 #'   note boxes, set the colour to e61_skylight8.
 #' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #' @param base_size Numeric. Chart font size. Default is 10.
-#' @param base_family Character. Chart font family. Default is PT-SANS (research notes).
+#' @param base_family Character. Chart font family. Default for notes is PT
+#'   Sans.
 #' @param base_line_size Numeric. Default line width.
 #' @param base_rect_size Numeric. Default rect width.
 #'
@@ -378,10 +376,10 @@ theme_e61_spatial <- function(
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 #' geom_point() +
 #' e61_colour_manual(n = 3) +
-#' theme_e61_clean()
+#' theme_e61_alt()
 
-theme_e61_clean <- function(
-    base_family = "Arial",
+theme_e61_alt <- function(
+    base_family = "pt-sans",
     base_size = 12
   ){
   ggthemes::theme_clean() +
@@ -431,7 +429,7 @@ theme_e61_clean <- function(
 #'
 
 square_legend_symbols <- function() {
-  ggplot2::guides(colour = ggplot2::guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))
 }
 
 #' Applies changes to the theme for horizontal bar graphs
@@ -442,23 +440,24 @@ square_legend_symbols <- function() {
 #' code, after theming functions such as \code{theme_e61()} have been called.
 #'
 #' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
-#' the default (-9) works for most graphs. A more negative value moves the
-#' title up, a less negative value moves the title down.
+#' the default works for most graphs. A negative value moves the
+#' title up, a positive value moves the title down.
 #'
 #' @return ggplot object
 #' @import ggplot2
 #' @export
 
-format_flipped_bar <- function(x_adj = -9) {
+format_flip <- function(x_adj = 0) {
   theme(
     panel.grid.major.x = element_line(colour = e61_greylight6, linewidth = points_to_mm(0.5)),
     panel.grid.major.y = element_blank(),
     axis.text.x.top = element_blank(),
     axis.ticks.x.top = element_blank(),
     axis.title.x.top = element_blank(),
-    axis.title.x.bottom = element_text(margin = margin(t = x_adj, b = 5),
-                                       hjust = 1, angle = 0)
-
+    axis.title.x.bottom = element_text(margin = margin(t = -9 + x_adj, b = 5),
+                                       hjust = 1, angle = 0),
+    plot.title.position = "plot",
+    plot.caption.position = "plot"
   )
 
 }

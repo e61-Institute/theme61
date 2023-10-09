@@ -48,7 +48,8 @@ note boxes, set the colour to e61_skylight8.}
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
 
-\item{base_family}{Character. Chart font family. Default is PT-SANS (research notes).}
+\item{base_family}{Character. Chart font family. Default for notes is PT
+Sans.}
 
 \item{base_line_size}{Numeric. Default line width.}
 
@@ -62,10 +63,6 @@ Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
 appearance. If you are looking to change the appearance of titles or labels,
 check the arguments in \code{\link[theme61]{labs_e61}}, which are probably
 what you are looking for.
-}
-\details{
-\code{scale_y_continuous_e61()} should be used in conjunction with this
-function to ensure that theming and axes are applied correctly.
 }
 \examples{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +

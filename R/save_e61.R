@@ -1,5 +1,17 @@
 #' Saves ggplot graphs with sensible defaults
 #'
+#' @description Designed to save ggplot graphs made with the e61 theme with
+#'   sensible defaults that ensure the text size is appropriately proportioned
+#'   given default sizing.
+#'
+#'   Currently the only file formats supported are \code{.pdf} or \code{.svg}
+#'   (preferred), and \code{.png}. PDF and SVG are modern vector graphics file
+#'   formats which can be scaled up and down in size without blurring or
+#'   becoming pixelated. Use the PNG file format in the rare case that vector
+#'   graphics are not supported.
+#'
+#'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
+#'
 #' @param filename File name to create on disk. Providing the file format
 #'   extension (e.g. .svg) is optional. The file extension must be lowercase. If
 #'   you want to save multiple files with different formats, see the
@@ -70,7 +82,6 @@ save_e61 <- function(filename,
                      resize = NULL,
                      pointsize = 12,
                      res = 72,
-                     test = !isTRUE(getOption("test_save")),
                      # mpanel specific arguments
                      plotlist = NULL,
                      title = NULL,
@@ -85,19 +96,22 @@ save_e61 <- function(filename,
                      nrow = NULL,
                      align = c("v", "none", "h", "hv"),
                      axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-                     rel_heights = NULL
+                     rel_heights = NULL,
+                     # For development purposes only
+                     test = !isTRUE(getOption("test_save"))
 ) {
 
-  # Check whether to save an mpanel or a single planel chart - these require different approaches
   plots <- c(list(...), plotlist)
 
   # check whether the plots are ggplot2 objects
   plots <- check_plots(plots)
 
+  # Enforce chart type
   chart_type <- match.arg(chart_type)
 
-  if(length(plots) > 1){
-
+  # Check whether to save an mpanel or a single planel chart - these require
+  # different approaches
+  if(length(plots) > 1) {
     save_multi(
       filename,
       format = format,
@@ -143,4 +157,29 @@ save_e61 <- function(filename,
       test = test
     )
   }
+}
+
+#' Set option to automatically open files created by \code{save_e61}
+#'
+#' These functions set and unset a session-wide option to automatically open
+#' files created by \code{save_e61}. This is useful when you want to look at the
+#' graph you have just created, such as when you are trying to figure out label
+#' locations or graph dimensions and don't want to manually navigate to the file
+#' location every time.
+#'
+#' @return This function is used for its side effects.
+#' @rdname set_open_graph
+#' @export
+set_open_graph <- function() {
+  options(open_e61_graph = TRUE)
+
+  invisible(TRUE)
+}
+
+#' @rdname set_open_graph
+#' @export
+unset_open_graph <- function() {
+  options(open_e61_graph = FALSE)
+
+  invisible(FALSE)
 }
