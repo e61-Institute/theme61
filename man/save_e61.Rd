@@ -18,7 +18,6 @@ save_e61(
   resize = NULL,
   pointsize = 12,
   res = 72,
-  test = !isTRUE(getOption("test_save")),
   plotlist = NULL,
   title = NULL,
   subtitle = NULL,
@@ -32,7 +31,8 @@ save_e61(
   nrow = NULL,
   align = c("v", "none", "h", "hv"),
   axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-  rel_heights = NULL
+  rel_heights = NULL,
+  test = !isTRUE(getOption("test_save"))
 )
 }
 \arguments{
@@ -84,8 +84,6 @@ and \code{res} to ensure the text is readable.}
     the default.  If not specified, taken as 72 ppi to set the size of
     text and line widths.}
 
-\item{test}{For development use only.}
-
 \item{plotlist}{(multi-panel specific) List of plots to combine as an
 multi-panel and save. You can also enter the charts individually as
 arguments to the function.}
@@ -131,6 +129,8 @@ Must be specified if any of the graphs are complex (e.g. faceted) and alignment 
 relative proportions of each graph component (title, plots, footer
 (optional)).}
 
+\item{test}{For development use only.}
+
 \item{title_adj}{(multi-panel specific) Rescales the size of the title text
 to be slightly larger than the titles of the subplots (default is 1.1). 2
 doubles the font size.}
@@ -141,5 +141,15 @@ ggplot2 object
 Invisibly returns the file name.
 }
 \description{
-Saves ggplot graphs with sensible defaults
+Designed to save ggplot graphs made with the e61 theme with
+  sensible defaults that ensure the text size is appropriately proportioned
+  given default sizing.
+
+  Currently the only file formats supported are \code{.pdf} or \code{.svg}
+  (preferred), and \code{.png}. PDF and SVG are modern vector graphics file
+  formats which can be scaled up and down in size without blurring or
+  becoming pixelated. Use the PNG file format in the rare case that vector
+  graphics are not supported.
+
+  See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 }

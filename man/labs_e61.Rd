@@ -9,9 +9,9 @@ labs_e61(
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
-  title_max_char = NULL,
-  subtitle_max_char = NULL,
-  footnote_max_char = NULL,
+  title_wrap_char = NULL,
+  subtitle_wrap_char = NULL,
+  footnote_wrap_char = NULL,
   x = NULL,
   y = ggplot2::waiver(),
   ...
@@ -29,9 +29,10 @@ separate points you include in the graph.}
 
 \item{sources}{String vector providing the names of sources for the graph.}
 
-\item{title_max_char, subtitle_max_char, footnote_max_char}{Numeric. Set the
-maximum number of characters per line in the title, subtitle, sources or
-footnotes. The default is roughly appropriate for the default graph
+\item{title_wrap_char, subtitle_wrap_char, footnote_wrap_char}{Numeric or
+logical. Set the maximum number of characters per line in the title,
+subtitle and footer text. Set to \code{FALSE} if you want to turn off text
+wrapping. The default is usually appropriate for the default graph
 dimensions in \code{\link[theme61]{e61_save}}.}
 
 \item{x, y}{String to set the x- and y-axis titles. Note that the x-axis title
