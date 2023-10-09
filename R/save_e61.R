@@ -82,7 +82,6 @@ save_e61 <- function(filename,
                      resize = NULL,
                      pointsize = 12,
                      res = 72,
-                     test = !isTRUE(getOption("test_save")),
                      # mpanel specific arguments
                      plotlist = NULL,
                      title = NULL,
@@ -97,7 +96,9 @@ save_e61 <- function(filename,
                      nrow = NULL,
                      align = c("v", "none", "h", "hv"),
                      axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-                     rel_heights = NULL
+                     rel_heights = NULL,
+                     # For development purposes only
+                     test = !isTRUE(getOption("test_save"))
 ) {
 
   plots <- c(list(...), plotlist)
