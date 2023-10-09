@@ -26,9 +26,10 @@
 #' @param sources String vector providing the names of sources for the graph.
 #' @param x,y String to set the x- and y-axis titles. Note that the x-axis title
 #'   is blank (NULL) by default.
-#' @param title_max_char,subtitle_max_char,footnote_max_char Numeric. Set the
-#'   maximum number of characters per line in the title, subtitle, sources or
-#'   footnotes. The default is roughly appropriate for the default graph
+#' @param title_wrap_char,subtitle_wrap_char,footnote_wrap_char Numeric or
+#'   logical. Set the maximum number of characters per line in the title,
+#'   subtitle and footer text. Set to \code{FALSE} if you want to turn off text
+#'   wrapping. The default is usually appropriate for the default graph
 #'   dimensions in \code{\link[theme61]{e61_save}}.
 #' @param title_wrap,subtitle_wrap,footnote_wrap Logical. Enables text wrapping
 #'   for the title, subtitle, sources or footnotes. Defaults to TRUE.
@@ -49,9 +50,9 @@ labs_e61 <- function(title = NULL,
                      subtitle = NULL,
                      footnotes = NULL,
                      sources = NULL,
-                     title_max_char = NULL,
-                     subtitle_max_char = NULL,
-                     footnote_max_char = NULL,
+                     title_wrap_char = NULL,
+                     subtitle_wrap_char = NULL,
+                     footnote_wrap_char = NULL,
                      x = NULL,
                      y = ggplot2::waiver(),
                      ...
@@ -65,32 +66,37 @@ labs_e61 <- function(title = NULL,
   })
 
   # Track whether a label has been wrapped
-  wrap_title <- F
-  wrap_subtitle <- F
-  wrap_caption <- F
+  wrap_title <- FALSE
+  wrap_subtitle <- FALSE
+  wrap_caption <- FALSE
+
+  # Turn off text wrapping if FALSE is the argument
+  if (isFALSE(title_wrap_char)) title_wrap_char <- 9999
+  if (isFALSE(subtitle_wrap_char)) subtitle_wrap_char <- 9999
+  if (isFALSE(footnote_wrap_char)) footnote_wrap_char <- 9999
 
   # For each label check whether to wrap the title
-  if(!is.null(title_max_char)){
+  if(!is.null(title_wrap_char)){
 
-    # Check the title and title_max_char have been correctly supplied
-    if (!is.numeric(title_max_char) || title_max_char < 0){
-      stop("title_max_char must be a positive integer.")
+    # Check the title and title_wrap_char have been correctly supplied
+    if (!is.numeric(title_wrap_char) || title_wrap_char < 0){
+      stop("title_wrap_char must be a positive integer.")
     }
 
     # Wrap the title text
-    title_text <- paste(strwrap(title, width = title_max_char), collapse = "\n")
+    title_text <- paste(strwrap(title, width = title_wrap_char), collapse = "\n")
 
-    wrap_title <- T
+    wrap_title <- TRUE
 
   } else {
     title_text <- paste(strwrap(title, width = 120), collapse = "\n")
   }
 
-  if(!is.null(subtitle_max_char)){
+  if(!is.null(subtitle_wrap_char)){
 
-    # Check the subtitle and subtitle_max_char have been correctly supplied
-    if (!is.numeric(subtitle_max_char) || subtitle_max_char < 0){
-      stop("subtitle_max_char must be a positive integer.")
+    # Check the subtitle and subtitle_wrap_char have been correctly supplied
+    if (!is.numeric(subtitle_wrap_char) || subtitle_wrap_char < 0){
+      stop("subtitle_wrap_char must be a positive integer.")
     }
 
     if (!is.null(subtitle) && !is.character(subtitle)){
@@ -98,24 +104,24 @@ labs_e61 <- function(title = NULL,
     }
 
     # Wrap the subtitle text
-    subtitle_text <- paste(strwrap(subtitle, width = subtitle_max_char), collapse = "\n")
+    subtitle_text <- paste(strwrap(subtitle, width = subtitle_wrap_char), collapse = "\n")
 
-    wrap_subtitle <- T
+    wrap_subtitle <- TRUE
 
   } else {
     subtitle_text <- paste(strwrap(subtitle, width = 120), collapse = "\n")
   }
 
-  if(!is.null(footnote_max_char)){
+  if(!is.null(footnote_wrap_char)){
 
-    # Check the subtitle and subtitle_max_char have been correctly supplied
-    if (!is.numeric(footnote_max_char) || footnote_max_char < 0){
-      stop("footnote_max_char must be a positive integer.")
+    # Check the subtitle and subtitle_wrap_char have been correctly supplied
+    if (!is.numeric(footnote_wrap_char) || footnote_wrap_char < 0){
+      stop("footnote_wrap_char must be a positive integer.")
     }
 
     # Wrap the subtitle text
-    caption_text <- caption_wrap(footnotes, sources, max_char = footnote_max_char)
-    wrap_subtitle <- T
+    caption_text <- caption_wrap(footnotes, sources, max_char = footnote_wrap_char)
+    wrap_subtitle <- TRUE
 
   } else {
     caption_text <- caption_wrap(footnotes, sources, max_char = 120)
@@ -149,7 +155,7 @@ caption_wrap <- function(
     footnotes = NULL,
     sources = NULL,
     max_char = 120,
-    caption_wrap = T
+    caption_wrap = TRUE
   ){
 
   # Footnotes
