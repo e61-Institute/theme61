@@ -26,13 +26,11 @@
 #' @param sources String vector providing the names of sources for the graph.
 #' @param x,y String to set the x- and y-axis titles. Note that the x-axis title
 #'   is blank (NULL) by default.
-#' @param title_wrap_char,subtitle_wrap_char,footnote_wrap_char Numeric or
+#' @param title_wrap,subtitle_wrap,footnote_wrap Numeric or
 #'   logical. Set the maximum number of characters per line in the title,
 #'   subtitle and footer text. Set to \code{FALSE} if you want to turn off text
 #'   wrapping. The default is usually appropriate for the default graph
 #'   dimensions in \code{\link[theme61]{e61_save}}.
-#' @param title_wrap,subtitle_wrap,footnote_wrap Logical. Enables text wrapping
-#'   for the title, subtitle, sources or footnotes. Defaults to TRUE.
 #' @param ... Additional graph component titles (optional).
 #'
 #' @export
@@ -50,9 +48,9 @@ labs_e61 <- function(title = NULL,
                      subtitle = NULL,
                      footnotes = NULL,
                      sources = NULL,
-                     title_wrap_char = NULL,
-                     subtitle_wrap_char = NULL,
-                     footnote_wrap_char = NULL,
+                     title_wrap = NULL,
+                     subtitle_wrap = NULL,
+                     footnote_wrap = NULL,
                      x = NULL,
                      y = ggplot2::waiver(),
                      ...
@@ -66,37 +64,37 @@ labs_e61 <- function(title = NULL,
   })
 
   # Track whether a label has been wrapped
-  wrap_title <- FALSE
-  wrap_subtitle <- FALSE
-  wrap_caption <- FALSE
+  wrap_title_trk <- FALSE
+  wrap_subtitle_trk <- FALSE
+  wrap_caption_trk <- FALSE
 
   # Turn off text wrapping if FALSE is the argument
-  if (isFALSE(title_wrap_char)) title_wrap_char <- 9999
-  if (isFALSE(subtitle_wrap_char)) subtitle_wrap_char <- 9999
-  if (isFALSE(footnote_wrap_char)) footnote_wrap_char <- 9999
+  if (isFALSE(title_wrap)) title_wrap <- 9999
+  if (isFALSE(subtitle_wrap)) subtitle_wrap <- 9999
+  if (isFALSE(footnote_wrap)) footnote_wrap <- 9999
 
   # For each label check whether to wrap the title
-  if(!is.null(title_wrap_char)){
+  if(!is.null(title_wrap)){
 
-    # Check the title and title_wrap_char have been correctly supplied
-    if (!is.numeric(title_wrap_char) || title_wrap_char < 0){
-      stop("title_wrap_char must be a positive integer.")
+    # Check the title and title_wrap have been correctly supplied
+    if (!is.numeric(title_wrap) || title_wrap < 0){
+      stop("title_wrap must be a positive integer.")
     }
 
     # Wrap the title text
-    title_text <- paste(strwrap(title, width = title_wrap_char), collapse = "\n")
+    title_text <- paste(strwrap(title, width = title_wrap), collapse = "\n")
 
-    wrap_title <- TRUE
+    wrap_title_trk <- TRUE
 
   } else {
     title_text <- paste(strwrap(title, width = 120), collapse = "\n")
   }
 
-  if(!is.null(subtitle_wrap_char)){
+  if(!is.null(subtitle_wrap)){
 
-    # Check the subtitle and subtitle_wrap_char have been correctly supplied
-    if (!is.numeric(subtitle_wrap_char) || subtitle_wrap_char < 0){
-      stop("subtitle_wrap_char must be a positive integer.")
+    # Check the subtitle and subtitle_wrap have been correctly supplied
+    if (!is.numeric(subtitle_wrap) || subtitle_wrap < 0){
+      stop("subtitle_wrap must be a positive integer.")
     }
 
     if (!is.null(subtitle) && !is.character(subtitle)){
@@ -104,32 +102,32 @@ labs_e61 <- function(title = NULL,
     }
 
     # Wrap the subtitle text
-    subtitle_text <- paste(strwrap(subtitle, width = subtitle_wrap_char), collapse = "\n")
+    subtitle_text <- paste(strwrap(subtitle, width = subtitle_wrap), collapse = "\n")
 
-    wrap_subtitle <- TRUE
+    wrap_subtitle_trk <- TRUE
 
   } else {
     subtitle_text <- paste(strwrap(subtitle, width = 120), collapse = "\n")
   }
 
-  if(!is.null(footnote_wrap_char)){
+  if(!is.null(footnote_wrap)){
 
-    # Check the subtitle and subtitle_wrap_char have been correctly supplied
-    if (!is.numeric(footnote_wrap_char) || footnote_wrap_char < 0){
-      stop("footnote_wrap_char must be a positive integer.")
+    # Check the subtitle and subtitle_wrap have been correctly supplied
+    if (!is.numeric(footnote_wrap) || footnote_wrap < 0){
+      stop("footnote_wrap must be a positive integer.")
     }
 
     # Wrap the subtitle text
-    caption_text <- caption_wrap(footnotes, sources, max_char = footnote_wrap_char)
-    wrap_subtitle <- TRUE
+    caption_text <- caption_wrap(footnotes, sources, max_char = footnote_wrap)
+    wrap_subtitle_trk <- TRUE
 
   } else {
     caption_text <- caption_wrap(footnotes, sources, max_char = 120)
   }
 
-  if(wrap_title) attr(title_text, "title_wrap") <- TRUE
-  if(wrap_subtitle) attr(subtitle_text, "subtitle_wrap") <- TRUE
-  if(wrap_caption) attr(caption_text, "caption_wrap") <- TRUE
+  if(wrap_title_trk) attr(title_text, "title_wrap") <- TRUE
+  if(wrap_subtitle_trk) attr(subtitle_text, "subtitle_wrap") <- TRUE
+  if(wrap_caption_trk) attr(caption_text, "caption_wrap") <- TRUE
 
   # add to a ggplot object and return
   label <-
