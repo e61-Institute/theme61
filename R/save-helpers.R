@@ -4,8 +4,8 @@
 #' Enforce file format requirements if a file extension is provided
 #' @noRd
 save_guard <- function(filename) {
-  if (grepl("\\..{3}$", filename) && !grepl("\\.(png|svg|pdf|eps)$", filename)) {
-    stop("You must provide a file extension. Only PDF, SVG and PNG file formats are currently supported.")
+  if (grepl("\\..{3}$", filename) && !grepl("\\.(svg|pdf|eps)$", filename)) {
+    stop("You must provide a file extension. Only PDF and SVG file formats are currently supported.")
   }
 }
 
