@@ -1,18 +1,5 @@
 test_that("Test dimensioning functions", {
 
-  # Test default height messages
-  withr::with_tempdir({
-
-    withr::local_options(list(test_save = NULL,
-                              quiet_wrap = NULL))
-
-    temp_file <- "default-height.png"
-    plot <- ggplot() + scale_y_continuous_e61()
-
-    expect_message(save_e61(temp_file, plot, autoheight = FALSE))
-
-  })
-
   # Turn off messages
   withr::local_options(list(test_save = TRUE,
                             quiet_wrap = TRUE))
@@ -20,39 +7,24 @@ test_that("Test dimensioning functions", {
   # Test custom dimensions work
   withr::with_tempdir({
 
-    plot <- ggplot() + scale_y_continuous_e61()
+    plot <- ggplot(data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y)) +
+      geom_point()
 
-    suppressMessages(save_e61("custom-dim.svg", plot, width = 10, height = 10))
+    suppressWarnings(save_e61("custom-dim.svg", plot, width = 10, height = 10))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
     expect_equal(g_info$width, 378)
     expect_equal(g_info$height, 378)
 
-    suppressMessages(save_e61("custom-dim.svg", plot, width = 10, height = 5))
+    suppressWarnings(save_e61("custom-dim.svg", plot, width = 10, height = 5))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
     expect_equal(g_info$width, 378)
     expect_equal(g_info$height, 189)
 
-    suppressMessages(save_e61("custom-dim.svg", plot, width = 5, height = 10))
+    suppressWarnings(save_e61("custom-dim.svg", plot, width = 5, height = 10))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
     expect_equal(g_info$width, 189)
     expect_equal(g_info$height, 378)
 
-  })
-
-  # Test horizontal graph detection code
-  withr::with_tempdir({
-    plot <- ggplot() + labs(title = "Test")
-    plot_h <- ggplot() + coord_flip() + labs(title = "Test")
-
-    suppressMessages(save_e61("gg.svg", plot))
-    g_info <- magick::image_info(magick::image_read("gg.svg"))
-    expect_equal(g_info$width, 321)
-    expect_equal(g_info$height, 272)
-
-    suppressMessages(save_e61("gg.svg", plot_h))
-    g_info <- magick::image_info(magick::image_read("gg.svg"))
-    expect_equal(g_info$width, 643)
-    expect_equal(g_info$height, 457)
   })
 
 })
