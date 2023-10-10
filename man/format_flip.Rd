@@ -4,7 +4,7 @@
 \alias{format_flip}
 \title{Applies changes to the theme for horizontal bar graphs}
 \usage{
-format_flip(x_adj = -9)
+format_flip(x_adj = 0)
 }
 \arguments{
 \item{x_adj}{Numeric. Adjusts the vertical position of the x-axis title,
