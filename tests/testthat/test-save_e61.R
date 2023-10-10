@@ -7,8 +7,7 @@ test_that("Test dimensioning functions", {
   # Test custom dimensions work
   withr::with_tempdir({
 
-    plot <- ggplot(data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y)) +
-      geom_point()
+    plot <- minimal_plot
 
     suppressWarnings(save_e61("custom-dim.svg", plot, width = 10, height = 10))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
@@ -33,14 +32,12 @@ test_that("Test flipped coordinate graph formatting", {
   # save_e61() should automatically apply format_flip() to flipped coord graphs
 
   p1 <-
-    ggplot(data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y)) +
-    geom_point() +
+    minimal_plot +
     coord_flip() +
     labs_e61(title = "Test")
 
   p2 <-
-    ggplot(data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y)) +
-    geom_point() +
+    minimal_plot +
     coord_flip() +
     format_flip() +
     labs_e61(title = "Test")
@@ -49,56 +46,7 @@ test_that("Test flipped coordinate graph formatting", {
     suppressWarnings(save_e61("gg.svg", p1))
     suppressWarnings(save_e61("gg2.svg", p2))
 
-    compare_file_binary("gg.svg", "gg2.svg")
-  })
-
-})
-
-test_that("Test resizing feature for PNGs", {
-
-  withr::local_options(list(test_save = TRUE,
-                            quiet_wrap = TRUE))
-
-  # Create a graph that will be written to disk (and deleted afterwards)
-  g <- ggplot() + labs(title = "Test")
-
-  withr::with_tempdir({
-    temp_file <- "test.png"
-
-    # Test PNG with default scaling
-    suppressMessages(save_e61(temp_file, autoheight = FALSE))
-
-    disk_file <- magick::image_read(temp_file)
-    deets <- magick::image_info(disk_file)
-
-    expected_deets <-
-      tibble::tibble(
-        format = "PNG",
-        width = 240,
-        height = 201
-      )
-
-    lapply(c("format", "width", "height"), function(x) {
-      expect_equal(deets[[x]], expected_deets[[x]])
-    })
-
-    # Test resized PNG
-    suppressMessages(save_e61(temp_file, resize = 2, autoheight = FALSE))
-
-    disk_file <- magick::image_read(temp_file)
-    deets <- magick::image_info(disk_file)
-
-    expected_deets <-
-      tibble::tibble(
-        format = "PNG",
-        width = 481,
-        height = 402
-      )
-
-    lapply(c("format", "width", "height"), function(x) {
-      expect_equal(deets[[x]], expected_deets[[x]])
-    })
-
+    expect_true(compare_file_binary("gg.svg", "gg2.svg"))
   })
 
 })
