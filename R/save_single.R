@@ -93,12 +93,15 @@ save_single <- function(
 
   if(is.null(chart_type)) chart_type <- "MN"
 
-  max_width <- get_plot_dims(chart_type, max_height)$max_width
-  max_height <- get_plot_dims(chart_type, max_height)$max_height
+  max_width <- get_plot_width(chart_type)
+  max_height <- get_plot_width(chart_type)
+
+  # update the base size variable
+  base_size <- base_size * max_width / get_plot_width("MN")
 
   # update the base size without removing the legend
   if(is_spatial_chart){
-    plot <- plot + theme_e61_spatial(base_size = base_size * max_width / get_plot_dims("MN")$max_width)
+    plot <- plot + theme_e61_spatial(base_size = base_size)
 
   } else {
 
@@ -107,7 +110,7 @@ save_single <- function(
     plot <- plot +
       theme_e61(
         keep_legend = T,
-        base_size = base_size * max_width / get_plot_dims("MN")$max_width
+        base_size = base_size
       )
 
     if(!is.null(legend_position)){
@@ -195,7 +198,7 @@ save_single <- function(
   plot <- update_mplot_label(plot, chart_type, base_size)
 
   # update y-axis labels
-  plot <- update_y_axis_labels(plot, base_size = base_size)
+  plot <- update_y_axis_labels(plot)
 
 
   # Height adjustments ----------------------------------------------------
