@@ -129,6 +129,40 @@ save_e61 <- function(filename,
   if (save_data && !is.data.frame(plot$data))
     stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
+
+  # Advisory messages -------------------------------------------------------
+
+  # Note that the following checks don't apply when multi-panel graphs are created
+  print_msg <- TRUE
+
+  adv_msg <- c()
+
+  # Message if the y-axis label text is missing
+  if (print_msg && (is.null(plot$labels$y) || nchar(plot$labels$y) == 0)) {
+    adv_msg <- c(adv_msg, "Your y-axis label is missing. Please provide the units of the axis for the reader. Specify the 'y' argument in 'labs_e61()'.")
+  }
+
+  # Message if the y-axis label text is too long
+  if (print_msg && isTRUE(nchar(plot$labels$y) > 5)) {
+    adv_msg <- c(adv_msg, "Your y-axis label may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label e.g. %, ppt, $b.")
+  }
+
+  # Compile and print advisory messages
+  print_adv <- function() {
+    cli::cli_div(theme = list(".bad" = list(color = "#cc0000",
+                                            before = paste0(cli::symbol$cross, " ")),
+                              ".adv" = list(`background-color` = "#FBFF00")
+    )
+    )
+    cli::cli_h1("--- Fix the following issues with your graph ----------------------------------------", class = "adv")
+    cli::cli_ul()
+    sapply(adv_msg, cli::cli_alert, class = "bad")
+    cli::cli_end()
+  }
+
+  if (length(adv_msg) > 0 && test) print_adv()
+
+
   # Single/multi-specific functions --------------------------------
 
   # Check whether to save an mpanel or a single planel chart - these require
