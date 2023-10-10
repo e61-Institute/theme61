@@ -61,13 +61,13 @@
 #' @export
 
 save_e61 <- function(filename,
-                     plot = ggplot2::last_plot(),
+                     format = c("svg", "pdf", "eps"),
+                     plot = last_plot(),
                      chart_type = c("MN", "RN", "PPT"),
                      auto_scale = TRUE, # manual control over whether y-axis is scaled
                      width = NULL, # manual control over the width of the chart
                      height = NULL, # manual control over the height of the chart
                      max_height = NULL, # manual control over the maximum height of the chart
-                     format = c("svg", "pdf", "eps"),
                      save_data = FALSE,
                      base_size = 10, # set the base size for the theme61 font size call
                      # multi-panel specific arguments

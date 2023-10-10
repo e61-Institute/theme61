@@ -3,7 +3,7 @@
 
 save_multi <-
   function(filename,
-           format = c("svg", "pdf", "eps", "png"),
+           format = NULL,
            ...,
            plotlist = NULL,
            chart_type = NULL,
