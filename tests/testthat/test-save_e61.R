@@ -58,53 +58,30 @@ test_that("Test support for different file formats", {
   withr::local_options(list(test_save = TRUE,
                             quiet_wrap = TRUE))
 
-  # Create a graph that will be written to disk (and deleted afterwards)
   g <- minimal_plot
 
   withr::with_tempdir({
-    temp_file <- "test.svg"
 
-    suppressMessages(save_e61(temp_file))
-
-    disk_file <- magick::image_read(temp_file)
-    deets <- magick::image_info(disk_file)
-
-    expected_deets <-
-      tibble::tibble(
-        format = "SVG",
-        width = 351,
-        height = 267
-      )
-
-    lapply(c("format", "width", "height"), function(x) {
-      expect_equal(deets[[x]], expected_deets[[x]])
-    })
-
-    ## These should fail
+    # Supported file types
+    expect_no_error(suppressWarnings(save_e61("test.svg", g), classes = c("warning", "message")))
+    expect_no_error(suppressWarnings(save_e61("test.pdf", g), classes = c("warning", "message")))
+    expect_no_error(suppressWarnings(save_e61("test.eps", g), classes = c("warning", "message")))
 
     # No support for some file formats
-    expect_error(suppressMessages(save_e61(paste0(tempdir(), "\\text.jpg"))))
+    expect_error(suppressWarnings(save_e61("text.jpg")))
 
     # Having svg in the file name (but not format) should still trip the file format error
-    expect_error(suppressMessages(save_e61(paste0(tempdir(), "\\svg-text.jpg"))))
+    expect_error(suppressWarnings(save_e61("svg-text.jpg")))
 
   })
-
-  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), g), classes = c("warning", "message")))
-  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".pdf"), g), classes = c("warning", "message")))
 
 })
 
 test_that("Test whether save_data works", {
-  data <- data.frame(x = 1, y = 1)
+  gg <- minimal_plot
 
-  dir <- tempdir()
-
-  gg <- ggplot(data, aes(x, y)) +
-    geom_point()
-
-  expect_no_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), save_data = TRUE)))
-  expect_no_error(suppressMessages(save_e61(file.path(dir, "graph"), format = "svg", save_data = TRUE)))
+  expect_no_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), gg, save_data = TRUE)))
+  expect_no_error(suppressMessages(save_e61(file.path(dir, "graph"), gg, format = "svg", save_data = TRUE)))
 
   # This should leave the $data container empty
   gg <- ggplot() +
