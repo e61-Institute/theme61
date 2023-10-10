@@ -48,9 +48,9 @@ check_plots <- function(plots){
   return(temp_list)
 }
 
-#' Get the correct plot width, base text size and maximum height based on the chart type
+#' Get the correct plot width based on the chart type
 #' @noRd
-get_plot_dims <- function(chart_type, max_height = 20){
+get_plot_width <- function(chart_type){
 
   # Set the maximum width based on the type of outputs
   if(chart_type == "MN"){
@@ -63,7 +63,6 @@ get_plot_dims <- function(chart_type, max_height = 20){
 
   } else if(chart_type == "PPT"){
 
-    max_height <- 13.25
     max_width <- 31.32
 
   } else if(is.null(chart_type)){
@@ -74,9 +73,7 @@ get_plot_dims <- function(chart_type, max_height = 20){
     stop("Invalid chart type. Please select from one of the following: 'MN' for micronotes, 'RN' for research notes, 'PPT' for powerpoint slides, or leave blank to use default maximum widths")
   }
 
-  if(is.null(max_height)) max_height <- 100
-
-  return(list("max_width" = max_width, "max_height" = max_height))
+  return(max_width)
 }
 
 #' Get the base size of the plot
@@ -86,19 +83,18 @@ get_base_size <- function(chart_type, plot_base_size = 10){
   # update the base size if the chart is not for a micronote
   if(chart_type == "RN"){
 
-    plot_base_size <- plot_base_size * get_plot_dims("RN")$max_width / get_plot_dims("MN")$max_width
+    plot_base_size <- plot_base_size * get_plot_width("RN") / get_plot_width("MN")
 
   } else if(chart_type == "PPT"){
 
-    plot_base_size <- plot_base_size * get_plot_dims("PPT")$max_width / get_plot_dims("MN")$max_width
+    plot_base_size <- plot_base_size * get_plot_width("PPT") / get_plot_width("MN")
 
   } else {
-    plot_base_size <- plot_base_size * 20 / get_plot_dims("MN")$max_width
+    plot_base_size <- plot_base_size * 20 / get_plot_width("MN")
   }
 
   return(plot_base_size)
 }
-
 
 #' Set option to automatically open files created by \code{save_e61}
 #'

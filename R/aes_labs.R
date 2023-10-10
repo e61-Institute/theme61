@@ -336,35 +336,26 @@ split_text_into_words <- function(text) {
 #' Update y-axis label spacing so that they are aesthetic
 #' plot - Plot object to adjust.
 #' adj_width - User supplied adjustment.
+#' max_y_lab - max width of the y-labels
+#' max_break_width - max width of the breaks
+#' base_size - base size of the text
 #' @noRd
-update_y_axis_labels <- function(plot, adj_width = NULL, max_y_lab = NA_real_, max_break_width = NA_real_, base_size){
+update_y_axis_labels <- function(plot){
 
-  if(is.null(adj_width)) {
+  # get the break widths
+  break_width <- get_y_break_width(plot)
 
-    # get the break widths
-    break_width <- get_y_break_width(plot)
+  # get the difference in the label size
+  y_font_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
 
-    # get the difference in the label size
-    y_font_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
-    y_lab_width <- get_text_width(plot$labels$y, font_size = y_font_size) * 10 * .pt
-
-    if(!is.na(max_y_lab)){
-
-      max_y_lab <- max_y_lab * 10 * .pt
-      max_width <- pmax(max_y_lab, max_break_width, na.rm = T)
-      diff <- max_width - y_lab_width
-
-    } else {
-
-      diff <- break_width - 10
-    }
-  }
+  # add the spacing of one character
+  spacing <- 2 * y_font_size / 10
 
   # add the break adjustment to the plot
   plot <- plot +
     theme(
-      axis.title.y.left = element_text(margin = margin(l = 2, r = -(base_size + diff)), vjust = 1, hjust = 1, angle = 0),
-      axis.title.y.right = element_text(margin = margin(l = -(base_size + diff), r = 2), vjust = 1, hjust = 0, angle = 0)
+      axis.title.y.left = element_text(margin = margin(l = 0, r = spacing - break_width), vjust = 1, hjust = 1, angle = 0),
+      axis.title.y.right = element_text(margin = margin(l = spacing - break_width, r = 0), vjust = 1, hjust = 0, angle = 0)
     )
 
   return(plot)
