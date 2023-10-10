@@ -23,9 +23,7 @@ save_multi <-
            nrow = NULL,
            align = c("v", "none", "h", "hv"),
            axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-           rel_heights = NULL,
-           pointsize = 12,
-           res = 300
+           rel_heights = NULL
            ) {
 
 
@@ -363,7 +361,7 @@ save_multi <-
 
 
     # Save the chart --------------------------------------------------------
-    save_graph(graph = gg, format, filename, width, height = tot_height, pointsize, res)
+    save_graph(graph = gg, format, filename, width, height = tot_height)
 
     # Post-save functions -----------------------------------------------------
 
