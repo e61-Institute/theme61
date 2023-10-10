@@ -22,20 +22,6 @@ save_single <- function(
   adv_msg <- c()
   info_msg <- c()
 
-  # Message if theme function not used
-  if (print_msg && is.null(attr(plot$theme, "t61"))) {
-
-    adv_msg <- c(adv_msg, "Add 'theme_e61()' to your ggplot code to ensure the e61 theme is applied.")
-  }
-
-  # Message if colour/fill functions aren't used, message to appear only if a
-  # colour/fill mappping exists
-  if (print_msg && any(grepl("(colour|color|fill)", names(plot$mapping))) &&
-      !"scale_col_e61" %in% unlist(sapply(plot$scales$scales, class))) {
-
-    adv_msg <- c(adv_msg, "Add 'scale_colour/fill_e61()' to your ggplot code to ensure the e61 colour palette is used.")
-  }
-
   # Message if the y-axis label text is missing
   if (print_msg && (is.null(plot$labels$y) || nchar(plot$labels$y) == 0)) {
     adv_msg <- c(adv_msg, "Your y-axis label is missing. Please provide the units of the axis for the reader. Specify the 'y' argument in 'labs_e61()'.")
