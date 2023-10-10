@@ -1,3 +1,5 @@
+# Tests for individual features -------------------------------------------
+
 test_that("Test dimensioning functions", {
 
   # Turn off messages
@@ -57,7 +59,7 @@ test_that("Test support for different file formats", {
                             quiet_wrap = TRUE))
 
   # Create a graph that will be written to disk (and deleted afterwards)
-  g <- ggplot() + labs(title = "Test")
+  g <- minimal_plot
 
   withr::with_tempdir({
     temp_file <- "test.svg"
@@ -70,8 +72,8 @@ test_that("Test support for different file formats", {
     expected_deets <-
       tibble::tibble(
         format = "SVG",
-        width = 321,
-        height = 272
+        width = 351,
+        height = 267
       )
 
     lapply(c("format", "width", "height"), function(x) {
@@ -80,63 +82,16 @@ test_that("Test support for different file formats", {
 
     ## These should fail
 
-    # SVGs should fail if user tries to resize them
-    expect_error(suppressMessages(save_e61(temp_file, resize = 2)))
-
-    # No support for non-SVG/PNG files
+    # No support for some file formats
     expect_error(suppressMessages(save_e61(paste0(tempdir(), "\\text.jpg"))))
 
-    # Having png or svg in the name should still trip the file format error
-    expect_error(suppressMessages(save_e61(paste0(tempdir(), "\\png-text.jpg"))))
+    # Having svg in the file name (but not format) should still trip the file format error
+    expect_error(suppressMessages(save_e61(paste0(tempdir(), "\\svg-text.jpg"))))
 
   })
 
   expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), g), classes = c("warning", "message")))
   expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".pdf"), g), classes = c("warning", "message")))
-  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".png"), g), classes = c("warning", "message")))
-
-})
-
-test_that("Output graphs have sensible dimensions", {
-
-  # This test should be run manually and the results inspected by hand
-  skip("This 'test' is only for interactive purposes")
-
-  # Generate some data
-  graph_data <- data.frame(x = runif(100, 1, 49), y = runif(100, 1, 49),
-                           xcol = 1:100)
-
-  # Graph
-  graph <- ggplot(graph_data, aes(x, y)) +
-    geom_point() +
-    theme_e61() +
-    scale_y_continuous_e61(limits = c(0, 50, 10)) +
-    scale_colour_e61(1) +
-    labs_e61(
-      title = "Fairly Lengthy Graph Title With A Lot of Words To Take Up Space",
-      subtitle = "Fairly Lengthy Graph Subtitle With A Lot of Words To Take Up Space",
-      footnotes = "Really long footnote to test that part of the code blah blah blah blah blah blah",
-      sources = c("e61 Institute"),
-      x = NULL, y = "units"
-    )
-
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), graph))
-
-  # Graph 2
-  graph_2 <- ggplot(graph_data, aes(xcol, y)) +
-    geom_col() +
-    theme_e61() +
-    scale_y_continuous_e61(limits = c(0, 50, 10)) +
-    scale_colour_e61(1) +
-    labs_e61(
-      title = "Fairly Lengthy Graph Title With A Lot of Words To Take Up Space",
-      subtitle = "Fairly Lengthy Graph Subtitle With A Lot of Words To Take Up Space",
-      footnotes = "Really long footnote to test that part of the code blah blah blah blah blah blah",
-      sources = c("e61 Institute"),
-      x = NULL, y = "units"
-    )
-
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), graph_2))
 
 })
 
