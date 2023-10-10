@@ -9,8 +9,8 @@ test_that("plot_label() and mplot_label() look the same", {
     mplot_label(label = c("Plot 1", "Plot 2"), x = c(2, 2), y = c(2, 3))
 
   withr::with_tempdir({
-    expect_snapshot_file(save_e61("plot-label-1.svg", p1, height = 10))
-    expect_snapshot_file(save_e61("plot-label-2.svg", p2, height = 10))
+    expect_snapshot_file(suppressWarnings(save_e61("plot-label-1.svg", p1)))
+    expect_snapshot_file(suppressWarnings(save_e61("plot-label-2.svg", p2)))
   })
 
 })
@@ -29,10 +29,10 @@ test_that("Specifying custom colours works in plot_label() and mplot_label()", {
 
   # Default colours
   retval <- plot_label("Test", "2020-01-01", 1, 1, 1)
-  expect_equal(retval$aes_params$colour, e61_palette(1))
+  expect_equal(retval$aes_params$colour, palette_e61(1))
 
   retval <- mplot_label("Test", "2020-01-01", 1)
-  expect_equal(retval[[1]]$aes_params$colour, e61_palette(1))
+  expect_equal(retval[[1]]$aes_params$colour, palette_e61(1))
 
   # Custom colours
   retval <- plot_label("Test", "2020-01-01", 1, colour = "#000000")
@@ -44,17 +44,16 @@ test_that("Specifying custom colours works in plot_label() and mplot_label()", {
 })
 
 test_that("Text and label plot labels work", {
-  skip("This 'test' is only for interactive purposes")
-
   p1 <- ggplot() +
     plot_label("label", 2, 2, 1, 1, geom = "label")
-
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), p1))
 
   p2 <- ggplot() +
     plot_label("text", 2, 2, 1, 1, geom = "text")
 
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), p2))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-label-label.svg", p1)))
+    expect_snapshot_file(suppressWarnings(save_e61("plot-label-text.svg", p2)))
+  })
 
 })
 
@@ -77,19 +76,18 @@ test_that("Specifying incorrect length of label characteristics fails", {
 })
 
 test_that("Changing horizontal alignment of text works", {
-  skip("This 'test' is only for interactive purposes")
 
   p1 <- ggplot() +
     plot_label("Left-aligned text", 2, 2, 1, 1, hjust = 0) +
     plot_label("Centre-aligned text", 2, 2.1, 1, 1, hjust = 0.5) +
     plot_label("Right-aligned text", 2, 2.2, 1, 1, hjust = 1)
 
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), p1))
-
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-label-horiz-align-change.svg", p1)))
+  })
 })
 
 test_that("Label rotation works", {
-  skip("This 'test' is only for interactive purposes")
 
   p1 <- ggplot() +
     plot_label("Normal text", 2, 2, 1, 1, angle = 90) +
@@ -97,16 +95,17 @@ test_that("Label rotation works", {
     plot_label("Diagonal text", 2, 2.15, 1, 1, angle = 45) +
     ylim(2, 2.3)
 
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), p1))
-
   # Test it works with mplot_label too
-  p1 <- ggplot() +
+  p2 <- ggplot() +
     mplot_label(c("Normal text", "Vertical text", "Diagonal text"),
                 x = rep(2, 3),
                 y = c(2, 2.3, 2.15),
                 angle = c(90, 0, 45)) +
     ylim(2, 2.3)
 
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), p1))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-label-rotate.svg", p1)))
+    expect_snapshot_file(suppressWarnings(save_e61("plot-label-rotate-multi.svg", p2)))
+  })
 
 })
