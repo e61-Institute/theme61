@@ -143,28 +143,20 @@ test_that("Test advisory messages", {
 })
 
 test_that("Test multiple file format saving features", {
-  g <- ggplot()
+  g <- minimal_plot
 
   # Test 3 formats
   withr::with_tempdir({
-    suppressMessages(save_e61("test_file", g, format = c("svg", "pdf", "eps"), autoheight = FALSE))
+    suppressMessages(save_e61("test_file", g, format = c("svg", "pdf", "eps")))
 
     expect_setequal(list.files(pattern = "test_file.*"),
                  c("test_file.eps", "test_file.pdf", "test_file.svg"))
 
   })
 
-  # Test if PNG breaks everything (it shouldn't)
-  withr::with_tempdir({
-    suppressMessages(save_e61("test_file", g, format = c("svg", "png"), autoheight = FALSE))
-
-    expect_setequal(list.files(pattern = "test_file.*"),
-                 c("test_file.svg", "test_file.png"))
-  })
-
   # Test providing file format in file path
   withr::with_tempdir({
-    suppressMessages(save_e61("test_file.svg", g, autoheight = FALSE))
+    suppressMessages(save_e61("test_file.svg", g))
 
     expect_setequal(list.files(pattern = "test_file.*"),
                  c("test_file.svg"))
@@ -172,7 +164,7 @@ test_that("Test multiple file format saving features", {
 
   # Test if providing format in path overrules format argument
   withr::with_tempdir({
-    suppressMessages(save_e61("test_file.svg", g, format = "png", autoheight = FALSE))
+    suppressMessages(save_e61("test_file.svg", g, format = "pdf"))
 
     expect_setequal(list.files(pattern = "test_file.*"),
                  c("test_file.svg"))
@@ -180,15 +172,15 @@ test_that("Test multiple file format saving features", {
 
   # Test what happens if nothing is provided (do the defaults do what you expect?)
   withr::with_tempdir({
-    suppressMessages(save_e61("test_file", g, autoheight = FALSE))
+    suppressMessages(save_e61("test_file", g))
 
     expect_setequal(list.files(pattern = "test_file.*"),
-                 c("test_file.svg", "test_file.png", "test_file.pdf", "test_file.eps"))
+                 c("test_file.svg", "test_file.pdf", "test_file.eps"))
   })
 
   # Error if invalid filename used
   withr::with_tempdir({
-    expect_error(suppressMessages(save_e61("test_file", g, format = "mp3", autoheight = FALSE)))
+    expect_error(suppressMessages(save_e61("test_file", g, format = "mp3")))
   })
 })
 
