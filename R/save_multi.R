@@ -54,11 +54,11 @@ save_multi <-
 
     if(is.null(chart_type)) chart_type <- "MN"
 
-    max_width <- get_plot_dims(chart_type, max_height)$max_width
-    max_height <- get_plot_dims(chart_type, max_height)$max_height
+    max_width <- get_plot_width(chart_type)
+    max_height <- get_plot_width(chart_type)
 
     # Update the base size based on the type of chart (MN, RN etc.) being produced
-    base_size <- base_size * max_width / get_plot_dims("MN")$max_width
+    base_size <- base_size * max_width / get_plot_width("MN")
 
 
     # Set width -------------------------------------------------------------
@@ -179,15 +179,7 @@ save_multi <-
         temp_plot <- clean_plotlist[[i]]
 
         # update y-axis labels
-        suppressMessages({
-          temp_plot <-
-            update_y_axis_labels(
-              temp_plot,
-              max_y_lab = y_lab_max_size,
-              max_break_width = max_break_width,
-              base_size = base_size
-            )
-        })
+        suppressMessages({temp_plot <- update_y_axis_labels(temp_plot)})
 
         # update labels - for each set the limit as width - knowwidth (axis labels etc.) divided by the number of columns we have
         temp_plot <- update_labs(temp_plot, panel_width)
