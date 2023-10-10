@@ -221,8 +221,11 @@ test_that("Test if directory existence checker works", {
   withr::with_tempdir({
 
     dir.create("temp_directory")
+    dir.create("temp_directory/temp_dir")
 
+    expect_no_error(save_e61("plot.svg", p))
     expect_no_error(save_e61("temp_directory/plot.svg", p))
+    expect_no_error(save_e61("temp_directory/temp_dir/plot.svg", p))
     expect_error(save_e61("faketemp_directory/plot.svg", p))
   })
 
