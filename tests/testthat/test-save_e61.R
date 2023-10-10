@@ -29,6 +29,31 @@ test_that("Test dimensioning functions", {
 
 })
 
+test_that("Test flipped coordinate graph formatting", {
+  # save_e61() should automatically apply format_flip() to flipped coord graphs
+
+  p1 <-
+    ggplot(data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y)) +
+    geom_point() +
+    coord_flip() +
+    labs_e61(title = "Test")
+
+  p2 <-
+    ggplot(data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y)) +
+    geom_point() +
+    coord_flip() +
+    format_flip() +
+    labs_e61(title = "Test")
+
+  withr::with_tempdir({
+    suppressWarnings(save_e61("gg.svg", p1))
+    suppressWarnings(save_e61("gg2.svg", p2))
+
+    compare_file_binary("gg.svg", "gg2.svg")
+  })
+
+})
+
 test_that("Test resizing feature for PNGs", {
 
   withr::local_options(list(test_save = TRUE,
