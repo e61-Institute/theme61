@@ -98,7 +98,10 @@ save_e61 <- function(filename,
   chart_type <- match.arg(chart_type)
 
   # check if the save directory exists
-  if (!dir.exists(gsub("^(.*)\\/.*\\..{3}$", "\\1", filename)))
+  dir_provided <- grepl("^(.*)\\/.*\\..{3}$", filename)
+  dir_name <- gsub("^(.*)\\/.*\\..{3}$", "\\1", filename)
+
+  if (dir_provided && !dir.exists(dir_name))
     stop("The directory you are trying to save to does not exist.")
 
   # Check whether to save an mpanel or a single planel chart - these require
