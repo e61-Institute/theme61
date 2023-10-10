@@ -20,7 +20,6 @@ save_single <- function(
   print_msg <- TRUE
 
   adv_msg <- c()
-  info_msg <- c()
 
   # Message if the y-axis label text is missing
   if (print_msg && (is.null(plot$labels$y) || nchar(plot$labels$y) == 0)) {
@@ -224,20 +223,7 @@ save_single <- function(
     cli::cli_end()
   }
 
-  print_info <- function() {
-    cli::cli_div(theme = list(".info-head" = list(color = "#247700"),
-                              ".just-info" = list(color = "#000000")
-    )
-    )
-    cli::cli_h1("--- For information -----------------------", class = "info-head")
-    cli::cli_ul()
-    sapply(info_msg, cli::cli_alert_info, class = "just-info")
-    cli::cli_end()
-  }
-
   if (length(adv_msg) > 0 && test) print_adv()
-
-  if (length(info_msg) > 0 && test) print_info()
 
   # Invisibly returns the filename (or vector of filenames). Currently some of
   # the tests rely on the filename being returned so maybe don't change this
