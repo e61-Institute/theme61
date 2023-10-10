@@ -15,9 +15,8 @@
 #'   extension (e.g. .svg) is optional. The file extension must be lowercase. If
 #'   you want to save multiple files with different formats, see the
 #'   \code{format} argument for details.
-#' @param plot Plot object to save. Defaults to the last plot displayed so
-#'   usually you do not need to provide this explicitly.
-#' @param ... (multi-panel specific) Plot objects to put on the panel.
+#' @param plot Single-panel plot object to save. Defaults to the last plot
+#'   displayed so usually you do not need to provide this explicitly.
 #' @param chart_type String. Type of chart. This is used to set sensible chart
 #'   widths based on the width of text in each document. Options are 'MN' ( for
 #'   micronotes), 'RN' (research notes), 'PPT' (PowerPoints).
@@ -38,6 +37,7 @@
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
 #' @param base_size Numeric. Chart font size. Default is 10.
+#' @param ... (multi-panel specific) Plot objects to put on the panel.
 #' @param plotlist (multi-panel specific) List of plots to combine as an
 #'   multi-panel and save. You can also enter the charts individually as
 #'   arguments to the function.
@@ -61,7 +61,6 @@
 #' @export
 
 save_e61 <- function(filename,
-                     ..., # specific for mpanel plots
                      plot = ggplot2::last_plot(),
                      chart_type = c("MN", "RN", "PPT"),
                      auto_scale = TRUE, # manual control over whether y-axis is scaled
@@ -72,6 +71,7 @@ save_e61 <- function(filename,
                      save_data = FALSE,
                      base_size = 10, # set the base size for the theme61 font size call
                      # multi-panel specific arguments
+                     ...,
                      plotlist = NULL,
                      title = NULL,
                      subtitle = NULL,
@@ -89,25 +89,52 @@ save_e61 <- function(filename,
                      test = !isTRUE(getOption("test_save"))
 ) {
 
+  # Compile plots
   plots <- c(list(...), plotlist)
 
-  # check whether the plots are ggplot2 objects
+  # For single-panel graphs
+  if (length(plots) == 0) plots <- list(plot)
+
+  # Guard clauses and checks ------------------------------------------------
+
+  # Check whether the plots are ggplot2 objects
   plots <- check_plots(plots)
 
   # Enforce chart type
   chart_type <- match.arg(chart_type)
 
-  # check if the save directory exists
+  # Check if the save directory exists
   dir_provided <- grepl("^(.*)\\/.*\\..{3}$", filename)
   dir_name <- gsub("^(.*)\\/.*\\..{3}$", "\\1", filename)
 
   if (dir_provided && !dir.exists(dir_name))
     stop("The directory you are trying to save to does not exist.")
 
+  # Enforce file format requirements if a file extension is provided
+  if (grepl("\\..{3}$", filename) && !grepl("\\.(svg|pdf|eps)$", filename)) {
+    stop("You must provide a file extension. Only PDF and SVG file formats are supported.")
+  }
+
+  # Determine which file formats to save
+  if (grepl("\\..{3}$", filename)) {
+    format <- gsub("^.*\\.(.{3})$", "\\1", filename)
+
+    # Strip file extension from filename
+    filename <- gsub("^(.*)\\..{3}$", "\\1", filename)
+  } else {
+    format <- match.arg(format, several.ok = TRUE)
+  }
+
+  # Check if the data frame can be written
+  if (save_data && !is.data.frame(plot$data))
+    stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
+
+  # Single/multi-specific functions --------------------------------
+
   # Check whether to save an mpanel or a single planel chart - these require
   # different approaches
-  if(length(plots) > 1) {
-    save_multi(
+  if (length(plots) > 1) {
+    retval <- save_multi(
       filename,
       format = format,
       plotlist = plots,
@@ -116,9 +143,9 @@ save_e61 <- function(filename,
       subtitle = subtitle,
       footnotes = footnotes,
       sources = sources,
-      width = width, # manual control over the width of the chart
-      height = height, # manual control over the height of the chart
-      max_height = max_height, # manual control over the maximum height of the chart
+      width = width, # control width of the chart
+      height = height, # control height of the chart
+      max_height = max_height, # control maximum height of the chart
       auto_scale = auto_scale,
       title_spacing_adj = title_spacing_adj, # adjust the amount of space given to the title
       subtitle_spacing_adj = subtitle_spacing_adj, # adjust the amount of space given to the subtitle
@@ -133,20 +160,45 @@ save_e61 <- function(filename,
 
   } else {
 
-    save_single(
+    retval <- save_single(
       filename = filename,
-      plot = plot,
+      plot = plots[[1]],
       chart_type = chart_type,
-      auto_scale = auto_scale, # manual control over whether y-axis is scaled
-      width = width, # manual control over the width of the chart
-      height = height, # manual control over the height of the chart
-      max_height = max_height, # manual control over the maximum height of the chart
+      auto_scale = auto_scale, # control whether y-axis is scaled
+      width = width, # control width
+      height = height, # control height
+      max_height = max_height, # control max height
       format = format,
       base_size = base_size,
       save_data = save_data,
       test = test
     )
   }
+
+  # Post-saving -------------------------------------------------------------
+
+  # Save the data used to make the graph
+  if (save_data) {
+    data_name <- gsub("\\.(\\w{3})$", "\\.csv", filename)
+    data.table::fwrite(plot$data, data_name)
+  }
+
+  # Opens the graph file if the option is set
+  if (as.logical(getOption("open_e61_graph", FALSE))) {
+
+    # Put filename back together
+    filename <- paste0(filename, ".", format[[1]])
+
+    file_to_open <- shQuote(here::here(filename))
+
+    out <- try(system2("open", file_to_open))
+
+    if (out != 0) warning("Graph file could not be opened.")
+  }
+
+  # Invisibly return the filepath
+  invisible(retval)
+
 }
 
 #' Set option to automatically open files created by \code{save_e61}

@@ -6,7 +6,6 @@
 \usage{
 save_e61(
   filename,
-  ...,
   plot = ggplot2::last_plot(),
   chart_type = c("MN", "RN", "PPT"),
   auto_scale = TRUE,
@@ -16,6 +15,7 @@ save_e61(
   format = c("svg", "pdf", "eps"),
   save_data = FALSE,
   base_size = 10,
+  ...,
   plotlist = NULL,
   title = NULL,
   subtitle = NULL,
@@ -38,10 +38,8 @@ extension (e.g. .svg) is optional. The file extension must be lowercase. If
 you want to save multiple files with different formats, see the
 \code{format} argument for details.}
 
-\item{...}{(multi-panel specific) Plot objects to put on the panel.}
-
-\item{plot}{Plot object to save. Defaults to the last plot displayed so
-usually you do not need to provide this explicitly.}
+\item{plot}{Single-panel plot object to save. Defaults to the last plot
+displayed so usually you do not need to provide this explicitly.}
 
 \item{chart_type}{String. Type of chart. This is used to set sensible chart
 widths based on the width of text in each document. Options are 'MN' ( for
@@ -70,6 +68,8 @@ same name as the graph that contains the data needed to recreate the graph
 (defaults to FALSE).}
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
+
+\item{...}{(multi-panel specific) Plot objects to put on the panel.}
 
 \item{plotlist}{(multi-panel specific) List of plots to combine as an
 multi-panel and save. You can also enter the charts individually as

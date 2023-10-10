@@ -33,21 +33,6 @@ save_multi <-
 
     plots <- check_plots(plots)
 
-    # Guard clauses and failing checks ----------------------------------------
-
-    # Check against guard clauses common to single/multi-panel
-    save_guard(filename)
-
-    # Determine which file formats to save
-    if (grepl("\\..{3}$", filename)) {
-      format <- gsub("^.*\\.(.{3})$", "\\1", filename)
-
-      # Strip file extension from filename
-      filename <- gsub("^(.*)\\..{3}$", "\\1", filename)
-    } else {
-      format <- match.arg(format, several.ok = TRUE)
-    }
-
     # Set maximum width based on output type ----------------------------------
 
     if(is.null(chart_type)) chart_type <- "MN"
@@ -363,20 +348,7 @@ save_multi <-
     # Save the chart --------------------------------------------------------
     save_graph(graph = gg, format, filename, width, height = tot_height)
 
-    # Post-save functions -----------------------------------------------------
-
-    # Opens the graph file if the option is set
-    if (as.logical(getOption("open_e61_graph", FALSE))) {
-
-      # Put filename back together
-      filename <- paste0(filename, ".", format[[1]])
-
-      file_to_open <- shQuote(here::here(filename))
-
-      out <- try(system2("open", file_to_open))
-
-      if (out != 0) warning("Graph file could not be opened.")
-    }
+    # Post-save -----------------------------------------------------
 
     # Invisibly returns the filename (or vector of filenames). Currently some of
     # the tests rely on the filename being returned so maybe don't change this
