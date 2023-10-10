@@ -44,9 +44,6 @@
 #' @param plotlist (multi-panel specific) List of plots to combine as an
 #'   multi-panel and save. You can also enter the charts individually as
 #'   arguments to the function.
-#' @param title_adj (multi-panel specific) Rescales the size of the title text
-#'   to be slightly larger than the titles of the subplots (default is 1.1). 2
-#'   doubles the font size.
 #' @param height_adj (multi-panel specific) Rescales the height of the
 #'   multi-panel. The function sets sensible defaults but this provides you with
 #'   manual control if you need it.
