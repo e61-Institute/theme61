@@ -4,11 +4,10 @@
 #'   sensible defaults that ensure the text size is appropriately proportioned
 #'   given default sizing.
 #'
-#'   Currently the only file formats supported are \code{.pdf} or \code{.svg}
-#'   (preferred), and \code{.png}. PDF and SVG are modern vector graphics file
+#'   Currently the only file formats supported are \code{.svg} (preferred),
+#'   \code{.pdf} or \code{.eps}. PDF and SVG are modern vector graphics file
 #'   formats which can be scaled up and down in size without blurring or
-#'   becoming pixelated. Use the PNG file format in the rare case that vector
-#'   graphics are not supported.
+#'   becoming pixelated.
 #'
 #'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 #'
@@ -38,17 +37,13 @@
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
-#' @param resize Numeric. Only used when PNG is the file format. Resize the
-#'   graph width and height. You may also need to adjust the \code{pointsize}
-#'   and \code{res} to ensure the text is readable.
+#' @param base_size Numeric. Chart font size. Default is 10.
 #' @param plotlist (multi-panel specific) List of plots to combine as an
 #'   multi-panel and save. You can also enter the charts individually as
 #'   arguments to the function.
 #' @param height_adj (multi-panel specific) Rescales the height of the
 #'   multi-panel. The function sets sensible defaults but this provides you with
 #'   manual control if you need it.
-#' @param base_size (multi-panel specific) Numeric. Chart font size. Default is
-#'   8.
 #' @param title_spacing_adj (multi-panel specific) Rescales the size of the
 #'   space give to the multi-panel title. Use if you think the title looks too
 #'   cramped on the chart.
@@ -62,7 +57,6 @@
 #' @return ggplot2 object
 #' @inheritParams labs_e61
 #' @inheritParams cowplot::plot_grid
-#' @inheritParams grDevices::png
 #' @return Invisibly returns the file name.
 #' @export
 
@@ -74,12 +68,10 @@ save_e61 <- function(filename,
                      width = NULL, # manual control over the width of the chart
                      height = NULL, # manual control over the height of the chart
                      max_height = NULL, # manual control over the maximum height of the chart
-                     format = c("svg", "pdf", "eps", "png"),
+                     format = c("svg", "pdf", "eps"),
                      save_data = FALSE,
-                     resize = NULL,
-                     pointsize = 12,
-                     res = 72,
-                     # mpanel specific arguments
+                     base_size = 10, # set the base size for the theme61 font size call
+                     # multi-panel specific arguments
                      plotlist = NULL,
                      title = NULL,
                      subtitle = NULL,
@@ -87,7 +79,6 @@ save_e61 <- function(filename,
                      sources = NULL,
                      title_spacing_adj = 1, # adjust the amount of space given to the title
                      subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
-                     base_size = 10, # set the base size for the theme61 font size call
                      height_adj = NULL, # adjust the vertical spacing of the mpanel charts
                      ncol = 2,
                      nrow = NULL,
@@ -105,6 +96,10 @@ save_e61 <- function(filename,
 
   # Enforce chart type
   chart_type <- match.arg(chart_type)
+
+  # check if the save directory exists
+  if (!dir.exists(gsub("^(.*)\\/.*\\..{3}$", "\\1", filename)))
+    stop("The directory you are trying to save to does not exist.")
 
   # Check whether to save an mpanel or a single planel chart - these require
   # different approaches
@@ -130,9 +125,7 @@ save_e61 <- function(filename,
       nrow = nrow,
       align = align,
       axis = axis,
-      rel_heights = rel_heights,
-      pointsize = pointsize,
-      res = res
+      rel_heights = rel_heights
     )
 
   } else {
@@ -148,9 +141,6 @@ save_e61 <- function(filename,
       format = format,
       base_size = base_size,
       save_data = save_data,
-      resize = resize,
-      pointsize = pointsize,
-      res = res,
       test = test
     )
   }

@@ -13,11 +13,9 @@ save_e61(
   width = NULL,
   height = NULL,
   max_height = NULL,
-  format = c("svg", "pdf", "eps", "png"),
+  format = c("svg", "pdf", "eps"),
   save_data = FALSE,
-  resize = NULL,
-  pointsize = 12,
-  res = 72,
+  base_size = 10,
   plotlist = NULL,
   title = NULL,
   subtitle = NULL,
@@ -25,7 +23,6 @@ save_e61(
   sources = NULL,
   title_spacing_adj = 1,
   subtitle_spacing_adj = 1,
-  base_size = 10,
   height_adj = NULL,
   ncol = 2,
   nrow = NULL,
@@ -72,17 +69,7 @@ location to SVG and PDF formats. If the file format is specified in
 same name as the graph that contains the data needed to recreate the graph
 (defaults to FALSE).}
 
-\item{resize}{Numeric. Only used when PNG is the file format. Resize the
-graph width and height. You may also need to adjust the \code{pointsize}
-and \code{res} to ensure the text is readable.}
-
-\item{pointsize}{the default pointsize of plotted text, interpreted as
-    big points (1/72 inch) at \code{res} ppi.}
-
-\item{res}{The nominal resolution in ppi which will be recorded in the
-    bitmap file, if a positive integer.  Also used for units other than
-    the default.  If not specified, taken as 72 ppi to set the size of
-    text and line widths.}
+\item{base_size}{Numeric. Chart font size. Default is 10.}
 
 \item{plotlist}{(multi-panel specific) List of plots to combine as an
 multi-panel and save. You can also enter the charts individually as
@@ -107,9 +94,6 @@ cramped on the chart.}
 space give to the multi-panel subtitle. Use if you think the subtitle looks
 too cramped on the chart.}
 
-\item{base_size}{(multi-panel specific) Numeric. Chart font size. Default is
-8.}
-
 \item{height_adj}{(multi-panel specific) Rescales the height of the
 multi-panel. The function sets sensible defaults but this provides you with
 manual control if you need it.}
@@ -130,10 +114,6 @@ relative proportions of each graph component (title, plots, footer
 (optional)).}
 
 \item{test}{For development use only.}
-
-\item{title_adj}{(multi-panel specific) Rescales the size of the title text
-to be slightly larger than the titles of the subplots (default is 1.1). 2
-doubles the font size.}
 }
 \value{
 ggplot2 object
@@ -145,11 +125,10 @@ Designed to save ggplot graphs made with the e61 theme with
   sensible defaults that ensure the text size is appropriately proportioned
   given default sizing.
 
-  Currently the only file formats supported are \code{.pdf} or \code{.svg}
-  (preferred), and \code{.png}. PDF and SVG are modern vector graphics file
+  Currently the only file formats supported are \code{.svg} (preferred),
+  \code{.pdf} or \code{.eps}. PDF and SVG are modern vector graphics file
   formats which can be scaled up and down in size without blurring or
-  becoming pixelated. Use the PNG file format in the rare case that vector
-  graphics are not supported.
+  becoming pixelated.
 
   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 }

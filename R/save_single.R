@@ -11,10 +11,7 @@ save_single <- function(
     max_height = 100, # manual control over the maximum height of the chart
     format = c("svg", "pdf", "eps", "png"),
     save_data = FALSE,
-    resize = NULL,
-    pointsize = 12,
     base_size = 10,
-    res = 72,
     test = !isTRUE(getOption("test_save"))){
 
   # Advisory messages -------------------------------------------------------
@@ -245,7 +242,7 @@ save_single <- function(
   }
 
   # Save ------------------------------------------------------------------
-  save_graph(graph = plot, format, filename, width, height, pointsize, res)
+  save_graph(graph = plot, format, filename, width, height)
 
   # Post-saving messages and functions ------------------------------------
 

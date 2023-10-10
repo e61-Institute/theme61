@@ -68,7 +68,7 @@ check_plots <- function(plots){
 
 #' Helper function to actually perform the saving functionality
 #' @noRd
-save_graph <- function(graph, format, filename, width, height, pointsize, res) {
+save_graph <- function(graph, format, filename, width, height) {
   lapply(format, function(fmt) {
 
     file_i <- paste0(filename, ".", fmt)
@@ -78,7 +78,6 @@ save_graph <- function(graph, format, filename, width, height, pointsize, res) {
       svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
       eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
       pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
-      png = png(filename = file_i, width = width, height = height, units = "cm", pointsize = pointsize, res = res, bg = "transparent")
     )
 
     print(graph)

@@ -215,6 +215,18 @@ test_that("Test multiple file format saving features", {
   })
 })
 
+test_that("Test if directory existence checker works", {
+  p <- minimal_plot
+
+  withr::with_tempdir({
+
+    dir.create("temp_directory")
+
+    expect_no_error(save_e61("temp_directory/plot.svg", p))
+    expect_error(save_e61("faketemp_directory/plot.svg", p))
+  })
+
+})
 
 # Check whole-graph generation consistency --------------------------------
 
