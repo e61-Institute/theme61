@@ -132,28 +132,52 @@ save_e61 <- function(filename,
 
   # Advisory messages -------------------------------------------------------
 
+  ## Check if y-axis label text is good
   adv_msg <- c()
 
-  # Turn these off is the test option is TRUE
-  print_msg <- !test
+  y_miss <- c()
+  y_long <- c()
 
-  ## Check if y-axis label text is good
+  # Loop through the plots
+  for(i in seq_along(plots)){
+    # Message if the y-axis label text is missing
+    if ((is.null(plots[[i]]$labels$y) || nchar(plots[[i]]$labels$y) == 0)) {
+      y_miss <- c(y_miss, i)
+    }
 
-  # Message if the y-axis label text is missing
-  if (print_msg && (is.null(plot$labels$y) || nchar(plot$labels$y) == 0)) {
-    adv_msg <- c(adv_msg, "Your y-axis label is missing. Please provide the units of the axis for the reader. Specify the 'y' argument in 'labs_e61()'.")
+    # Message if the y-axis label text is too long
+    if (isTRUE(nchar(plots[[i]]$labels$y) > 5)) {
+      y_long <- c(y_long, i)
+    }
   }
 
-  # Message if the y-axis label text is too long
-  if (print_msg && isTRUE(nchar(plot$labels$y) > 5)) {
-    adv_msg <- c(adv_msg, "Your y-axis label may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label e.g. %, ppt, $b.")
+  # Compile the messages
+  if (length(y_miss) > 0) {
+    y_miss <- paste0(
+      "Plot ",
+      paste(y_miss, collapse = ", "),
+      " is missing a y-axis label. Provide the y-axis units for the reader by specifying the 'y' argument in 'labs_e61()'.")
+  } else {
+    y_miss <- NULL
   }
+
+  if (length(y_long) > 0) {
+    y_long <- paste0(
+      "Plot ",
+      paste(y_long, collapse = ", "),
+      " y-axis labels may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label e.g. %, ppt, $b."
+    )
+  } else {
+    y_long <- NULL
+  }
+
+  adv_msg <- c(y_miss, y_long)
 
   # Compile and print advisory messages
   print_adv <- function() {
     cli::cli_div(theme = list(".bad" = list(color = "#cc0000",
                                             before = paste0(cli::symbol$cross, " ")),
-                              ".adv" = list(`background-color` = "#FBFF00")
+                              ".adv" = list(`color` = "#cc0000")
     )
     )
     cli::cli_h1("--- Fix the following issues with your graph ----------------------------------------", class = "adv")
@@ -162,7 +186,22 @@ save_e61 <- function(filename,
     cli::cli_end()
   }
 
-  if (length(adv_msg) > 0 && test) print_adv()
+  if (length(adv_msg) > 0) print_adv()
+
+  # Turn these off if the test option is TRUE
+  if (test) {
+
+    # Require user acknowledgement
+    prompt <- ""
+    while (prompt == "") {
+      prompt <- readline(prompt = "Type 'Y' to stop generating the graph or 'N' to continue.")
+    }
+
+    if (prompt == "Y") {
+      return(message("Stopping graph generation based on user request."))
+    }
+
+  }
 
   # Single/multi-specific functions --------------------------------
 
@@ -172,7 +211,7 @@ save_e61 <- function(filename,
     retval <- save_multi(
       filename,
       format = format,
-      plotlist = plots,
+      plots = plots,
       chart_type = chart_type,
       title = title,
       subtitle = subtitle,
@@ -192,7 +231,6 @@ save_e61 <- function(filename,
       axis = axis,
       rel_heights = rel_heights
     )
-
   } else {
 
     retval <- save_single(

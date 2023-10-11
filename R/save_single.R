@@ -1,4 +1,3 @@
-
 #' Save a single-panel chart with e61 formatting
 #' @noRd
 save_single <- function(

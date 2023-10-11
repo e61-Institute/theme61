@@ -1,11 +1,9 @@
 #' Save a multi-panel chart with e61 formatting
 #' @noRd
-
 save_multi <-
   function(filename,
            format = NULL,
-           ...,
-           plotlist = NULL,
+           plots,
            chart_type = NULL,
            title = NULL,
            subtitle = NULL,
@@ -25,13 +23,6 @@ save_multi <-
            axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
            rel_heights = NULL
            ) {
-
-
-    # Combine and clean plot list ---------------------------------------------
-
-    plots <- c(list(...), plotlist)
-
-    plots <- check_plots(plots)
 
     # Set maximum width based on output type ----------------------------------
 
