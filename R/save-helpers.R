@@ -96,12 +96,3 @@ get_base_size <- function(chart_type, plot_base_size = 10){
 
   return(plot_base_size)
 }
-
-#' Counts the number of occurrences of a line break (\n)
-#'
-#' @param text The string to be parsed.
-#' @return Integer counting the number of line breaks in the string.
-#' @noRd
-n_count <- function(text) {
-  nchar(text) - nchar(gsub("\n", "", text, fixed = TRUE))
-}
