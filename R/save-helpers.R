@@ -97,31 +97,6 @@ get_base_size <- function(chart_type, plot_base_size = 10){
   return(plot_base_size)
 }
 
-#' Set option to automatically open files created by \code{save_e61}
-#'
-#' These functions set and unset a session-wide option to automatically open
-#' files created by \code{save_e61}. This is useful when you want to look at the
-#' graph you have just created, such as when you are trying to figure out label
-#' locations or graph dimensions and don't want to manually navigate to the file
-#' location every time.
-#'
-#' @return This function is used for its side effects.
-#' @rdname set_open_graph
-#' @export
-set_open_graph <- function() {
-  options(open_e61_graph = TRUE)
-
-  invisible(TRUE)
-}
-
-#' @rdname set_open_graph
-#' @export
-unset_open_graph <- function() {
-  options(open_e61_graph = FALSE)
-
-  invisible(FALSE)
-}
-
 #' Counts the number of occurrences of a line break (\n)
 #'
 #' @param text The string to be parsed.
