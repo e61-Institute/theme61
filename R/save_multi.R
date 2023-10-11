@@ -335,16 +335,10 @@ save_multi <-
       rel_heights = rel_heights
     )
 
+    retval <- list(graph = gg,
+                   width = width,
+                   height = tot_height)
 
-    # Save the chart --------------------------------------------------------
-    save_graph(graph = gg, format, filename, width, height = tot_height)
+    return(retval)
 
-    # Post-save -----------------------------------------------------
-
-    # Invisibly returns the filename (or vector of filenames). Currently some of
-    # the tests rely on the filename being returned so maybe don't change this
-    # without a good reason.
-    retval <- paste(filename, format, sep = ".")
-
-    invisible(retval)
 }

@@ -186,15 +186,10 @@ save_single <- function(
     }
   }
 
-  # Save ------------------------------------------------------------------
-  save_graph(graph = plot, format, filename, width, height)
+  retval <- list(graph = plot,
+                 width = width,
+                 height = height)
 
-  # Post-save -------------------------------------------------------------
+  return(retval)
 
-  # Invisibly returns the filename (or vector of filenames). Currently some of
-  # the tests rely on the filename being returned so maybe don't change this
-  # without a good reason.
-  retval <- paste(filename, format, sep = ".")
-
-  invisible(retval)
 }

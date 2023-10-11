@@ -198,12 +198,12 @@ save_e61 <- function(filename,
 
   }
 
-  # Save functions --------------------------------
+  # Make graph to save --------------------------------
 
   # Check whether to save an mpanel or a single planel chart - these require
   # different approaches
   if (length(plots) > 1) {
-    retval <- save_multi(
+    save_input <- save_multi(
       filename = filename,
       format = format,
       plots = plots,
@@ -228,7 +228,7 @@ save_e61 <- function(filename,
     )
   } else {
 
-    retval <- save_single(
+    save_input <- save_single(
       filename = filename,
       plot = plots[[1]],
       chart_type = chart_type,
@@ -240,6 +240,16 @@ save_e61 <- function(filename,
       base_size = base_size
     )
   }
+
+  # Save --------------------------------------------------------------------
+
+  save_graph(
+    graph = save_input$graph,
+    format = format,
+    filename = filename,
+    width = save_input$width,
+    height = save_input$height
+  )
 
   # Post-saving -------------------------------------------------------------
 
@@ -262,7 +272,11 @@ save_e61 <- function(filename,
     if (out != 0) warning("Graph file could not be opened.")
   }
 
-  # Invisibly return the filepath
+  # Invisibly returns the filename (or vector of filenames). Currently some of
+  # the tests rely on the filename being returned so maybe don't change this
+  # without a good reason.
+  retval <- paste(filename, format, sep = ".")
+
   invisible(retval)
 
 }
