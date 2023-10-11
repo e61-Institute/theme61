@@ -310,20 +310,23 @@ unset_open_graph <- function() {
 
 #' Converts SVG to PNG
 #'
-#' Converts a SVG file to a PNG file with the same name (but with a .png file
-#' extension).
+#' Converts an SVG file to a PNG file
 #'
-#' @param file File path to the SVG image to convert.
+#' @param file_in File path to the SVG image to convert.
+#' @param file_out File path to the PNG image to save. Default saves a file with
+#'   the same name and location (except for the file extension).
 #' @param delete Logical. Delete the original SVG file? (defaults to FALSE)
 #' @return Invisibly returns the file path to the PNG image
 #' @export
-svg_to_png <- function(file, delete = FALSE) {
+svg_to_png <- function(file_in, file_out = NULL, delete = FALSE) {
 
-  new_path <- gsub("(.*)\\.svg$", "\\1.png", file)
+  if (is.null(file_out)) {
+    file_out <- gsub("(.*)\\.svg$", "\\1.png", file_in)
+  }
 
-  rsvg::rsvg_png(svg = file, file = new_path)
+  rsvg::rsvg_png(svg = file_in, file = file_out)
 
-  if (delete) unlink(file)
+  if (delete) unlink(file_in)
 
-  return(new_path)
+  return(file_out)
 }
