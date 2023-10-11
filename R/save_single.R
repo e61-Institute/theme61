@@ -1,89 +1,34 @@
-
 #' Save a single-panel chart with e61 formatting
 #' @noRd
 save_single <- function(
     filename,
-    plot = last_plot(),
-    chart_type = NULL,
-    auto_scale = TRUE, # manual control over whether y-axis is scaled
-    width = NULL, # manual control over the width of the chart
-    height = NULL, # manual control over the height of the chart
-    max_height = 100, # manual control over the maximum height of the chart
-    format = c("svg", "pdf", "eps", "png"),
-    save_data = FALSE,
-    base_size = 10,
-    test = !isTRUE(getOption("test_save"))){
-
-  # Advisory messages -------------------------------------------------------
-
-  # Note that the following checks don't apply when multi-panel graphs are created
-  print_msg <- TRUE
-
-  adv_msg <- c()
-  info_msg <- c()
-
-  # Message if theme function not used
-  if (print_msg && is.null(attr(plot$theme, "t61"))) {
-
-    adv_msg <- c(adv_msg, "Add 'theme_e61()' to your ggplot code to ensure the e61 theme is applied.")
-  }
-
-  # Message if colour/fill functions aren't used, message to appear only if a
-  # colour/fill mappping exists
-  if (print_msg && any(grepl("(colour|color|fill)", names(plot$mapping))) &&
-      !"scale_col_e61" %in% unlist(sapply(plot$scales$scales, class))) {
-
-    adv_msg <- c(adv_msg, "Add 'scale_colour/fill_e61()' to your ggplot code to ensure the e61 colour palette is used.")
-  }
-
-  # Message if the y-axis label text is missing
-  if (print_msg && (is.null(plot$labels$y) || nchar(plot$labels$y) == 0)) {
-    adv_msg <- c(adv_msg, "Your y-axis label is missing. Please provide the units of the axis for the reader. Specify the 'y' argument in 'labs_e61()'.")
-  }
-
-  # Message if the y-axis label text is too long
-  if (print_msg && isTRUE(nchar(plot$labels$y) > 5)) {
-    adv_msg <- c(adv_msg, "Your y-axis label may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label e.g. %, ppt, $b.")
-  }
-
-
-  # Guard clauses and failing checks ----------------------------------------
-
-  # Enforce file format requirements if a file extension is provided
-  save_guard(filename)
-
-  # Determine which file formats to save
-  if (grepl("\\..{3}$", filename)) {
-    format <- gsub("^.*\\.(.{3})$", "\\1", filename)
-
-    # Strip file extension from filename
-    filename <- gsub("^(.*)\\..{3}$", "\\1", filename)
-  } else {
-    format <- match.arg(format, several.ok = TRUE)
-  }
-
-  # Check if the data frame can be written
-  if (save_data && !is.data.frame(plot$data))
-    stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
-
+    plot,
+    chart_type,
+    auto_scale, # manual control over whether y-axis is scaled
+    width, # manual control over the width of the chart
+    height, # manual control over the height of the chart
+    max_height, # manual control over the maximum height of the chart
+    format,
+    base_size
+    ) {
 
   # Check if we have a spatial chart, if we do save without editing ---------
 
-  is_spatial_chart <- F
+  is_spatial_chart <- FALSE
 
   for(i in seq_along(plot$layers)){
 
     layer_class <- class(plot$layers[[i]]$geom)
 
     if("GeomSf" %in% layer_class) {
-      is_spatial_chart <- T
+      is_spatial_chart <- TRUE
 
       break
     }
   }
 
   # if it's a spatial plot, turn of autoscaling
-  if(is_spatial_chart) auto_scale <- F
+  if(is_spatial_chart) auto_scale <- FALSE
 
 
   # Set maximum width based on output type ----------------------------------
@@ -106,7 +51,7 @@ save_single <- function(
 
     plot <- plot +
       theme_e61(
-        keep_legend = T,
+        keep_legend = TRUE,
         base_size = base_size
       )
 
@@ -241,62 +186,11 @@ save_single <- function(
     }
   }
 
-  # Save ------------------------------------------------------------------
-  save_graph(graph = plot, format, filename, width, height)
+  # Return objects needed to save the graph ----
+  retval <- list(graph = plot,
+                 width = width,
+                 height = height)
 
-  # Post-saving messages and functions ------------------------------------
+  return(retval)
 
-  # Compile the messages together
-  print_adv <- function() {
-    cli::cli_div(theme = list(".bad" = list(color = "#cc0000",
-                                            before = paste0(cli::symbol$cross, " ")),
-                              ".adv" = list(`background-color` = "#FBFF00")
-    )
-    )
-    cli::cli_h1("--- Fix the following issues with your graph ----------------------------------------", class = "adv")
-    cli::cli_ul()
-    sapply(adv_msg, cli::cli_alert, class = "bad")
-    cli::cli_end()
-  }
-
-  print_info <- function() {
-    cli::cli_div(theme = list(".info-head" = list(color = "#247700"),
-                              ".just-info" = list(color = "#000000")
-    )
-    )
-    cli::cli_h1("--- For information -----------------------", class = "info-head")
-    cli::cli_ul()
-    sapply(info_msg, cli::cli_alert_info, class = "just-info")
-    cli::cli_end()
-  }
-
-  if (length(adv_msg) > 0 && test) print_adv()
-
-  if (length(info_msg) > 0 && test) print_info()
-
-  # Save the data used to make the graph
-  if (save_data) {
-    data_name <- gsub("\\.(\\w{3})$", "\\.csv", filename)
-    data.table::fwrite(plot$data, data_name)
-  }
-
-  # Opens the graph file if the option is set
-  if (as.logical(getOption("open_e61_graph", FALSE))) {
-
-    # Put filename back together
-    filename <- paste0(filename, ".", format[[1]])
-
-    file_to_open <- shQuote(here::here(filename))
-
-    out <- try(system2("open", file_to_open))
-
-    if (out != 0) warning("Graph file could not be opened.")
-  }
-
-  # Invisibly returns the filename (or vector of filenames). Currently some of
-  # the tests rely on the filename being returned so maybe don't change this
-  # without a good reason.
-  retval <- paste(filename, format, sep = ".")
-
-  invisible(retval)
 }

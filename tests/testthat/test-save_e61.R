@@ -1,6 +1,6 @@
 # Tests for individual features -------------------------------------------
 
-test_that("Test dimensioning functions", {
+test_that("Dimensioning functions", {
 
   # Turn off messages
   withr::local_options(list(test_save = TRUE,
@@ -30,7 +30,7 @@ test_that("Test dimensioning functions", {
 
 })
 
-test_that("Test flipped coordinate graph formatting", {
+test_that("Flipped coord formatting", {
   # save_e61() should automatically apply format_flip() to flipped coord graphs
 
   p1 <-
@@ -53,169 +53,40 @@ test_that("Test flipped coordinate graph formatting", {
 
 })
 
-test_that("Test support for different file formats", {
+test_that("Y-axis label messages", {
 
   withr::local_options(list(test_save = TRUE,
                             quiet_wrap = TRUE))
 
-  # Create a graph that will be written to disk (and deleted afterwards)
-  g <- minimal_plot
-
+  # y-axis text missing or too long
   withr::with_tempdir({
-    temp_file <- "test.svg"
 
-    suppressMessages(save_e61(temp_file))
+    p1 <- minimal_plot + labs_e61(y = "")
+    p2 <- minimal_plot + labs_e61(y = "too long label")
 
-    disk_file <- magick::image_read(temp_file)
-    deets <- magick::image_info(disk_file)
-
-    expected_deets <-
-      tibble::tibble(
-        format = "SVG",
-        width = 351,
-        height = 267
-      )
-
-    lapply(c("format", "width", "height"), function(x) {
-      expect_equal(deets[[x]], expected_deets[[x]])
-    })
-
-    ## These should fail
-
-    # No support for some file formats
-    expect_error(suppressMessages(save_e61(paste0(tempdir(), "\\text.jpg"))))
-
-    # Having svg in the file name (but not format) should still trip the file format error
-    expect_error(suppressMessages(save_e61(paste0(tempdir(), "\\svg-text.jpg"))))
+    suppressWarnings(suppressMessages(
+      expect_message(save_e61("test.svg", p1, p2), class = "cliMessage"),
+      classes = c("message", "cliMessage")))
 
   })
-
-  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".svg"), g), classes = c("warning", "message")))
-  expect_no_error(suppressWarnings(save_e61(withr::local_tempfile(fileext = ".pdf"), g), classes = c("warning", "message")))
-
-})
-
-test_that("Test whether save_data works", {
-  data <- data.frame(x = 1, y = 1)
-
-  dir <- tempdir()
-
-  gg <- ggplot(data, aes(x, y)) +
-    geom_point()
-
-  expect_no_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), save_data = TRUE)))
-  expect_no_error(suppressMessages(save_e61(file.path(dir, "graph"), format = "svg", save_data = TRUE)))
-
-  # This should leave the $data container empty
-  gg <- ggplot() +
-    geom_point(data = data, aes(x, y)) +
-    geom_point(data = data, aes(x, y))
-
-  expect_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), save_data = TRUE)))
-})
-
-test_that("Test advisory messages", {
-  # Ensure option is not set, but turn off wrapper warnings
-  withr::local_options(list(no_t61_style_msg = FALSE,
-                            quiet_wrap = TRUE))
-
-  # No theming, no y-axis
-  gg <- ggplot()
-
-  expect_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1), ".*Fix the following issues.*")
-
-  # No colour palette
-  gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
-    geom_col()
-
-  expect_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1), ".*Fix the following issues.*")
-
-  # y-axis text missing
-  gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
-    geom_col() +
-    scale_y_continuous_e61(c(0, 4)) +
-    scale_fill_e61(3) +
-    theme_e61() +
-    labs_e61(y = NULL)
-
-  expect_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1), ".*Fix the following issues.*")
-
-  # y-axis text too long
-  gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
-    geom_col() +
-    scale_y_continuous_e61(c(0, 4)) +
-    scale_fill_e61(3) +
-    theme_e61() +
-    labs_e61(y = "Really long y-axis label")
-
-  expect_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1), ".*Fix the following issues.*")
 
   # No message if you do it right
-  gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
-    geom_col() +
-    scale_y_continuous_e61(c(0, 4)) +
-    scale_fill_e61(3) +
-    theme_e61()
+  gg <- minimal_plot
 
-  expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
+  suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg)),
+                   classes = c("messages", "warning"))
 
-  # No messages for multipanels
-  gg <- mpanel_e61(gg)
+  # No message if y_top is FALSE
+  p <- minimal_plot +
+    labs_e61(y = "Long y-axis label that goes on the side") +
+    theme_e61(y_top = FALSE)
 
-  expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg, height = 1))
+  suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p)),
+                   classes = c("messages", "warning"))
+
 })
 
-test_that("Test multiple file format saving features", {
-  g <- ggplot()
-
-  # Test 3 formats
-  withr::with_tempdir({
-    suppressMessages(save_e61("test_file", g, format = c("svg", "pdf", "eps"), autoheight = FALSE))
-
-    expect_setequal(list.files(pattern = "test_file.*"),
-                 c("test_file.eps", "test_file.pdf", "test_file.svg"))
-
-  })
-
-  # Test if PNG breaks everything (it shouldn't)
-  withr::with_tempdir({
-    suppressMessages(save_e61("test_file", g, format = c("svg", "png"), autoheight = FALSE))
-
-    expect_setequal(list.files(pattern = "test_file.*"),
-                 c("test_file.svg", "test_file.png"))
-  })
-
-  # Test providing file format in file path
-  withr::with_tempdir({
-    suppressMessages(save_e61("test_file.svg", g, autoheight = FALSE))
-
-    expect_setequal(list.files(pattern = "test_file.*"),
-                 c("test_file.svg"))
-  })
-
-  # Test if providing format in path overrules format argument
-  withr::with_tempdir({
-    suppressMessages(save_e61("test_file.svg", g, format = "png", autoheight = FALSE))
-
-    expect_setequal(list.files(pattern = "test_file.*"),
-                 c("test_file.svg"))
-  })
-
-  # Test what happens if nothing is provided (do the defaults do what you expect?)
-  withr::with_tempdir({
-    suppressMessages(save_e61("test_file", g, autoheight = FALSE))
-
-    expect_setequal(list.files(pattern = "test_file.*"),
-                 c("test_file.svg", "test_file.png", "test_file.pdf", "test_file.eps"))
-  })
-
-  # Error if invalid filename used
-  withr::with_tempdir({
-    expect_error(suppressMessages(save_e61("test_file", g, format = "mp3", autoheight = FALSE)))
-  })
-})
-
-test_that("Test if directory existence checker works", {
+test_that("Directory existence checker", {
   p <- minimal_plot
 
   withr::with_tempdir({
@@ -229,6 +100,96 @@ test_that("Test if directory existence checker works", {
     expect_error(save_e61("faketemp_directory/plot.svg", p))
   })
 
+})
+
+test_that("Different file formats", {
+
+  withr::local_options(list(test_save = TRUE,
+                            quiet_wrap = TRUE))
+
+  g <- minimal_plot
+
+  withr::with_tempdir({
+
+    # No support for some file formats
+    expect_error(suppressWarnings(save_e61("text.jpg")))
+
+    # Having svg in the file name (but not format) should still trip the file format error
+    expect_error(suppressWarnings(save_e61("svg-text.jpg")))
+
+    # Make sure the slightly fiddlier PNG saving method works
+    suppressWarnings(save_e61("test.png", g), classes = c("warning", "message"))
+    expect_false(file.exists("test.svg"))
+    expect_true(file.exists("test.png"))
+
+    # Test other supported file types
+    expect_no_error(suppressWarnings(save_e61("test.svg", g), classes = c("warning", "message")))
+    expect_no_error(suppressWarnings(save_e61("test.pdf", g), classes = c("warning", "message")))
+    expect_no_error(suppressWarnings(save_e61("test.eps", g), classes = c("warning", "message")))
+
+  })
+
+})
+
+test_that("Multiple file saving", {
+  g <- minimal_plot
+
+  # Test 3 formats
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file", g, format = c("svg", "pdf", "eps")))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                    c("test_file.eps", "test_file.pdf", "test_file.svg"))
+
+  })
+
+  # Test providing file format in file path
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file.svg", g))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                    c("test_file.svg"))
+  })
+
+  # Test if providing format in path overrules format argument
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file.svg", g, format = "pdf"))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                    c("test_file.svg"))
+  })
+
+  # Test what happens if nothing is provided (do the defaults do what you expect?)
+  withr::with_tempdir({
+    suppressMessages(save_e61("test_file", g))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                    c("test_file.svg", "test_file.pdf", "test_file.eps", "test_file.png"))
+  })
+
+  # Error if invalid filename used
+  withr::with_tempdir({
+    expect_error(suppressMessages(save_e61("test_file", g, format = "mp3")))
+  })
+
+})
+
+test_that("Does save_data work", {
+  gg <- minimal_plot
+
+  withr::with_tempdir({
+    expect_no_error(suppressMessages(save_e61("graph.svg", gg, save_data = TRUE)))
+    expect_no_error(suppressMessages(save_e61("graph", gg, format = "svg", save_data = TRUE)))
+  })
+
+  # This should leave the $data container empty
+  gg <- ggplot() +
+    geom_point(data = data, aes(x, y)) +
+    geom_point(data = data, aes(x, y))
+
+  withr::with_tempdir({
+    expect_error(suppressMessages(save_e61("graph.svg", save_data = TRUE)))
+  })
 })
 
 # Check whole-graph generation consistency --------------------------------

@@ -7,13 +7,12 @@
 save_e61(
   filename,
   ...,
-  plot = ggplot2::last_plot(),
+  plot = last_plot(),
+  format = c("svg", "pdf", "eps", "png"),
   chart_type = c("MN", "RN", "PPT"),
   auto_scale = TRUE,
-  width = NULL,
-  height = NULL,
+  dim = list(height = NULL, width = NULL),
   max_height = NULL,
-  format = c("svg", "pdf", "eps"),
   save_data = FALSE,
   base_size = 10,
   plotlist = NULL,
@@ -21,27 +20,30 @@ save_e61(
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
-  title_spacing_adj = 1,
-  subtitle_spacing_adj = 1,
+  spacing_adj = list(title = 1, subtitle = 1),
   height_adj = NULL,
   ncol = 2,
   nrow = NULL,
   align = c("v", "none", "h", "hv"),
   axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-  rel_heights = NULL,
-  test = !isTRUE(getOption("test_save"))
+  rel_heights = NULL
 )
 }
 \arguments{
 \item{filename}{File name to create on disk. Providing the file format
-extension (e.g. .svg) is optional. The file extension must be lowercase. If
-you want to save multiple files with different formats, see the
-\code{format} argument for details.}
+extension (e.g. .svg) is suggested when saving to a single file format. The
+file extension must be lowercase. If you want to save to multiple formats,
+do not include the extension, see the \code{format} argument for details.}
 
 \item{...}{(multi-panel specific) Plot objects to put on the panel.}
 
-\item{plot}{Plot object to save. Defaults to the last plot displayed so
-usually you do not need to provide this explicitly.}
+\item{plot}{Single-panel plot object to save. Defaults to the last plot
+displayed so usually you do not need to provide this explicitly.}
+
+\item{format}{An optional vector of file formats to save as. For example
+\code{c("svg", "pdf")} will save 2 files with the same name to the same
+location to SVG and PDF formats. If the file format is specified in
+\code{filename}, then this argument is ignored.}
 
 \item{chart_type}{String. Type of chart. This is used to set sensible chart
 widths based on the width of text in each document. Options are 'MN' ( for
@@ -50,20 +52,13 @@ micronotes), 'RN' (research notes), 'PPT' (PowerPoints).}
 \item{auto_scale}{Logical. Should the y-axis be scaled automatically. Default
 is TRUE.}
 
-\item{width}{Numeric. Plot width in cm. Defaults to NULL which means the
-width will be set based on the chart type.}
-
-\item{height}{Numeric. Plot height in cm. If you do not specify a height, the
-function will calculate an appropriate height.}
+\item{dim}{An optional named list specifying the plot height and width.
+Defaults to NULL which means the graph dimensions will be set based on the
+chart type and function-calculated value.}
 
 \item{max_height}{Numeric. The maximum height of your plot in cm. This is
 used to constrain the plot resizing algorithm in cases where you want to
 limit the height of your charts.}
-
-\item{format}{An optional vector of file formats to save as. For example
-\code{c("svg", "pdf")} will save 2 files with the same name to the same
-location to SVG and PDF formats. If the file format is specified in
-\code{filename}, then this argument is ignored.}
 
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph
@@ -86,12 +81,9 @@ separate points you include in the graph.}
 
 \item{sources}{String vector providing the names of sources for the graph.}
 
-\item{title_spacing_adj}{(multi-panel specific) Rescales the size of the
-space give to the multi-panel title. Use if you think the title looks too
-cramped on the chart.}
-
-\item{subtitle_spacing_adj}{(multi-panel specific) Rescales the size of the
-space give to the multi-panel subtitle. Use if you think the subtitle looks
+\item{spacing_adj}{(multi-panel specific) An optional named list specifying
+the adjustment to the title and subtitle. Rescales the size of the space
+give to the multi-panel title/subtitle. Use if you think the title looks
 too cramped on the chart.}
 
 \item{height_adj}{(multi-panel specific) Rescales the height of the
@@ -112,12 +104,8 @@ Must be specified if any of the graphs are complex (e.g. faceted) and alignment 
 \item{rel_heights}{(multi-panel specific) A numeric vector giving the
 relative proportions of each graph component (title, plots, footer
 (optional)).}
-
-\item{test}{For development use only.}
 }
 \value{
-ggplot2 object
-
 Invisibly returns the file name.
 }
 \description{

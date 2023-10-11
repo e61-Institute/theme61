@@ -1,52 +1,28 @@
 #' Save a multi-panel chart with e61 formatting
 #' @noRd
-
 save_multi <-
   function(filename,
-           format = c("svg", "pdf", "eps", "png"),
-           ...,
-           plotlist = NULL,
-           chart_type = NULL,
-           title = NULL,
-           subtitle = NULL,
-           footnotes = NULL,
-           sources = NULL,
-           width = NULL, # manual control over the width of the chart
-           height = NULL, # manual control over the height of the chart
-           max_height = NULL, # manual control over the maximum height of the chart
-           auto_scale = TRUE,
-           title_spacing_adj = 1, # adjust the amount of space given to the title
-           subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
-           base_size = 10, # set the base size for the theme61 font size call
-           height_adj = NULL, # adjust the vertical spacing of the mpanel charts
-           ncol = 2,
-           nrow = NULL,
-           align = c("v", "none", "h", "hv"),
-           axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-           rel_heights = NULL
+           format,
+           plots,
+           chart_type,
+           title,
+           subtitle,
+           footnotes,
+           sources,
+           width, # manual control over the width of the chart
+           height, # manual control over the height of the chart
+           max_height, # manual control over the maximum height of the chart
+           auto_scale,
+           title_spacing_adj, # adjust the amount of space given to the title
+           subtitle_spacing_adj, # adjust the amount of space given to the subtitle
+           base_size, # set the base size for the theme61 font size call
+           height_adj, # adjust the vertical spacing of the mpanel charts
+           ncol,
+           nrow,
+           align,
+           axis,
+           rel_heights
            ) {
-
-
-    # Combine and clean plot list ---------------------------------------------
-
-    plots <- c(list(...), plotlist)
-
-    plots <- check_plots(plots)
-
-    # Guard clauses and failing checks ----------------------------------------
-
-    # Check against guard clauses common to single/multi-panel
-    save_guard(filename)
-
-    # Determine which file formats to save
-    if (grepl("\\..{3}$", filename)) {
-      format <- gsub("^.*\\.(.{3})$", "\\1", filename)
-
-      # Strip file extension from filename
-      filename <- gsub("^(.*)\\..{3}$", "\\1", filename)
-    } else {
-      format <- match.arg(format, several.ok = TRUE)
-    }
 
     # Set maximum width based on output type ----------------------------------
 
@@ -359,29 +335,11 @@ save_multi <-
       rel_heights = rel_heights
     )
 
+    # Return objects needed to save the graph ----
+    retval <- list(graph = gg,
+                   width = width,
+                   height = tot_height)
 
-    # Save the chart --------------------------------------------------------
-    save_graph(graph = gg, format, filename, width, height = tot_height)
+    return(retval)
 
-    # Post-save functions -----------------------------------------------------
-
-    # Opens the graph file if the option is set
-    if (as.logical(getOption("open_e61_graph", FALSE))) {
-
-      # Put filename back together
-      filename <- paste0(filename, ".", format[[1]])
-
-      file_to_open <- shQuote(here::here(filename))
-
-      out <- try(system2("open", file_to_open))
-
-      if (out != 0) warning("Graph file could not be opened.")
-    }
-
-    # Invisibly returns the filename (or vector of filenames). Currently some of
-    # the tests rely on the filename being returned so maybe don't change this
-    # without a good reason.
-    retval <- paste(filename, format, sep = ".")
-
-    invisible(retval)
 }
