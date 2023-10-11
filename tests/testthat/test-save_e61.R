@@ -53,37 +53,23 @@ test_that("Flipped coord formatting", {
 
 })
 
-test_that("Advisory messages", {
-  # Ensure option is not set, but turn off wrapper warnings
-  withr::local_options(list(no_t61_style_msg = FALSE,
+test_that("Y-axis label messages", {
+
+  withr::local_options(list(test_save = TRUE,
                             quiet_wrap = TRUE))
 
-  # y-axis text missing
-  gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
-    geom_col() +
-    scale_y_continuous_e61(c(0, 4)) +
-    scale_fill_e61(3) +
-    theme_e61() +
-    labs_e61(y = NULL)
+  # y-axis text missing or too long
+  withr::with_tempdir({
 
-  expect_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg), ".*Fix the following issues.*")
+    p1 <- minimal_plot + labs_e61(y = "")
+    p2 <- minimal_plot + labs_e61(y = "too long label")
 
-  # y-axis text too long
-  gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
-    geom_col() +
-    scale_y_continuous_e61(c(0, 4)) +
-    scale_fill_e61(3) +
-    theme_e61() +
-    labs_e61(y = "Really long y-axis label")
-
-  expect_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg), ".*Fix the following issues.*")
+    suppressMessages(expect_message(save_e61("test.svg", p1, p2),
+                                    ".*Fix the following issues.*"))
+  })
 
   # No message if you do it right
-  gg <- ggplot(data.frame(x = LETTERS[1:3], y = 1:3), aes(x, y, fill = x)) +
-    geom_col() +
-    scale_y_continuous_e61(c(0, 4)) +
-    scale_fill_e61(3) +
-    theme_e61()
+  gg <- minimal_plot
 
   expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg))
 
