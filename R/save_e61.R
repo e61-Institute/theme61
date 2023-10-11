@@ -61,8 +61,9 @@
 #' @export
 
 save_e61 <- function(filename,
-                     format = c("svg", "pdf", "eps"),
+                     ...,
                      plot = last_plot(),
+                     format = c("svg", "pdf", "eps"),
                      chart_type = c("MN", "RN", "PPT"),
                      auto_scale = TRUE, # manual control over whether y-axis is scaled
                      width = NULL, # manual control over the width of the chart
@@ -71,7 +72,6 @@ save_e61 <- function(filename,
                      save_data = FALSE,
                      base_size = 10, # set the base size for the theme61 font size call
                      # multi-panel specific arguments
-                     ...,
                      plotlist = NULL,
                      title = NULL,
                      subtitle = NULL,
@@ -132,10 +132,12 @@ save_e61 <- function(filename,
 
   # Advisory messages -------------------------------------------------------
 
-  # Note that the following checks don't apply when multi-panel graphs are created
-  print_msg <- TRUE
-
   adv_msg <- c()
+
+  # Turn these off is the test option is TRUE
+  print_msg <- !test
+
+  ## Check if y-axis label text is good
 
   # Message if the y-axis label text is missing
   if (print_msg && (is.null(plot$labels$y) || nchar(plot$labels$y) == 0)) {
@@ -161,7 +163,6 @@ save_e61 <- function(filename,
   }
 
   if (length(adv_msg) > 0 && test) print_adv()
-
 
   # Single/multi-specific functions --------------------------------
 
@@ -204,8 +205,7 @@ save_e61 <- function(filename,
       max_height = max_height, # control max height
       format = format,
       base_size = base_size,
-      save_data = save_data,
-      test = test
+      save_data = save_data
     )
   }
 
