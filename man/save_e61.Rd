@@ -8,7 +8,7 @@ save_e61(
   filename,
   ...,
   plot = last_plot(),
-  format = c("svg", "pdf", "eps"),
+  format = c("svg", "pdf", "eps", "png"),
   chart_type = c("MN", "RN", "PPT"),
   auto_scale = TRUE,
   width = NULL,
@@ -33,9 +33,9 @@ save_e61(
 }
 \arguments{
 \item{filename}{File name to create on disk. Providing the file format
-extension (e.g. .svg) is optional. The file extension must be lowercase. If
-you want to save multiple files with different formats, see the
-\code{format} argument for details.}
+extension (e.g. .svg) is suggested when saving to a single file format. The
+file extension must be lowercase. If you want to save to multiple formats,
+do not include the extension, see the \code{format} argument for details.}
 
 \item{...}{(multi-panel specific) Plot objects to put on the panel.}
 
