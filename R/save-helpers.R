@@ -1,5 +1,25 @@
 # Helper functions that are used across save_single, save_multi or save_e61
 
+#' Converts SVG to PNG
+#'
+#' Converts a SVG file to a PNG file with the same name (but with a .png file
+#' extension).
+#'
+#' @param file File path to the SVG image to convert.
+#' @param delete Logical. Delete the original SVG file? (defaults to FALSE)
+#' @return Invisibly returns the file path to the PNG image
+#' @export
+svg_to_png <- function(file, delete = FALSE) {
+
+  new_path <- gsub("(.*)\\.svg$", "\\1.png", file)
+
+  rsvg::rsvg_png(svg = file, file = new_path)
+
+  if (delete) unlink(file)
+
+  return(new_path)
+}
+
 #' Helper function to actually perform the saving functionality
 #' @noRd
 save_graph <- function(graph, format, filename, width, height) {
@@ -12,14 +32,22 @@ save_graph <- function(graph, format, filename, width, height) {
       svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
       eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
       pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
+      # When saving PNG we save the SVG first then convert it to PNG
+      png = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent")
     )
 
     print(graph)
     dev.off()
+
+    # Save a PNG if required
+    if (fmt == "png") {
+      file <- paste0(filename, ".svg")
+      svg_to_png(file, delete = TRUE)
+    }
+
   })
 
 }
-
 
 #' Check plots are ggplot objects and return a list of only ggplot objects
 #' @noRd

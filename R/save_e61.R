@@ -12,9 +12,9 @@
 #'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 #'
 #' @param filename File name to create on disk. Providing the file format
-#'   extension (e.g. .svg) is optional. The file extension must be lowercase. If
-#'   you want to save multiple files with different formats, see the
-#'   \code{format} argument for details.
+#'   extension (e.g. .svg) is suggested when saving to a single file format. The
+#'   file extension must be lowercase. If you want to save to multiple formats,
+#'   do not include the extension, see the \code{format} argument for details.
 #' @param plot Single-panel plot object to save. Defaults to the last plot
 #'   displayed so usually you do not need to provide this explicitly.
 #' @param chart_type String. Type of chart. This is used to set sensible chart
@@ -61,7 +61,7 @@
 save_e61 <- function(filename,
                      ...,
                      plot = last_plot(),
-                     format = c("svg", "pdf", "eps"),
+                     format = c("svg", "pdf", "eps", "png"),
                      chart_type = c("MN", "RN", "PPT"),
                      auto_scale = TRUE, # manual control over whether y-axis is scaled
                      width = NULL, # manual control over the width of the chart
@@ -106,7 +106,7 @@ save_e61 <- function(filename,
     stop("The directory you are trying to save to does not exist.")
 
   # Enforce file format requirements if a file extension is provided
-  if (grepl("\\..{3}$", filename) && !grepl("\\.(svg|pdf|eps)$", filename)) {
+  if (grepl("\\..{3}$", filename) && !grepl("\\.(svg|pdf|eps|png)$", filename)) {
     stop("You must provide a file extension. Only PDF and SVG file formats are supported.")
   }
 
