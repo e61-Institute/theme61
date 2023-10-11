@@ -145,13 +145,17 @@ test_that("Multiple file saving", {
 
   # Test what happens if nothing is provided (do the defaults do what you expect?)
   withr::with_tempdir({
-    expect_error(suppressMessages(save_e61("test_file", g)))
+    suppressMessages(save_e61("test_file", g))
+
+    expect_setequal(list.files(pattern = "test_file.*"),
+                    c("test_file.svg", "test_file.pdf", "test_file.eps"))
   })
 
   # Error if invalid filename used
   withr::with_tempdir({
     expect_error(suppressMessages(save_e61("test_file", g, format = "mp3")))
   })
+
 })
 
 test_that("Does save_data work", {
