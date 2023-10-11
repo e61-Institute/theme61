@@ -116,7 +116,7 @@ save_e61 <- function(filename,
   }
 
   # Check if the data frame can be written
-  if (save_data && !is.data.frame(plot$data))
+  if (save_data && !is.data.frame(plots[[1]]$data))
     stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
   # Check list args are valid
@@ -256,8 +256,11 @@ save_e61 <- function(filename,
 
   # Save the data used to make the graph
   if (save_data) {
-    data_name <- gsub("\\.(\\w{3})$", "\\.csv", filename)
-    data.table::fwrite(plot$data, data_name)
+
+    for (i in seq_along(plots)) {
+      data_name <- gsub("\\.(\\w{3})$", paste0(i, ".csv"), filename)
+      data.table::fwrite(plots[[i]]$data, data_name)
+    }
   }
 
   # Opens the graph file if the option is set
