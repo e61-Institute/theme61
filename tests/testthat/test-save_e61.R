@@ -100,16 +100,21 @@ test_that("Different file formats", {
 
   withr::with_tempdir({
 
-    # Supported file types
-    expect_no_error(suppressWarnings(save_e61("test.svg", g), classes = c("warning", "message")))
-    expect_no_error(suppressWarnings(save_e61("test.pdf", g), classes = c("warning", "message")))
-    expect_no_error(suppressWarnings(save_e61("test.eps", g), classes = c("warning", "message")))
-
     # No support for some file formats
     expect_error(suppressWarnings(save_e61("text.jpg")))
 
     # Having svg in the file name (but not format) should still trip the file format error
     expect_error(suppressWarnings(save_e61("svg-text.jpg")))
+
+    # Supported file types
+    expect_no_error(suppressWarnings(save_e61("test.svg", g), classes = c("warning", "message")))
+    expect_no_error(suppressWarnings(save_e61("test.pdf", g), classes = c("warning", "message")))
+    expect_no_error(suppressWarnings(save_e61("test.eps", g), classes = c("warning", "message")))
+
+    # Make sure the slightly fiddlier PNG saving method works
+    suppressWarnings(save_e61("test.png", g), classes = c("warning", "message"))
+    expect_false(file.exists("test.svg"))
+    expect_true(file.exists("test.png"))
 
   })
 

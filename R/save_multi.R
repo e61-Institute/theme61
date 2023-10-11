@@ -335,6 +335,7 @@ save_multi <-
       rel_heights = rel_heights
     )
 
+    # Return objects needed to save the graph ----
     retval <- list(graph = gg,
                    width = width,
                    height = tot_height)

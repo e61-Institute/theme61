@@ -186,6 +186,7 @@ save_single <- function(
     }
   }
 
+  # Return objects needed to save the graph ----
   retval <- list(graph = plot,
                  width = width,
                  height = height)

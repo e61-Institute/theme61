@@ -272,9 +272,7 @@ save_e61 <- function(filename,
     if (out != 0) warning("Graph file could not be opened.")
   }
 
-  # Invisibly returns the filename (or vector of filenames). Currently some of
-  # the tests rely on the filename being returned so maybe don't change this
-  # without a good reason.
+  # Invisibly returns the filename/s
   retval <- paste(filename, format, sep = ".")
 
   invisible(retval)
