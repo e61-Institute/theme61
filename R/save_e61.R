@@ -53,7 +53,6 @@
 #' @param rel_heights (multi-panel specific) A numeric vector giving the
 #'   relative proportions of each graph component (title, plots, footer
 #'   (optional)).
-#' @param test For development use only.
 #' @return ggplot2 object
 #' @inheritParams labs_e61
 #' @inheritParams cowplot::plot_grid
@@ -84,10 +83,7 @@ save_e61 <- function(filename,
                      nrow = NULL,
                      align = c("v", "none", "h", "hv"),
                      axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-                     rel_heights = NULL,
-                     # For development purposes only
-                     test = !isTRUE(getOption("test_save"))
-) {
+                     rel_heights = NULL) {
 
   # Compile plots
   plots <- c(list(...), plotlist)
@@ -189,7 +185,7 @@ save_e61 <- function(filename,
   if (length(adv_msg) > 0) print_adv()
 
   # Turn these off if the test option is TRUE
-  if (test) {
+  if (!getOption("test_save")) {
 
     # Require user acknowledgement
     prompt <- ""

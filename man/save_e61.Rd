@@ -6,16 +6,16 @@
 \usage{
 save_e61(
   filename,
-  plot = ggplot2::last_plot(),
+  ...,
+  plot = last_plot(),
+  format = c("svg", "pdf", "eps"),
   chart_type = c("MN", "RN", "PPT"),
   auto_scale = TRUE,
   width = NULL,
   height = NULL,
   max_height = NULL,
-  format = c("svg", "pdf", "eps"),
   save_data = FALSE,
   base_size = 10,
-  ...,
   plotlist = NULL,
   title = NULL,
   subtitle = NULL,
@@ -28,8 +28,7 @@ save_e61(
   nrow = NULL,
   align = c("v", "none", "h", "hv"),
   axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-  rel_heights = NULL,
-  test = !isTRUE(getOption("test_save"))
+  rel_heights = NULL
 )
 }
 \arguments{
@@ -38,8 +37,15 @@ extension (e.g. .svg) is optional. The file extension must be lowercase. If
 you want to save multiple files with different formats, see the
 \code{format} argument for details.}
 
+\item{...}{(multi-panel specific) Plot objects to put on the panel.}
+
 \item{plot}{Single-panel plot object to save. Defaults to the last plot
 displayed so usually you do not need to provide this explicitly.}
+
+\item{format}{An optional vector of file formats to save as. For example
+\code{c("svg", "pdf")} will save 2 files with the same name to the same
+location to SVG and PDF formats. If the file format is specified in
+\code{filename}, then this argument is ignored.}
 
 \item{chart_type}{String. Type of chart. This is used to set sensible chart
 widths based on the width of text in each document. Options are 'MN' ( for
@@ -58,18 +64,11 @@ function will calculate an appropriate height.}
 used to constrain the plot resizing algorithm in cases where you want to
 limit the height of your charts.}
 
-\item{format}{An optional vector of file formats to save as. For example
-\code{c("svg", "pdf")} will save 2 files with the same name to the same
-location to SVG and PDF formats. If the file format is specified in
-\code{filename}, then this argument is ignored.}
-
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph
 (defaults to FALSE).}
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
-
-\item{...}{(multi-panel specific) Plot objects to put on the panel.}
 
 \item{plotlist}{(multi-panel specific) List of plots to combine as an
 multi-panel and save. You can also enter the charts individually as
@@ -112,8 +111,6 @@ Must be specified if any of the graphs are complex (e.g. faceted) and alignment 
 \item{rel_heights}{(multi-panel specific) A numeric vector giving the
 relative proportions of each graph component (title, plots, footer
 (optional)).}
-
-\item{test}{For development use only.}
 }
 \value{
 ggplot2 object
