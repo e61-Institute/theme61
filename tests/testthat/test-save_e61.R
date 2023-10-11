@@ -64,14 +64,14 @@ test_that("Y-axis label messages", {
     p1 <- minimal_plot + labs_e61(y = "")
     p2 <- minimal_plot + labs_e61(y = "too long label")
 
-    suppressMessages(expect_message(save_e61("test.svg", p1, p2),
+    suppressWarnings(expect_message(save_e61("test.svg", p1, p2),
                                     ".*Fix the following issues.*"))
   })
 
   # No message if you do it right
   gg <- minimal_plot
 
-  expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg))
+  suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg)))
 
 })
 
@@ -106,15 +106,15 @@ test_that("Different file formats", {
     # Having svg in the file name (but not format) should still trip the file format error
     expect_error(suppressWarnings(save_e61("svg-text.jpg")))
 
-    # Supported file types
-    expect_no_error(suppressWarnings(save_e61("test.svg", g), classes = c("warning", "message")))
-    expect_no_error(suppressWarnings(save_e61("test.pdf", g), classes = c("warning", "message")))
-    expect_no_error(suppressWarnings(save_e61("test.eps", g), classes = c("warning", "message")))
-
     # Make sure the slightly fiddlier PNG saving method works
     suppressWarnings(save_e61("test.png", g), classes = c("warning", "message"))
     expect_false(file.exists("test.svg"))
     expect_true(file.exists("test.png"))
+
+    # Test other supported file types
+    expect_no_error(suppressWarnings(save_e61("test.svg", g), classes = c("warning", "message")))
+    expect_no_error(suppressWarnings(save_e61("test.pdf", g), classes = c("warning", "message")))
+    expect_no_error(suppressWarnings(save_e61("test.eps", g), classes = c("warning", "message")))
 
   })
 
@@ -153,7 +153,7 @@ test_that("Multiple file saving", {
     suppressMessages(save_e61("test_file", g))
 
     expect_setequal(list.files(pattern = "test_file.*"),
-                    c("test_file.svg", "test_file.pdf", "test_file.eps"))
+                    c("test_file.svg", "test_file.pdf", "test_file.eps", "test_file.png"))
   })
 
   # Error if invalid filename used
@@ -166,15 +166,19 @@ test_that("Multiple file saving", {
 test_that("Does save_data work", {
   gg <- minimal_plot
 
-  expect_no_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), gg, save_data = TRUE)))
-  expect_no_error(suppressMessages(save_e61(file.path(dir, "graph"), gg, format = "svg", save_data = TRUE)))
+  withr::with_tempdir({
+    expect_no_error(suppressMessages(save_e61("graph.svg", gg, save_data = TRUE)))
+    expect_no_error(suppressMessages(save_e61("graph", gg, format = "svg", save_data = TRUE)))
+  })
 
   # This should leave the $data container empty
   gg <- ggplot() +
     geom_point(data = data, aes(x, y)) +
     geom_point(data = data, aes(x, y))
 
-  expect_error(suppressMessages(save_e61(file.path(dir, "graph.svg"), save_data = TRUE)))
+  withr::with_tempdir({
+    expect_error(suppressMessages(save_e61("graph.svg", save_data = TRUE)))
+  })
 })
 
 # Check whole-graph generation consistency --------------------------------
