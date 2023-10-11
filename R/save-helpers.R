@@ -1,25 +1,5 @@
 # Helper functions that are used across save_single, save_multi or save_e61
 
-#' Converts SVG to PNG
-#'
-#' Converts a SVG file to a PNG file with the same name (but with a .png file
-#' extension).
-#'
-#' @param file File path to the SVG image to convert.
-#' @param delete Logical. Delete the original SVG file? (defaults to FALSE)
-#' @return Invisibly returns the file path to the PNG image
-#' @export
-svg_to_png <- function(file, delete = FALSE) {
-
-  new_path <- gsub("(.*)\\.svg$", "\\1.png", file)
-
-  rsvg::rsvg_png(svg = file, file = new_path)
-
-  if (delete) unlink(file)
-
-  return(new_path)
-}
-
 #' Helper function to actually perform the saving functionality
 #' @noRd
 save_graph <- function(graph, format, filename, width, height) {
