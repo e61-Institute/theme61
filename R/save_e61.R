@@ -53,7 +53,6 @@
 #' @param rel_heights (multi-panel specific) A numeric vector giving the
 #'   relative proportions of each graph component (title, plots, footer
 #'   (optional)).
-#' @return ggplot2 object
 #' @inheritParams labs_e61
 #' @inheritParams cowplot::plot_grid
 #' @return Invisibly returns the file name.

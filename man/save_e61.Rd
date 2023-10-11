@@ -113,8 +113,6 @@ relative proportions of each graph component (title, plots, footer
 (optional)).}
 }
 \value{
-ggplot2 object
-
 Invisibly returns the file name.
 }
 \description{
