@@ -137,12 +137,12 @@ save_e61 <- function(filename,
   # Loop through the plots
   for(i in seq_along(plots)){
     # Message if the y-axis label text is missing
-    if ((is.null(plots[[i]]$labels$y) || nchar(plots[[i]]$labels$y) == 0)) {
+    if (is.null(attr(plots[[i]]$theme, "y_top")) && (is.null(plots[[i]]$labels$y) || nchar(plots[[i]]$labels$y) == 0)) {
       y_miss <- c(y_miss, i)
     }
 
     # Message if the y-axis label text is too long
-    if (isTRUE(nchar(plots[[i]]$labels$y) > 5)) {
+    if (is.null(attr(plots[[i]]$theme, "y_top")) && isTRUE(nchar(plots[[i]]$labels$y) > 5)) {
       y_long <- c(y_long, i)
     }
   }

@@ -64,14 +64,25 @@ test_that("Y-axis label messages", {
     p1 <- minimal_plot + labs_e61(y = "")
     p2 <- minimal_plot + labs_e61(y = "too long label")
 
-    suppressWarnings(expect_message(save_e61("test.svg", p1, p2),
-                                    ".*Fix the following issues.*"))
+    suppressWarnings(suppressMessages(
+      expect_message(save_e61("test.svg", p1, p2), class = "cliMessage"),
+      classes = c("message", "cliMessage")))
+
   })
 
   # No message if you do it right
   gg <- minimal_plot
 
-  suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg)))
+  suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg)),
+                   classes = c("messages", "warning"))
+
+  # No message if y_top is FALSE
+  p <- minimal_plot +
+    labs_e61(y = "Long y-axis label that goes on the side") +
+    theme_e61(y_top = FALSE)
+
+  suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p)),
+                   classes = c("messages", "warning"))
 
 })
 
