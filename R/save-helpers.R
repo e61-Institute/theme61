@@ -34,7 +34,7 @@ check_plots <- function(plots){
       temp_list[[length(temp_list) + 1]] <- temp_plot
     } else {
 
-      stop("The object/argument with name ", "Some elements of the plotlist are not ggplot objects. Check you have not supplied the wrong object or used an incorrect argument.")
+      stop("Some elements of the plotlist are not ggplot objects. Check you have not supplied the wrong object or used an incorrect argument.")
     }
   }
 
