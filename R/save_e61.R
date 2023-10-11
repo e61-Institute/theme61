@@ -22,10 +22,9 @@
 #'   micronotes), 'RN' (research notes), 'PPT' (PowerPoints).
 #' @param auto_scale Logical. Should the y-axis be scaled automatically. Default
 #'   is TRUE.
-#' @param width Numeric. Plot width in cm. Defaults to NULL which means the
-#'   width will be set based on the chart type.
-#' @param height Numeric. Plot height in cm. If you do not specify a height, the
-#'   function will calculate an appropriate height.
+#' @param dim An optional named list specifying the plot height and width.
+#'   Defaults to NULL which means the graph dimensions will be set based on the
+#'   chart type and function-calculated value.
 #' @param max_height Numeric. The maximum height of your plot in cm. This is
 #'   used to constrain the plot resizing algorithm in cases where you want to
 #'   limit the height of your charts.
@@ -44,11 +43,9 @@
 #' @param height_adj (multi-panel specific) Rescales the height of the
 #'   multi-panel. The function sets sensible defaults but this provides you with
 #'   manual control if you need it.
-#' @param title_spacing_adj (multi-panel specific) Rescales the size of the
-#'   space give to the multi-panel title. Use if you think the title looks too
-#'   cramped on the chart.
-#' @param subtitle_spacing_adj (multi-panel specific) Rescales the size of the
-#'   space give to the multi-panel subtitle. Use if you think the subtitle looks
+#' @param spacing_adj (multi-panel specific) An optional named list specifying
+#'   the adjustment to the title and subtitle. Rescales the size of the space
+#'   give to the multi-panel title/subtitle. Use if you think the title looks
 #'   too cramped on the chart.
 #' @param rel_heights (multi-panel specific) A numeric vector giving the
 #'   relative proportions of each graph component (title, plots, footer
@@ -64,8 +61,7 @@ save_e61 <- function(filename,
                      format = c("svg", "pdf", "eps", "png"),
                      chart_type = c("MN", "RN", "PPT"),
                      auto_scale = TRUE, # manual control over whether y-axis is scaled
-                     width = NULL, # manual control over the width of the chart
-                     height = NULL, # manual control over the height of the chart
+                     dim = list(height = NULL, width = NULL), # manual control over chart dims
                      max_height = NULL, # manual control over the maximum height of the chart
                      save_data = FALSE,
                      base_size = 10, # set the base size for the theme61 font size call
@@ -75,8 +71,7 @@ save_e61 <- function(filename,
                      subtitle = NULL,
                      footnotes = NULL,
                      sources = NULL,
-                     title_spacing_adj = 1, # adjust the amount of space given to the title
-                     subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
+                     spacing_adj = list(title = 1, subtitle = 1),
                      height_adj = NULL, # adjust the vertical spacing of the mpanel charts
                      ncol = 2,
                      nrow = NULL,
@@ -124,6 +119,12 @@ save_e61 <- function(filename,
   if (save_data && !is.data.frame(plot$data))
     stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
+  # Check list args are valid
+  if (!all(names(dim) %in% c("height", "width")))
+    stop("You have specified invalid list elements in 'dim'.")
+
+  if (!all(names(spacing_adj) %in% c("title", "subtitle")))
+    stop("You have specified invalid list elements in 'spacing_adj'.")
 
   # Advisory messages -------------------------------------------------------
 
@@ -212,12 +213,12 @@ save_e61 <- function(filename,
       subtitle = subtitle,
       footnotes = footnotes,
       sources = sources,
-      width = width, # control width of the chart
-      height = height, # control height of the chart
+      width = dim$width, # control width of the chart
+      height = dim$height, # control height of the chart
       max_height = max_height, # control maximum height of the chart
       auto_scale = auto_scale,
-      title_spacing_adj = title_spacing_adj, # adjust the amount of space given to the title
-      subtitle_spacing_adj = subtitle_spacing_adj, # adjust the amount of space given to the subtitle
+      title_spacing_adj = spacing_adj$title, # adjust the amount of space given to the title
+      subtitle_spacing_adj = spacing_adj$subtitle, # adjust the amount of space given to the subtitle
       height_adj = height_adj, # adjust the vertical spacing of the mpanel charts
       base_size = base_size,
       ncol = ncol,
@@ -233,8 +234,8 @@ save_e61 <- function(filename,
       plot = plots[[1]],
       chart_type = chart_type,
       auto_scale = auto_scale, # control whether y-axis is scaled
-      width = width, # control width
-      height = height, # control height
+      width = dim$width, # control width
+      height = dim$height, # control height
       max_height = max_height, # control max height
       format = format,
       base_size = base_size

@@ -11,8 +11,7 @@ save_e61(
   format = c("svg", "pdf", "eps", "png"),
   chart_type = c("MN", "RN", "PPT"),
   auto_scale = TRUE,
-  width = NULL,
-  height = NULL,
+  dim = list(height = NULL, width = NULL),
   max_height = NULL,
   save_data = FALSE,
   base_size = 10,
@@ -21,8 +20,7 @@ save_e61(
   subtitle = NULL,
   footnotes = NULL,
   sources = NULL,
-  title_spacing_adj = 1,
-  subtitle_spacing_adj = 1,
+  spacing_adj = list(title = 1, subtitle = 1),
   height_adj = NULL,
   ncol = 2,
   nrow = NULL,
@@ -54,11 +52,9 @@ micronotes), 'RN' (research notes), 'PPT' (PowerPoints).}
 \item{auto_scale}{Logical. Should the y-axis be scaled automatically. Default
 is TRUE.}
 
-\item{width}{Numeric. Plot width in cm. Defaults to NULL which means the
-width will be set based on the chart type.}
-
-\item{height}{Numeric. Plot height in cm. If you do not specify a height, the
-function will calculate an appropriate height.}
+\item{dim}{An optional named list specifying the plot height and width.
+Defaults to NULL which means the graph dimensions will be set based on the
+chart type and function-calculated value.}
 
 \item{max_height}{Numeric. The maximum height of your plot in cm. This is
 used to constrain the plot resizing algorithm in cases where you want to
@@ -85,12 +81,9 @@ separate points you include in the graph.}
 
 \item{sources}{String vector providing the names of sources for the graph.}
 
-\item{title_spacing_adj}{(multi-panel specific) Rescales the size of the
-space give to the multi-panel title. Use if you think the title looks too
-cramped on the chart.}
-
-\item{subtitle_spacing_adj}{(multi-panel specific) Rescales the size of the
-space give to the multi-panel subtitle. Use if you think the subtitle looks
+\item{spacing_adj}{(multi-panel specific) An optional named list specifying
+the adjustment to the title and subtitle. Rescales the size of the space
+give to the multi-panel title/subtitle. Use if you think the title looks
 too cramped on the chart.}
 
 \item{height_adj}{(multi-panel specific) Rescales the height of the
