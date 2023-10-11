@@ -3,14 +3,13 @@
 save_single <- function(
     filename,
     plot,
-    chart_type = NULL,
-    auto_scale = TRUE, # manual control over whether y-axis is scaled
-    width = NULL, # manual control over the width of the chart
-    height = NULL, # manual control over the height of the chart
-    max_height = 100, # manual control over the maximum height of the chart
-    format = NULL,
-    save_data = FALSE,
-    base_size = 10
+    chart_type,
+    auto_scale, # manual control over whether y-axis is scaled
+    width, # manual control over the width of the chart
+    height, # manual control over the height of the chart
+    max_height, # manual control over the maximum height of the chart
+    format,
+    base_size
     ) {
 
   # Check if we have a spatial chart, if we do save without editing ---------

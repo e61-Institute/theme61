@@ -199,13 +199,13 @@ save_e61 <- function(filename,
 
   }
 
-  # Single/multi-specific functions --------------------------------
+  # Save functions --------------------------------
 
   # Check whether to save an mpanel or a single planel chart - these require
   # different approaches
   if (length(plots) > 1) {
     retval <- save_multi(
-      filename,
+      filename = filename,
       format = format,
       plots = plots,
       chart_type = chart_type,

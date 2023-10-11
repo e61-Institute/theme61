@@ -2,26 +2,26 @@
 #' @noRd
 save_multi <-
   function(filename,
-           format = NULL,
+           format,
            plots,
-           chart_type = NULL,
-           title = NULL,
-           subtitle = NULL,
-           footnotes = NULL,
-           sources = NULL,
-           width = NULL, # manual control over the width of the chart
-           height = NULL, # manual control over the height of the chart
-           max_height = NULL, # manual control over the maximum height of the chart
-           auto_scale = TRUE,
-           title_spacing_adj = 1, # adjust the amount of space given to the title
-           subtitle_spacing_adj = 1, # adjust the amount of space given to the subtitle
-           base_size = 10, # set the base size for the theme61 font size call
-           height_adj = NULL, # adjust the vertical spacing of the mpanel charts
-           ncol = 2,
-           nrow = NULL,
-           align = c("v", "none", "h", "hv"),
-           axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-           rel_heights = NULL
+           chart_type,
+           title,
+           subtitle,
+           footnotes,
+           sources,
+           width, # manual control over the width of the chart
+           height, # manual control over the height of the chart
+           max_height, # manual control over the maximum height of the chart
+           auto_scale,
+           title_spacing_adj, # adjust the amount of space given to the title
+           subtitle_spacing_adj, # adjust the amount of space given to the subtitle
+           base_size, # set the base size for the theme61 font size call
+           height_adj, # adjust the vertical spacing of the mpanel charts
+           ncol,
+           nrow,
+           align,
+           axis,
+           rel_heights
            ) {
 
     # Set maximum width based on output type ----------------------------------
