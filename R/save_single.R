@@ -51,7 +51,7 @@ save_single <- function(
 
     plot <- plot +
       theme_e61(
-        keep_legend = T,
+        keep_legend = TRUE,
         base_size = base_size
       )
 

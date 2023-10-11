@@ -2,24 +2,24 @@
 #' plot - ggplot object. This is the plot whose scales we want to update.
 #' auto_scale - should the chart be auto-scaled or should we leave it as is
 #' @noRd
-update_scales <- function(plot, auto_scale, warn = F){
+update_scales <- function(plot, auto_scale, warn = FALSE){
 
   # check if we have a numeric y-variable
   check_y_var <- check_for_y_var(plot)
 
-  # if we don't have a numeric y-variable then check whether the plot contains ageom_density or geom_histogram (GeomBar without a y-variable)
+  # if we don't have a numeric y-variable then check whether the plot contains geom_density or geom_histogram (GeomBar without a y-variable)
   if (!check_y_var) {
     layers <- plot$layers
 
     for (j in seq_along(layers)){
 
       # don't get y-aesthetic for geom_text objects
-      layer_type <- layers[[j]]$geom %>% class()
+      layer_type <- class(layers[[j]]$geom)
 
       # if there isn't one but it is a density plot or a bar chart then it is either a density chart or a histogram so go ahead
       if ("GeomDensity" %in% layer_type || "GeomBar" %in% layer_type) {
 
-        check_y_var <- T
+        check_y_var <- TRUE
 
         break
       }
@@ -27,22 +27,22 @@ update_scales <- function(plot, auto_scale, warn = F){
   }
 
   # check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
-  grobs <- ggplot2::ggplotGrob(plot)
+  grobs <- ggplotGrob(plot)
 
   test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
 
   sec_axis <- !(is.null(test_sec_axis) || test_sec_axis == 0)
 
   # if the y-variable class is numeric, or the plot is a density or histogram, then update the chart scales
-  if(check_y_var){
+  if (check_y_var){
 
     suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
 
     # if the y-var class is NULL, send a warning message about the auto updating of chart scales
-  } else if(!check_y_var & warn == FALSE){
+  } else if (!check_y_var & warn == FALSE){
 
     warning("Could not identify the class of the y variable. This prevents the y-axis scales from being automatically updated to aesthetic values. To address this issue check that you have not edited the variable within your ggplot call (e.g. aes(y = 100 * var)). Instead make any changes before passing the dataset to ggplot (e.g. data %>% mutate(new_var = 100 * var) %>% ggplot(...)).")
-    warn <<- T
+    warn <<- TRUE
   }
 
   return(plot)
@@ -52,21 +52,21 @@ update_scales <- function(plot, auto_scale, warn = F){
 #'@noRd
 check_for_y_var <- function(plot){
 
-  chart_data <- ggplot2::ggplot_build(plot)$data
+  chart_data <- ggplot_build(plot)$data
 
-  check <- F
+  check <- FALSE
 
   # check whether there are any non-missing values for y, ymax and ymin. Note min will return -Inf if the variable doesn't exist or is all missing
-  for(i in seq_along(chart_data)){
+  for (i in seq_along(chart_data)){
 
     suppressMessages({suppressWarnings({
-      check_y <- min(chart_data[[i]]$y, na.rm = T)
-      check_ymax <- min(chart_data[[i]]$ymax, na.rm = T)
-      check_ymin <- min(chart_data[[i]]$ymin, na.rm = T)
+      check_y <- min(chart_data[[i]]$y, na.rm = TRUE)
+      check_ymax <- min(chart_data[[i]]$ymax, na.rm = TRUE)
+      check_ymin <- min(chart_data[[i]]$ymin, na.rm = TRUE)
     })})
 
-    if(is.finite(check_y) || is.finite(check_ymax) || is.finite(check_ymin)){
-      check <- T
+    if (is.finite(check_y) || is.finite(check_ymax) || is.finite(check_ymin)){
+      check <- TRUE
       break
     }
   }
@@ -79,7 +79,7 @@ check_for_y_var <- function(plot){
 update_chart_scales <- function(plot, auto_scale, sec_axis){
 
   # Returns the order of the first scale function used - how do we determine this
-  y_scale_lims <- ggplot2::layer_scales(plot)$y$limits
+  y_scale_lims <- layer_scales(plot)$y$limits
 
   # If no y-axis scale is present and y is numeric, then add a default aesthetic scale
   if(is.null(y_scale_lims) && auto_scale){
@@ -98,7 +98,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
 
     suppressWarnings({
       if(sec_axis){
-        plot <- plot + scale_y_continuous_e61(limits = aes_lims, sec_axis = ggplot2::dup_axis())
+        plot <- plot + scale_y_continuous_e61(limits = aes_lims, sec_axis = dup_axis())
 
       } else {
         plot <- plot + scale_y_continuous_e61(limits = aes_lims)
@@ -128,7 +128,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
     # rescale the axis
     suppressWarnings({
       if(sec_axis){
-        plot <- plot + scale_y_continuous_e61(limits = aes_lims, sec_axis = ggplot2::dup_axis())
+        plot <- plot + scale_y_continuous_e61(limits = aes_lims, sec_axis = dup_axis())
 
       } else {
         plot <- plot + scale_y_continuous_e61(limits = aes_lims)
@@ -145,7 +145,7 @@ get_y_minmax <- function(plot){
 
   min_y <- NA_real_
   max_y <- NA_real_
-  chart_data <- ggplot2::ggplot_build(plot)$data
+  chart_data <- ggplot_build(plot)$data
 
   for(i in seq_along(chart_data)){
 
@@ -154,8 +154,8 @@ get_y_minmax <- function(plot){
 
     # suppress messages as this will frequently warn about no non missing values
     suppressMessages({suppressWarnings({
-      temp_ymax <- chart_data[[i]]$ymax %>% max(na.rm = T)
-      temp_y <- chart_data[[i]]$y %>% max(na.rm = T)
+      temp_ymax <- max(chart_data[[i]]$ymax, na.rm = TRUE)
+      temp_y <- max(chart_data[[i]]$y, na.rm = TRUE)
     })})
 
     # if its finite then it it exists (max of a null variable returns -Inf)
@@ -179,8 +179,8 @@ get_y_minmax <- function(plot){
 
     # suppress messages as this will frequently warn about no non missing values
     suppressMessages({suppressWarnings({
-      temp_ymin <- min(chart_data[[i]]$ymin, na.rm = T)
-      temp_y <- min(chart_data[[i]]$y, na.rm = T)
+      temp_ymin <- min(chart_data[[i]]$ymin, na.rm = TRUE)
+      temp_y <- min(chart_data[[i]]$y, na.rm = TRUE)
     })})
 
     # if its finite then it it exists (min of a null variable returns -Inf)
@@ -229,7 +229,7 @@ is_barchart <- function(plot){
 
   check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
 
-  is_bar <- F
+  is_bar <- FALSE
 
   for (i in seq_along(geoms)) {
     g <- geoms[[i]]
@@ -237,7 +237,7 @@ is_barchart <- function(plot){
     class <- class(g$geom)
 
     if (any(class %in% check_geoms)) {
-      is_bar <- T
+      is_bar <- TRUE
 
       break
     }
@@ -253,7 +253,7 @@ is_barchart <- function(plot){
 get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
 
   # set the adjustment factor based on whether we are looking at a value above or below 1
-  if (y_val > 0) adj <- 1 else adj <- -1
+  adj <- if (y_val > 0) 1 else -1
 
   aes_y_points <- data.table::data.table(points = c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100))
 
