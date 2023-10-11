@@ -238,8 +238,7 @@ save_e61 <- function(filename,
       height = height, # control height
       max_height = max_height, # control max height
       format = format,
-      base_size = base_size,
-      save_data = save_data
+      base_size = base_size
     )
   }
 
