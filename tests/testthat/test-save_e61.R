@@ -198,11 +198,45 @@ test_that("Single-panel graph examples", {
 
   # Put a comprehensive series of graph examples here
 
+  # Graph with cont-y var with values from 0-20
+
+  # Graph with cont-y var with small values from 0-1
+
+  # Graph with cont-y var with large values from -1000-1000
+
+  # Graph with cont x and y vars
+
+  # Graph with discrete x and y vars
+
+  # Graph with date x var
+
+  # Flipped coord graph discrete x var, cont y var
+
+  # Date x-var, ribbon y-var
+
+  # geom_histogram graph
+
+  # geom_density graph
+
 })
 
 test_that("Multi-panel graph examples", {
 
-  # Put a comprehensive series of graph examples here
+  # 1x2 graph
+
+  # 2x1 graph
+
+  # 2x2 graph
+
+  # 2x3 graph
+
+  # 3x2 graph
+
+  # 1x2 graph with long common footnotes + sources
+
+  # 1x2 graph with long title
+
+  # 1x2 graph with long panel titles and subtitles
 
 })
 
