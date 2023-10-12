@@ -22,6 +22,16 @@ knitr::opts_chunk$set(
 )
 ```
 
+<!-- 
+
+### To do list 
+
+- Workflow needs to be updated
+- All the example graphs need to be changed
+- Add a multi-panel example graph
+
+-->
+
 ## Introduction
 
 `theme61` is an extension to `ggplot2`. It is made up of a custom theme and functions that change the appearance of a standard `ggplot2` graph. Thus, the correct usage of this package is to create your normal `ggplot2` graph, then add `theme61`-specific elements. 

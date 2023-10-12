@@ -8,6 +8,14 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+<!-- 
+
+### To do list 
+
+- Most of this is obsolete because much of it is now automated.
+
+-->
+
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 devtools::load_all()
 library(ggplot2)
