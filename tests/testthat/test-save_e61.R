@@ -196,27 +196,84 @@ test_that("Does save_data work", {
 
 test_that("Single-panel graph examples", {
 
+  withr::local_seed(42)
+
   # Put a comprehensive series of graph examples here
 
   # Graph with cont-y var with values from 0-20
+  data <- data.frame(x = factor(1:10), y = runif(10, 0, 20))
+
+  ggplot(data, aes(x, y)) +
+    geom_col()
 
   # Graph with cont-y var with small values from 0-1
+  data <- data.frame(x = factor(1:10), y = runif(10, 0, 1))
 
-  # Graph with cont-y var with large values from -1000-1000
+  ggplot(data, aes(x, y)) +
+    geom_col()
+
+  # Graph with cont-y var with negative values from -20 to 0
+  data <- data.frame(x = factor(1:10), y = runif(10, -20, 0))
+
+  ggplot(data, aes(x, y)) +
+    geom_col()
+
+  # Graph with cont-y var with large values from -1000 to +1000
+  data <- data.frame(x = factor(1:10), y = runif(10, -1000, 1000))
+
+  ggplot(data, aes(x, y)) +
+    geom_col()
 
   # Graph with cont x and y vars
+  data <- data.frame(x = runif(10, -1, 1), y = runif(10, -1, 1))
+
+  ggplot(data, aes(x, y)) +
+    geom_point()
 
   # Graph with discrete x and y vars
+  data <- data.table::CJ(x = factor(1:10), y = factor(1:10))
+  data[, fill := runif(100, 0, 100)]
+
+  ggplot(data, aes(x, y, fill = fill)) +
+    geom_tile()
 
   # Graph with date x var
+  data <- data.frame(
+    x = seq.Date(as.Date("2011-01-01"), by = "1 year", length.out = 10),
+    y = runif(10, -1, 1)
+    )
+
+  ggplot(data, aes(x, y)) +
+    geom_line()
 
   # Flipped coord graph discrete x var, cont y var
+  data <- data.frame(x = factor(1:10), y = runif(10, 0, 10))
+
+  ggplot(data, aes(x, y)) +
+    geom_col() +
+    coord_flip()
 
   # Date x-var, ribbon y-var
+  data <- data.frame(
+    x = seq.Date(as.Date("2011-01-01"), by = "1 year", length.out = 10),
+    y = runif(10, -1, 1),
+    ymin = runif(10, -2, -1.1),
+    ymax = runif(10, 1.1, 2)
+  )
+
+  ggplot(data, aes(x, y, ymin = ymin, ymax = ymax)) +
+    geom_line() +
+    geom_ribbon(alpha = 0.1)
 
   # geom_histogram graph
+  data <- data.frame(x = rnorm(1000))
+
+  ggplot(data, aes(x)) +
+    geom_histogram()
 
   # geom_density graph
+  ggplot(data, aes(x)) +
+    geom_density()
 
 })
 
