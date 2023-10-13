@@ -335,27 +335,43 @@ split_text_into_words <- function(text) {
 
 #' Update y-axis label spacing so that they are aesthetic
 #' plot - Plot object to adjust.
-#' adj_width - User supplied adjustment.
-#' max_y_lab - max width of the y-labels
-#' max_break_width - max width of the breaks
-#' base_size - base size of the text
+#' y_lab_max_size - for multi-panels the max size of the y-axis labels
 #' @noRd
-update_y_axis_labels <- function(plot){
+update_y_axis_labels <- function(plot, max_break_width = NULL, y_lab_max_size = NULL){
 
-  # get the break widths
-  break_width <- get_y_break_width(plot)
+  # browser()
 
   # get the difference in the label size
   y_font_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
 
-  # add the spacing of one character
-  spacing <- 2 * y_font_size / 10
+  # add the spacing of one character for the other margin
+  spacing <- y_font_size / 5
+
+  # if the y lab max is null, then we have a single panel plot and don't need to worry about the max label size
+  if(is.null(y_lab_max_size)){
+
+    adj_width <- get_y_break_width(plot)
+
+  # otherwise we have a multi panel and need to take into account the width of the widest label
+  } else {
+
+    # get the maximum offset and compare to the
+    y_lab_max_size <- y_lab_max_size * .pt * 10
+
+    max_offset <- pmax(y_lab_max_size, max_break_width)
+
+    y_lab_size <- get_text_width(plot$labels$y, font_size = y_font_size) * .pt * 10
+
+    diff <- max_offset - y_lab_size
+
+    adj_width <- max_break_width + diff
+  }
 
   # add the break adjustment to the plot
   plot <- plot +
     theme(
-      axis.title.y.left = element_text(margin = margin(l = 0, r = spacing - break_width), vjust = 1, hjust = 1, angle = 0),
-      axis.title.y.right = element_text(margin = margin(l = spacing - break_width, r = 0), vjust = 1, hjust = 0, angle = 0)
+      axis.title.y.left = element_text(margin = margin(l = spacing, r = - adj_width), vjust = 1, hjust = 1, angle = 0),
+      axis.title.y.right = element_text(margin = margin(l = - adj_width, r = spacing), vjust = 1, hjust = 0, angle = 0)
     )
 
   return(plot)
@@ -439,8 +455,18 @@ get_y_break_width <- function(plot){
     }
   }
 
+  # take the absolute value of the breaks if required
+  neg_breaks <- ifelse(breaks < 0, "-", "")
+
+  breaks <- abs(breaks)
+
   # get the width of the breaks - find the maximum width
   break_text_widths <- get_text_width(breaks, font_size = break_text_size)
+
+  # add the minus sign width
+  neg_breaks_width <- get_text_width(neg_breaks, font_size = break_text_size) * 0.5
+
+  break_text_widths <- break_text_widths + neg_breaks_width
 
   max_break_width <- max(break_text_widths) # this is in cm
 
@@ -521,4 +547,52 @@ update_mplot_label <- function(plot, chart_type, base_size){
   }
 
   return(plot)
+}
+
+#' Update plot margins when new base size is provided
+#' @noRd
+update_margins <- function(base_size, legend_title) {
+
+  half_line <- base_size / 2
+
+  ret <-
+    theme(
+      axis.text.x = element_text(margin = margin(t = base_size / 4, unit = "pt")),
+      axis.text.x.top = element_text(margin = margin(b = base_size / 5)),
+      axis.text.y = element_text(margin = margin(r = base_size / 5)),
+      axis.text.y.right = element_text(margin = margin(l = base_size / 5)),
+      axis.ticks.length = unit(half_line / 2, "pt"),
+      axis.ticks.length.x = unit(half_line / 2, "pt"), # Puts ticks inside graph
+      axis.title.x = element_text(margin = margin(t = half_line / 2)),
+      axis.title.x.top = element_text(margin = margin(b = half_line / 2)),
+      axis.title.y = element_text(margin = margin(r = half_line / 2)),
+      axis.title.y.right = element_text(margin = margin(l = half_line / 2)),
+      legend.spacing = unit(half_line, "pt"),
+      legend.margin = margin(),
+      legend.text = element_text(margin = margin(l = 0, r = base_size / 4, unit = "pt")),
+      legend.box.margin = margin(0, 0, 0, 0, "cm"),
+      legend.box.spacing = unit(half_line, "pt"),
+      strip.text = element_text(
+        margin = margin(0.8 * half_line, 0.8 * half_line, 0.8 * half_line, 0.8 * half_line)
+      ),
+      strip.switch.pad.grid = unit(half_line / 2, "pt"),
+      strip.switch.pad.wrap = unit(half_line / 2, "pt"),
+      plot.title = element_text(margin = margin(b = half_line)),
+      plot.subtitle = element_text(
+        margin = margin(
+          t = 0, r = 0, b = base_size * .5, l = 0,
+          unit = "pt"
+        )
+      )
+    )
+
+  # adjust borders to the legend title if there is one
+  if (!"element_blank" %in% class(legend_title)) {
+    ret <- ret %+replace%
+      theme(legend.title = element_text(size = rel(1),
+                                        margin = margin(l = 0,
+                                                        r = base_size / 4, unit = "pt")))
+  }
+
+  return(ret)
 }
