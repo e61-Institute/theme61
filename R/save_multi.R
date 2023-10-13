@@ -71,11 +71,24 @@ save_multi <-
 
       temp_plot <- plots[[i]]
 
-      # update the text sizes
-      temp_plot <- temp_plot + theme_e61(base_size = base_size)
-
       # check whether to apply the autoscaler or not
-      if(auto_scale) temp_plot <- update_scales(temp_plot, auto_scale, warn = F)
+      if(auto_scale) {
+
+        # update the scales to aesthetic values
+        temp_plot <- update_scales(temp_plot, auto_scale, warn = F)
+
+        # update the text and margin sizes
+        legend_title <- temp_plot$theme$legend.title
+        legend_position <- temp_plot$theme$legend.position
+
+        temp_plot <- temp_plot + theme(text = element_text(size = base_size))
+
+        temp_plot <- temp_plot + update_margins(base_size = base_size, legend_title = legend_title)
+
+        if(!is.null(legend_position)){
+          temp_plot <- temp_plot + theme(legend.position = legend_position)
+        }
+      }
 
       # save the plot
       clean_plotlist[[i]] <- temp_plot
@@ -153,7 +166,7 @@ save_multi <-
         temp_plot <- clean_plotlist[[i]]
 
         # update y-axis labels
-        suppressMessages({temp_plot <- update_y_axis_labels(temp_plot)})
+        suppressMessages({temp_plot <- update_y_axis_labels(temp_plot, max_break_width, y_lab_max_size)})
 
         # update labels - for each set the limit as width - knowwidth (axis labels etc.) divided by the number of columns we have
         temp_plot <- update_labs(temp_plot, panel_width)
