@@ -492,7 +492,6 @@ in_to_cm <- function(inches, round = FALSE) {
   }
 }
 
-
 # Reposition y-axis titles to the top
 y_title_top <- function(adj, fix_left) {
 

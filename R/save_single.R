@@ -12,6 +12,7 @@ save_single <- function(
     base_size
     ) {
 
+
   # Check if we have a spatial chart, if we do save without editing ---------
 
   is_spatial_chart <- FALSE
@@ -36,7 +37,6 @@ save_single <- function(
   if(is.null(chart_type)) chart_type <- "MN"
 
   max_width <- get_plot_width(chart_type)
-  max_height <- get_plot_width(chart_type)
 
   # update the base size variable
   base_size <- base_size * max_width / get_plot_width("MN")
@@ -47,13 +47,12 @@ save_single <- function(
 
   } else {
 
+    legend_title <- plot$theme$legend.title
     legend_position <- plot$theme$legend.position
 
-    plot <- plot +
-      theme_e61(
-        keep_legend = TRUE,
-        base_size = base_size
-      )
+    plot <- plot + theme(text = element_text(size = base_size))
+
+    plot <- plot + update_margins(base_size = base_size, legend_title = legend_title)
 
     if(!is.null(legend_position)){
       plot <- plot + theme(legend.position = legend_position)
@@ -153,6 +152,8 @@ save_single <- function(
     known_ht <- sum(grid::convertHeight(p$heights, "cm", valueOnly = TRUE))
 
     # calculate the total free width and height we have to play with
+    if(is.null(max_height)) max_height <- 100
+
     free_ht <- max_height - known_ht
     free_wd <- width - known_wd
 
