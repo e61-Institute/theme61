@@ -11,17 +11,17 @@ test_that("Dimensioning functions", {
 
     plot <- minimal_plot
 
-    suppressWarnings(save_e61("custom-dim.svg", plot, width = 10, height = 10))
+    suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(width = 10, height = 10)))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
     expect_equal(g_info$width, 378)
     expect_equal(g_info$height, 378)
 
-    suppressWarnings(save_e61("custom-dim.svg", plot, width = 10, height = 5))
+    suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(width = 10, height = 5)))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
     expect_equal(g_info$width, 378)
     expect_equal(g_info$height, 189)
 
-    suppressWarnings(save_e61("custom-dim.svg", plot, width = 5, height = 10))
+    suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(width = 5, height = 10)))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
     expect_equal(g_info$width, 189)
     expect_equal(g_info$height, 378)
@@ -100,10 +100,10 @@ test_that("Directory existence checker", {
     dir.create("temp_directory")
     dir.create("temp_directory/temp_dir")
 
-    expect_no_error(save_e61("plot.svg", p))
-    expect_no_error(save_e61("temp_directory/plot.svg", p))
-    expect_no_error(save_e61("temp_directory/temp_dir/plot.svg", p))
-    expect_error(save_e61("faketemp_directory/plot.svg", p))
+    expect_no_error(suppressWarnings(save_e61("plot.svg", p)))
+    expect_no_error(suppressWarnings(save_e61("temp_directory/plot.svg", p)))
+    expect_no_error(suppressWarnings(save_e61("temp_directory/temp_dir/plot.svg", p)))
+    expect_error(suppressWarnings(save_e61("faketemp_directory/plot.svg", p)))
   })
 
 })
@@ -145,7 +145,7 @@ test_that("Multiple file saving", {
 
   # Test 3 formats
   withr::with_tempdir({
-    suppressMessages(save_e61("test_file", g, format = c("svg", "pdf", "eps")))
+    suppressWarnings(save_e61("test_file", g, format = c("svg", "pdf", "eps")))
 
     expect_setequal(list.files(pattern = "test_file.*"),
                     c("test_file.eps", "test_file.pdf", "test_file.svg"))
@@ -154,7 +154,7 @@ test_that("Multiple file saving", {
 
   # Test providing file format in file path
   withr::with_tempdir({
-    suppressMessages(save_e61("test_file.svg", g))
+    suppressWarnings(save_e61("test_file.svg", g))
 
     expect_setequal(list.files(pattern = "test_file.*"),
                     c("test_file.svg"))
@@ -162,7 +162,7 @@ test_that("Multiple file saving", {
 
   # Test if providing format in path overrules format argument
   withr::with_tempdir({
-    suppressMessages(save_e61("test_file.svg", g, format = "pdf"))
+    suppressWarnings(save_e61("test_file.svg", g, format = "pdf"))
 
     expect_setequal(list.files(pattern = "test_file.*"),
                     c("test_file.svg"))
@@ -170,7 +170,7 @@ test_that("Multiple file saving", {
 
   # Test what happens if nothing is provided (do the defaults do what you expect?)
   withr::with_tempdir({
-    suppressMessages(save_e61("test_file", g))
+    suppressWarnings(save_e61("test_file", g))
 
     expect_setequal(list.files(pattern = "test_file.*"),
                     c("test_file.svg", "test_file.pdf", "test_file.eps", "test_file.png"))
@@ -178,7 +178,7 @@ test_that("Multiple file saving", {
 
   # Error if invalid filename used
   withr::with_tempdir({
-    expect_error(suppressMessages(save_e61("test_file", g, format = "mp3")))
+    expect_error(suppressWarnings(save_e61("test_file", g, format = "mp3")))
   })
 
 })
@@ -190,8 +190,8 @@ test_that("Does save_data work", {
   gg <- minimal_plot
 
   withr::with_tempdir({
-    expect_no_error(suppressMessages(save_e61("graph.svg", gg, save_data = TRUE)))
-    expect_no_error(suppressMessages(save_e61("graph", gg, format = "svg", save_data = TRUE)))
+    expect_no_error(suppressWarnings(save_e61("graph.svg", gg, save_data = TRUE)))
+    expect_no_error(suppressWarnings(save_e61("graph", gg, format = "svg", save_data = TRUE)))
   })
 
   # This should leave the $data container empty
@@ -200,7 +200,7 @@ test_that("Does save_data work", {
     geom_point(data = data, aes(x, y))
 
   withr::with_tempdir({
-    expect_error(suppressMessages(save_e61("graph.svg", save_data = TRUE)))
+    expect_error(suppressWarnings(save_e61("graph.svg", save_data = TRUE)))
   })
 })
 
