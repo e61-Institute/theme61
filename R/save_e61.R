@@ -184,8 +184,8 @@ save_e61 <- function(filename,
 
   if (length(adv_msg) > 0) print_adv()
 
-  # Turn these off if the test option is set
-  if (!is.null(getOption("test_save"))) {
+  # Turn these off if the test option is set (i.e. run if unset)
+  if (is.null(getOption("test_save"))) {
 
     # Require user acknowledgement
     prompt <- ""
