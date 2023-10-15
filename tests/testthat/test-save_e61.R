@@ -203,39 +203,51 @@ test_that("Single-panel graph examples", {
   # Graph with cont-y var with values from 0-20
   data <- data.frame(x = factor(1:10), y = runif(10, 0, 20))
 
-  ggplot(data, aes(x, y)) +
+  p <- ggplot(data, aes(x, y)) +
     geom_col()
+
+  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y.svg", p)))
 
   # Graph with cont-y var with small values from 0-1
   data <- data.frame(x = factor(1:10), y = runif(10, 0, 1))
 
-  ggplot(data, aes(x, y)) +
+  p <- ggplot(data, aes(x, y)) +
     geom_col()
+
+  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y-sml-val.svg", p)))
 
   # Graph with cont-y var with negative values from -20 to 0
   data <- data.frame(x = factor(1:10), y = runif(10, -20, 0))
 
-  ggplot(data, aes(x, y)) +
+  p <- ggplot(data, aes(x, y)) +
     geom_col()
+
+  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y-neg-val.svg", p)))
 
   # Graph with cont-y var with large values from -1000 to +1000
   data <- data.frame(x = factor(1:10), y = runif(10, -1000, 1000))
 
-  ggplot(data, aes(x, y)) +
+  p <- ggplot(data, aes(x, y)) +
     geom_col()
+
+  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y-lg-val.svg", p)))
 
   # Graph with cont x and y vars
   data <- data.frame(x = runif(10, -1, 1), y = runif(10, -1, 1))
 
-  ggplot(data, aes(x, y)) +
+  p <- ggplot(data, aes(x, y)) +
     geom_point()
+
+  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-x-y.svg", p)))
 
   # Graph with discrete x and y vars
   data <- data.table::CJ(x = factor(1:10), y = factor(1:10))
   data[, fill := runif(100, 0, 100)]
 
-  ggplot(data, aes(x, y, fill = fill)) +
+  p <- ggplot(data, aes(x, y, fill = fill)) +
     geom_tile()
+
+  expect_snapshot_file(suppressWarnings(save_e61("plot-single-disc-x-y.svg", p)))
 
   # Graph with date x var
   data <- data.frame(
@@ -243,15 +255,19 @@ test_that("Single-panel graph examples", {
     y = runif(10, -1, 1)
     )
 
-  ggplot(data, aes(x, y)) +
+  p <- ggplot(data, aes(x, y)) +
     geom_line()
+
+  expect_snapshot_file(suppressWarnings(save_e61("plot-single-date-x.svg", p)))
 
   # Flipped coord graph discrete x var, cont y var
   data <- data.frame(x = factor(1:10), y = runif(10, 0, 10))
 
-  ggplot(data, aes(x, y)) +
+  p <- ggplot(data, aes(x, y)) +
     geom_col() +
     coord_flip()
+
+  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-flip.svg", p)))
 
   # Date x-var, ribbon y-var
   data <- data.frame(
@@ -261,19 +277,25 @@ test_that("Single-panel graph examples", {
     ymax = runif(10, 1.1, 2)
   )
 
-  ggplot(data, aes(x, y, ymin = ymin, ymax = ymax)) +
+  p <- ggplot(data, aes(x, y, ymin = ymin, ymax = ymax)) +
     geom_line() +
     geom_ribbon(alpha = 0.1)
+
+  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-ymin-max.svg", p)))
 
   # geom_histogram graph
   data <- data.frame(x = rnorm(1000))
 
-  ggplot(data, aes(x)) +
+  p <- ggplot(data, aes(x)) +
     geom_histogram()
 
+  expect_snapshot_file(suppressWarnings(save_e61("plot-single-hist.svg", p)))
+
   # geom_density graph
-  ggplot(data, aes(x)) +
+  p <- ggplot(data, aes(x)) +
     geom_density()
+
+  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-dens.svg", p)))
 
 })
 
