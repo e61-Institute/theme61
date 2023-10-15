@@ -321,8 +321,7 @@ test_that("Multi-panel graph examples", {
 
 test_that("Output graphs have sensible dimensions", {
 
-  # This test should be run manually and the results inspected by hand
-  skip("This 'test' is only for interactive purposes")
+  skip("Old tests to be rewritten")
 
   # Generate some data
   graph_data <- data.frame(x = runif(100, 1, 49), y = runif(100, 1, 49),
@@ -364,8 +363,7 @@ test_that("Output graphs have sensible dimensions", {
 
 test_that("Test saving of multi-panel graphs", {
 
-  # This test should be run manually and the results inspected by hand
-  skip("This 'test' is only for interactive purposes")
+  skip("Old tests to be rewritten")
 
   # Generate some data
   graph_data <- data.frame(x = runif(100, 1, 49), y = runif(100, 1, 49),
