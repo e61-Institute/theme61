@@ -33,6 +33,9 @@ test_that("Dimensioning functions", {
 test_that("Flipped coord formatting", {
   # save_e61() should automatically apply format_flip() to flipped coord graphs
 
+  withr::local_options(list(test_save = TRUE,
+                            quiet_wrap = TRUE))
+
   p1 <-
     minimal_plot +
     coord_flip() +
@@ -87,6 +90,9 @@ test_that("Y-axis label messages", {
 })
 
 test_that("Directory existence checker", {
+  withr::local_options(list(test_save = TRUE,
+                            quiet_wrap = TRUE))
+
   p <- minimal_plot
 
   withr::with_tempdir({
@@ -132,6 +138,9 @@ test_that("Different file formats", {
 })
 
 test_that("Multiple file saving", {
+  withr::local_options(list(test_save = TRUE,
+                            quiet_wrap = TRUE))
+
   g <- minimal_plot
 
   # Test 3 formats
@@ -175,6 +184,9 @@ test_that("Multiple file saving", {
 })
 
 test_that("Does save_data work", {
+  withr::local_options(list(test_save = TRUE,
+                            quiet_wrap = TRUE))
+
   gg <- minimal_plot
 
   withr::with_tempdir({
@@ -195,6 +207,9 @@ test_that("Does save_data work", {
 # Check whole-graph generation consistency --------------------------------
 
 test_that("Single-panel graph examples", {
+
+  withr::local_options(list(test_save = TRUE,
+                            quiet_wrap = TRUE))
 
   withr::local_seed(42)
 
