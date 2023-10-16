@@ -16,7 +16,7 @@ save_graph <- function(graph, format, filename, width, height) {
       eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
       pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
       # When saving PNG we save the SVG first then convert it to PNG
-      png = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent")
+      png = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = "white")
     )
 
     print(graph)
