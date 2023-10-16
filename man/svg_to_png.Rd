@@ -20,3 +20,4 @@ Invisibly returns the file path to the PNG image
 \description{
 Converts an SVG file to a PNG file
 }
+\keyword{internal}

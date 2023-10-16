@@ -325,6 +325,7 @@ unset_open_graph <- function() {
 #'   the same name and location (except for the file extension).
 #' @param delete Logical. Delete the original SVG file? (defaults to FALSE)
 #' @return Invisibly returns the file path to the PNG image
+#' @keywords internal
 #' @export
 svg_to_png <- function(file_in, file_out = NULL, delete = FALSE) {
 
