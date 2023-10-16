@@ -124,9 +124,9 @@ test_that("Different file formats", {
     expect_error(suppressWarnings(save_e61("svg-text.jpg")))
 
     # Make sure the slightly fiddlier PNG saving method works
-    suppressWarnings(save_e61("test.png", g), classes = c("warning", "message"))
-    expect_false(file.exists("test.svg"))
-    expect_true(file.exists("test.png"))
+    suppressWarnings(save_e61("test-png.png", g), classes = c("warning", "message"))
+    expect_false(file.exists("test-png.svg"))
+    expect_true(file.exists("test-png.png"))
 
     # Test other supported file types
     expect_no_error(suppressWarnings(save_e61("test.svg", g), classes = c("warning", "message")))
