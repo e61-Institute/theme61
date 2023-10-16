@@ -38,7 +38,7 @@
 #' @param base_size Numeric. Chart font size. Default is 10.
 #' @param bg_colour Sets the graph background colour. Defaults to white. Accepts
 #'   a colour name, hex code or theme61 colour object name. For graphs used in
-#'   research note boxes, set the colour to e61_skylight8.
+#'   research note boxes, set the colour to e61_boxback.
 #' @param ... (multi-panel specific) Plot objects to put on the panel.
 #' @param plotlist (multi-panel specific) List of plots to combine as an
 #'   multi-panel and save. You can also enter the charts individually as
