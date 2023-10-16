@@ -43,8 +43,9 @@ values.}
 
 \item{panel_borders}{Logical. Show panel borders? Defaults to TRUE.}
 
-\item{background}{Character. Default is "white". For graphs used in research
-note boxes, set the colour to e61_skylight8.}
+\item{background}{Character. Default is "white". For all graphs that you
+save, you should control the background colour using the \code{bg_colour}
+argument in \code{save_e61}, not here.}
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
 

@@ -4,10 +4,13 @@
 \alias{svg_to_png}
 \title{Converts SVG to PNG}
 \usage{
-svg_to_png(file, delete = FALSE)
+svg_to_png(file_in, file_out = NULL, delete = FALSE)
 }
 \arguments{
-\item{file}{File path to the SVG image to convert.}
+\item{file_in}{File path to the SVG image to convert.}
+
+\item{file_out}{File path to the PNG image to save. Default saves a file with
+the same name and location (except for the file extension).}
 
 \item{delete}{Logical. Delete the original SVG file? (defaults to FALSE)}
 }
@@ -15,6 +18,5 @@ svg_to_png(file, delete = FALSE)
 Invisibly returns the file path to the PNG image
 }
 \description{
-Converts a SVG file to a PNG file with the same name (but with a .png file
-extension).
+Converts an SVG file to a PNG file
 }
