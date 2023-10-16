@@ -21,7 +21,8 @@ save_multi <-
            nrow,
            align,
            axis,
-           rel_heights
+           rel_heights,
+           bg_colour
            ) {
 
     # Set maximum width based on output type ----------------------------------
@@ -70,6 +71,9 @@ save_multi <-
     for(i in seq_along(plots)){
 
       temp_plot <- plots[[i]]
+
+      # set the background colour
+      temp_plot <- temp_plot + theme(rect = element_rect(fill = bg_colour))
 
       # check whether to apply the autoscaler or not
       if(auto_scale) {

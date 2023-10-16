@@ -36,6 +36,9 @@
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
 #' @param base_size Numeric. Chart font size. Default is 10.
+#' @param bg_colour Sets the graph background colour. Defaults to white. Accepts
+#'   a colour name, hex code or theme61 colour object name. For graphs used in
+#'   research note boxes, set the colour to e61_skylight8.
 #' @param ... (multi-panel specific) Plot objects to put on the panel.
 #' @param plotlist (multi-panel specific) List of plots to combine as an
 #'   multi-panel and save. You can also enter the charts individually as
@@ -66,6 +69,7 @@ save_e61 <- function(filename,
                      save_data = FALSE,
                      base_size = 10, # set the base size for the theme61 font size call
                      # multi-panel specific arguments
+                     bg_colour = "white",
                      plotlist = NULL,
                      title = NULL,
                      subtitle = NULL,
@@ -225,7 +229,8 @@ save_e61 <- function(filename,
       nrow = nrow,
       align = align,
       axis = axis,
-      rel_heights = rel_heights
+      rel_heights = rel_heights,
+      bg_colour = bg_colour
     )
   } else {
 
@@ -238,7 +243,8 @@ save_e61 <- function(filename,
       height = dim$height, # control height
       max_height = max_height, # control max height
       format = format,
-      base_size = base_size
+      base_size = base_size,
+      bg_colour = bg_colour
     )
   }
 
@@ -250,7 +256,8 @@ save_e61 <- function(filename,
     format = format,
     filename = filename,
     width = save_input$width,
-    height = save_input$height
+    height = save_input$height,
+    bg_colour = bg_colour
   )
 
   # Post-saving -------------------------------------------------------------

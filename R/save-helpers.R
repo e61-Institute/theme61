@@ -2,7 +2,7 @@
 
 #' Helper function to actually perform the saving functionality
 #' @noRd
-save_graph <- function(graph, format, filename, width, height) {
+save_graph <- function(graph, format, filename, width, height, bg_colour) {
   lapply(format, function(fmt) {
 
     file_i <- paste0(filename, ".", fmt)
@@ -12,11 +12,11 @@ save_graph <- function(graph, format, filename, width, height) {
 
     switch(
       fmt,
-      svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
-      eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
-      pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = "transparent"),
+      svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
+      eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
+      pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
       # When saving PNG we save the SVG first then convert it to PNG
-      png = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = "white")
+      png = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
     )
 
     print(graph)
