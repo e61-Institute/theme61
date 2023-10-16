@@ -215,6 +215,19 @@ test_that("Does save_data work", {
   })
 })
 
+test_that("Change background colour", {
+
+  withr::local_options(list(test_save = TRUE,
+                            quiet_wrap = TRUE))
+
+  p <- minimal_plot
+
+  expect_snapshot_file(suppressWarnings(save_e61("plot-bg-col-pink.svg", p, bg_colour = "pink")))
+  expect_snapshot_file(suppressWarnings(save_e61("plot-bg-col-box.svg", p, bg_colour = e61_skylight8)))
+  expect_snapshot_file(suppressWarnings(save_e61("plot-multi-bg-col-box.svg", plotlist = list(p, p), bg_colour = e61_skylight8)))
+
+})
+
 # Check whole-graph generation consistency --------------------------------
 
 test_that("Single-panel graph examples", {
