@@ -218,7 +218,9 @@ test_that("Single-panel graph examples", {
   p <- ggplot(data, aes(x, y)) +
     geom_col()
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y.svg", p)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y.svg", p)))
+  })
 
   # Graph with cont-y var with small values from 0-1
   data <- data.frame(x = factor(1:10), y = runif(10, 0, 1))
@@ -226,7 +228,9 @@ test_that("Single-panel graph examples", {
   p <- ggplot(data, aes(x, y)) +
     geom_col()
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y-sml-val.svg", p)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y-sml-val.svg", p)))
+  })
 
   # Graph with cont-y var with negative values from -20 to 0
   data <- data.frame(x = factor(1:10), y = runif(10, -20, 0))
@@ -234,7 +238,9 @@ test_that("Single-panel graph examples", {
   p <- ggplot(data, aes(x, y)) +
     geom_col()
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y-neg-val.svg", p)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y-neg-val.svg", p)))
+  })
 
   # Graph with cont-y var with large values from -1000 to +1000
   data <- data.frame(x = factor(1:10), y = runif(10, -1000, 1000))
@@ -242,7 +248,9 @@ test_that("Single-panel graph examples", {
   p <- ggplot(data, aes(x, y)) +
     geom_col()
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y-lg-val.svg", p)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y-lg-val.svg", p)))
+  })
 
   # Graph with cont x and y vars
   data <- data.frame(x = runif(10, -1, 1), y = runif(10, -1, 1))
@@ -250,7 +258,9 @@ test_that("Single-panel graph examples", {
   p <- ggplot(data, aes(x, y)) +
     geom_point()
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-x-y.svg", p)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-x-y.svg", p)))
+  })
 
   # Graph with discrete x and y vars
   data <- data.table::CJ(x = factor(1:10), y = factor(1:10))
@@ -259,7 +269,9 @@ test_that("Single-panel graph examples", {
   p <- ggplot(data, aes(x, y, fill = fill)) +
     geom_tile()
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-single-disc-x-y.svg", p)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-single-disc-x-y.svg", p)))
+  })
 
   # Graph with date x var
   data <- data.frame(
@@ -270,7 +282,9 @@ test_that("Single-panel graph examples", {
   p <- ggplot(data, aes(x, y)) +
     geom_line()
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-single-date-x.svg", p)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-single-date-x.svg", p)))
+  })
 
   # Graph with date x var and colours
   data <- data.frame(
@@ -282,7 +296,9 @@ test_that("Single-panel graph examples", {
   p <- ggplot(data, aes(x, y, colour = colour)) +
     geom_line()
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-single-date-x-colour.svg", p)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-single-date-x-colour.svg", p)))
+  })
 
   # Flipped coord graph discrete x var, cont y var
   data <- data.frame(x = factor(1:10), y = runif(10, 0, 10))
@@ -291,7 +307,9 @@ test_that("Single-panel graph examples", {
     geom_col() +
     coord_flip()
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-flip.svg", p)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-flip.svg", p)))
+  })
 
   # Date x-var, ribbon y-var
   data <- data.frame(
@@ -305,7 +323,9 @@ test_that("Single-panel graph examples", {
     geom_line() +
     geom_ribbon(alpha = 0.1)
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-ymin-max.svg", p)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-ymin-max.svg", p)))
+  })
 
   # geom_histogram graph
   data <- data.frame(x = rnorm(1000))
@@ -313,13 +333,17 @@ test_that("Single-panel graph examples", {
   p <- ggplot(data, aes(x)) +
     geom_histogram()
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-single-hist.svg", p)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-single-hist.svg", p)))
+  })
 
   # geom_density graph
   p <- ggplot(data, aes(x)) +
     geom_density()
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-dens.svg", p)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-dens.svg", p)))
+  })
 
 })
 
@@ -383,35 +407,49 @@ test_that("Multi-panel graph examples", {
              subtitle = "Panel graph subtitle text")
 
   # 1x2 graph
-  expect_snapshot_file(suppressWarnings(save_e61("plot-multi-1x2.svg", p1, p2)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-multi-1x2.svg", p1, p2)))
+  })
 
   # 2x1 graph
-  expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x1.svg", p1, p2, ncol = 1)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x1.svg", p1, p2, ncol = 1)))
+  })
 
   # 2x2 graph
-  expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x2.svg", p1_t, p2_t, p3_t, p4_t)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x2.svg", p1_t, p2_t, p3_t, p4_t)))
+  })
 
   # 2x3 graph
-  expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x3.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, ncol = 3)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x3.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, ncol = 3)))
+  })
 
   # 3x2 graph
-  expect_snapshot_file(suppressWarnings(save_e61("plot-multi-3x2.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, ncol = 2)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-multi-3x2.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, ncol = 2)))
+  })
 
   # 1x2 graph with long common footnotes + sources
-  expect_snapshot_file(suppressWarnings(
-    save_e61("plot-multi-1x2-long-footer.svg", p1, p2,
-             title = "Multi-panel graph title text",
-             subtitle = "Multi-panel graph subtitle text",
-             footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
-             sources = c("Sources", "Sauces"))))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
+      save_e61("plot-multi-1x2-long-footer.svg", p1, p2,
+               title = "Multi-panel graph title text",
+               subtitle = "Multi-panel graph subtitle text",
+               footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+               sources = c("Sources", "Sauces"))))
+  })
 
   # 1x2 graph with long title
-  expect_snapshot_file(suppressWarnings(
-    save_e61("plot-multi-1x2-long-title.svg", p1, p2,
-             title = "Multi-panel graph title text that goes on and on and on and on and on and on and on and on and on and on and on",
-             subtitle = "Multi-panel graph subtitle text",
-             footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
-             sources = c("Sources", "Sauces"))))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
+      save_e61("plot-multi-1x2-long-title.svg", p1, p2,
+               title = "Multi-panel graph title text that goes on and on and on and on and on and on and on and on and on and on and on",
+               subtitle = "Multi-panel graph subtitle text",
+               footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+               sources = c("Sources", "Sauces"))))
+  })
 
   # 1x2 graph with long panel titles and subtitles
   p1_lt <- p1 +
@@ -422,23 +460,27 @@ test_that("Multi-panel graph examples", {
     labs_e61(title = "Really long panel title title title title title",
              subtitle = "Really long panel title title title title title")
 
-  expect_snapshot_file(suppressWarnings(
-    save_e61("plot-multi-1x2-long-panel-title.svg", p1_lt, p2_lt,
-             title = "Multi-panel graph title text",
-             subtitle = "Multi-panel graph subtitle text",
-             footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
-             sources = c("Sources", "Sauces"))))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
+      save_e61("plot-multi-1x2-long-panel-title.svg", p1_lt, p2_lt,
+               title = "Multi-panel graph title text",
+               subtitle = "Multi-panel graph subtitle text",
+               footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+               sources = c("Sources", "Sauces"))))
+  })
 
   # 1x2 graph with 1 long panel title and subtitles
   p1_lt <- p1 +
     labs_e61(title = "Really long panel title title title title title title title title",
              subtitle = "Really long panel title title title title title")
 
-  expect_snapshot_file(suppressWarnings(
-    save_e61("plot-multi-1x2-long-panel-title.svg", p1_lt, p2_t,
-             title = "Multi-panel graph title text",
-             subtitle = "Multi-panel graph subtitle text",
-             footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
-             sources = c("Sources", "Sauces"))))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
+      save_e61("plot-multi-1x2-long-panel-title.svg", p1_lt, p2_t,
+               title = "Multi-panel graph title text",
+               subtitle = "Multi-panel graph subtitle text",
+               footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+               sources = c("Sources", "Sauces"))))
+  })
 
 })

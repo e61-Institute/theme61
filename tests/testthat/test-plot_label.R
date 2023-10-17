@@ -8,8 +8,10 @@ test_that("plot_label() and mplot_label() look the same", {
     ggplot2::ggplot() +
     mplot_label(label = c("Plot 1", "Plot 2"), x = c(2, 2), y = c(2, 3))
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-label-1.svg", p1)))
-  expect_snapshot_file(suppressWarnings(save_e61("plot-label-2.svg", p2)))
+  withr::with_tempdir({
+    suppressWarnings(expect_snapshot_file(save_e61("plot-label-compare-plot.svg", p1)))
+    suppressWarnings(expect_snapshot_file(save_e61("plot-label-compare-mplot.svg", p2)))
+  })
 
 })
 
@@ -48,8 +50,10 @@ test_that("Text and label plot labels work", {
   p2 <- ggplot() +
     plot_label("text", 2, 2, 1, 1, geom = "text")
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-label-label.svg", p1)))
-  expect_snapshot_file(suppressWarnings(save_e61("plot-label-text.svg", p2)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-label-label.svg", p1)))
+    expect_snapshot_file(suppressWarnings(save_e61("plot-label-text.svg", p2)))
+  })
 
 })
 
@@ -78,7 +82,9 @@ test_that("Changing horizontal alignment of text works", {
     plot_label("Centre-aligned text", 2, 2.1, 1, 1, hjust = 0.5) +
     plot_label("Right-aligned text", 2, 2.2, 1, 1, hjust = 1)
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-label-horiz-align-change.svg", p1)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-label-horiz-align-change.svg", p1)))
+  })
 })
 
 test_that("Label rotation works", {
@@ -97,7 +103,9 @@ test_that("Label rotation works", {
                 angle = c(90, 0, 45)) +
     ylim(2, 2.3)
 
-  expect_snapshot_file(suppressWarnings(save_e61("plot-label-rotate.svg", p1)))
-  expect_snapshot_file(suppressWarnings(save_e61("plot-label-rotate-multi.svg", p2)))
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-label-rotate.svg", p1)))
+    expect_snapshot_file(suppressWarnings(save_e61("plot-label-rotate-multi.svg", p2)))
+  })
 
 })
