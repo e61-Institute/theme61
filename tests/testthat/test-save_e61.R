@@ -35,7 +35,7 @@ test_that("Dimensioning functions", {
     suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(width = 10)))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
     expect_equal(g_info$width, 378)
-    expect_equal(g_info$height, 287)
+    expect_equal(g_info$height, 282)
 
   })
 
@@ -299,6 +299,18 @@ test_that("Single-panel graph examples", {
 
   expect_snapshot_file(suppressWarnings(save_e61("plot-single-date-x.svg", p)))
 
+  # Graph with date x var and colours
+  data <- data.frame(
+    x = rep(seq.Date(as.Date("2011-01-01"), by = "1 year", length.out = 10), 2),
+    y = runif(20, -1, 1),
+    colour = c(rep("A", 10), rep("B", 10))
+  )
+
+  p <- ggplot(data, aes(x, y, colour = colour)) +
+    geom_line()
+
+  expect_snapshot_file(suppressWarnings(save_e61("plot-single-date-x-colour.svg", p)))
+
   # Flipped coord graph discrete x var, cont y var
   data <- data.frame(x = factor(1:10), y = runif(10, 0, 10))
 
@@ -340,143 +352,123 @@ test_that("Single-panel graph examples", {
 
 test_that("Multi-panel graph examples", {
 
+  withr::local_options(list(test_save = TRUE,
+                            quiet_wrap = TRUE))
+
+  withr::local_seed(42)
+
+  # Graphs to use in the panels
+
+  # Graph with cont-y var with small values from 0-1
+  data <- data.frame(x = factor(1:10), y = runif(10, 0, 1))
+
+  p1 <- ggplot(data, aes(x, y)) +
+    geom_col()
+
+  p1_t <- p1 +
+    labs_e61(title = "Panel graph title text",
+             subtitle = "Panel graph subtitle text",
+             y = "ppt")
+
+  # Graph with date x var and colour
+  data <- data.frame(
+    x = rep(seq.Date(as.Date("2011-01-01"), by = "1 year", length.out = 10), 2),
+    y = runif(20, -1, 1),
+    colour = c(rep("A", 10), rep("B", 10))
+  )
+
+  p2 <- ggplot(data, aes(x, y, colour = colour)) +
+    geom_line()
+
+  p2_t <- p2 +
+    labs_e61(title = "Panel graph title text",
+             subtitle = "Panel graph subtitle text",
+             y = "'000")
+
+  # Graph with cont-y var with large values from -1000 to +1000
+  data <- data.frame(x = factor(1:10), y = runif(10, -1000, 1000))
+
+  p3 <- ggplot(data, aes(x, y)) +
+    geom_col()
+
+  p3_t <- p3 +
+    labs_e61(title = "Panel graph title text",
+             subtitle = "Panel graph subtitle text",
+             y = "value")
+
+  # Date x-var, ribbon y-var
+  data <- data.frame(
+    x = seq.Date(as.Date("2011-01-01"), by = "1 year", length.out = 10),
+    y = runif(10, -1, 1),
+    ymin = runif(10, -2, -1.1),
+    ymax = runif(10, 1.1, 2)
+  )
+
+  p4 <- ggplot(data, aes(x, y, ymin = ymin, ymax = ymax)) +
+    geom_line() +
+    geom_ribbon(alpha = 0.1)
+
+  p4_t <- p4 +
+    labs_e61(title = "Panel graph title text",
+             subtitle = "Panel graph subtitle text")
+
   # 1x2 graph
+  expect_snapshot_file(suppressWarnings(save_e61("plot-multi-1x2.svg", p1, p2)))
 
   # 2x1 graph
+  expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x1.svg", p1, p2, ncol = 1)))
 
   # 2x2 graph
+  expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x2.svg", p1_t, p2_t, p3_t, p4_t)))
 
   # 2x3 graph
+  expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x3.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, ncol = 3)))
 
   # 3x2 graph
+  expect_snapshot_file(suppressWarnings(save_e61("plot-multi-3x2.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, ncol = 2)))
 
   # 1x2 graph with long common footnotes + sources
+  expect_snapshot_file(suppressWarnings(
+    save_e61("plot-multi-1x2-long-footer.svg", p1, p2,
+             title = "Multi-panel graph title text",
+             subtitle = "Multi-panel graph subtitle text",
+             footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+             sources = c("Sources", "Sauces"))))
 
   # 1x2 graph with long title
+  expect_snapshot_file(suppressWarnings(
+    save_e61("plot-multi-1x2-long-title.svg", p1, p2,
+             title = "Multi-panel graph title text that goes on and on and on and on and on and on and on and on and on and on and on",
+             subtitle = "Multi-panel graph subtitle text",
+             footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+             sources = c("Sources", "Sauces"))))
 
   # 1x2 graph with long panel titles and subtitles
+  p1_lt <- p1 +
+    labs_e61(title = "Really long panel title title title title title",
+             subtitle = "Really long panel title title title title title")
+
+  p2_lt <- p2 +
+    labs_e61(title = "Really long panel title title title title title",
+             subtitle = "Really long panel title title title title title")
+
+  expect_snapshot_file(suppressWarnings(
+    save_e61("plot-multi-1x2-long-panel-title.svg", p1_lt, p2_lt,
+             title = "Multi-panel graph title text",
+             subtitle = "Multi-panel graph subtitle text",
+             footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+             sources = c("Sources", "Sauces"))))
+
+  # 1x2 graph with 1 long panel title and subtitles
+  p1_lt <- p1 +
+    labs_e61(title = "Really long panel title title title title title title title title",
+             subtitle = "Really long panel title title title title title")
+
+  expect_snapshot_file(suppressWarnings(
+    save_e61("plot-multi-1x2-long-panel-title.svg", p1_lt, p2_t,
+             title = "Multi-panel graph title text",
+             subtitle = "Multi-panel graph subtitle text",
+             footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+             sources = c("Sources", "Sauces"))))
 
 })
-
-test_that("Output graphs have sensible dimensions", {
-
-  skip("Old tests to be rewritten")
-
-  # Generate some data
-  graph_data <- data.frame(x = runif(100, 1, 49), y = runif(100, 1, 49),
-                           xcol = 1:100)
-
-  # Graph
-  graph <- ggplot(graph_data, aes(x, y)) +
-    geom_point() +
-    theme_e61() +
-    scale_y_continuous_e61(limits = c(0, 50, 10)) +
-    scale_colour_e61(1) +
-    labs_e61(
-      title = "Fairly Lengthy Graph Title With A Lot of Words To Take Up Space",
-      subtitle = "Fairly Lengthy Graph Subtitle With A Lot of Words To Take Up Space",
-      footnotes = "Really long footnote to test that part of the code blah blah blah blah blah blah",
-      sources = c("e61 Institute"),
-      x = NULL, y = "units"
-    )
-
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), graph))
-
-  # Graph 2
-  graph_2 <- ggplot(graph_data, aes(xcol, y)) +
-    geom_col() +
-    theme_e61() +
-    scale_y_continuous_e61(limits = c(0, 50, 10)) +
-    scale_colour_e61(1) +
-    labs_e61(
-      title = "Fairly Lengthy Graph Title With A Lot of Words To Take Up Space",
-      subtitle = "Fairly Lengthy Graph Subtitle With A Lot of Words To Take Up Space",
-      footnotes = "Really long footnote to test that part of the code blah blah blah blah blah blah",
-      sources = c("e61 Institute"),
-      x = NULL, y = "units"
-    )
-
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), graph_2))
-
-})
-
-test_that("Test saving of multi-panel graphs", {
-
-  skip("Old tests to be rewritten")
-
-  # Generate some data
-  graph_data <- data.frame(x = runif(100, 1, 49), y = runif(100, 1, 49),
-                           xcol = 1:100)
-
-  # Graph
-  graph <- ggplot(graph_data, aes(x, y)) +
-    geom_point() +
-    theme_e61() +
-    scale_y_continuous_e61(limits = c(0, 50, 10)) +
-    scale_colour_e61(1) +
-    labs_e61(
-      title = "Graph",
-      footnotes = "Really long footnote to test that part of the code blah blah blah blah blah blah",
-      sources = c("e61 Institute"),
-      x = NULL, y = "units"
-    )
-
-  # No title or subtitle
-  mp <- mpanel_e61(graph, graph)
-
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp))
-
-  # Title, no subtitle
-  mp <- mpanel_e61(graph, graph,
-                   title = "Title")
-
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp, height = 8))
-
-  # No title, with subtitle
-  mp <- mpanel_e61(graph, graph,
-                   subtitle = "Graph subtitle")
-
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp, height = 8))
-
-  # Title, caption
-  mp <- mpanel_e61(graph, graph,
-                   title = "Title",
-                   sources = "Source 1")
-
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp))
-
-  # No title, no subtitle, caption
-  mp <- mpanel_e61(graph, graph,
-                   sources = "Source 1")
-
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp))
-
-  # No title, no subtitle, footnotes, sources
-  mp <- mpanel_e61(graph, graph,
-                   footnotes = "Footnote 1",
-                   sources = "Source 1")
-
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp, height = 8.3))
-
-  # Title, subtitle, footnotes, sources
-  mp <- mpanel_e61(graph, graph,
-                   title = "Title",
-                   subtitle = "Graph subtitle",
-                   footnotes = "Footnote 1",
-                   sources = "Source 1")
-
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp))
-
-  # 2x2 with title, subtitle, footnotes, sources
-  mp <- mpanel_e61(graph, graph, graph, graph,
-                   ncol = 2,
-                   title = "Title",
-                   subtitle = "Graph subtitle",
-                   footnotes = "Footnote 1",
-                   sources = "Source 1",
-                   show_height = TRUE)
-
-  rstudioapi::viewer(save_e61(withr::local_tempfile(fileext = ".svg"), mp))
-
-})
-
