@@ -98,3 +98,10 @@ get_base_size <- function(chart_type, plot_base_size = 10){
 
   return(plot_base_size)
 }
+
+#' Replication of testthat::is_testing() so we can turn off some functionality
+#' in the test env.
+#' @noRd
+is_testing <- function() {
+  identical(Sys.getenv("TESTTHAT"), "true")
+}
