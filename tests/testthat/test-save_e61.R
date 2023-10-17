@@ -2,10 +2,6 @@
 
 test_that("Dimensioning functions", {
 
-  # Turn off messages
-  withr::local_options(list(test_save = TRUE,
-                            quiet_wrap = TRUE))
-
   # Test custom dimensions work
   withr::with_tempdir({
 
@@ -44,9 +40,6 @@ test_that("Dimensioning functions", {
 test_that("Flipped coord formatting", {
   # save_e61() should automatically apply format_flip() to flipped coord graphs
 
-  withr::local_options(list(test_save = TRUE,
-                            quiet_wrap = TRUE))
-
   p1 <-
     minimal_plot +
     coord_flip() +
@@ -68,9 +61,6 @@ test_that("Flipped coord formatting", {
 })
 
 test_that("Y-axis label messages", {
-
-  withr::local_options(list(test_save = TRUE,
-                            quiet_wrap = TRUE))
 
   # y-axis text missing or too long
   withr::with_tempdir({
@@ -101,9 +91,6 @@ test_that("Y-axis label messages", {
 })
 
 test_that("Directory existence checker", {
-  withr::local_options(list(test_save = TRUE,
-                            quiet_wrap = TRUE))
-
   p <- minimal_plot
 
   withr::with_tempdir({
@@ -120,9 +107,6 @@ test_that("Directory existence checker", {
 })
 
 test_that("Different file formats", {
-
-  withr::local_options(list(test_save = TRUE,
-                            quiet_wrap = TRUE))
 
   g <- minimal_plot
 
@@ -149,9 +133,6 @@ test_that("Different file formats", {
 })
 
 test_that("Multiple file saving", {
-  withr::local_options(list(test_save = TRUE,
-                            quiet_wrap = TRUE))
-
   g <- minimal_plot
 
   # Test 3 formats
@@ -195,8 +176,6 @@ test_that("Multiple file saving", {
 })
 
 test_that("Does save_data work", {
-  withr::local_options(list(test_save = TRUE,
-                            quiet_wrap = TRUE))
 
   gg <- minimal_plot
 
@@ -217,9 +196,6 @@ test_that("Does save_data work", {
 
 test_that("Change background colour", {
 
-  withr::local_options(list(test_save = TRUE,
-                            quiet_wrap = TRUE))
-
   p <- minimal_plot
 
   expect_snapshot_file(suppressWarnings(save_e61("plot-bg-col-pink.svg", p, bg_colour = "pink")))
@@ -231,9 +207,6 @@ test_that("Change background colour", {
 # Check whole-graph generation consistency --------------------------------
 
 test_that("Single-panel graph examples", {
-
-  withr::local_options(list(test_save = TRUE,
-                            quiet_wrap = TRUE))
 
   withr::local_seed(42)
 
@@ -351,9 +324,6 @@ test_that("Single-panel graph examples", {
 })
 
 test_that("Multi-panel graph examples", {
-
-  withr::local_options(list(test_save = TRUE,
-                            quiet_wrap = TRUE))
 
   withr::local_seed(42)
 
