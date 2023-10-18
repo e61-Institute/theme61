@@ -165,7 +165,7 @@ save_e61 <- function(filename,
     y_long <- paste0(
       "Plot ",
       paste(y_long, collapse = ", "),
-      " y-axis labels may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label e.g. %, ppt, $b."
+      " y-axis labels may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label (for example you could use: %, ppt, $b, '000, n)."
     )
   } else {
     y_long <- NULL
@@ -188,8 +188,9 @@ save_e61 <- function(filename,
 
   if (length(adv_msg) > 0) print_adv()
 
-  # Turn these off if the test option is set (i.e. run if unset)
-  if (!is_testing()) {
+  # Require user acknowledgement if there are issues to address
+  # Turn these off in test env
+  if (length(adv_msg) > 0 && !is_testing()) {
 
     # Require user acknowledgement
     prompt <- ""
