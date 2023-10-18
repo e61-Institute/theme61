@@ -1,16 +1,16 @@
 test_that("plot_label() and mplot_label() look the same", {
   p1 <-
-    ggplot2::ggplot() +
+    ggplot() +
     plot_label(label = "Plot 1", x = 2, y = 2, n_labs = 2, n = 1) +
     plot_label(label = "Plot 2", x = 2, y = 3, n_labs = 2, n = 2)
 
   p2 <-
-    ggplot2::ggplot() +
+    ggplot() +
     mplot_label(label = c("Plot 1", "Plot 2"), x = c(2, 2), y = c(2, 3))
 
   withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("plot-label-1.svg", p1)))
-    expect_snapshot_file(suppressWarnings(save_e61("plot-label-2.svg", p2)))
+    suppressWarnings(expect_snapshot_file(save_e61("plot-label-compare-plot.svg", p1)))
+    suppressWarnings(expect_snapshot_file(save_e61("plot-label-compare-mplot.svg", p2)))
   })
 
 })

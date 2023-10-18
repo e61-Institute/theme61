@@ -19,8 +19,9 @@
 #' @param legend Character. Legend position, "none" (default) hides the legend.
 #' @param legend_title Logical. Include Legend title? Defaults to FALSE.
 #' @param aspect_ratio Numeric. Sets the aspect ratio of the graph panel.
-#' @param background Character. Default is "white". For graphs used in research
-#'   note boxes, set the colour to e61_skylight8.
+#' @param background Character. Default is "white". For all graphs that you
+#'   save, you should control the background colour using the \code{bg_colour}
+#'   argument in \code{save_e61}, not here.
 #' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #' @param base_size Numeric. Chart font size. Default is 10.
 #' @param base_family Character. Chart font family. Default for notes is PT

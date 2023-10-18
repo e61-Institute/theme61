@@ -9,7 +9,8 @@ save_single <- function(
     height, # manual control over the height of the chart
     max_height, # manual control over the maximum height of the chart
     format,
-    base_size
+    base_size,
+    bg_colour
     ) {
 
 
@@ -61,6 +62,10 @@ save_single <- function(
 
   plot_build <- ggplot_build(plot)
 
+
+  # Update plot background --------------------------------------------------
+
+  plot <- plot + theme(rect = element_rect(fill = bg_colour))
 
   # Update y-axis limits ----------------------------------------------------
 
