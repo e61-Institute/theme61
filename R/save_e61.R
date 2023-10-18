@@ -188,8 +188,9 @@ save_e61 <- function(filename,
 
   if (length(adv_msg) > 0) print_adv()
 
-  # Turn these off if the test option is set (i.e. run if unset)
-  if (!is_testing()) {
+  # Require user acknowledgement if there are issues to address
+  # Turn these off in test env
+  if (length(adv_msg) > 0 && !is_testing()) {
 
     # Require user acknowledgement
     prompt <- ""
