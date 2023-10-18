@@ -321,8 +321,13 @@ unset_open_graph <- function() {
 #' @export
 svg_to_png <- function(file_in, file_out = NULL, delete = FALSE) {
 
+  if (!grepl(".*\\.svg$", file_in))
+    stop("file_in must be an svg file.")
+
   if (is.null(file_out)) {
     file_out <- gsub("(.*)\\.svg$", "\\1.png", file_in)
+  } else if (!grepl(".*\\.png$", file_out)) {
+    stop("file_out must be a png file.")
   }
 
   rsvg::rsvg_png(svg = file_in, file = file_out)
