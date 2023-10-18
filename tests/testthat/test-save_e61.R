@@ -264,10 +264,10 @@ test_that("Single-panel graph examples", {
   })
 
   # Graph with discrete x and y vars
-  data <- data.table::CJ(x = factor(1:10), y = factor(1:10))
+  data <- data.table::CJ(x = factor(1:10), y_var = factor(1:10))
   data[, fill := runif(100, 0, 100)]
 
-  p <- ggplot(data, aes(x, y, fill = fill)) +
+  p <- ggplot(data, aes(x, y = y_var, fill = fill)) +
     geom_tile()
 
   withr::with_tempdir({
