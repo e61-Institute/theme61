@@ -13,7 +13,6 @@ save_single <- function(
     bg_colour
     ) {
 
-
   # Check if we have a spatial chart, if we do save without editing ---------
 
   is_spatial_chart <- FALSE
@@ -66,6 +65,7 @@ save_single <- function(
   # Update plot background --------------------------------------------------
 
   plot <- plot + theme(rect = element_rect(fill = bg_colour))
+
 
   # Update y-axis limits ----------------------------------------------------
 

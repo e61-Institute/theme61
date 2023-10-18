@@ -339,8 +339,6 @@ split_text_into_words <- function(text) {
 #' @noRd
 update_y_axis_labels <- function(plot, max_break_width = NULL, y_lab_max_size = NULL){
 
-  # browser()
-
   # get the difference in the label size
   y_font_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
 

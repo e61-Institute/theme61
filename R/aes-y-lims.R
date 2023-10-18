@@ -52,22 +52,42 @@ update_scales <- function(plot, auto_scale, warn = FALSE){
 #'@noRd
 check_for_y_var <- function(plot){
 
-  chart_data <- ggplot_build(plot)$data
-
   check <- FALSE
 
-  # check whether there are any non-missing values for y, ymax and ymin. Note min will return -Inf if the variable doesn't exist or is all missing
-  for (i in seq_along(chart_data)){
+  # First check if the y-variable is a factor or a character - we can't scale those
+  y_var <- deparse(plot$mapping$y)
+  y_var <- gsub("~", "", y_var)
 
-    suppressMessages({suppressWarnings({
-      check_y <- min(chart_data[[i]]$y, na.rm = TRUE)
-      check_ymax <- min(chart_data[[i]]$ymax, na.rm = TRUE)
-      check_ymin <- min(chart_data[[i]]$ymin, na.rm = TRUE)
-    })})
+  y_class <- class(plot$data[[y_var]])
 
-    if (is.finite(check_y) || is.finite(check_ymax) || is.finite(check_ymin)){
-      check <- TRUE
-      break
+  # if the y-var is either missing, or it is not a factor/character, then
+  # continue looking for whether there is a y-variable that can be used for scaling
+  if(is.null(y_class) || (y_class != "factor" && y_class != "character")){
+
+    chart_data <- ggplot_build(plot)$data
+
+    # check whether there are any non-missing values for y, ymax and ymin. Note min will return -Inf if the variable doesn't exist or is all missing
+    for (i in seq_along(chart_data)){
+
+      suppressMessages({suppressWarnings({
+        check_y <- min(chart_data[[i]]$y, na.rm = TRUE)
+        is_factor_y <- is.factor(chart_data[[i]]$y)
+
+        check_ymax <- min(chart_data[[i]]$ymax, na.rm = TRUE)
+        is_factor_ymax <- is.factor(chart_data[[i]]$ymax)
+
+        check_ymin <- min(chart_data[[i]]$ymin, na.rm = TRUE)
+        is_factor_ymin <- is.factor(chart_data[[i]]$ymin)
+      })})
+
+      # check whether any of the variables are both finite and not a factor
+      if ((is.finite(check_y) && !is_factor_y) ||
+          (is.finite(check_ymax) && !is_factor_ymax) ||
+          (is.finite(check_ymin) && !is_factor_ymin)) {
+
+        check <- TRUE
+        break
+      }
     }
   }
 
@@ -530,7 +550,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
         dplyr::slice_max(diff, n = 1, with_ties = F) %>%
         dplyr::pull(aes_small)
 
-    } else {
+    } else if(smallest_val < 0) {
       aes_smallest_val <- get_aes_num(smallest_val, type = "next_largest")
 
       # adjust for the smallest aesthetic value
@@ -538,6 +558,16 @@ get_aes_pair <- function(y_val_1, y_val_2){
         dplyr::mutate(diff = aes_small - aes_smallest_val) %>%
         dplyr::filter(diff <= 0) %>%
         dplyr::slice_max(diff, n = 1, with_ties = F) %>%
+        dplyr::pull(aes_small)
+
+    } else if(smallest_val > 0) {
+      aes_smallest_val <- get_aes_num(smallest_val, type = "next_largest")
+
+      # adjust for the smallest aesthetic value
+      ret_smallest_val <- temp_data %>%
+        dplyr::mutate(diff = aes_small - aes_smallest_val) %>%
+        dplyr::filter(diff >= 0) %>%
+        dplyr::slice_min(diff, n = 1, with_ties = F) %>%
         dplyr::pull(aes_small)
     }
 
@@ -565,6 +595,9 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F, include_vals = F
     min_y_val <- max_y_val
     max_y_val <- temp
   }
+
+  # update to prevent odd behaviour with bar charts
+  if(min_y_val < 0 & max_y_val > 0) from_zero <- F
 
   # increase the size of each value to provide some buffer around the points
   if(min_y_val > 0 && (min_y_val - (0.01 * abs(min_y_val))) < 0){
