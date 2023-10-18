@@ -454,7 +454,7 @@ test_that("Multi-panel graph examples", {
 
   # 1x2 graph with long panel titles and subtitles
   p1_lt <- p1 +
-    labs_e61(title = "Really long panel title title title title title",
+    labs_e61(title = "Really long panel title title title title title title title title",
              subtitle = "Really long panel title title title title title")
 
   p2_lt <- p2 +
@@ -471,13 +471,9 @@ test_that("Multi-panel graph examples", {
   })
 
   # 1x2 graph with 1 long panel title and subtitles
-  p1_lt <- p1 +
-    labs_e61(title = "Really long panel title title title title title title title title",
-             subtitle = "Really long panel title title title title title")
-
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61("plot-multi-1x2-long-panel-title.svg", p1_lt, p2_t,
+      save_e61("plot-multi-1x2-1-long-panel-title.svg", p1_lt, p2_t,
                title = "Multi-panel graph title text",
                subtitle = "Multi-panel graph subtitle text",
                footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
