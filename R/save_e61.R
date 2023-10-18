@@ -329,5 +329,5 @@ svg_to_png <- function(file_in, file_out = NULL, delete = FALSE) {
 
   if (delete) unlink(file_in)
 
-  return(file_out)
+  invisible(file_out)
 }
