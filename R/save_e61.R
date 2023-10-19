@@ -36,6 +36,9 @@
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
 #' @param base_size Numeric. Chart font size. Default is 10.
+#' @param bg_colour Sets the graph background colour. Defaults to white. Accepts
+#'   a colour name, hex code or theme61 colour object name. For graphs used in
+#'   research note boxes, set the colour to e61_boxback.
 #' @param ... (multi-panel specific) Plot objects to put on the panel.
 #' @param plotlist (multi-panel specific) List of plots to combine as an
 #'   multi-panel and save. You can also enter the charts individually as
@@ -66,6 +69,7 @@ save_e61 <- function(filename,
                      save_data = FALSE,
                      base_size = 10, # set the base size for the theme61 font size call
                      # multi-panel specific arguments
+                     bg_colour = "white",
                      plotlist = NULL,
                      title = NULL,
                      subtitle = NULL,
@@ -161,7 +165,7 @@ save_e61 <- function(filename,
     y_long <- paste0(
       "Plot ",
       paste(y_long, collapse = ", "),
-      " y-axis labels may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label e.g. %, ppt, $b."
+      " y-axis labels may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label (for example you could use: %, ppt, $b, '000, n)."
     )
   } else {
     y_long <- NULL
@@ -184,8 +188,9 @@ save_e61 <- function(filename,
 
   if (length(adv_msg) > 0) print_adv()
 
-  # Turn these off if the test option is set
-  if (!is.null(getOption("test_save"))) {
+  # Require user acknowledgement if there are issues to address
+  # Turn these off in test env
+  if (length(adv_msg) > 0 && !is_testing()) {
 
     # Require user acknowledgement
     prompt <- ""
@@ -225,7 +230,8 @@ save_e61 <- function(filename,
       nrow = nrow,
       align = align,
       axis = axis,
-      rel_heights = rel_heights
+      rel_heights = rel_heights,
+      bg_colour = bg_colour
     )
   } else {
 
@@ -238,7 +244,8 @@ save_e61 <- function(filename,
       height = dim$height, # control height
       max_height = max_height, # control max height
       format = format,
-      base_size = base_size
+      base_size = base_size,
+      bg_colour = bg_colour
     )
   }
 
@@ -250,7 +257,8 @@ save_e61 <- function(filename,
     format = format,
     filename = filename,
     width = save_input$width,
-    height = save_input$height
+    height = save_input$height,
+    bg_colour = bg_colour
   )
 
   # Post-saving -------------------------------------------------------------
@@ -318,16 +326,22 @@ unset_open_graph <- function() {
 #'   the same name and location (except for the file extension).
 #' @param delete Logical. Delete the original SVG file? (defaults to FALSE)
 #' @return Invisibly returns the file path to the PNG image
+#' @keywords internal
 #' @export
 svg_to_png <- function(file_in, file_out = NULL, delete = FALSE) {
 
+  if (!grepl(".*\\.svg$", file_in))
+    stop("file_in must be an svg file.")
+
   if (is.null(file_out)) {
     file_out <- gsub("(.*)\\.svg$", "\\1.png", file_in)
+  } else if (!grepl(".*\\.png$", file_out)) {
+    stop("file_out must be a png file.")
   }
 
   rsvg::rsvg_png(svg = file_in, file = file_out)
 
   if (delete) unlink(file_in)
 
-  return(file_out)
+  invisible(file_out)
 }
