@@ -202,7 +202,7 @@ save_e61 <- function(filename,
     }
 
     if (prompt == "Y") {
-      return(message("Stopping graph generation based on user request."))
+      return(message("Stopping graph generation based on user request. To turn off this message for the remainder of the session, run `options(no_advisory = TRUE)`."))
     }
 
   }
