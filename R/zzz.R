@@ -4,6 +4,9 @@ t61_env <- NULL
 
 .onLoad <- function(libname, pkgname) {
 
+  # Check if package is up-to-date
+  chk_pkg_ver()
+
   # Add PT Sans font and set up for use
   sysfonts::font_add_google("PT Sans", "pt-sans")
   showtext::showtext_auto()
