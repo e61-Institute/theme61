@@ -63,16 +63,14 @@ test_that("Flipped coord formatting", {
 test_that("Y-axis label messages", {
 
   # y-axis text missing or too long
-  withr::with_tempdir({
+  p1 <- minimal_plot + labs_e61(y = "")
+  p2 <- minimal_plot + labs_e61(y = "too long label")
 
-    p1 <- minimal_plot + labs_e61(y = "")
-    p2 <- minimal_plot + labs_e61(y = "too long label")
-
-    suppressWarnings(suppressMessages(
-      expect_message(save_e61("test.svg", p1, p2), class = "cliMessage"),
-      classes = c("message", "cliMessage")))
-
-  })
+  suppressWarnings(suppressMessages(
+    expect_message(
+      save_e61(withr::local_tempfile(fileext = ".svg"), p1, p2),
+      class = "cliMessage"),
+    classes = c("message", "cliMessage")))
 
   # No message if you do it right
   gg <- minimal_plot
@@ -82,12 +80,28 @@ test_that("Y-axis label messages", {
 
   # No message if y_top is FALSE
   p <- minimal_plot +
-    labs_e61(y = "Long y-axis label that goes on the side") +
+    labs_e61(y = "Long y-axis label") +
     theme_e61(y_top = FALSE)
 
   suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p)),
                    classes = c("messages", "warning"))
 
+  # No message if non-theme61 scale functions are used.
+  p <- minimal_plot +
+    labs_e61(y = "Long y-axis label that goes on the side") +
+    ggplot2::scale_y_continuous()
+
+  suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p)),
+                   classes = c("messages", "warning"))
+
+  # No message if session option is set
+  withr::with_options(list(no_advisory = TRUE), {
+    p <- minimal_plot +
+      labs_e61(y = "Long y-axis label")
+
+    suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p)),
+                     classes = c("messages", "warning"))
+  })
 })
 
 test_that("Directory existence checker", {
