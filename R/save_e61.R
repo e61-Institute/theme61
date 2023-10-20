@@ -4,10 +4,13 @@
 #'   sensible defaults that ensure the text size is appropriately proportioned
 #'   given default sizing.
 #'
-#'   Currently the only file formats supported are \code{.svg} (preferred),
-#'   \code{.pdf} or \code{.eps}. PDF and SVG are modern vector graphics file
-#'   formats which can be scaled up and down in size without blurring or
-#'   becoming pixelated.
+#'   The supported file formats are SVG, PDF, EPS and PNG.
+#'
+#'   Use PDF in all notes and SVG in PowerPoint presentations. PDF and SVG are
+#'   better as they are modern vector graphics file formats which can be scaled
+#'   up and down in size without blurring or becoming pixelated.
+#'
+#'   PNG should only be used for Twitter posts for compatibility reasons.
 #'
 #'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
 #'
