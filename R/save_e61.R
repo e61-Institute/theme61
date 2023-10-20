@@ -193,7 +193,7 @@ save_e61 <- function(filename,
 
   # Require user acknowledgement if there are issues to address
   # Turn these off in test env
-  if (length(adv_msg) > 0 && !is_testing()) {
+  if (length(adv_msg) > 0 && !is_testing() && is.null(getOption("no_advisory"))) {
 
     # Require user acknowledgement
     prompt <- ""
