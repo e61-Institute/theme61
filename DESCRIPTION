@@ -20,6 +20,7 @@ Imports:
     ggplot2 (>= 3.4.1),
     ggrepel (>= 0.9.2),
     ggthemes (>= 4.2.4),
+    gh (>= 1.4.0),
     grDevices (>= 4.2.2),
     grid (>= 4.2.2),
     gridExtra (>= 2.3),
