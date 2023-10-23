@@ -569,6 +569,9 @@ get_aes_pair <- function(y_val_1, y_val_2){
         dplyr::filter(diff >= 0) %>%
         dplyr::slice_min(diff, n = 1, with_ties = F) %>%
         dplyr::pull(aes_small)
+
+    } else {
+      ret_smallest_val <- 0
     }
 
     if (length(ret_smallest_val) == 0) ret_smallest_val <- 0
