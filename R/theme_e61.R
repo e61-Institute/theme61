@@ -421,18 +421,19 @@ theme_e61_alt <- function(
 #' to squares. This needs to be used in conjunction with some invisible point
 #' geoms so the function has a shape to reshape.
 #'
+#' @param size Numeric. Control the size of the replacement square. Default of 6
+#'   works well when \code{ymin} or \code{ymax} are not present.
 #' @return ggplot object
 #' @export
 #' @examples
-#' ggplot(data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
+#' ggplot2::ggplot(data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
 #'   aes(x, y, colour = group)) +
 #'   geom_line() +
 #'   geom_point(alpha = 0) + # The required "invisible points"
 #'   square_legend_symbols()
 #'
-
-square_legend_symbols <- function() {
-  guides(colour = guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))
+square_legend_symbols <- function(size = 6) {
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = size, shape = 15)))
 }
 
 #' Applies changes to the theme for horizontal bar graphs

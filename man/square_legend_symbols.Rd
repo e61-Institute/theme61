@@ -4,7 +4,11 @@
 \alias{square_legend_symbols}
 \title{Converts all legend colours to squares}
 \usage{
-square_legend_symbols()
+square_legend_symbols(size = 6)
+}
+\arguments{
+\item{size}{Numeric. Control the size of the replacement square. Default of 6
+works well when \code{ymin} or \code{ymax} are not present.}
 }
 \value{
 ggplot object
@@ -16,7 +20,7 @@ to squares. This needs to be used in conjunction with some invisible point
 geoms so the function has a shape to reshape.
 }
 \examples{
-ggplot(data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
+ggplot2::ggplot(data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
   aes(x, y, colour = group)) +
   geom_line() +
   geom_point(alpha = 0) + # The required "invisible points"
