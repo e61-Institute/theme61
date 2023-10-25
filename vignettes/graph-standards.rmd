@@ -53,29 +53,26 @@ The purpose of this vignette is to demonstrate how to use the functions in `them
 
 ## Summary
 
-You start by creating an unthemed graph using the 'normal' stuff: `ggplot(data, aes(x, y)) + geom_blah()`
+We start by creating a simple graph using the 'normal' stuff: `ggplot(data, aes(x, y)) + geom_blah()`
 
 Then:
-
--   [Apply the theme](#theme): `theme_e61()`
--   [Add graph colours](#colours): `scale_colour_e61()` or `scale_fill_e61()`
--   [Format the x and y axes scales](#scales): `scale_y_continuous_e61()`, `scale_x_continuous_e61()`
+-   [(optional) Manually add graph colours if they are not applied by default](#colours): `scale_colour_e61()` or `scale_fill_e61()`
+-   [(optional) Manually format the x and y axes scales](#scales): `scale_y_continuous_e61()`, `scale_x_continuous_e61()`
 -   [Add labels to your lines/points/bars](#labels): `mplot_label()` or `plot_label()`
 -   [Add titles, axes labels, footnotes and sources](#titles): `labs_e61(title = "Title", footnotes = "Footnotes", sources = c("Source 1", "Source 2"))`
--   [Create a multi-panel](#mpanel) (if required): `mpanel_e61()`
 -   [Save the graph](#save): `save_e61()`
 
 ## The starting graph {#start}
 
-We're going to turn a default ggplot2 graph into one that is correctly formatted in the e61 Institute style using the package features.
+We're start with a simple ggplot2 graph with no labels.
 
 ```{r}
-gg <- ggplot2::ggplot(data_3, aes(x = year, y = value, colour = category)) + 
-  geom_line() + theme(legend.position = "bottom")
+gg <- ggplot(data_3, aes(x = year, y = value, colour = category)) + 
+  geom_line()
 ```
 
 ```{r, echo = FALSE}
-ggsave(here::here("man/figures/g-prev.svg"), gg, height = 7.9, width = 8.5, units = "cm")
+ggsave(here::here("man/figures/g-prev.svg"), gg)
 knitr::include_graphics(here::here("man/figures/g-prev.svg"))
 ```
 

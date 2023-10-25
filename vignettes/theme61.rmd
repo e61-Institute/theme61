@@ -36,29 +36,36 @@ This article provides some examples to help you figure out what elements you can
 source("colour-palette.R", print.eval = TRUE)
 ```
 
-## Correct workflow
+## Workflow
 
 When making graphs, you should follow the below workflow. 
 
-Save your graph using `save_e61()`. Do **not** use the Export button in the Plots tab or `ggsave()`.
+### New to ggplot - start here
 
-Start by creating an unthemed graph using the 'normal' stuff: `ggplot(data, aes(x, y)) + geom_blah()`
+If you're new to R and ggplot, or just want to explore your data, start by using `e61_chart_maker()`. It has limited functionality, but should help you learn the basics of ggplot and create charts quickly.
+
+### Experienced users - start here
+
+Start by creating a simple graph using the 'normal' stuff: `ggplot(data, aes(x =, y =, col =, fill =)) + facet_wrap(vars(var_blah)) + geom_blah()`
 
 Then:
 
-- Apply the theme: `theme_e61()`
-- Add graph colours: `scale_colour_e61()` or `scale_fill_e61()`
-- Format the x and y axes scales: `scale_y_continuous_e61()`, `scale_x_continuous_e61()`
-- Add plot labelling: `mplot_label()` or `plot_label()`
+- (optional) Manually add graph colours if the auto colour scaling has not worked properly: `scale_colour_e61()` or `scale_fill_e61()`
+- (optional) Manually format the x and y axes scales if you are not happy with the auto y-axis scaling: `scale_y_continuous_e61()`, `scale_x_continuous_e61()`
+- Add on plot labels: `mplot_label()` or `plot_label()`
 - Add titles, axes labels, footnotes and sources: `labs_e61(title = "Title", footnotes = "Footnotes", sources = c("Source 1", "Source 2"))`
-- Create a multi-panel (if required): `mpanel_e61()`
-- Save the graph: `save_e61()`
+  - Note 1: You no longer need to specify title_max_char etc. manually as the titles and footnotes are now automatically scaled when the chart is saved. If you want, you can still specify the max_char variables manually if you are unhappy with the automatic scaling.
+  - Note 2: To comply with the current theme61 style, your y-axis labels should by no longer than 5 characters. You should use the subtitle to describe your y variable and the y-axis label should be used to specify the units (e.g. \$, %, 000s, \$000s).
+- Save the graph: `save_e61()` (always save your graph using `save_e61()`. Do **not** use the Export button in the Plots tab or `ggsave()`)
+  - Note 1: Multi-panel charts are now created using `save_e61()`, `mpanel()` has been retired. For example, to create an multi-panel chart with charts fig1a and fig1b, you would use `save_e61(fig1a, fig1b, filename = "blah", title = "mpanel title blah", subtitle = "mpanel subtitle blah", footnotes = "mpanel footnotes blah", sources = "e61 Institute")` 
+  - Note 2: There is a new argument called chart_type, which has three possible values "MN" (micronote, the default), "RN" (research note) and "PPT" (PowerPoint). This adjusts the chart size and text size for each output type.
+  - Note 3: There is a new argument called bg_colour which is used to set the background colour of the chart. The default is white, but if you are adding a chart to to a box in a research note you should set `bg_colour = e61_boxback`. 
 
 The [Graph standards](graph-standards.html) article sets out this workflow in greater detail.
 
 ## Graph examples
 
-### Scatter graph
+### Basic scatter graph
 
 ```{r}
 
@@ -70,11 +77,11 @@ mtcars2 <- within(mtcars, {
   gear <- factor(gear)
 })
 
-# Graph
-p1 <- ggplot(mtcars2) +
-  geom_point(aes(x = wt, y = mpg, colour = gear)) +
+# Graph - only the basics
+p1 <- ggplot(mtcars2, aes(x = wt, y = mpg, colour = gear)) +
+  geom_point() +
   labs_e61(
-    title = "Fuel Economy Declines as Weight Increases",
+    title = "Fuel economy declines as weight increases",
     subtitle = "1973-74",
     sources = "1974 Motor Trend US magazine.",
     x = "Weight (1000 lbs)",
@@ -82,24 +89,65 @@ p1 <- ggplot(mtcars2) +
     colour = "Gears"
   )
 
-
-graph <- p1 +
-  theme_e61(adj = -12) + 
-  mplot_label(label = c("3", "4", "5"),
-              x = c(4, 2.7, 2.5),
-              y = c(23, 35, 15)) +
-  scale_y_continuous_e61(limits = c(0, 40)) +
-  scale_colour_e61(n = 3) +
-  add_e61_logo() + 
-  square_legend_symbols()
-
-save_e61(here::here("man/figures/fig-1.svg"), graph)
+save_e61(p1, filename = here::here("man/figures/fig-1.svg"), chart_type = "MN")
 
 knitr::include_graphics(here::here("man/figures/fig-1.svg"))
 
 ```
 
-### Faceted scatter graph
+### Adding mplot labels and the e61 logo.
+
+```{r}
+
+# Graph - plot labels and logo
+p2 <- ggplot(mtcars2) +
+  geom_point(aes(x = wt, y = mpg, colour = gear)) +
+  mplot_label(label = c("3", "4", "5"),
+              x = c(4, 2.7, 2.5),
+              y = c(23, 35, 15)) +
+  labs_e61(
+    title = "Fuel economy declines as weight increases",
+    subtitle = "1973-74",
+    sources = "1974 Motor Trend US magazine.",
+    x = "Weight (1000 lbs)",
+    y = "mpg",
+    colour = "Gears"
+  ) + 
+  add_e61_logo()
+
+save_e61(p2, filename = here::here("man/figures/fig-2.svg"), chart_type = "MN")
+
+knitr::include_graphics(here::here("man/figures/fig-2.svg"))
+
+```
+
+### Adding a legend and a legend title
+
+```{r}
+
+# Graph - adding a legend
+p3 <- ggplot(mtcars2) +
+  geom_point(aes(x = wt, y = mpg, colour = gear)) +
+  mplot_label(label = c("3", "4", "5"),
+              x = c(4, 2.7, 2.5),
+              y = c(23, 35, 15)) +
+  labs_e61(
+    title = "Fuel economy declines as weight increases",
+    subtitle = "1973-74",
+    sources = "1974 Motor Trend US magazine.",
+    x = "Weight (1000 lbs)",
+    y = "mpg",
+    colour = "Gears"
+  ) + 
+  theme_e61(legend = "bottom", legend_title = T)
+
+save_e61(p3, filename = here::here("man/figures/fig-3.svg"), chart_type = "MN")
+
+knitr::include_graphics(here::here("man/figures/fig-3.svg"))
+
+```
+
+### Faceted graph
 
 ```{r}
 graph <- p1 +
@@ -122,7 +170,7 @@ knitr::include_graphics(here::here("man/figures/fig-2.svg"))
 g <- ggplot(mpg, aes(cty)) + 
   geom_density(aes(fill = factor(cyl)), linetype = "blank", alpha = 0.8) +
   labs_e61(
-    title = "Distribution of Car City Mileage",
+    title = "Distribution of car city mileage",
     subtitle = "In miles per gallon, by number of cylinders",
     sources = "mpg dataset",
     x = NULL,
