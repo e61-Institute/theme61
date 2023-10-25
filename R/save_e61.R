@@ -143,13 +143,31 @@ save_e61 <- function(filename,
 
   # Loop through the plots
   for(i in seq_along(plots)){
+    # Don't trigger checks if a theme61 function is not being used
+    if (length(plots[[i]]$scales$scales) > 1) {
+      has_scale_e61 <- "scale_e61" %in% class(plots[[i]]$scales$scales[[2]])
+    } else {
+      has_scale_e61 <- FALSE
+    }
+
+    # Or if attr has been set by function args to FALSE
+    y_top_set <- !isFALSE(attr(plots[[i]]$theme, "y_top"))
+
     # Message if the y-axis label text is missing
-    if (is.null(attr(plots[[i]]$theme, "y_top")) && (is.null(plots[[i]]$labels$y) || nchar(plots[[i]]$labels$y) == 0)) {
+    if (
+      # Checks if y is missing or blank
+      (is.null(plots[[i]]$labels$y) || nchar(plots[[i]]$labels$y) == 0) &&
+      y_top_set && has_scale_e61
+      ) {
       y_miss <- c(y_miss, i)
     }
 
     # Message if the y-axis label text is too long
-    if (is.null(attr(plots[[i]]$theme, "y_top")) && isTRUE(nchar(plots[[i]]$labels$y) > 5)) {
+    if (
+      # Check label char length
+      isTRUE(nchar(plots[[i]]$labels$y) > 5) &&
+      y_top_set && has_scale_e61
+      ) {
       y_long <- c(y_long, i)
     }
   }
@@ -189,7 +207,7 @@ save_e61 <- function(filename,
     cli::cli_end()
   }
 
-  if (length(adv_msg) > 0) print_adv()
+  if (length(adv_msg) > 0 && is.null(getOption("no_advisory"))) print_adv()
 
   # Require user acknowledgement if there are issues to address
   # Turn these off in test env
