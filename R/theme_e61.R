@@ -36,8 +36,7 @@
 #' @examples
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 #'   geom_point() +
-#'   theme_e61() +
-#'   scale_colour_e61(n = 3)
+#'   theme_e61()
 #'
 
 theme_e61 <- function(y_top = TRUE,
@@ -292,11 +291,11 @@ theme_e61 <- function(y_top = TRUE,
 #' sa3_shp <- strayr::read_absmap("sa32016")
 #'
 #' sydney_map <- sa3_shp %>%
-#'    mutate(gcc_code_2016 == "1GSYD")
+#'    filter(gcc_code_2016 == "1GSYD")
 #'
 #' ggplot(data = sydney_map) +
-#'   geom_sf(aes(fill = gcc_name_2016 , col = gcc_name_2016 )) +
-#'   theme61_sf() +
+#'   geom_sf(aes(fill = gcc_name_2016)) +
+#'   theme_e61_spatial()
 #'
 
 theme_e61_spatial <- function(
@@ -305,6 +304,8 @@ theme_e61_spatial <- function(
   base_size = 10,
   base_family = "pt-sans"
 ){
+
+  legend <- match.arg(legend)
 
   half_line <- base_size / 2
 
@@ -372,9 +373,8 @@ theme_e61_spatial <- function(
 #'
 #' @examples
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
-#' geom_point() +
-#' e61_colour_manual(n = 3) +
-#' theme_e61_alt()
+#'   geom_point() +
+#'   theme_e61_alt()
 
 theme_e61_alt <- function(
     base_family = "pt-sans",
@@ -421,8 +421,10 @@ theme_e61_alt <- function(
 #' @return ggplot object
 #' @export
 #' @examples
-#' ggplot2::ggplot(data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
-#'   aes(x, y, colour = group)) +
+#' ggplot(
+#'   data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
+#'   aes(x, y, colour = group)
+#'   ) +
 #'   geom_line() +
 #'   geom_point(alpha = 0) + # The required "invisible points"
 #'   square_legend_symbols()
