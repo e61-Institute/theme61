@@ -9,10 +9,10 @@ vignette: >
 ---
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
-devtools::load_all()
 library(ggplot2)
 library(ggrepel)
 library(data.table)
+devtools::load_all()
 
 knitr::opts_chunk$set(
   echo = TRUE,
@@ -58,9 +58,6 @@ graph <- ggplot(graph_data, aes(x, y, colour = source)) +
   geom_line(linewidth = 1) +
   plot_label(label = "Source A", x = 2016, y = 6, n_labs = 2, n = 1) +
   plot_label(label = "Source B", x = 2016, y = 13, n_labs = 2, n = 2) +
-  theme_e61() +
-  scale_y_continuous_e61(limits = c(0, 20, 5)) +
-  scale_colour_e61(2) +
   labs_e61(
     title = "Simple Case Using plot_label()",
     sources = c("e61 Institute"),
@@ -98,9 +95,6 @@ graph <- ggplot(graph_data, aes(x, y, colour = source)) +
     x = c(2016, 2016),
     y = c(6, 13)
   ) +
-  theme_e61() +
-  scale_y_continuous_e61(limits = c(0, 20, 5)) +
-  scale_colour_e61(2) +
   labs_e61(
     title = "Multiple Labels Using mplot_label()",
     sources = c("e61 Institute"),
@@ -148,10 +142,7 @@ graph <- ggplot(graph_data, aes(x, y, fill = group)) +
   # The label arg add the text, the colour arg ensures the text colour matches 
   # the lines they are identifying.
   geom_text(data = graph_labels, aes(x, y, label = group, colour = group)) +
-  theme_e61() +
-  scale_y_continuous_e61(limits = c(0, 20, 5)) +
-  scale_colour_e61(2) +
-  scale_fill_e61(2) +
+  scale_colour_e61() +
   labs_e61(
     title = "Facetted Case Using a Helper data.frame",
     sources = c("e61 Institute"),
@@ -189,12 +180,9 @@ graph <- ggplot(graph_data, aes(x = year, y = value, fill = source)) +
                   # This hides the line that joins the label to the graph element
                   segment.color = NA,
                   size = 4) +
-  theme_e61(fix_left = 3) +
   # Extends the right-side of the graph to create room for the labels
   scale_x_continuous(limits = c(NA, 2026)) +
-  scale_y_continuous_e61(limits = c(0, 25, 5)) +
-  scale_fill_e61(5) +
-  scale_colour_e61(5) +
+  scale_colour_e61() +
   labs_e61(
     title = "Use geom_text_repel to Show Many Labels Automatically",
     sources = c("e61 Institute"),
