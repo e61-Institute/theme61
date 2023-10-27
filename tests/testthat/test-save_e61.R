@@ -358,6 +358,23 @@ test_that("Single-panel graph examples", {
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-dens.svg", p)))
   })
 
+  ## Horizontal time series ----
+  p <- ggplot(data.frame(x = 1:2, y = rep(100, 2)), aes(x, y)) +
+    geom_line()
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-straight-line.svg", p)))
+  })
+
+  ## Plot with geom_rect ----
+  p <- ggplot(data.frame(x = 1:3, y = c(90, 100, 110)), aes(x, y)) +
+    geom_rect(xmin = 0.25, xmax = 0.75, ymin = -Inf, ymax = Inf,
+              alpha = 0.1)
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-geom_rect.svg", p)))
+  })
+
 })
 
 test_that("Multi-panel graph examples", {
