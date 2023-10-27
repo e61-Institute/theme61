@@ -31,6 +31,9 @@
 #' @param max_height Numeric. The maximum height of your plot in cm. This is
 #'   used to constrain the plot resizing algorithm in cases where you want to
 #'   limit the height of your charts.
+#' @param add_width Numeric. Add additional space on the left and right of the
+#'   graph. Useful in the rare case where the graphing algorithm does not
+#'   provide adequate width.
 #' @param format An optional vector of file formats to save as. For example
 #'   \code{c("svg", "pdf")} will save 2 files with the same name to the same
 #'   location to SVG and PDF formats. If the file format is specified in
@@ -69,6 +72,7 @@ save_e61 <- function(filename,
                      auto_scale = TRUE, # manual control over whether y-axis is scaled
                      dim = list(height = NULL, width = NULL), # manual control over chart dims
                      max_height = NULL, # manual control over the maximum height of the chart
+                     add_width = 0,
                      save_data = FALSE,
                      base_size = 10, # set the base size for the theme61 font size call
                      # multi-panel specific arguments
@@ -84,7 +88,8 @@ save_e61 <- function(filename,
                      nrow = NULL,
                      align = c("v", "none", "h", "hv"),
                      axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-                     rel_heights = NULL) {
+                     rel_heights = NULL
+                     ) {
 
   # Compile plots
   plots <- c(list(...), plotlist)
@@ -277,7 +282,7 @@ save_e61 <- function(filename,
     graph = save_input$graph,
     format = format,
     filename = filename,
-    width = save_input$width,
+    width = save_input$width + add_width,
     height = save_input$height,
     bg_colour = bg_colour
   )

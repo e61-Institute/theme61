@@ -219,6 +219,15 @@ test_that("Change background colour", {
   })
 })
 
+test_that("Extra width", {
+  p <- minimal_plot
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-extra-width.svg", p, add_width = 2)))
+    expect_snapshot_file(suppressWarnings(save_e61("plot-multi-extra-width.svg", p, p, add_width = 2)))
+  })
+})
+
 # Check whole-graph generation consistency --------------------------------
 
 test_that("Single-panel graph examples", {

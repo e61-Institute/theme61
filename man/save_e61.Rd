@@ -13,6 +13,7 @@ save_e61(
   auto_scale = TRUE,
   dim = list(height = NULL, width = NULL),
   max_height = NULL,
+  add_width = 0,
   save_data = FALSE,
   base_size = 10,
   bg_colour = "white",
@@ -60,6 +61,10 @@ chart type and function-calculated value.}
 \item{max_height}{Numeric. The maximum height of your plot in cm. This is
 used to constrain the plot resizing algorithm in cases where you want to
 limit the height of your charts.}
+
+\item{add_width}{Numeric. Add additional space on the left and right of the
+graph. Useful in the rare case where the graphing algorithm does not
+provide adequate width.}
 
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph
