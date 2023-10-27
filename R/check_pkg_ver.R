@@ -6,8 +6,9 @@
 #' This function runs when the package is loaded and throws a warning to the
 #' user if the package is out-of-date.
 #'
+#' @param test Logical. For testing the interactive prompt.
 #' @noRd
-chk_pkg_ver <- function() {
+check_pkg_ver <- function(test = FALSE) {
   # Checks Github for latest version of theme61
   releases <- gh::gh("GET /repos/{owner}/{repo}/releases",
                      owner = "e61-institute",
@@ -19,9 +20,23 @@ chk_pkg_ver <- function() {
   # Get the latest version of the local installation
   inst_v <- packageVersion("theme61")
 
+  # Set up a test with fake package versions that trigger the prompt
+  if (test) {
+    inst_v <- "0.8.2"
+    latest_v <- "0.9.0"
+  }
+
   # Print a warning to update the package if it is out-of-date
   if (inst_v < latest_v) {
-    cli::cli_alert_warning("Your version of theme61 is out-of-date. Please update by running `remotes::install_github('e61-institute/theme61')`")
+
+    resp <- ""
+    while (resp != "Ok") {
+      cli::cli_alert_warning(
+        "Your version of theme61 is out-of-date. Run `remotes::install_github('e61-institute/theme61')` to update. Type 'Ok' to continue.",
+        wrap = TRUE)
+
+      resp <- readline()
+    }
   }
 
   invisible(NULL)

@@ -41,6 +41,10 @@ secondary axis. \code{sec_rescale} is used in the \code{sec_axis} argument of
 See the examples for how to use the two functions to manipulate the secondary
 axis. Trial and error will be needed to select appropriate scale and shift
 values.
+
+**Note:** Due to the way that ggplot functions interact with the R
+environment, you have to run the code that generates the graph **twice**
+after you change it before the changes will show up.
 }
 \examples{
 
