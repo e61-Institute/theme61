@@ -15,6 +15,10 @@
 #' axis. Trial and error will be needed to select appropriate scale and shift
 #' values.
 #'
+#' **Note:** Due to the way that ggplot functions interact with the R
+#' environment, you have to run the code that generates the graph **twice**
+#' after you change it before the changes will show up.
+#'
 #' @param values Vector of data that would normally be passed as the y aesthetic
 #'   in the graph.
 #' @param scale Numeric. Multiplicative factor that rescales the axis. For
@@ -47,6 +51,15 @@ sec_rescale_inv <- function(values, scale = 1, shift = 0) {
   # Store scale and shift vars to supply to sec_rescale()
   assign("sec_axis_scale", scale, envir = t61_env)
   assign("sec_axis_shift", shift, envir = t61_env)
+
+  # Inform the user of the weirdness
+  if (getOption("sec_axis_msg", default = TRUE)) {
+    cli::cli_alert_info("Did your graph not show any change to the secondary axis? Due to weirdness, you need to run the graph code twice after making changes to the secondary axis rescaling. This message appears once per session. To view it again, run `options(sec_axis_msg = TRUE)`.",
+                        wrap = TRUE)
+
+    # Turn off the option after appearing once
+    options(sec_axis_msg = FALSE)
+  }
 
   return ((values + shift) / scale)
 }
