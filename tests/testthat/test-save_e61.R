@@ -225,9 +225,7 @@ test_that("Single-panel graph examples", {
 
   withr::local_seed(42)
 
-  # Put a comprehensive series of graph examples here
-
-  # Graph with cont-y var with values from 0-20
+  ## Cont-y var with values from 0-20 ----
   data <- data.frame(x = factor(1:10), y = runif(10, 0, 20))
 
   p <- ggplot(data, aes(x, y)) +
@@ -237,7 +235,7 @@ test_that("Single-panel graph examples", {
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y.svg", p)))
   })
 
-  # Graph with cont-y var with small values from 0-1
+  ## Cont-y var with small values from 0-1 ----
   data <- data.frame(x = factor(1:10), y = runif(10, 0, 1))
 
   p <- ggplot(data, aes(x, y)) +
@@ -247,7 +245,7 @@ test_that("Single-panel graph examples", {
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y-sml-val.svg", p)))
   })
 
-  # Graph with cont-y var with negative values from -20 to 0
+  ## Cont-y var with negative values from -20 to 0 ----
   data <- data.frame(x = factor(1:10), y = runif(10, -20, 0))
 
   p <- ggplot(data, aes(x, y)) +
@@ -257,7 +255,7 @@ test_that("Single-panel graph examples", {
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y-neg-val.svg", p)))
   })
 
-  # Graph with cont-y var with large values from -1000 to +1000
+  ## Cont-y var with large values from -1000 to +1000 ----
   data <- data.frame(x = factor(1:10), y = runif(10, -1000, 1000))
 
   p <- ggplot(data, aes(x, y)) +
@@ -267,7 +265,7 @@ test_that("Single-panel graph examples", {
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-y-lg-val.svg", p)))
   })
 
-  # Graph with cont x and y vars
+  ## Cont x and y vars ----
   data <- data.frame(x = runif(10, -1, 1), y = runif(10, -1, 1))
 
   p <- ggplot(data, aes(x, y)) +
@@ -277,7 +275,7 @@ test_that("Single-panel graph examples", {
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-x-y.svg", p)))
   })
 
-  # Graph with discrete x and y vars
+  ## Discrete x and y vars ----
   data <- data.table::CJ(x = factor(1:10), y_var = factor(1:10))
   data[, fill := runif(100, 0, 100)]
 
@@ -288,7 +286,7 @@ test_that("Single-panel graph examples", {
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-disc-x-y.svg", p)))
   })
 
-  # Graph with date x var
+  ## Date x var ----
   data <- data.frame(
     x = seq.Date(as.Date("2011-01-01"), by = "1 year", length.out = 10),
     y = runif(10, -1, 1)
@@ -301,7 +299,7 @@ test_that("Single-panel graph examples", {
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-date-x.svg", p)))
   })
 
-  # Graph with date x var and colours
+  ## Date x var and colours ----
   data <- data.frame(
     x = rep(seq.Date(as.Date("2011-01-01"), by = "1 year", length.out = 10), 2),
     y = runif(20, -1, 1),
@@ -315,7 +313,7 @@ test_that("Single-panel graph examples", {
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-date-x-colour.svg", p)))
   })
 
-  # Flipped coord graph discrete x var, cont y var
+  ## Flipped coord with discrete x var, cont y var ----
   data <- data.frame(x = factor(1:10), y = runif(10, 0, 10))
 
   p <- ggplot(data, aes(x, y)) +
@@ -326,7 +324,7 @@ test_that("Single-panel graph examples", {
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-flip.svg", p)))
   })
 
-  # Date x-var, ribbon y-var
+  ## Date x-var, ribbon y-var ----
   data <- data.frame(
     x = seq.Date(as.Date("2011-01-01"), by = "1 year", length.out = 10),
     y = runif(10, -1, 1),
@@ -342,7 +340,7 @@ test_that("Single-panel graph examples", {
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-ymin-max.svg", p)))
   })
 
-  # geom_histogram graph
+  ## geom_histogram graph ----
   data <- data.frame(x = rnorm(1000))
 
   p <- ggplot(data, aes(x)) +
@@ -352,12 +350,29 @@ test_that("Single-panel graph examples", {
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-hist.svg", p)))
   })
 
-  # geom_density graph
+  ## geom_density graph ----
   p <- ggplot(data, aes(x)) +
     geom_density()
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-dens.svg", p)))
+  })
+
+  ## Horizontal time series ----
+  p <- ggplot(data.frame(x = 1:2, y = rep(100, 2)), aes(x, y)) +
+    geom_line()
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-straight-line.svg", p)))
+  })
+
+  ## Plot with geom_rect ----
+  p <- ggplot(data.frame(x = 1:3, y = c(90, 100, 110)), aes(x, y)) +
+    geom_rect(xmin = 0.25, xmax = 0.75, ymin = -Inf, ymax = Inf,
+              alpha = 0.1)
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-geom_rect.svg", p)))
   })
 
 })
@@ -368,7 +383,7 @@ test_that("Multi-panel graph examples", {
 
   # Graphs to use in the panels
 
-  # Graph with cont-y var with small values from 0-1
+  # Cont-y var with small values from 0-1
   data <- data.frame(x = factor(1:10), y = runif(10, 0, 1))
 
   p1 <- ggplot(data, aes(x, y)) +
@@ -394,7 +409,7 @@ test_that("Multi-panel graph examples", {
              subtitle = "Panel graph subtitle text",
              y = "'000")
 
-  # Graph with cont-y var with large values from -1000 to +1000
+  # Cont-y var with large values from -1000 to +1000
   data <- data.frame(x = factor(1:10), y = runif(10, -1000, 1000))
 
   p3 <- ggplot(data, aes(x, y)) +
