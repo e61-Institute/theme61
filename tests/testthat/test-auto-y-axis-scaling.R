@@ -15,7 +15,7 @@ test_that("Functionality in auto y-axis scaling works", {
   expect_equal(get_aes_limits(-20, -14), list(-25, -10, 5))
   expect_equal(get_aes_limits(0, 11.5), list(0, 15, 5))
 
-  # Testing opposite sides - this creates issues - should be
+  # Testing opposite sides
   expect_equal(get_aes_limits(-4, 44), list(-10, 50, 10))
   expect_equal(get_aes_limits(-0.4, 44), list(-10, 50, 10))
   expect_equal(get_aes_limits(-44, 44), list(-45, 45, 15))
@@ -79,10 +79,10 @@ test_that("Functionality in auto y-axis scaling works", {
   expect_equal(get_aes_pair(4, 44), list(0, 45))
   expect_equal(get_aes_pair(11, 44), list(10, 45))
   expect_equal(get_aes_pair(16, 74), list(15, 75))
-  expect_equal(get_aes_pair(-16, -74), list(-15, -75))
-  expect_equal(get_aes_pair(-1, -14), list(0, -15))
-  expect_equal(get_aes_pair(-10, -14), list(-9, -15))
-  expect_equal(get_aes_pair(-20, -14), list(-10, -25))
+  expect_equal(get_aes_pair(-16, -74), list(-75, -15))
+  expect_equal(get_aes_pair(-1, -14), list(-15, 0))
+  expect_equal(get_aes_pair(-10, -14), list(-15, -9))
+  expect_equal(get_aes_pair(-20, -14), list(-25, -10))
 
   # Testing opposite sides
   expect_equal(get_aes_pair(-4, 44), list(-10, 50))

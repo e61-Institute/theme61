@@ -278,6 +278,13 @@ get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
   aes_y_points <- data.table::data.table(points = c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100))
 
   order_mag <- ceiling(log10(adj * y_val))
+
+  # Check that we don't have a number at the top of the order of magnitude range
+  # (e.g. 10) - this will throw an error if you try to look for the next largest
+  # number as there will be none larger in the set
+  if(adj * y_val == 10 ^ order_mag & type == "next_largest")
+      order_mag <- order_mag + 1
+
   aes_y_points[, points_adj := adj * points]
   aes_y_points[, points_diff := points_adj - (y_val / 10 ^ (order_mag - 2))]
 
@@ -347,30 +354,29 @@ get_aes_ticks <- function(min_y_val, max_y_val){
 
     # both not equal to 0 - gap spans 0
     if(min_y_val != 0 && max_y_val != 0){
-      min_val <- min(c(max_y_val, abs(min_y_val)))
-      max_val <- min(c(max_y_val, abs(min_y_val)))
 
-      max_size <- min_val
+      # the maximum size of the break is equal to the smallest of the two points
+      max_size <- min(c(max_y_val, abs(min_y_val)))
 
       # top equal to 0 and bot below
     } else if(min_y_val < 0){
-      max_size <- abs(min_y_val) / 2
+      max_size <- abs(min_y_val) / 3
 
       # bot equal to 0 and top above
     } else {
-      max_size <- max_y_val / 2
+      max_size <- max_y_val / 3
     }
 
   } else if (min_y_val < 0 && max_y_val < 0) {
 
     diff <- abs(min_y_val) - abs(max_y_val)
 
-    max_size <- diff / 2
+    max_size <- diff / 3
 
   } else {
     diff <- max_y_val - min_y_val
 
-    max_size <- diff / 2
+    max_size <- diff / 3
   }
 
   # adjust the order of magnitude of the difference if it is less than 10 or > 100
@@ -403,7 +409,7 @@ get_aes_ticks <- function(min_y_val, max_y_val){
     # But first check the max value is aesthetic itself - it should be most of the time
     aes_y_points <- unlist(aes_y_points)
 
-    # adjust the order of magnitude if necessary
+    # adjust the order of magnitude if necessary - returning NULL does this
     if(!chk_diff(aes_y_points, max_size / 10 ^ (order_mag_max - 2))) {
       return(NULL)
 
@@ -413,9 +419,8 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   }
 
   # Rule 2 - If the band size is larger than the distance from the smallest value to 0, then it will not be aesthetic!!
-  if(band_val > max_size) {
-    band_val <- max_size
-  }
+  # Max size is the maximum allowable size for the band width
+  if(band_val > max_size) band_val <- max_size
 
   # Adjust orders of magnitude so that modular arithmetic still works
   adj_max_size <- max_size / 10 ^ (order_mag_max - 2)
@@ -428,11 +433,16 @@ get_aes_ticks <- function(min_y_val, max_y_val){
   if(min_y_val < 0 && max_y_val > 0){
     if(adj_max_size %% adj_band_val != 0){
 
+      # check whether the max size is
       if(adj_max_size %% 2 == 0) {
         band_val <- max_size / 2
 
       } else if(adj_max_size %% 3 == 0){
         band_val <- max_size / 3
+
+      # if both the min and max y-values are less than, then return NULL and try again
+      } else if(max_size >= abs(max_y_val) && max_size >= abs(min_y_val)) {
+        return(NULL)
 
       } else {
         band_val <- max_size
@@ -463,19 +473,32 @@ get_aes_pair <- function(y_val_1, y_val_2){
 
   aes_band_sizes <- c(5, 10, 15, 20, 25, 30)
 
-  # 1 - Start with the larger value - get an aesthic number for that one first
-  if(abs(y_val_1) > abs(y_val_2)){
-    largest_val <- y_val_1
-    smallest_val <- y_val_2
+  # 1 - If they're on the same side of zero, start with the larger value -
+  # get an aesthetic number for that one first
+  if((y_val_1 <= 0 & y_val_2 <= 0) || (y_val_1 >= 0 & y_val_2 >= 0)){
 
+    if(abs(y_val_1) > abs(y_val_2)){
+      first_value <- y_val_1
+      second_value <- y_val_2
+
+    } else {
+      first_value <- y_val_2
+      second_value <- y_val_1
+    }
+
+  # If they're either side of zero, then start with the smaller value
   } else {
-    largest_val <- y_val_2
-    smallest_val <- y_val_1
+    if(abs(y_val_1) > abs(y_val_2)){
+      first_value <- y_val_2
+      second_value <- y_val_1
+
+    } else {
+      first_value <- y_val_1
+      second_value <- y_val_2
+    }
   }
 
-  first_aes_largest_val <- get_aes_num(largest_val, type = "next_largest")
-
-  aes_largest_val <- first_aes_largest_val
+  aes_first_value <- get_aes_num(first_value, type = "next_largest")
   keep_going <- T
 
   # check whether we can get a good match with this aesthetic value - otherwise we may need to go higher
@@ -484,25 +507,25 @@ get_aes_pair <- function(y_val_1, y_val_2){
     # 2 - Then find all the aesthetic pairs
     aes_y_points <- c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100)
 
-    # adjust to the right order of magnitude for the smallest value
-    order_mag_large <- ceiling(log10(abs(aes_largest_val)))
-    order_mag_small <- ceiling(log10(abs(smallest_val)))
+    # adjust to the right order of magnitude for the second value
+    order_mag_first <- ceiling(log10(abs(aes_first_value)))
+    order_mag_second <- ceiling(log10(abs(second_value)))
 
     # If the numbers are more than one order of magnitude different, they'll never make a good pair
-    if(order_mag_large > order_mag_small + 1){
-      order_mag <- order_mag_large - 1
+    if(order_mag_first > order_mag_second + 1){
+      order_mag <- order_mag_first - 1
 
       # add 0 as a point because chances are we'll need it
       aes_y_points <- c(0, aes_y_points)
 
     } else {
-      order_mag <- order_mag_small
+      order_mag <- order_mag_second
     }
 
     aes_y_points <- aes_y_points * 10 ^ (order_mag - 2)
 
     # multiply by -1 if we're looking for a negative aesthetic pair
-    if(smallest_val < 0) aes_y_points <- -1 * aes_y_points
+    if(second_value < 0) aes_y_points <- -1 * aes_y_points
 
     # if the order of magnitude is 1 - i.e. numbers from 0-9, then add 0 to the mix
     if(order_mag <= 1) aes_y_points <- c(0, aes_y_points)
@@ -513,73 +536,77 @@ get_aes_pair <- function(y_val_1, y_val_2){
 
       test_val <- aes_y_points[i]
 
-      # the test value must be closer to zero than the smallest value if they both values are on the same side, otherwise it must be further from 0
-      if((smallest_val <= 0 & largest_val <= 0) || (smallest_val >= 0 & largest_val >= 0)){
+      # the test value must be closer to zero than the second value if they both values are on the same side, otherwise it must be further from 0
+      if((second_value <= 0 & first_value <= 0) || (second_value >= 0 & first_value >= 0)){
 
-        if(abs(test_val) > abs(smallest_val)) next
+        if(abs(test_val) > abs(second_value)) next
 
       } else {
-        if(abs(test_val) < abs(smallest_val)) next
+        if(abs(test_val) < abs(second_value)) next
       }
 
-      ticks <- get_aes_ticks(test_val, aes_largest_val)
+      ticks <- get_aes_ticks(test_val, aes_first_value)
 
       if(!is.null(ticks)) aes_pairs <- c(aes_pairs, test_val)
     }
 
-    # if there are no aesthetic pairs, then try the next highest aesthetic value for the top
+    # if there are no aesthetic pairs, then try the next highest aesthetic value
+    # for the first value
     if(is.null(aes_pairs)) {
 
-      aes_largest_val <- get_aes_num(aes_largest_val, type = "next_largest")
+      aes_first_value <- get_aes_num(aes_first_value, type = "next_largest")
 
-      # repeat the process
+      # repeat the process if this has failed
       next
     }
 
-    temp_data <- expand.grid(aes_large = aes_largest_val, aes_small = aes_pairs)
+    temp_data <- expand.grid(aes_first = aes_first_value, aes_second = aes_pairs)
 
-    # 3 - get the pair that is closest to the aesthetic value of the smaller number
-    # For the aesthetic number, if they are both positive or both negative we want the value just below the smallest number
+    # 3 - get the pair that is closest to the aesthetic value of the second number
+    # For the aesthetic number, if they are both positive or both negative we want the value just below the second number
     if((y_val_1 < 0 && y_val_2 < 0) || (y_val_1 > 0 && y_val_2 > 0)){
-      aes_smallest_val <- get_aes_num(smallest_val, type = "next_smallest")
+      aes_second_value <- get_aes_num(second_value, type = "next_smallest")
 
-      # adjust for the smallest aesthetic value
-      ret_smallest_val <- temp_data %>%
-        dplyr::mutate(diff = aes_small - aes_smallest_val) %>%
-        dplyr::filter(diff <= 0, abs(aes_small) <= abs(smallest_val)) %>%
+      # adjust for the second aesthetic value
+      ret_second_value <- temp_data %>%
+        dplyr::mutate(diff = aes_second - aes_second_value) %>%
+        dplyr::filter(diff <= 0, abs(aes_second) <= abs(second_value)) %>%
         dplyr::slice_max(diff, n = 1, with_ties = F) %>%
-        dplyr::pull(aes_small)
+        dplyr::pull(aes_second)
 
-    } else if(smallest_val < 0) {
-      aes_smallest_val <- get_aes_num(smallest_val, type = "next_largest")
+    } else if(second_value < 0) {
+      aes_second_value <- get_aes_num(second_value, type = "next_largest")
 
-      # adjust for the smallest aesthetic value
-      ret_smallest_val <- temp_data %>%
-        dplyr::mutate(diff = aes_small - aes_smallest_val) %>%
+      # adjust for the second aesthetic value
+      ret_second_value <- temp_data %>%
+        dplyr::mutate(diff = aes_second - aes_second_value) %>%
         dplyr::filter(diff <= 0) %>%
         dplyr::slice_max(diff, n = 1, with_ties = F) %>%
-        dplyr::pull(aes_small)
+        dplyr::pull(aes_second)
 
-    } else if(smallest_val > 0) {
-      aes_smallest_val <- get_aes_num(smallest_val, type = "next_largest")
+    } else if(second_value > 0) {
+      aes_second_value <- get_aes_num(second_value, type = "next_largest")
 
-      # adjust for the smallest aesthetic value
-      ret_smallest_val <- temp_data %>%
-        dplyr::mutate(diff = aes_small - aes_smallest_val) %>%
+      # adjust for the second aesthetic value
+      ret_second_value <- temp_data %>%
+        dplyr::mutate(diff = aes_second - aes_second_value) %>%
         dplyr::filter(diff >= 0) %>%
         dplyr::slice_min(diff, n = 1, with_ties = F) %>%
-        dplyr::pull(aes_small)
+        dplyr::pull(aes_second)
 
     } else {
-      ret_smallest_val <- 0
+      ret_second_value <- 0
     }
 
-    if (length(ret_smallest_val) == 0) ret_smallest_val <- 0
+    if (length(ret_second_value) == 0) ret_second_value <- 0
 
     break
   }
 
-  return(list(ret_smallest_val, aes_largest_val))
+  lower <- min(ret_second_value, aes_first_value)
+  upper <- max(ret_second_value, aes_first_value)
+
+  return(list(lower, upper))
 }
 
 # Return aesthetic limits given a min and max y-axis values
