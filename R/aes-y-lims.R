@@ -278,6 +278,13 @@ get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
   aes_y_points <- data.table::data.table(points = c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100))
 
   order_mag <- ceiling(log10(adj * y_val))
+
+  # Check that we don't have a number at the top of the order of magnitude range
+  # (e.g. 10) - this will throw an error if you try to look for the next largest
+  # number as there will be none larger in the set
+  if(adj * y_val == 10 ^ order_mag & type == "next_largest")
+      order_mag <- order_mag + 1
+
   aes_y_points[, points_adj := adj * points]
   aes_y_points[, points_diff := points_adj - (y_val / 10 ^ (order_mag - 2))]
 
@@ -331,10 +338,11 @@ get_aes_ticks <- function(min_y_val, max_y_val){
 
   # differences between points by the number of ticks to include
   aes_y_points <- list(
-    five_point = c(10, 15, 25, 50, 75, 100),
-    six_point = c(30, 60, 90),
+    five_point = c(10, 25, 50, 75, 100),
+    six_point = c(30, 60),
     four_point = c(20, 40, 80),
-    seven_point = c(35, 70)
+    seven_point = c(35, 70),
+    three_point = c(15, 45, 90)
   )
 
   # the maximum size of the tick spacing - set to max value (100 as we adjust based on the order of magnitude)
@@ -391,6 +399,9 @@ get_aes_ticks <- function(min_y_val, max_y_val){
 
   } else if (chk_diff(aes_y_points$seven_point, diff)) {
     band_val <- diff / 7
+
+  } else if (chk_diff(aes_y_points$three_point, diff)) {
+    band_val <- diff / 3
 
     # Rule 1 - If the difference is not in any of the lists, then it isn't aesthetic and we should try the max size to begin with
   } else {
@@ -487,9 +498,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
     }
   }
 
-  first_aes_val <- get_aes_num(first_value, type = "next_largest")
-
-  aes_first_value <- first_aes_val
+  aes_first_value <- get_aes_num(first_value, type = "next_largest")
   keep_going <- T
 
   # check whether we can get a good match with this aesthetic value - otherwise we may need to go higher
@@ -594,7 +603,10 @@ get_aes_pair <- function(y_val_1, y_val_2){
     break
   }
 
-  return(list(ret_second_value, aes_first_value))
+  lower <- min(ret_second_value, aes_first_value)
+  upper <- max(ret_second_value, aes_first_value)
+
+  return(list(lower, upper))
 }
 
 # Return aesthetic limits given a min and max y-axis values
