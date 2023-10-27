@@ -67,7 +67,6 @@ what you are looking for.
 \examples{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
   geom_point() +
-  theme_e61() +
-  scale_colour_e61(n = 3)
+  theme_e61()
 
 }
