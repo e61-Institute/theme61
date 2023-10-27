@@ -30,8 +30,8 @@
 #'   logical. Set the maximum number of characters per line in the title,
 #'   subtitle and footer text. Set to \code{FALSE} if you want to turn off text
 #'   wrapping. The default is usually appropriate for the default graph
-#'   dimensions in \code{\link[theme61]{e61_save}}.
-#' @param ... Additional graph component titles (optional).
+#'   dimensions in \link{save_e61}.
+#' @param ... Additional optional arguments passed to \link[ggplot2]{labs}.
 #'
 #' @export
 #' @examples

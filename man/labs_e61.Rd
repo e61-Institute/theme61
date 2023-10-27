@@ -33,12 +33,12 @@ separate points you include in the graph.}
 logical. Set the maximum number of characters per line in the title,
 subtitle and footer text. Set to \code{FALSE} if you want to turn off text
 wrapping. The default is usually appropriate for the default graph
-dimensions in \code{\link[theme61]{e61_save}}.}
+dimensions in \link{save_e61}.}
 
 \item{x, y}{String to set the x- and y-axis titles. Note that the x-axis title
 is blank (NULL) by default.}
 
-\item{...}{Additional graph component titles (optional).}
+\item{...}{Additional optional arguments passed to \link[ggplot2]{labs}.}
 }
 \description{
 Provides support for well-formatted titles and footer text with minimal user

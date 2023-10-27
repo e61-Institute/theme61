@@ -38,8 +38,9 @@ do not include the extension, see the \code{format} argument for details.}
 
 \item{...}{(multi-panel specific) Plot objects to put on the panel.}
 
-\item{plot}{Single-panel plot object to save. Defaults to the last plot
-displayed so usually you do not need to provide this explicitly.}
+\item{plot}{(single-panel specific) Name of the plot object to save. Defaults
+to the last plot displayed so usually you do not need to provide this
+argument explicitly.}
 
 \item{format}{An optional vector of file formats to save as. For example
 \code{c("svg", "pdf")} will save 2 files with the same name to the same
@@ -47,8 +48,8 @@ location to SVG and PDF formats. If the file format is specified in
 \code{filename}, then this argument is ignored.}
 
 \item{chart_type}{String. Type of chart. This is used to set sensible chart
-widths based on the width of text in each document. Options are 'MN' ( for
-micronotes), 'RN' (research notes), 'PPT' (PowerPoints).}
+widths based on the width of text in each document. Options are "MN" (for
+micronotes), "RN" (research notes) or "PPT" (PowerPoints).}
 
 \item{auto_scale}{Logical. Should the y-axis be scaled automatically. Default
 is TRUE.}
@@ -67,9 +68,9 @@ same name as the graph that contains the data needed to recreate the graph
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
 
-\item{bg_colour}{Sets the graph background colour. Defaults to white. Accepts
-a colour name, hex code or theme61 colour object name. For graphs used in
-research note boxes, set the colour to e61_boxback.}
+\item{bg_colour}{Sets the graph background colour. Defaults to "white".
+Accepts a colour name, hex code or theme61 colour object name. For graphs
+used in research note boxes, set the colour to \code{e61_boxback}.}
 
 \item{plotlist}{(multi-panel specific) List of plots to combine as an
 multi-panel and save. You can also enter the charts individually as
@@ -114,17 +115,15 @@ relative proportions of each graph component (title, plots, footer
 Invisibly returns the file name.
 }
 \description{
-Designed to save ggplot graphs made with the e61 theme with
-  sensible defaults that ensure the text size is appropriately proportioned
-  given default sizing.
+Saves ggplot2 graphs made with using theme61. Using \code{save_e61()} is
+required to ensure graphs are consistent with the e61 style and formatting.
+}
+\details{
+The supported file formats are SVG, PDF, EPS and PNG.
 
-  The supported file formats are SVG, PDF, EPS and PNG.
+Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
+better as they are modern vector graphics file formats which can be scaled up
+and down in size without blurring or becoming pixelated.
 
-  Use PDF in all notes and SVG in PowerPoint presentations. PDF and SVG are
-  better as they are modern vector graphics file formats which can be scaled
-  up and down in size without blurring or becoming pixelated.
-
-  PNG should only be used for Twitter posts for compatibility reasons.
-
-  See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
+PNG should only be used for Twitter posts for compatibility reasons.
 }
