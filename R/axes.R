@@ -70,14 +70,22 @@ scale_y_continuous_e61 <- function(limits = NULL,
     sec_axis$labels <- sec_labels
   }
 
-  # Put it all together
-  retval <- ggplot2::scale_y_continuous(
-    expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
-    sec.axis = sec_axis,
-    limits = limits,
-    breaks = breaks,
-    ...
+  if(!is.null(limits)){
+    # Put it all together
+    retval <- ggplot2::scale_y_continuous(
+      expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
+      sec.axis = sec_axis,
+      limits = limits,
+      breaks = breaks,
+      ...
     )
+
+  } else {
+    retval <- ggplot2::scale_y_continuous(
+      expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
+      ...
+    )
+  }
 
   class(retval) <- c(class(retval), "scale_e61")
 

@@ -110,6 +110,10 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
     min_y <- minmax[[1]]
     max_y <- minmax[[2]]
 
+    # if they are the same value then, then update to return something more
+    # interesting
+    if(min_y == max_y) min_y <- get_aes_num(min_y, diff = 0, "next_smallest")
+
     # check whether the chart is a bar chart or not
     is_bar <- is_barchart(plot)
 
@@ -244,10 +248,11 @@ get_y_minmax <- function(plot){
 #' Check whether a ggplot is a barchart or not
 #' @noRd
 is_barchart <- function(plot){
+
   # Check whether the chart is a column chart
   geoms <- plot$layers
 
-  check_geoms <- c("GeomCol", "GeomBar", "GeomRect")
+  check_geoms <- c("GeomCol", "GeomBar")
 
   is_bar <- FALSE
 
@@ -270,12 +275,13 @@ is_barchart <- function(plot){
 #' y_val - Numeric. Number for which we are going
 #' type - String. Are we looking for the next smallest or next largest aesthetic value.
 #' @noRd
-get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
+get_aes_num <- function(y_val, diff, type = c("next_largest", "next_smallest")) {
 
   # set the adjustment factor based on whether we are looking at a value above or below 1
   adj <- if (y_val > 0) 1 else -1
 
   aes_y_points <- data.table::data.table(points = c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100))
+  aes_y_points[, points_adj := adj * points]
 
   order_mag <- ceiling(log10(adj * y_val))
 
@@ -285,8 +291,24 @@ get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
   if(adj * y_val == 10 ^ order_mag & type == "next_largest")
       order_mag <- order_mag + 1
 
-  aes_y_points[, points_adj := adj * points]
-  aes_y_points[, points_diff := points_adj - (y_val / 10 ^ (order_mag - 2))]
+  # check whether we are scaling the order of magnitude up by too much, or
+  # whether we would be better off just adding another 100 points
+  order_mag_diff <- ceiling(log10(diff))
+
+  # if the orders of magnitude are off, then this is the case
+  if(order_mag_diff < order_mag){
+
+    order_mag_same <- TRUE
+
+    adj_val <- ceiling(y_val / 100) * 100
+
+    aes_y_points[, points_diff := (points_adj + adj_val) - y_val]
+
+  } else {
+    order_mag_same <- FALSE
+
+    aes_y_points[, points_diff := points_adj - (y_val / 10 ^ (order_mag - 2))]
+  }
 
   if(type == "next_smallest")
     aes_y_points[, points_diff := -1 * points_diff]
@@ -307,11 +329,10 @@ get_aes_num <- function(y_val, type = c("next_largest", "next_smallest")) {
     }
   }
 
-  # take the smallest value that is greater than 0
-  y_aes_adj <- adj * aes_y_points$points[1]
-  y_aes <- aes_y_points$points[1]
+  # take the smallest value that is greater than 0, then transform back the order of magnitude
+  y_aes_adj <- adj * aes_y_points$points[1] * 10 ^ (order_mag - 2)
 
-  return(y_aes_adj * 10 ^ (order_mag - 2))
+  return(y_aes_adj)
 }
 
 #' Aesthetic ticks for a given pair of numbers
@@ -498,7 +519,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
     }
   }
 
-  aes_first_value <- get_aes_num(first_value, type = "next_largest")
+  aes_first_value <- get_aes_num(first_value, diff = abs(first_value - second_value), type = "next_largest")
   keep_going <- T
 
   # check whether we can get a good match with this aesthetic value - otherwise we may need to go higher
@@ -554,7 +575,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
     # for the first value
     if(is.null(aes_pairs)) {
 
-      aes_first_value <- get_aes_num(aes_first_value, type = "next_largest")
+      aes_first_value <- get_aes_num(aes_first_value, diff = abs(second_value - aes_first_value), type = "next_largest")
 
       # repeat the process if this has failed
       next
@@ -565,7 +586,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
     # 3 - get the pair that is closest to the aesthetic value of the second number
     # For the aesthetic number, if they are both positive or both negative we want the value just below the second number
     if((y_val_1 < 0 && y_val_2 < 0) || (y_val_1 > 0 && y_val_2 > 0)){
-      aes_second_value <- get_aes_num(second_value, type = "next_smallest")
+      aes_second_value <- get_aes_num(second_value, diff = abs(second_value - aes_first_value), type = "next_smallest")
 
       # adjust for the second aesthetic value
       ret_second_value <- temp_data %>%
@@ -575,7 +596,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
         dplyr::pull(aes_second)
 
     } else if(second_value < 0) {
-      aes_second_value <- get_aes_num(second_value, type = "next_largest")
+      aes_second_value <- get_aes_num(second_value, diff = abs(second_value - aes_first_value), type = "next_largest")
 
       # adjust for the second aesthetic value
       ret_second_value <- temp_data %>%
@@ -585,7 +606,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
         dplyr::pull(aes_second)
 
     } else if(second_value > 0) {
-      aes_second_value <- get_aes_num(second_value, type = "next_largest")
+      aes_second_value <- get_aes_num(second_value, diff = abs(second_value - aes_first_value), type = "next_largest")
 
       # adjust for the second aesthetic value
       ret_second_value <- temp_data %>%
@@ -616,10 +637,13 @@ get_aes_pair <- function(y_val_1, y_val_2){
 #' @noRd
 get_aes_limits <- function(min_y_val, max_y_val, from_zero = F, include_vals = F){
 
+  # if either is NULL return an error
   if(is.null(min_y_val) || is.null(max_y_val)){
     stop("Y-axis limits could not be determined. Please check your y-axis variable is numeric.")
   }
 
+  # arrange to make sure the min value is always the lowest, not necessarily the
+  # smallest in absolute value terms
   if(max_y_val < min_y_val){
     temp <- min_y_val
     min_y_val <- max_y_val
@@ -630,26 +654,26 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F, include_vals = F
   if(min_y_val < 0 & max_y_val > 0) from_zero <- F
 
   # increase the size of each value to provide some buffer around the points
-  if(min_y_val > 0 && (min_y_val - (0.01 * abs(min_y_val))) < 0){
+  if(min_y_val > 0 && (min_y_val - (0.001 * abs(min_y_val))) < 0){
 
     min_y_val <- 0
 
   } else if (!include_vals) {
-    min_y_val <- min_y_val - (0.01 * abs(min_y_val))
+    min_y_val <- min_y_val - (0.001 * abs(min_y_val))
   }
 
-  if(max_y_val < 0 && (max_y_val + (0.01 * abs(max_y_val))) > 0){
+  if(max_y_val < 0 && (max_y_val + (0.001 * abs(max_y_val))) > 0){
 
     max_y_val <- 0
 
   } else if (!include_vals) {
-    max_y_val <- max_y_val + (0.01 * abs(max_y_val))
+    max_y_val <- max_y_val + (0.001 * abs(max_y_val))
   }
 
   # If they are the same, return a scale from 0 to the value
   if(min_y_val == max_y_val){
 
-    aes_num <- get_aes_num(y_val = min_y_val, type = "next_largest")
+    aes_num <- get_aes_num(y_val = min_y_val, diff = 0, type = "next_largest")
 
     # if we want to scale from from_zero then only use one value for the limits
   } else if(from_zero){
@@ -662,10 +686,10 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F, include_vals = F
       limits <- list(min(temp), max(temp))
 
     } else if (min_y_val < 0){
-      limits <- list(get_aes_num(min_y_val, type = "next_largest"), 0)
+      limits <- list(get_aes_num(min_y_val, diff = abs(min_y_val), type = "next_largest"), 0)
 
     } else {
-      limits <- list(0, get_aes_num(max_y_val, type = "next_largest"))
+      limits <- list(0, get_aes_num(max_y_val, diff = abs(max_y_val), type = "next_largest"))
     }
 
     # otherwise just get an aesthetic pair (not equal and not a bar chart)

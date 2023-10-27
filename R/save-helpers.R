@@ -10,6 +10,9 @@ save_graph <- function(graph, format, filename, width, height, bg_colour) {
     # Create a temp name for png
     if (fmt == "png") file_temp <- tempfile(fileext = ".svg")
 
+    # add very slight width buffer
+    width <- width + 0.1
+
     switch(
       fmt,
       svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
@@ -26,9 +29,7 @@ save_graph <- function(graph, format, filename, width, height, bg_colour) {
     if (fmt == "png") {
       svg_to_png(file_temp, paste0(filename, ".png"), delete = TRUE)
     }
-
   })
-
 }
 
 #' Check plots are ggplot objects and return a list of only ggplot objects
