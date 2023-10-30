@@ -2,37 +2,32 @@
 
 XX XXX 2023
 
-#### Major breaking change: Automatic chart sizing, y-axis scaling, colour and fill scaling, sensible chart widths.
+#### Automatic chart sizing, and y-axis, colour and fill scaling.
 
-* Added automatic chart resizing functionality. This sets the chart height so there is no excess white space given the chart width. Note that this is only applied when chart is saved using `save_e61()`.
-* Added methods to automatically scale titles, subtitles and footnotes to exactly the panel width. This ensures that each exactly fits the width of the chart panel by taking into account the width of the panel (in cm) and the width of the text (in cm). Note this is only applied when chart is saved.
-* Added automatic y-axis scaling. This means that if you have a numeric y-axis the limits and breaks will be set to sensible, aesthetic defaults. Note this is only applied when the chart is saved. You can also override this automatic scaling by providing your own limits using `scale_y_continuous_e61()`.
-* Added sensible default chart widths that are different for micronotes, research notes and PowerPoint presentations. These are based on the paragraph widths in each document and are chosen based on the `chart_type` argument supplied to `save_e61()`.
-* Added automatic colour and fill scaling. This means that your charts will use the e61 palette by default if you define a fill or colour variable in your main `ggplot` call (e.g. `ggplot(data, aes(x = x_var, y = y_var, fill = fill_var)))`). If you don't do this you can still take advantage of the new functionality when using `scale_fill_e61()` and `scale_colour_e61()` as you no longer need to state the number of colours you need (i.e. no more `n = 7`).
-* These features are implemented directly in `theme61::ggplot()`. This masks the `ggplot()` function in `ggplot2` so if you wish to call the original function you need to specify the namespace like so `ggplot2:ggplot()`. 
-* Updated `mpanel_e61()` so that it leverages the above code.
+This is a major breaking change. Your code will be simpler but may need some changes to work.
 
-#### Other new/changed functionality
+Most of these improvements are applied when you save graphs using `save_e61()`, so will not show up in the preview.
 
-* Added console messages that tell you when common graphing mistakes have been made and how to correct them when you save a graph using `save_e61()`.
+* Graphs now automatically size themselves correctly. You no longer need to figure out the appropriate graph height.
+* Titles, subtitles and footnotes will automatically scale to fit the panel width. 
+* Y-axis will automatically set limits and breaks to aesthetic defaults. You can override this by providing your own limits using `scale_y_continuous_e61()`.
+* Colour/fill will automatically apply the e61 Institute colour palette. This works if you define a fill/colour variable in your main `ggplot` call (e.g. `ggplot(data, aes(x, y, fill = fill)))`). You no longer need to specify the number of colours when using `scale_colour/fill_e61()`.
+* Added different default graph dimensions for micro notes, research notes and PowerPoint presentations. 
+* These features are implemented directly in `theme61::ggplot()`. This masks the `ggplot()` function in `ggplot2` so if you wish to call the original function you need to specify the namespace like so `ggplot2::ggplot()`. Make sure you load `theme61` *after* `ggplot2` otherwise the correct functions will not be called.
+* `mpanel_e61()` has been retired as functionality has been incorporated directly into `save_e61()`.
+
+#### Other changes
+
+* Added console messages to help correct common graphing mistakes.
 * Changed default font of graphs to 'PT Sans' to be consistent with research note font.
 * Allow rotation of labels in `mplot_label()`.
-* Renamed `add_zeroline()` to `add_baseline()` because you can now add a line at a place other than `y = 0`.
-* Renamed `e61_palette()` to `palette_e61()` for consistency with other functions suffixed `_e61`.
-* Added alias for `plot_label()` (`plab()`) and `mplot_label()` (`mplab()`) to let you type slightly less code when making graphs.
-* Add additional warning messages when inappropriately formatted y-axis labels are used.
-* Improvements to `mpanel_e61()` to better support multi-panel graphs with no titles.
-* X-axis ticks now point out from the x-axis.
+* Renamed `add_zeroline()` to `add_baseline()`, and `e61_palette()` to `palette_e61()`.
+* Added aliases for `plot_label()` (`plab()`) and `mplot_label()` (`mplab()`) to let you type slightly less code.
 
-#### Bug fixes
+#### Bug fixes and documentation updates
 
-* Fixed the adjustment of y-axis titles so they no longer overlap the chart panel or are too far away as the number of characters in y-axis labels changes.
 * Fixed an issue where saving graphs with no title created whitespace above the plot.
-
-#### Documentation updates
-
-* [TODO] Vignettes rewritten to reflect new workflow.
-* Documentation updates to reflect new workflow.
+* Documentation and vignettes rewritten to reflect new workflow.
 
 # theme61 0.5.0
 
