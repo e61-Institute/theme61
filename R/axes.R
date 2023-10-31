@@ -65,8 +65,10 @@ scale_y_continuous_e61 <- function(limits = NULL,
 
   # Prepares breaks for the rescaled secondary axis if used
   if (isTRUE(rescale_sec)) {
-    sec_labels <- sec_rescale(breaks)
+    sec_breaks <- sec_rescale(breaks)
+    sec_labels <- sec_breaks
     sec_labels[is.na(sec_labels)] <- ""
+    sec_axis$breaks <- sec_breaks
     sec_axis$labels <- sec_labels
   }
 
