@@ -283,32 +283,60 @@ get_aes_num <- function(y_val, diff, type = c("next_largest", "next_smallest")) 
   aes_y_points <- data.table::data.table(points = c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100))
   aes_y_points[, points_adj := adj * points]
 
-  order_mag <- ceiling(log10(adj * y_val))
-
-  # Check that we don't have a number at the top of the order of magnitude range
-  # (e.g. 10) - this will throw an error if you try to look for the next largest
-  # number as there will be none larger in the set
-  if(adj * y_val == 10 ^ order_mag & type == "next_largest")
-      order_mag <- order_mag + 1
-
   # check whether we are scaling the order of magnitude up by too much, or
   # whether we would be better off just adding another 100 points
   order_mag_diff <- ceiling(log10(diff))
+  order_mag <- ceiling(log10(adj * y_val))
 
-  # if the orders of magnitude are off, then this is the case
-  if(order_mag_diff < order_mag){
+  # if the difference is of a lesser order of magnitude than the number, then
+  # adjust the y-vale to take into account this difference -
+  # two hacky caveats: don't do it for values under 100 where the difference in
+  # order of magnitudes isn't very large
+  diff_adj <- FALSE
+  adj_val <- 0
 
-    order_mag_same <- TRUE
+  if(order_mag_diff < order_mag && (order_mag > 2 || order_mag_diff < (order_mag - 1))){
 
-    adj_val <- ceiling(y_val / 100) * 100
+    diff_adj <- TRUE
 
-    aes_y_points[, points_diff := (points_adj + adj_val) - y_val]
+    # adjust both diff and y-vals using the diff order of magnitude - gets rid
+    # of dealing with fiddly decimal points
+    diff <- round(diff / 10 ^ (order_mag_diff - 2), 0)
+    y_val_new <- ceiling(abs(y_val) / 10 ^ (order_mag_diff - 2))
 
-  } else {
-    order_mag_same <- FALSE
+    # take only the overlapping digits and scale this part of the number
+    len <- nchar(y_val_new)
 
-    aes_y_points[, points_diff := points_adj - (y_val / 10 ^ (order_mag - 2))]
+    y_val <- substring(y_val_new, len - nchar(diff) + 1, len) %>% as.numeric()
+
+    # save the values we dropped to to add back
+    adj_y_val <- y_val_new - y_val
+
+    # scale the y-value up so that if there were leading 0s (e.g. 409 becomes 09
+    # above) then we use 10 instead of 9 - this produces nicer aesthetic values
+    temp_y <- y_val
+    y_val <- pmax(y_val, 10 ^ (nchar(diff) - 1))
+
+    # If we have increase the size of the y-val in the lines above, then this
+    # allows the below algorithm to return values that are the same size as the
+    # value that has been scaled (e.g. is 09 becomes 10, this allows 10 to be
+    # returned)
+    if(temp_y < y_val) adj_val <- 1e-10
+
+    # convert the y-value back to negative territory if need be
+    y_val <- adj * y_val
+    adj_y_val <- adj * adj_y_val
   }
+
+  order_mag <- ceiling(log10(adj * y_val))
+
+  # Check that we don't have a number at the top of the order of magnitude range
+  # (e.g. 100) - this will throw an error if you try to look for the next largest
+  # number as there will be none larger in the set
+  if(adj * y_val == 10 ^ order_mag & type == "next_largest")
+    order_mag <- order_mag + 1
+
+  aes_y_points[, points_diff := adj_val + points_adj - y_val / 10 ^ (order_mag - 2)]
 
   if(type == "next_smallest")
     aes_y_points[, points_diff := -1 * points_diff]
@@ -331,6 +359,10 @@ get_aes_num <- function(y_val, diff, type = c("next_largest", "next_smallest")) 
 
   # take the smallest value that is greater than 0, then transform back the order of magnitude
   y_aes_adj <- adj * aes_y_points$points[1] * 10 ^ (order_mag - 2)
+
+  if(diff_adj){
+    y_aes_adj <- (y_aes_adj + adj_y_val) * 10 ^ (order_mag_diff - 2)
+  }
 
   return(y_aes_adj)
 }
@@ -520,6 +552,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
   }
 
   aes_first_value <- get_aes_num(first_value, diff = abs(first_value - second_value), type = "next_largest")
+
   keep_going <- T
 
   # check whether we can get a good match with this aesthetic value - otherwise we may need to go higher
@@ -596,6 +629,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
         dplyr::pull(aes_second)
 
     } else if(second_value < 0) {
+
       aes_second_value <- get_aes_num(second_value, diff = abs(second_value - aes_first_value), type = "next_largest")
 
       # adjust for the second aesthetic value

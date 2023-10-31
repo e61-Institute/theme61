@@ -11,8 +11,11 @@ test_that("Functionality in auto y-axis scaling works", {
   expect_equal(get_aes_limits(16, 74), list(15, 75, 10))
   expect_equal(get_aes_limits(-74, -16), list(-75, -15, 10))
   expect_equal(get_aes_limits(-14, -1), list(-15, 0, 5))
+
+  # TODO - these two fail in a really weird way
   expect_equal(get_aes_limits(-14, -10), list(-15, -9, 1))
   expect_equal(get_aes_limits(-20, -14), list(-25, -10, 5))
+
   expect_equal(get_aes_limits(0, 11.5), list(0, 15, 5))
 
   # Testing opposite sides
@@ -98,25 +101,37 @@ test_that("Functionality in auto y-axis scaling works", {
   # Test aesthetic numbers ----
 
   # Testing basic function
-  expect_equal(get_aes_num(87, type = "next_largest"), 90)
-  expect_equal(get_aes_num(101, type = "next_largest"), 150)
-  expect_equal(get_aes_num(987, type = "next_largest"), 1000)
-  expect_equal(get_aes_num(32, type = "next_largest"), 35)
-  expect_equal(get_aes_num(0.029, type = "next_largest"), 0.03)
-  expect_equal(get_aes_num(0.29, type = "next_largest"), 0.3)
+  expect_equal(get_aes_num(87, diff = 100, type = "next_largest"), 90)
+  expect_equal(get_aes_num(101, diff = 100, type = "next_largest"), 150)
+  expect_equal(get_aes_num(987, diff = 100, type = "next_largest"), 1000)
 
-  expect_equal(get_aes_num(-87, type = "next_largest"), -90)
-  expect_equal(get_aes_num(-101, type = "next_largest"), -150)
-  expect_equal(get_aes_num(-987, type = "next_largest"), -1000)
-  expect_equal(get_aes_num(-0.029, type = "next_largest"), -0.03)
-  expect_equal(get_aes_num(-0.29, type = "next_largest"), -0.3)
+  expect_equal(get_aes_num(32, diff = 100, type = "next_largest"), 35)
+  expect_equal(get_aes_num(0.029, diff = 100, type = "next_largest"), 0.03)
+  expect_equal(get_aes_num(0.29, diff = 100, type = "next_largest"), 0.3)
+
+  expect_equal(get_aes_num(-87, diff = 100, type = "next_largest"), -90)
+  expect_equal(get_aes_num(-101, diff = 100, type = "next_largest"), -150)
+  expect_equal(get_aes_num(-987, diff = 100, type = "next_largest"), -1000)
+  expect_equal(get_aes_num(-0.029, diff = 100, type = "next_largest"), -0.03)
+  expect_equal(get_aes_num(-0.29, diff = 100, type = "next_largest"), -0.3)
+
+  # Test the difference argument
+  expect_equal(get_aes_num(8.641, diff = 0.009, type = "next_largest"), 8.6415)
+  expect_equal(get_aes_num(864.1, diff = 0.9, type = "next_largest"), 864.15)
+  expect_equal(get_aes_num(864.09, diff = 0.9, type = "next_largest"), 864.10)
+  expect_equal(get_aes_num(1010, diff = 20, type = "next_largest"), 1015)
+  expect_equal(get_aes_num(1009, diff = 20, type = "next_largest"), 1010)
+  expect_equal(get_aes_num(109, diff = 20, type = "next_largest"), 110)
+  expect_equal(get_aes_num(109, diff = 200, type = "next_largest"), 150)
+  expect_equal(get_aes_num(101, diff = 100, type = "next_largest"), 150)
+  expect_equal(get_aes_num(101, diff = 90, type = "next_largest"), 110)
 
   # Test the type argument
-  expect_equal(get_aes_num(5, type = "next_smallest"), 4.5)
-  expect_equal(get_aes_num(9, type = "next_smallest"), 8)
-  expect_equal(get_aes_num(21, type = "next_smallest"), 20)
-  expect_equal(get_aes_num(17, type = "next_smallest"), 15)
+  expect_equal(get_aes_num(5, diff = 90, type = "next_smallest"), 4.5)
+  expect_equal(get_aes_num(9, diff = 90, type = "next_smallest"), 8)
+  expect_equal(get_aes_num(21, diff = 90, type = "next_smallest"), 20)
+  expect_equal(get_aes_num(17, diff = 90, type = "next_smallest"), 15)
 
-  expect_equal(get_aes_num(1700, type = "next_smallest"), 1500)
-  expect_equal(get_aes_num(0.17, type = "next_smallest"), 0.15)
+  expect_equal(get_aes_num(1700, diff = 9000, type = "next_smallest"), 1500)
+  expect_equal(get_aes_num(0.17, diff = 90, type = "next_smallest"), 0.15)
 })
