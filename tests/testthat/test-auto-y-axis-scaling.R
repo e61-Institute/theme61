@@ -11,11 +11,8 @@ test_that("Functionality in auto y-axis scaling works", {
   expect_equal(get_aes_limits(16, 74), list(15, 75, 10))
   expect_equal(get_aes_limits(-74, -16), list(-75, -15, 10))
   expect_equal(get_aes_limits(-14, -1), list(-15, 0, 5))
-
-  # TODO - these two fail in a really weird way
   expect_equal(get_aes_limits(-14, -10), list(-15, -9, 1))
   expect_equal(get_aes_limits(-20, -14), list(-25, -10, 5))
-
   expect_equal(get_aes_limits(0, 11.5), list(0, 15, 5))
 
   # Testing opposite sides
