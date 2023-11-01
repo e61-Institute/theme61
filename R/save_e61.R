@@ -67,6 +67,7 @@ save_e61 <- function(filename,
                      format = c("svg", "pdf", "eps", "png"),
                      chart_type = c("MN", "RN", "PPT"),
                      auto_scale = TRUE, # manual control over whether y-axis is scaled
+                     force = FALSE,
                      dim = list(height = NULL, width = NULL), # manual control over chart dims
                      max_height = NULL, # manual control over the maximum height of the chart
                      save_data = FALSE,
@@ -173,7 +174,7 @@ save_e61 <- function(filename,
   }
 
   # Compile the messages
-  if (length(y_miss) > 0) {
+  if (length(y_miss) > 0 & !force) {
     y_miss <- paste0(
       "Plot ",
       paste(y_miss, collapse = ", "),
@@ -182,7 +183,7 @@ save_e61 <- function(filename,
     y_miss <- NULL
   }
 
-  if (length(y_long) > 0) {
+  if (length(y_long) > 0 & !force) {
     y_long <- paste0(
       "Plot ",
       paste(y_long, collapse = ", "),
