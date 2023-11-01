@@ -140,11 +140,13 @@ save_single <- function(
 
   plot <- update_labs(plot, tot_panel_width)
 
-  # update the mplot_labels
-  plot <- update_mplot_label(plot, chart_type, base_size)
+  if(!is_spatial_chart){
+    # update the mplot_labels
+    plot <- update_mplot_label(plot, chart_type, base_size)
 
-  # update y-axis labels
-  plot <- update_y_axis_labels(plot)
+    # update y-axis labels
+    plot <- update_y_axis_labels(plot)
+  }
 
 
   # Height adjustments ----------------------------------------------------
