@@ -50,7 +50,7 @@ ggplot <-
 
       p <- p + scale_fill_e61(discrete = FALSE)
 
-    } else if (any(fill_var_class %in% c("factor", "character"))) {
+    } else if (any(fill_var_class %in% c("factor", "character", "logical"))) {
 
       p <- p + scale_fill_e61()
     }
@@ -72,7 +72,7 @@ ggplot <-
     if (any(colour_var_class %in% "numeric")) {
       p <- p + scale_colour_e61(discrete = FALSE)
 
-    } else if (any(colour_var_class %in% c("factor", "character"))) {
+    } else if (any(colour_var_class %in% c("factor", "character", "logical"))) {
 
       p <- p + scale_colour_e61()
     }
