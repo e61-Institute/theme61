@@ -138,9 +138,9 @@ save_single <- function(
   # update the width after this check
   width <- tot_panel_width + known_wd
 
-  if(!is_spatial_chart){
-    plot <- update_labs(plot, tot_panel_width)
+  plot <- update_labs(plot, tot_panel_width)
 
+  if(!is_spatial_chart){
     # update the mplot_labels
     plot <- update_mplot_label(plot, chart_type, base_size)
 
