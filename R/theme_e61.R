@@ -306,6 +306,8 @@ theme_e61_spatial <- function(
   base_family = "pt-sans"
 ){
 
+  legend <- match.arg(legend)
+
   half_line <- base_size / 2
 
   ret <-
