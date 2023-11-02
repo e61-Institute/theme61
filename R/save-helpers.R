@@ -45,7 +45,7 @@ check_plots <- function(plots){
       temp_list[[length(temp_list) + 1]] <- temp_plot
     } else {
 
-      stop("Some elements of the plotlist are not ggplot objects. Check you have not supplied the wrong object or used an incorrect argument.")
+      stop(paste0(temp_plot, " is not a valid save_e61() argument. Check that you have not supplied the wrong object to save_e61() or used an incorrect or outdated argument (use ?save_e61 to view valid arguments)."))
     }
   }
 
