@@ -59,7 +59,6 @@ ggplot(data, aes(x)) +
   # Set rescaled_sec = TRUE in scale_y_continuous_e61() to format the breaks correctly.
   # The secondary y-axis label (name = "\%") needs to be explicitly specified otherwise it will not appear.
   scale_y_continuous_e61(limits = c(0, 60, 10), sec_axis = sec_axis(~sec_rescale(.), name = "\%"), rescale_sec = TRUE) +
-  theme_e61() +
   labs_e61(y = "\%")
 }
 

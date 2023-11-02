@@ -6,8 +6,8 @@
 \usage{
 theme_e61(
   y_top = TRUE,
-  fix_left = 0,
   adj = 0,
+  fix_left = 0,
   legend = c("none", "bottom", "top", "left", "right"),
   legend_title = FALSE,
   aspect_ratio = 0.75,
@@ -22,21 +22,19 @@ theme_e61(
 \arguments{
 \item{y_top}{Defaults to TRUE. Puts the y-axis title at the top. If you
 change this argument you also need to change the argument with the same
-name in \code{\link[theme61]{scale_y_continuous_e61}}.}
-
-\item{fix_left}{Optional. Sometimes if the value of the \code{adj} argument
-is too negative, the margins on the left side of the graph start to cut off
-some of the text. Provide a small positive value (5?) to correct this.}
+name in \link{scale_y_continuous_e61}.}
 
 \item{adj}{Either a single numeric to adjust left and right axis titles
 simultaneously or a vector of 2 numerics to adjust each axis title
-separately. More negative values move the text closer to the graph panel.
-Defaults to -12 which seems to work well for y-axis with 1-3 character-wide
-values.}
+separately. More negative values move the text closer to the graph panel.}
+
+\item{fix_left}{Sometimes if the value of the \code{adj} argument is too
+negative, the margins on the left side of the graph start to cut off some
+of the text. Provide a small positive value (5?) to correct this.}
 
 \item{legend}{Character. Legend position, "none" (default) hides the legend.}
 
-\item{legend_title}{Logical. Include Legend title? Defaults to FALSE.}
+\item{legend_title}{Logical. Include legend title? Defaults to FALSE.}
 
 \item{aspect_ratio}{Numeric. Sets the aspect ratio of the graph panel.}
 
@@ -61,13 +59,12 @@ ggplot2 object
 \description{
 Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
 appearance. If you are looking to change the appearance of titles or labels,
-check the arguments in \code{\link[theme61]{labs_e61}}, which are probably
-what you are looking for.
+check the arguments in \link{labs_e61}, which are probably what you are
+looking for.
 }
 \examples{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
   geom_point() +
-  theme_e61() +
-  scale_colour_e61(n = 3)
+  theme_e61()
 
 }

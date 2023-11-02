@@ -8,11 +8,19 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+<!-- 
+
+### To do list 
+
+- Most of this is obsolete because much of it is now automated.
+
+-->
+
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
-devtools::load_all()
 library(ggplot2)
 library(ggrepel)
 library(data.table)
+devtools::load_all()
 
 knitr::opts_chunk$set(
   echo = TRUE,
@@ -53,25 +61,25 @@ The purpose of this vignette is to demonstrate how to use the functions in `them
 
 ## Summary
 
-You start by creating an unthemed graph using the 'normal' stuff: `ggplot(data, aes(x, y)) + geom_blah()`
+Start by creating a graph using the 'normal' stuff: `ggplot(data, aes(x, y)) + geom_blah()`
 
 Then:
-
--   [Apply the theme](#theme): `theme_e61()`
--   [Add graph colours](#colours): `scale_colour_e61()` or `scale_fill_e61()`
--   [Format the x and y axes scales](#scales): `scale_y_continuous_e61()`, `scale_x_continuous_e61()`
+-   [Apply the theme](#theme): (optional) Use `theme_e61()` if you want to add a legend, or change its position. Other aspects of `theme_e61()` are now added by default (you can overide this functionality by explicitly using `ggplot2::ggplot()` instead of just `ggplot()` which is now a theme61 function. 
+-   [Format the x and y axes scales](#scales): (optional) Format the x and y axes scales: `scale_y_continuous_e61()`, `scale_x_continuous_e61()`. Your y-axis will be automatically scaled when you save your chart using `save_e61()` but if you do not like the automatic scaling then you can always scale you axes manually.
 -   [Add labels to your lines/points/bars](#labels): `mplot_label()` or `plot_label()`
 -   [Add titles, axes labels, footnotes and sources](#titles): `labs_e61(title = "Title", footnotes = "Footnotes", sources = c("Source 1", "Source 2"))`
--   [Create a multi-panel](#mpanel) (if required): `mpanel_e61()`
--   [Save the graph](#save): `save_e61()`
+-   [Save the graph](#save): `save_e61()` (if you want to create an mpanel, you now do it via the `save_e61()` function)
 
 ## The starting graph {#start}
 
-We're going to turn a default ggplot2 graph into one that is correctly formatted in the e61 Institute style using the package features.
+We're going to simple ggplot2 graph into one that is correctly formatted in the e61 Institute style using the package features.
+
+In the first step we'll call the base ggplot function explicitly using `ggplot2::ggplot()`. 
 
 ```{r}
 gg <- ggplot2::ggplot(data_3, aes(x = year, y = value, colour = category)) + 
-  geom_line() + theme(legend.position = "bottom")
+  geom_line() + 
+  theme(legend.position = "bottom")
 ```
 
 ```{r, echo = FALSE}
@@ -81,13 +89,12 @@ knitr::include_graphics(here::here("man/figures/g-prev.svg"))
 
 ## Applying the e61 theme to the graph {#theme}
 
-Most of the theming is done by the `theme_e61()` function. This is included automatically in `theme61::ggplot()`.
+Most of the theming is done by the `theme_e61()` function. This is now included automatically in `theme61::ggplot()` (or just by calling `ggplot()` when you have the package loaded).
 
 `theme_e61()` deliberately steers you away from long y-axis titles. The information required to interpret the graph should be contained in the title or subtitle.
 
 ```{r}
-gg <- 
-  ggplot(data, aes(x = year, y = value, colour = category)) + 
+gg <- ggplot(data, aes(x = year, y = value, colour = category)) + 
   geom_line()
 ```
 
@@ -98,7 +105,7 @@ knitr::include_graphics(here::here("man/figures/g-start.svg"))
 
 ### The theme61 colour palette
 
-`theme61` comes with a comprehensive colour palette that you can use in your colour and fill scales. are automatically added when you use `theme61::ggplot()` and add either a fill or colour aesthetic variable. The colour palette also comes with colour and fill functions (`scale_colour_e61()` and `scale_fill_e61()`) if you want to add them to other plots or you do not define your colour and fill variables in the main `ggplot` call (e.g. if you were to define them within an `aes` call in `geom_line()`).
+`theme61` comes with a comprehensive colour palette that you can use in your colour and fill scales. These are now automatically added when you use `theme61::ggplot()` and add either a fill or colour aesthetic variable. The colour palette also comes with colour and fill functions (`scale_colour_e61()` and `scale_fill_e61()`) that you can use if you want to add them to other plots or you do not define your colour and fill variables in the main `ggplot` call (e.g. if you were to define them within an `aes` call in `geom_line()`).
 
 In case you want to customise the chosen colours, all of the valid colours in the e61 colour palette are stored as named objects in the package, they can be accessed by name (see [here](https://e61-institute.github.io/theme61/reference/index.html#colours) for the full list of names). The colour name can be deduced from the position in the colour palette image below.
 
@@ -130,20 +137,22 @@ knitr::include_graphics(here::here("man/figures/g-colours.svg"))
 
 ## Formatting axis scales {#scales}
 
-`scale_y_continuous_e61()` is the preferred axis scale function for graphs. It duplicates the axis by default and allows you to specify the axis limits in the `limits` argument if you do not like the defaults applied in `save_e61()`.
+Your y-axis labels are now automatically scaled to aesthetic values when you save your chart using `save_e61()`.
+
+However, if you do not like the defaults applied in `save_e61()` you can still manually specify the axis limits in the `limits` argument of `scale_y_continuous_e61()`.
 
 ### Axes labelling
 
-As Greg's prime graph directive states, the title and subtitle of your graph should reflect what the data shows, not what you interpret the graph to be showing.
+At e61 we follow the 'Kaplan Rule' when making charts, which means that the title and subtitle of your graph should reflect what your chart is actually showing, not what you interpret it to be showing.
 
-Thus, there should be enough information in the title that your y-axis label does not need to repeat what the data are. Consequentially, the y-axis labels in `theme61` are designed to have space for short labels of 1-5 characters.
+There should also be enough information in the title and subtitle that your y-axis label should be primarily used to reflect the units of the y-axis (e.g. \$, %, \$000s, 000s, ptile, ppt). Consequentially, the y-axis labels in `theme61` are designed to have space for short labels of 1-5 characters.
 
-The package also defaults to showing no x-axis title. This is because the x-axis is usually very obvious. For example, if the x-axis is "2010, 2011, 2012, ...", then it is obviously a time series in years, which would be a waste of space to label. Save the x-axis labels for when the x-axis actually requires explanation.
+The package also defaults to showing no x-axis title. This is because in our line of work the x-axis is usually very obvious. For example, if the x-axis is "2010, 2011, 2012, ...", then it is obviously a time series in years, which would be a waste of space to label. Save the x-axis labels for when the x-axis actually requires explanation.
 
 Some examples of y-axis labels:
 
 -   **Good:** %, ppt, \$, '000, \$m, \$b, index, ratio.
--   **Bad (these are all too long):** US Personal Expenditures (\$ billions), Number of individuals, Model coefficient estimates (ppt), Other long sentences.
+-   **Bad (these are all too long and should be included in the subtitle):** US Personal Expenditures (\$ billions), Number of individuals, Model coefficient estimates (ppt), Other long sentences.
 
 ```{r}
 gg <- 
@@ -161,9 +170,9 @@ knitr::include_graphics(here::here("man/figures/g-axis.svg"))
 
 *A full guide to plot labelling is [here](ongraph-labels.html).*
 
-Graph legends are inferior to labels on the graph, so `theme61` defaults to hiding the legends.
+On plot labels are generally preferred to legends, so `theme61` defaults to hiding the legends. You can add a legend and a legend title (if needed) using `theme_e61(legend = "bottom", legend_title = "blah")`
 
-This is because legends require you to rapidly flip between the coloured lines or bars on the graph and match them with a box outside the graph that tells you what that colour represents. This creates additional cognitive load, making the message of your graph harder and slower to communicate to the audience and therefore your graph is less effective.
+The reason for using on plot labels is that legends generally require you to rapidly flip between the coloured lines or bars on the graph and match them with a box outside the graph that tells you what that colour represents. This creates additional cognitive load, making the message of your graph harder and slower to communicate to the audience and therefore making your graph is less effective.
 
 Graph labels put the label on the graph directly, near the data point that is being identified. This makes it faster to figure out what the graph is about.
 
@@ -186,17 +195,16 @@ knitr::include_graphics(here::here("man/figures/g-labels.svg"))
 
 ## Graph titles, subtitles and footers {#titles}
 
-When adding titles, subtitles, captions and sources, use `labs_e61()`. Text is automatically wrapped if it is too long on one line. You can adjust this or turn it off. Sources are automatically reordered in alphabetical order if you supply the sources as a character vector.
+When adding titles, subtitles, captions and sources, use `labs_e61()`. Text is automatically wrapped if it is too long on one line when you use `save_e61()`. You can adjust this (e.g. manually supply the maximum number of characters for a title, subtitle or footnotes using title_max_char etc.) or turn it off (set `auto_scale = FALSE` in `save_e61()`). Sources are automatically reordered in alphabetical order if you supply the sources as a character vector.
 
 ```{r}
-gg <- 
-  ggplot(data_3, aes(x = year, y = value, colour = category)) + 
+gg <- ggplot(data_3, aes(x = year, y = value, colour = category)) + 
   geom_line() +
   mplot_label(c("Food and\nTobacco", "Household\nOperation", "Medical and\nHealth"),
               c(1944, 1954, 1953),
               c(65, 55, 25)) +
   labs_e61(
-    title = "US Personal Expenditures*",
+    title = "US personal expenditures*",
     subtitle = "1940-1960",
     y = "$b",
     footnotes = "Data comes from the built-in 'USPersonalExpenditure' dataset.",
@@ -213,9 +221,9 @@ knitr::include_graphics(here::here("man/figures/g-titles.svg"))
 
 Make sure you use `save_e61()` when saving graphs at e61. `save_e61()` ensures that the relative size of your graph elements and text is appropriate. It will also apply sensible limits and scales to your y-axis if you have not already added your own custom limits.
 
-You should save your graphs using a vector graphics format (SVG or PDF). SVGs are a modern vector graphics format, which is the highly recommended format because you can resize them to any size without pixelation. If you are making graphs for LaTeX documents, you will need to save the graphs in PDF format for them to render as LaTeX does not support SVGs. If for some reason you need to use a raster format, the package provides limited support for PNGs, although some customisation features may be unavailable.
+You should generally save your graphs using a vector graphics format (SVG or PDF). SVGs are a modern vector graphics format, which is the highly recommended format because you can resize them to any size without pixelation. If you are making graphs for LaTeX documents, you will need to save the graphs in PDF format for them to render as LaTeX does not support SVGs. If you need to use a raster format (e.g. for posting on the website formerly known as Twitter), the package does support PNGs, although some customisation features may be unavailable.
 
-You do not need to supply the ggplot object when using `save_e61()` as it automatically saves the last-created graph.
+You do not need to supply the ggplot object when using `save_e61()` as it automatically saves the last-created graph, although supplying the chart to `save_e61()` can minimise the likelihood of errors. If you are saving a multi-panel chart (see mpanel section below) using `save_e61()`, then you will need to supply the charts.
 
 The `save_data` argument also lets you save a `.csv` file with the data used to create a graph.
 
@@ -266,7 +274,7 @@ gg <-
 ```
 
 ```{r, echo=FALSE}
-save_e61(here::here("man/figures/g-dual.svg"))
+save_e61(here::here("man/figures/g-dual.svg"), force = TRUE)
 knitr::include_graphics(here::here("man/figures/g-dual.svg"))
 ```
 
@@ -293,16 +301,16 @@ g1 <-
 g2 <- ggplot(data_dual, aes(x = year)) +
     geom_line(aes(y = `Food and Tobacco`), colour = palette_e61(2)[[1]]) +
     geom_line(aes(y = `Personal Care`), colour = palette_e61(2)[[2]]) +
-    scale_y_continuous_e61(
-      limits = c(0, 100, 25),
-      name = "$b"
-    ) +
+    scale_y_continuous_e61(limits = c(0, 100, 25)) +
   mplot_label(
     c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
     c(1945, 1952),
     c(75, 15)
   ) +
-  labs_e61(title = "Selected Aggregates")
+  labs_e61(
+    title = "Selected Aggregates",
+    y = "$b"
+  )
 
 g3 <-
   ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
@@ -331,11 +339,10 @@ g4 <-
   )
 ```
 
-Then we use the `mpanel_e61()` function to put the graphs together.
+Then we use the `save_e61()` to put the graphs together.
 
 ```{r, echo=FALSE}
-gg <-
-  save_mpanel_e61(
+save_e61(
     g1, g2, g3, g4,
     filename = here::here("man/figures/g-multi.svg"),
     title = "US Personal Expenditures*",
@@ -357,12 +364,12 @@ gg <-
   ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
   geom_col(position = "dodge") +
   coord_flip() +
-  # scale_y_continuous_e61(limits = c(0, 90, 30)) +
   mplot_label(c("1940", "1960"),
               c(1.8, 2.2),
               c(15, 50)) +
   labs_e61(
-    title = "1940 to 1960 Change", y = "$b"
+    title = "1940 to 1960 Change", 
+    y = "$b"
   ) +
   format_flip()
 

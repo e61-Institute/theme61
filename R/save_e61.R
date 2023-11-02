@@ -1,30 +1,30 @@
 #' Saves ggplot graphs with sensible defaults
 #'
-#' @description Designed to save ggplot graphs made with the e61 theme with
-#'   sensible defaults that ensure the text size is appropriately proportioned
-#'   given default sizing.
+#' Saves ggplot2 graphs made with using theme61. Using \code{save_e61()} is
+#' required to ensure graphs are consistent with the e61 style and formatting.
 #'
-#'   The supported file formats are SVG, PDF, EPS and PNG.
+#' The supported file formats are SVG, PDF, EPS and PNG.
 #'
-#'   Use PDF in all notes and SVG in PowerPoint presentations. PDF and SVG are
-#'   better as they are modern vector graphics file formats which can be scaled
-#'   up and down in size without blurring or becoming pixelated.
+#' Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
+#' better as they are modern vector graphics file formats which can be scaled up
+#' and down in size without blurring or becoming pixelated.
 #'
-#'   PNG should only be used for Twitter posts for compatibility reasons.
-#'
-#'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
+#' PNG should only be used for Twitter posts for compatibility reasons.
 #'
 #' @param filename File name to create on disk. Providing the file format
 #'   extension (e.g. .svg) is suggested when saving to a single file format. The
 #'   file extension must be lowercase. If you want to save to multiple formats,
 #'   do not include the extension, see the \code{format} argument for details.
-#' @param plot Single-panel plot object to save. Defaults to the last plot
-#'   displayed so usually you do not need to provide this explicitly.
+#' @param plot (single-panel specific) Name of the plot object to save. Defaults
+#'   to the last plot displayed so usually you do not need to provide this
+#'   argument explicitly.
 #' @param chart_type String. Type of chart. This is used to set sensible chart
-#'   widths based on the width of text in each document. Options are 'MN' ( for
-#'   micronotes), 'RN' (research notes), 'PPT' (PowerPoints).
+#'   widths based on the width of text in each document. Options are "MN" (for
+#'   micronotes), "RN" (research notes) or "PPT" (PowerPoints).
 #' @param auto_scale Logical. Should the y-axis be scaled automatically. Default
 #'   is TRUE.
+#' @param force Logical. If force is set to TRUE the graph is saved without running the
+#' tests for y-axis labels etc.
 #' @param dim An optional named list specifying the plot height and width.
 #'   Defaults to NULL which means the graph dimensions will be set based on the
 #'   chart type and function-calculated value.
@@ -39,9 +39,9 @@
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
 #' @param base_size Numeric. Chart font size. Default is 10.
-#' @param bg_colour Sets the graph background colour. Defaults to white. Accepts
-#'   a colour name, hex code or theme61 colour object name. For graphs used in
-#'   research note boxes, set the colour to e61_boxback.
+#' @param bg_colour Sets the graph background colour. Defaults to "white".
+#'   Accepts a colour name, hex code or theme61 colour object name. For graphs
+#'   used in research note boxes, set the colour to \code{e61_boxback}.
 #' @param ... (multi-panel specific) Plot objects to put on the panel.
 #' @param plotlist (multi-panel specific) List of plots to combine as an
 #'   multi-panel and save. You can also enter the charts individually as
@@ -67,6 +67,7 @@ save_e61 <- function(filename,
                      format = c("svg", "pdf", "eps", "png"),
                      chart_type = c("MN", "RN", "PPT"),
                      auto_scale = TRUE, # manual control over whether y-axis is scaled
+                     force = FALSE,
                      dim = list(height = NULL, width = NULL), # manual control over chart dims
                      max_height = NULL, # manual control over the maximum height of the chart
                      save_data = FALSE,
@@ -173,7 +174,7 @@ save_e61 <- function(filename,
   }
 
   # Compile the messages
-  if (length(y_miss) > 0) {
+  if (length(y_miss) > 0 & !force) {
     y_miss <- paste0(
       "Plot ",
       paste(y_miss, collapse = ", "),
@@ -182,7 +183,7 @@ save_e61 <- function(filename,
     y_miss <- NULL
   }
 
-  if (length(y_long) > 0) {
+  if (length(y_long) > 0 & !force) {
     y_long <- paste0(
       "Plot ",
       paste(y_long, collapse = ", "),

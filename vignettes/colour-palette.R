@@ -18,4 +18,10 @@ p <- ggplot(inputs, aes(x = col, y = row, fill = value)) +
   scale_x_continuous_e61(n.breaks = 9) +
   labs_e61(title = "The e61 Institute Colour Palette", y = NULL)
 
-save_e61(here::here("man/figures/g-palette-colours.svg"), height = 6)
+save_e61(
+  plot = p,
+  filename = here::here("man/figures/g-palette-colours.svg"),
+  dim = list(height = 6),
+  auto_scale = FALSE,
+  force = TRUE
+)

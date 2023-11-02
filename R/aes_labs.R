@@ -176,7 +176,7 @@ rescale_text <- function(text, text_type, font_size, plot_width){
         text_lines[[i]] <- text_lines[[i]] %>% dplyr::mutate(footnote_num = i)
       }
 
-      text_lines <- text_lines %>% dplyr::bind_rows()
+      text_lines <- dplyr::bind_rows(text_lines)
 
       # combine text into a caption along with the sources
       footnote_data <- text_lines %>%

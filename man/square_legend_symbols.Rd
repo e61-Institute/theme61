@@ -20,8 +20,10 @@ to squares. This needs to be used in conjunction with some invisible point
 geoms so the function has a shape to reshape.
 }
 \examples{
-ggplot2::ggplot(data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
-  aes(x, y, colour = group)) +
+ggplot(
+  data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
+  aes(x, y, colour = group)
+  ) +
   geom_line() +
   geom_point(alpha = 0) + # The required "invisible points"
   square_legend_symbols()

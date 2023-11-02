@@ -66,7 +66,7 @@ ggplot <-
       colour_var_class <- "factor"
 
     } else {
-      colour_var_class <- data[[colour_var_name]] %>% class()
+      colour_var_class <- class(data[[colour_var_name]])
     }
 
     if (any(colour_var_class %in% "numeric")) {

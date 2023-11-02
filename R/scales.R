@@ -18,8 +18,6 @@
 #'
 #' @examples
 #'
-#' library(ggplot2)
-#'
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 #'    geom_point() +
 #'    scale_colour_e61() +
@@ -84,8 +82,6 @@ scale_fill_e61 <- function(n = 0,
 #'
 #' @examples
 #'
-#' library(ggplot2)
-#'
 #' graph_data <- data.frame(
 #'   state = c("AUS", "ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"),
 #'   value = runif(9)
@@ -93,7 +89,7 @@ scale_fill_e61 <- function(n = 0,
 #'
 #' ggplot(graph_data, aes(x = state, y = value, fill = state)) +
 #'   geom_col() +
-#'   e61_fill_aus()
+#'   scale_fill_e61_aus()
 
 scale_colour_e61_aus <- function(...) {
 

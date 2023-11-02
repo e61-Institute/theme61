@@ -30,11 +30,15 @@ names and roads from Stamen's map server to plot under geographical data.
 \examples{
 
 library(sf)
-library(dplyr)
-sa3 <- filter(absmapsdata::sa32021, gcc_code_2021 == "1GSYD") # let's just look at Sydney
+sa3 <- dplyr::filter(strayr::read_absmap("sa32021"), gcc_code_2021 == "1GSYD") # let's just look at Sydney
 
  ggplot(sa3) +
- e61_map(bbox = c(left = min(sa3$cent_long), bottom = min(sa3$cent_lat), right = max(sa3$cent_long), top = max(sa3$cent_lat))) +
+ e61_map(bbox = c(
+   left = min(sa3$cent_long),
+   bottom = min(sa3$cent_lat),
+   right = max(sa3$cent_long),
+   top = max(sa3$cent_lat))
+   ) +
  geom_point(aes(x = cent_long, y = cent_lat)) #plot points
 
 

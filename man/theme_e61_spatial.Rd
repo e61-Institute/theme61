@@ -36,10 +36,10 @@ what you are looking for.
 sa3_shp <- strayr::read_absmap("sa32016")
 
 sydney_map <- sa3_shp \%>\%
-   mutate(gcc_code_2016 == "1GSYD")
+   filter(gcc_code_2016 == "1GSYD")
 
 ggplot(data = sydney_map) +
-  geom_sf(aes(fill = gcc_name_2016 , col = gcc_name_2016 )) +
-  theme61_sf() +
+  geom_sf(aes(fill = gcc_name_2016)) +
+  theme_e61_spatial()
 
 }

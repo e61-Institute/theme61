@@ -19,7 +19,6 @@ e61 themed graph options in an alternative style
 }
 \examples{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
-geom_point() +
-e61_colour_manual(n = 3) +
-theme_e61_alt()
+  geom_point() +
+  theme_e61_alt()
 }

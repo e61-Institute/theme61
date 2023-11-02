@@ -15,11 +15,15 @@
 #' @examples
 #'
 #' library(sf)
-#' library(dplyr)
-#' sa3 <- filter(absmapsdata::sa32021, gcc_code_2021 == "1GSYD") # let's just look at Sydney
+#' sa3 <- dplyr::filter(strayr::read_absmap("sa32021"), gcc_code_2021 == "1GSYD") # let's just look at Sydney
 #'
 #'  ggplot(sa3) +
-#'  e61_map(bbox = c(left = min(sa3$cent_long), bottom = min(sa3$cent_lat), right = max(sa3$cent_long), top = max(sa3$cent_lat))) +
+#'  e61_map(bbox = c(
+#'    left = min(sa3$cent_long),
+#'    bottom = min(sa3$cent_lat),
+#'    right = max(sa3$cent_long),
+#'    top = max(sa3$cent_lat))
+#'    ) +
 #'  geom_point(aes(x = cent_long, y = cent_lat)) #plot points
 #'
 #'
@@ -35,10 +39,10 @@ e61_map <-
   maptype = "toner-lite") {
 
     # Some guards for common mistakes
-    if (top > 0 || bottom > 0) warning("Your latitude coordinates are >0, are you sure you aren't missing a negative sign somewhere? Australia is south of the equator so latitude is negative.")
-    if (top < bottom) stop("Your top coordinate must be greater than your bottom coordinate.")
-    if (right < left) stop("Your right coordinate must be greater than your left coordinate.")
-    if (top == bottom || right == left) stop("Your bounding box coordinates can't be equal.")
+    if (bbox[["top"]] > 0 || bbox[["bottom"]] > 0) warning("Your latitude coordinates are >0, are you sure you aren't missing a negative sign somewhere? Australia is south of the equator so latitude is negative.")
+    if (bbox[["top"]] < bbox[["bottom"]]) stop("Your top coordinate must be greater than your bottom coordinate.")
+    if (bbox[["right"]] < bbox[["left"]]) stop("Your right coordinate must be greater than your left coordinate.")
+    if (bbox[["top"]] == bbox[["bottom"]] || bbox[["right"]] == bbox[["left"]]) stop("Your bounding box coordinates can't be equal.")
 
     lon_range <- bbox[c("left", "right")]
     lat_range <- bbox[c("bottom", "top")]

@@ -2,22 +2,20 @@
 #'
 #' Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
 #' appearance. If you are looking to change the appearance of titles or labels,
-#' check the arguments in \code{\link[theme61]{labs_e61}}, which are probably
-#' what you are looking for.
+#' check the arguments in \link{labs_e61}, which are probably what you are
+#' looking for.
 #'
 #' @param y_top Defaults to TRUE. Puts the y-axis title at the top. If you
 #'   change this argument you also need to change the argument with the same
-#'   name in \code{\link[theme61]{scale_y_continuous_e61}}.
+#'   name in \link{scale_y_continuous_e61}.
 #' @param adj Either a single numeric to adjust left and right axis titles
 #'   simultaneously or a vector of 2 numerics to adjust each axis title
 #'   separately. More negative values move the text closer to the graph panel.
-#'   Defaults to -12 which seems to work well for y-axis with 1-3 character-wide
-#'   values.
-#' @param fix_left Optional. Sometimes if the value of the \code{adj} argument
-#'   is too negative, the margins on the left side of the graph start to cut off
-#'   some of the text. Provide a small positive value (5?) to correct this.
+#' @param fix_left Sometimes if the value of the \code{adj} argument is too
+#'   negative, the margins on the left side of the graph start to cut off some
+#'   of the text. Provide a small positive value (5?) to correct this.
 #' @param legend Character. Legend position, "none" (default) hides the legend.
-#' @param legend_title Logical. Include Legend title? Defaults to FALSE.
+#' @param legend_title Logical. Include legend title? Defaults to FALSE.
 #' @param aspect_ratio Numeric. Sets the aspect ratio of the graph panel.
 #' @param background Character. Default is "white". For all graphs that you
 #'   save, you should control the background colour using the \code{bg_colour}
@@ -36,13 +34,12 @@
 #' @examples
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 #'   geom_point() +
-#'   theme_e61() +
-#'   scale_colour_e61(n = 3)
+#'   theme_e61()
 #'
 
 theme_e61 <- function(y_top = TRUE,
-                      fix_left = 0,
                       adj = 0,
+                      fix_left = 0,
                       legend = c("none", "bottom", "top", "left", "right"),
                       legend_title = FALSE,
                       aspect_ratio = 0.75,
@@ -291,12 +288,11 @@ theme_e61 <- function(y_top = TRUE,
 #'
 #' sa3_shp <- strayr::read_absmap("sa32016")
 #'
-#' sydney_map <- sa3_shp %>%
-#'    mutate(gcc_code_2016 == "1GSYD")
+#' sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
 #'
 #' ggplot(data = sydney_map) +
-#'   geom_sf(aes(fill = gcc_name_2016 , col = gcc_name_2016 )) +
-#'   theme61_sf() +
+#'   geom_sf(aes(fill = gcc_name_2016)) +
+#'   theme_e61_spatial()
 #'
 
 theme_e61_spatial <- function(
@@ -374,9 +370,8 @@ theme_e61_spatial <- function(
 #'
 #' @examples
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
-#' geom_point() +
-#' e61_colour_manual(n = 3) +
-#' theme_e61_alt()
+#'   geom_point() +
+#'   theme_e61_alt()
 
 theme_e61_alt <- function(
     base_family = "pt-sans",
@@ -423,8 +418,10 @@ theme_e61_alt <- function(
 #' @return ggplot object
 #' @export
 #' @examples
-#' ggplot2::ggplot(data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
-#'   aes(x, y, colour = group)) +
+#' ggplot(
+#'   data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
+#'   aes(x, y, colour = group)
+#'   ) +
 #'   geom_line() +
 #'   geom_point(alpha = 0) + # The required "invisible points"
 #'   square_legend_symbols()

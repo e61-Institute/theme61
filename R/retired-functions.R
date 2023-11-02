@@ -25,7 +25,17 @@ e61_palette <- function(...) {
                             with = "palette_e61()")
 }
 
-# Defunct from vX.X -----------------------------------------------------
+# Defunct from v0.8 -----------------------------------------------------
+
+#' Defunct
+#' @export
+#' @noRd
+mpanel_e61 <- function(...) {
+  lifecycle::deprecate_stop(
+    when = "0.6.0", what = "mpanel_e61()",
+    details = "You no longer need to use mpanel_e61() when making multi-panel graphs. Instead, individual panels are directly supplied to save_e61(). See the documentation for save_e61() for more information."
+    )
+}
 
 # # Keep this as an example of a defunct function
 #

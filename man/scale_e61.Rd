@@ -66,8 +66,6 @@ desired, the \code{discrete} argument can be set to \code{FALSE}.
 }
 \examples{
 
-library(ggplot2)
-
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
    geom_point() +
    scale_colour_e61() +

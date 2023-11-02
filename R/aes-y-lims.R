@@ -307,7 +307,7 @@ get_aes_num <- function(y_val, diff, type = c("next_largest", "next_smallest")) 
     # take only the overlapping digits and scale this part of the number
     len <- nchar(y_val_new)
 
-    y_val <- substring(y_val_new, len - nchar(diff) + 1, len) %>% as.numeric()
+    y_val <- as.numeric(substring(y_val_new, len - nchar(diff) + 1, len))
 
     # save the values we dropped to to add back
     adj_y_val <- y_val_new - y_val

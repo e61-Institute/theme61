@@ -9,9 +9,9 @@ vignette: >
 ---
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
-devtools::load_all()
 library(ggplot2)
 library(data.table)
+devtools::load_all()
 
 knitr::opts_chunk$set(
   echo = TRUE,
@@ -22,9 +22,19 @@ knitr::opts_chunk$set(
 )
 ```
 
+<!-- 
+
+### To do list 
+
+- Workflow needs to be updated
+- All the example graphs need to be changed
+- Add a multi-panel example graph
+
+-->
+
 ## Introduction
 
-`theme61` is an extension to `ggplot2`. It is made up of a custom theme and functions that change the appearance of a standard `ggplot2` graph. Thus, the correct usage of this package is to create your normal `ggplot2` graph, then add `theme61`-specific elements. 
+`theme61` is an extension to `ggplot2`. It is made up of a custom theme and functions that change the appearance of a standard `ggplot2` graph.
 
 You should read this article and the [Graph standards](graph-standards.html) article to help you understand how to create graphs following the e61 graph standards. 
 
@@ -42,17 +52,14 @@ When making graphs, you should follow the below workflow.
 
 Save your graph using `save_e61()`. Do **not** use the Export button in the Plots tab or `ggsave()`.
 
-Start by creating an unthemed graph using the 'normal' stuff: `ggplot(data, aes(x, y)) + geom_blah()`
+Start by creating a graph using the 'normal' stuff: `ggplot(data, aes(x, y)) + geom_blah()`
 
 Then:
-
-- Apply the theme: `theme_e61()`
-- Add graph colours: `scale_colour_e61()` or `scale_fill_e61()`
-- Format the x and y axes scales: `scale_y_continuous_e61()`, `scale_x_continuous_e61()`
+- (optional) Use `theme_e61()` if you want to add a legend, or change its position. Other aspects of `theme_e61()` are now added by default. 
+- (optional) Format the x and y axes scales: `scale_y_continuous_e61()`, `scale_x_continuous_e61()`. Your y-axis will be automatically scaled when you save your chart using `save_e61()` but if you do not like the automatic scaling then you can always scale you axes manually.
 - Add plot labelling: `mplot_label()` or `plot_label()`
 - Add titles, axes labels, footnotes and sources: `labs_e61(title = "Title", footnotes = "Footnotes", sources = c("Source 1", "Source 2"))`
-- Create a multi-panel (if required): `mpanel_e61()`
-- Save the graph: `save_e61()`
+- Save the graph: `save_e61()`. If you want to save a multi-panel, this is now done within `save_e61()` using the same argument as the old `mpanel()` function.
 
 The [Graph standards](graph-standards.html) article sets out this workflow in greater detail.
 
@@ -71,29 +78,23 @@ mtcars2 <- within(mtcars, {
 })
 
 # Graph
-p1 <- ggplot(mtcars2) +
-  geom_point(aes(x = wt, y = mpg, colour = gear)) +
+fig1 <- ggplot(mtcars2, aes(x = wt, y = mpg, colour = gear)) +
+  geom_point() +
+  mplot_label(
+    label = c("3", "4", "5"),
+    x = c(4, 2.7, 2.5),
+    y = c(23, 35, 15)
+  ) +
   labs_e61(
-    title = "Fuel Economy Declines as Weight Increases",
-    subtitle = "1973-74",
+    title = "Heavier cars are less fuel efficient",
+    subtitle = "Data from 1973-74",
     sources = "1974 Motor Trend US magazine.",
     x = "Weight (1000 lbs)",
     y = "mpg",
     colour = "Gears"
   )
 
-
-graph <- p1 +
-  theme_e61(adj = -12) + 
-  mplot_label(label = c("3", "4", "5"),
-              x = c(4, 2.7, 2.5),
-              y = c(23, 35, 15)) +
-  scale_y_continuous_e61(limits = c(0, 40)) +
-  scale_colour_e61(n = 3) +
-  add_e61_logo() + 
-  square_legend_symbols()
-
-save_e61(here::here("man/figures/fig-1.svg"), graph)
+save_e61(here::here("man/figures/fig-1.svg"), fig1)
 
 knitr::include_graphics(here::here("man/figures/fig-1.svg"))
 
@@ -102,27 +103,38 @@ knitr::include_graphics(here::here("man/figures/fig-1.svg"))
 ### Faceted scatter graph
 
 ```{r}
-graph <- p1 +
+fig2 <- ggplot(mtcars2, aes(x = wt, y = mpg, colour = gear)) +
   facet_grid(vs ~ am) +
-  theme_e61(legend = "bottom", legend_title = TRUE) +
-  scale_colour_e61(n = 3) +
-  scale_y_continuous_e61(limits = c(10, 40)) +
-  scale_x_continuous_e61()
+  geom_point() +
+  mplot_label(
+    label = c("3", "4", "5"),
+    x = c(4, 2.7, 2.5),
+    y = c(23, 35, 15)
+  ) +
+  labs_e61(
+    title = "Heavier cars are less fuel efficient",
+    subtitle = "Data from 1973-74",
+    sources = "1974 Motor Trend US magazine.",
+    x = "Weight (1000 lbs)",
+    y = "mpg",
+    colour = "Gears"
+  ) +
+  theme_e61(legend = "bottom", legend_title = TRUE)
 
-save_e61(here::here("man/figures/fig-2.svg"), graph)
+save_e61(here::here("man/figures/fig-2.svg"), fig2)
 
 knitr::include_graphics(here::here("man/figures/fig-2.svg"))
 
 
 ```
 
-### Density graph
+### Density graph - with the e61 logo added
 
 ```{r}
-g <- ggplot(mpg, aes(cty)) + 
-  geom_density(aes(fill = factor(cyl)), linetype = "blank", alpha = 0.8) +
+fig3 <- ggplot(mpg, aes(x = cty, fill = factor(cyl))) + 
+  geom_density(linetype = "blank", alpha = 0.8) +
   labs_e61(
-    title = "Distribution of Car City Mileage",
+    title = "Distribution of car city mileage",
     subtitle = "In miles per gallon, by number of cylinders",
     sources = "mpg dataset",
     x = NULL,
@@ -132,45 +144,41 @@ g <- ggplot(mpg, aes(cty)) +
   mplot_label(label = c("3 cyl", "5 cyl", "6 cyl", "8 cyl"),
               x = c(25, 24, 16, 12),
               y = c(0.1, 0.35, 0.25, 0.25)) +
-  theme_e61() +
-  scale_y_continuous_e61(limits = c(0, 0.6, 0.2)) +
-  scale_x_continuous_e61() +
-  scale_fill_e61(n = 4) +
-  scale_colour_e61(n = 4) +
   add_e61_logo()
 
-save_e61(here::here("man/figures/fig-3.svg"), g)
+save_e61(here::here("man/figures/fig-3.svg"), fig3)
 
 knitr::include_graphics(here::here("man/figures/fig-3.svg"))
 
 ```
 
-### Line graph
+### Line graph - and an example of using `scale_x_date()`
 
 ```{r}
 df <- economics_long[economics_long$variable %in% c("psavert", "uempmed"), ]
 df <- df[year(df$date) %in% c(1967:1981), ]
 
 # plot
-graph <- ggplot(df, aes(x = date)) +
-  geom_line(aes(y = value, colour = variable), size = 1) +
-  # Not using mplot_label just to show how plot_label works
-  plot_label("Market returns", as.Date("1969-01-01"), 17, 2, 1) +
-  plot_label("Unemployment", as.Date("1973-01-01"), 3, 2, 2) +
+fig4 <- ggplot(df, aes(x = date, y = value, colour = variable)) +
+  geom_line(size = 1) +
+  mplot_label(
+    label = c("Market returns", "Unemployment"),
+    x = c(as.Date("1969-01-01"), as.Date("1973-01-01")),
+    y = c(17, 3),
+    size = 3
+  ) +
   labs_e61(
-    title = "Time Series of Returns Percentage*",
+    title = "Time series of returns percentage*",
     subtitle = "Drawn from long data format",
     footnotes = "Some pointless footnote",
     sources = "Economics",
-    x = NULL, y = "%"
+    x = NULL, 
+    y = "%"
   ) + 
   scale_x_date(date_breaks = "3 years", date_labels = "%Y") +
-  scale_y_continuous_e61(limits = c(0, 20, 5)) +
-  theme_e61() +
-  scale_colour_e61(2) +
   add_e61_logo()
 
-save_e61(here::here("man/figures/fig-4.svg"), graph)
+save_e61(here::here("man/figures/fig-4.svg"), fig4)
 
 knitr::include_graphics(here::here("man/figures/fig-4.svg"))
 
@@ -184,18 +192,16 @@ col_data <- head(mtcars2, 8)
 col_data$names <- rownames(col_data)
 col_data$index <- 1:nrow(col_data)
 
-graph <- ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
+fig5 <- ggplot(col_data, aes(x = index, y = hp, fill = hp)) +
   geom_col() +
   labs_e61(
-    title = "Frivolous Filled Column Chart", 
+    title = "Frivolous filled column chart", 
     subtitle = "For the purpose of showing off the continuous colour palette",
     sources = c("e61 Institute", "Another source"),
     x = NULL, y = "hp") +
-  scale_y_continuous_e61(limits = c(0, 250)) +
-  theme_e61(legend = "bottom", adj = -15) +
-  scale_fill_e61(discrete = FALSE, palette = "light")
+  theme_e61(legend = "bottom")
 
-save_e61(here::here("man/figures/fig-5.svg"), graph)
+save_e61(here::here("man/figures/fig-5.svg"), fig5)
 
 knitr::include_graphics(here::here("man/figures/fig-5.svg"))
 
@@ -208,21 +214,17 @@ col_data <- head(mtcars2, 8)
 col_data$names <- rownames(col_data)
 col_data$index <- 1:nrow(col_data)
 
-graph <- ggplot(col_data, aes(x = factor(index), y = hp, fill = hp)) +
+fig6 <- ggplot(col_data, aes(x = factor(index), y = hp, fill = hp)) +
   geom_col() +
   coord_flip() +
   theme_e61(legend = "bottom") +
   labs_e61(
-    title = "Frivolous Filled Horizontal Bar Chart", 
+    title = "Frivolous filled horizontal bar chart", 
     subtitle = "For the purpose of showing off the continuous colour palette",
     sources = c("e61 Institute", "Another source"),
-    x = NULL, y = "hp") +
-  scale_x_discrete(breaks = 1:8) +
-  scale_y_continuous_e61(limits = c(0, 250)) +
-  scale_fill_e61(discrete = FALSE, palette = "light") + 
-  format_flip()
-
-save_e61(here::here("man/figures/fig-6.svg"), graph)
+    x = NULL, y = "hp")
+  
+save_e61(here::here("man/figures/fig-6.svg"), fig6)
 
 knitr::include_graphics(here::here("man/figures/fig-6.svg"))
 
