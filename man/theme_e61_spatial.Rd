@@ -35,8 +35,7 @@ what you are looking for.
 
 sa3_shp <- strayr::read_absmap("sa32016")
 
-sydney_map <- sa3_shp \%>\%
-   filter(gcc_code_2016 == "1GSYD")
+sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
 
 ggplot(data = sydney_map) +
   geom_sf(aes(fill = gcc_name_2016)) +

@@ -15,8 +15,8 @@
 #' axis. Trial and error will be needed to select appropriate scale and shift
 #' values.
 #'
-#' **Note:** Due to the way that ggplot functions interact with the R
-#' environment, you have to run the code that generates the graph **twice**
+#' \strong{Note:} Due to the way that ggplot functions interact with the R
+#' environment, you have to run the code that generates the graph \strong{twice}
 #' after you change it before the changes will show up.
 #'
 #' @param values Vector of data that would normally be passed as the y aesthetic
