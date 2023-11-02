@@ -23,8 +23,6 @@
 #'   micronotes), "RN" (research notes) or "PPT" (PowerPoints).
 #' @param auto_scale Logical. Should the y-axis be scaled automatically. Default
 #'   is TRUE.
-#' @param force Logical. If force is set to TRUE the graph is saved without running the
-#' tests for y-axis labels etc.
 #' @param dim An optional named list specifying the plot height and width.
 #'   Defaults to NULL which means the graph dimensions will be set based on the
 #'   chart type and function-calculated value.
@@ -67,7 +65,6 @@ save_e61 <- function(filename,
                      format = c("svg", "pdf", "eps", "png"),
                      chart_type = c("MN", "RN", "PPT"),
                      auto_scale = TRUE, # manual control over whether y-axis is scaled
-                     force = FALSE,
                      dim = list(height = NULL, width = NULL), # manual control over chart dims
                      max_height = NULL, # manual control over the maximum height of the chart
                      save_data = FALSE,
@@ -174,7 +171,7 @@ save_e61 <- function(filename,
   }
 
   # Compile the messages
-  if (length(y_miss) > 0 & !force) {
+  if (length(y_miss) > 0) {
     y_miss <- paste0(
       "Plot ",
       paste(y_miss, collapse = ", "),
@@ -183,7 +180,7 @@ save_e61 <- function(filename,
     y_miss <- NULL
   }
 
-  if (length(y_long) > 0 & !force) {
+  if (length(y_long) > 0) {
     y_long <- paste0(
       "Plot ",
       paste(y_long, collapse = ", "),
@@ -222,6 +219,8 @@ save_e61 <- function(filename,
 
     if (prompt == "Y") {
       return(message("Stopping graph generation based on user request. To turn off this message for the remainder of the session, run `options(no_advisory = TRUE)`."))
+    } else {
+      message("To turn off this message for the remainder of the session, set the `no_advisory` option to TRUE.")
     }
 
   }

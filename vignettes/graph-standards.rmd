@@ -32,6 +32,9 @@ knitr::opts_chunk$set(
   out.width = '60%'
 )
 
+# No annoying messages
+options(no_advisory = TRUE)
+
 # Prep data: US personal expenditure aggregates in US$b
 data <- USPersonalExpenditure
 data <- as.data.table(data, keep.rownames = TRUE)
@@ -274,7 +277,7 @@ gg <-
 ```
 
 ```{r, echo=FALSE}
-save_e61(here::here("man/figures/g-dual.svg"), force = TRUE)
+save_e61(here::here("man/figures/g-dual.svg"))
 knitr::include_graphics(here::here("man/figures/g-dual.svg"))
 ```
 
