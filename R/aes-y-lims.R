@@ -380,7 +380,7 @@ get_aes_ticks <- function(min_y_val, max_y_val){
     any(unlist(lapply(value, function(x) isTRUE(all.equal(x, compare)))))
   }
 
-  # check the argments are correctly ordered, otherwise adjust
+  # check the arguments are correctly ordered, otherwise adjust
   if(max_y_val < min_y_val) {
     temp_bot <- min_y_val
     min_y_val <- max_y_val
