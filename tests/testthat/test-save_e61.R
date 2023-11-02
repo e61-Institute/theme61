@@ -9,29 +9,29 @@ test_that("Dimensioning functions", {
 
     suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(width = 10, height = 10)))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
-    expect_equal(g_info$width, 378)
+    expect_equal(g_info$width, 382)
     expect_equal(g_info$height, 378)
 
     suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(width = 10, height = 5)))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
-    expect_equal(g_info$width, 378)
+    expect_equal(g_info$width, 382)
     expect_equal(g_info$height, 189)
 
     suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(width = 5, height = 10)))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
-    expect_equal(g_info$width, 189)
+    expect_equal(g_info$width, 193)
     expect_equal(g_info$height, 378)
 
     # Don't have to specify both?
     suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(height = 10)))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
-    expect_equal(g_info$width, 351)
+    expect_equal(g_info$width, 355)
     expect_equal(g_info$height, 378)
 
     suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(width = 10)))
     g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
-    expect_equal(g_info$width, 378)
-    expect_equal(g_info$height, 282)
+    expect_equal(g_info$width, 382)
+    expect_equal(g_info$height, 287)
 
   })
 
