@@ -141,21 +141,35 @@ save_e61 <- function(filename,
 
   # Loop through the plots
   for(i in seq_along(plots)){
-    # Don't trigger checks if a theme61 function is not being used
-    if (length(plots[[i]]$scales$scales) > 1) {
-      has_scale_e61 <- "scale_e61" %in% class(plots[[i]]$scales$scales[[2]])
-    } else {
-      has_scale_e61 <- FALSE
-    }
 
-    # Or if attr has been set by function args to FALSE
-    y_top_set <- !isFALSE(attr(plots[[i]]$theme, "y_top"))
+    # Skip checks if any of the following criteria are met
+    skip_check <-
+      if (
+        # If a theme61 function is not being used
+        length(plots[[i]]$scales$scales) > 1 &&
+        !"scale_e61" %in% class(plots[[i]]$scales$scales[[2]])
+      ) {
+        TRUE
+      } else if (
+        # If rescaled dual axis scales are used
+        length(plots[[i]]$scales$scales) > 1 &&
+        "rescale_y" %in% class(plots[[i]]$scales$scales[[2]])
+      ) {
+        TRUE
+      } else if (
+        # If y_top is not being used
+        isFALSE(attr(plots[[i]]$theme, "y_top"))
+      ) {
+        TRUE
+      } else {
+        FALSE
+      }
 
     # Message if the y-axis label text is missing
     if (
       # Checks if y is missing or blank
       (is.null(plots[[i]]$labels$y) || nchar(plots[[i]]$labels$y) == 0) &&
-      y_top_set && has_scale_e61
+      !skip_check
       ) {
       y_miss <- c(y_miss, i)
     }
@@ -164,7 +178,7 @@ save_e61 <- function(filename,
     if (
       # Check label char length
       isTRUE(nchar(plots[[i]]$labels$y) > 5) &&
-      y_top_set && has_scale_e61
+      !skip_check
       ) {
       y_long <- c(y_long, i)
     }

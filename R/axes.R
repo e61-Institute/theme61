@@ -91,6 +91,9 @@ scale_y_continuous_e61 <- function(limits = NULL,
 
   class(retval) <- c(class(retval), "scale_e61")
 
+  # Set an additional class if rescaled dual axis used
+  if (isTRUE(rescale_sec)) class(retval) <- c(class(retval), "rescale_y")
+
   return(retval)
 }
 
