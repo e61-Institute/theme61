@@ -25,6 +25,8 @@
 #'   micronotes), 'RN' (research notes), 'PPT' (PowerPoints).
 #' @param auto_scale Logical. Should the y-axis be scaled automatically. Default
 #'   is TRUE.
+#' @param force Logical. If force is set to TRUE the graph is saved without running the
+#' tests for y-axis labels etc.
 #' @param dim An optional named list specifying the plot height and width.
 #'   Defaults to NULL which means the graph dimensions will be set based on the
 #'   chart type and function-calculated value.
