@@ -740,3 +740,4 @@ get_aes_limits <- function(min_y_val, max_y_val, from_zero = F, include_vals = F
 
   return(list(limits[[1]], limits[[2]], tick_spacing))
 }
+

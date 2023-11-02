@@ -19,6 +19,7 @@ test_that("Graphs produced with manipulated secondary axes work", {
 
   withr::local_options(list(sec_axis_msg = FALSE))
 
+  # Test rescaling
   p <- ggplot(
     data.frame(x = 1, y1 = 10, y2 = 200),
     aes(x)) +
@@ -33,6 +34,7 @@ test_that("Graphs produced with manipulated secondary axes work", {
     expect_snapshot_file(suppressWarnings(save_e61("graph-scale.svg", p)))
   })
 
+  # Test shift up and down
   p <- ggplot(
     data.frame(x = 1, y1 = 10, y2 = 30),
     aes(x)) +

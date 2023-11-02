@@ -7,31 +7,31 @@ test_that("Dimensioning functions", {
 
     plot <- minimal_plot
 
-    suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(width = 10, height = 10)))
-    g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
-    expect_equal(g_info$width, 382)
-    expect_equal(g_info$height, 378)
+    suppressWarnings(save_e61("custom-dim.png", plot, dim = list(width = 10, height = 10)))
+    g_info <- magick::image_info(magick::image_read("custom-dim.png"))
+    expect_equal(g_info$width, 358)
+    expect_equal(g_info$height, 354)
 
-    suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(width = 10, height = 5)))
-    g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
-    expect_equal(g_info$width, 382)
-    expect_equal(g_info$height, 189)
+    suppressWarnings(save_e61("custom-dim.png", plot, dim = list(width = 10, height = 5)))
+    g_info <- magick::image_info(magick::image_read("custom-dim.png"))
+    expect_equal(g_info$width, 358)
+    expect_equal(g_info$height, 177)
 
-    suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(width = 5, height = 10)))
-    g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
-    expect_equal(g_info$width, 193)
-    expect_equal(g_info$height, 378)
+    suppressWarnings(save_e61("custom-dim.png", plot, dim = list(width = 5, height = 10)))
+    g_info <- magick::image_info(magick::image_read("custom-dim.png"))
+    expect_equal(g_info$width, 181)
+    expect_equal(g_info$height, 354)
 
     # Don't have to specify both?
-    suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(height = 10)))
-    g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
-    expect_equal(g_info$width, 355)
-    expect_equal(g_info$height, 378)
+    suppressWarnings(save_e61("custom-dim.png", plot, dim = list(height = 10)))
+    g_info <- magick::image_info(magick::image_read("custom-dim.png"))
+    expect_equal(g_info$width, 333)
+    expect_equal(g_info$height, 354)
 
-    suppressWarnings(save_e61("custom-dim.svg", plot, dim = list(width = 10)))
-    g_info <- magick::image_info(magick::image_read("custom-dim.svg"))
-    expect_equal(g_info$width, 382)
-    expect_equal(g_info$height, 287)
+    suppressWarnings(save_e61("custom-dim.png", plot, dim = list(width = 10)))
+    g_info <- magick::image_info(magick::image_read("custom-dim.png"))
+    expect_equal(g_info$width, 358)
+    expect_equal(g_info$height, 269)
 
   })
 
