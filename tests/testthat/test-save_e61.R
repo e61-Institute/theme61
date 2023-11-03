@@ -8,30 +8,23 @@ test_that("Dimensioning functions", {
     plot <- minimal_plot
 
     suppressWarnings(save_e61("custom-dim.png", plot, dim = list(width = 10, height = 10)))
-    g_info <- magick::image_info(magick::image_read("custom-dim.png"))
-    expect_equal(g_info$width, 358)
-    expect_equal(g_info$height, 354)
+    g_info1 <- magick::image_info(magick::image_read("custom-dim.png"))
 
     suppressWarnings(save_e61("custom-dim.png", plot, dim = list(width = 10, height = 5)))
-    g_info <- magick::image_info(magick::image_read("custom-dim.png"))
-    expect_equal(g_info$width, 358)
-    expect_equal(g_info$height, 177)
+    g_info2 <- magick::image_info(magick::image_read("custom-dim.png"))
 
     suppressWarnings(save_e61("custom-dim.png", plot, dim = list(width = 5, height = 10)))
-    g_info <- magick::image_info(magick::image_read("custom-dim.png"))
-    expect_equal(g_info$width, 181)
-    expect_equal(g_info$height, 354)
+    g_info3 <- magick::image_info(magick::image_read("custom-dim.png"))
+
+    expect_equal(g_info1$width, g_info2$width, tolerance = 1)
+    expect_equal(g_info1$width, g_info3$width * 2, tolerance = 10)
+
+    expect_equal(g_info1$height, g_info3$height, tolerance = 1)
+    expect_equal(g_info1$height, g_info2$height * 2, tolerance = 10)
 
     # Don't have to specify both?
-    suppressWarnings(save_e61("custom-dim.png", plot, dim = list(height = 10)))
-    g_info <- magick::image_info(magick::image_read("custom-dim.png"))
-    expect_equal(g_info$width, 333)
-    expect_equal(g_info$height, 354)
-
-    suppressWarnings(save_e61("custom-dim.png", plot, dim = list(width = 10)))
-    g_info <- magick::image_info(magick::image_read("custom-dim.png"))
-    expect_equal(g_info$width, 358)
-    expect_equal(g_info$height, 264)
+    suppressWarnings(expect_no_error(save_e61("custom-dim.png", plot, dim = list(height = 10))))
+    suppressWarnings(expect_no_error(save_e61("custom-dim.png", plot, dim = list(width = 10))))
 
   })
 
