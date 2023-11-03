@@ -1,11 +1,11 @@
 #' Add a single on-graph label to a graph
 #'
-#' Wrapper function around \code{annotate()} that helps you add labels for
-#' lines, columns or other elements directly onto the graph plot as a
-#' replacement for legends outside the plot area.
+#' @description Add text labels for lines, columns or other elements directly
+#'   onto the graph plot. This is preferred over using legends.
 #'
-#' Automatically chooses the correct colour in the theme61 colour palette if you
-#' provide the total number of labels, and the relative ordering of each label.
+#'   Automatically chooses the correct colour in the theme61 colour palette if
+#'   you provide the total number of labels and the relative ordering of each
+#'   label.
 #'
 #' @param label String. Label text to be displayed.
 #' @param x Numeric or string. X-axis position of the label text.
