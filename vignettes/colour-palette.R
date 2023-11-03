@@ -22,6 +22,5 @@ save_e61(
   plot = p,
   filename = here::here("man/figures/g-palette-colours.svg"),
   dim = list(height = 6),
-  auto_scale = FALSE,
-  force = TRUE
+  auto_scale = FALSE
 )
