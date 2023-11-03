@@ -14,7 +14,6 @@ reference:
 - title: Formatting
   contents:
   - format_flip
-  - mpanel_e61
   - save_e61
   - square_legend_symbols
   - starts_with("theme_e61")
@@ -27,6 +26,7 @@ reference:
 - title: Miscellaneous
   contents:
   - crop_aus_coord
+  - e61_chart_maker
   - e61_map
   - set_open_graph
   - unset_open_graph
