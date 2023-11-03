@@ -1,3 +1,35 @@
+# theme61 0.6.0
+
+06 Nov 2023
+
+#### Automatic graph sizing, and y-axis, colour and fill scaling
+
+This is a major breaking change. Your code will be simpler but may need some changes to work.
+
+Most of these improvements are applied when you save graphs using `save_e61()`, so will not show up in the preview.
+
+* Graphs now automatically size themselves correctly. You no longer need to figure out the appropriate graph height.
+* Titles, subtitles and footnotes will automatically scale to fit the panel width. 
+* Y-axis will automatically set limits and breaks to aesthetic defaults. You can override this by providing your own limits using `scale_y_continuous_e61()`.
+* Colour/fill will automatically apply the e61 Institute colour palette. This works if you define a fill/colour variable in your main `ggplot` call (e.g. `ggplot(data, aes(x, y, fill = fill))`). You no longer need to specify the number of colours when using `scale_colour/fill_e61()`.
+* Added different default graph dimensions for micro notes, research notes and PowerPoint presentations. 
+
+These features are implemented directly in `theme61::ggplot()`. This masks the `ggplot()` function in `ggplot2` so if you wish to call the original function you need to specify the namespace like so `ggplot2::ggplot()`. Make sure you load `theme61` *after* `ggplot2` otherwise the correct functions will not be called.
+
+#### Other changes
+
+* All functionality in `mplot_label()` has been combined into `plot_label()`. `mplot_label()` is now deprecated and users need to rename all instances of `mplot_label()` to `plot_label()`.
+* `mpanel_e61()` has been retired as functionality has been incorporated directly into `save_e61()`.
+* Added console messages to help correct common graphing mistakes.
+* Changed default font of graphs to 'PT Sans' to be consistent with research note font.
+* Allow rotation of labels in `plot_label()`.
+* Renamed `add_zeroline()` to `add_baseline()`, and `e61_palette()` to `palette_e61()`.
+
+#### Bug fixes and documentation updates
+
+* Fixed an issue where saving graphs with no title created whitespace above the plot.
+* Documentation and vignettes rewritten to reflect new workflow.
+
 # theme61 0.5.0
 
 26 May 2023

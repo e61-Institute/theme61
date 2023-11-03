@@ -4,7 +4,13 @@
 \alias{add_e61_logo}
 \title{Add e61 logo to graph}
 \usage{
-add_e61_logo()
+add_e61_logo(x = 0.9, y = 0.9, size = 0.1)
+}
+\arguments{
+\item{x, y}{Numeric. Set the x and y position of the logo. Value needs to be
+between 0 and 1.}
+
+\item{size}{Numeric. Set the height and width of the logo.}
 }
 \value{
 ggplot2 object
@@ -16,7 +22,7 @@ Add e61 logo to graph
 library(ggplot2)
 p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
  geom_point() +
- add_e61_logo(x=5,5.5,30,35)
+ add_e61_logo()
 
 
 }

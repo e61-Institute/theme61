@@ -7,13 +7,13 @@
 #'   and the top/bottom of the graph. See \link[ggplot2]{expansion} for details.
 #' @param sec_axis Defaults to duplicating the y-axis so it shows on the left
 #'   and right. To add a rescaled secondary axis, see the documentation for
-#'   \link[theme61]{dual_y_axis}. Set to FALSE to hide the secondary axis.
+#'   \link{dual_y_axis}. Set to FALSE to hide the secondary axis.
 #' @param rescale_sec Logical. Set this to TRUE if you are using a rescaled
 #'   secondary axis, otherwise leave it as FALSE (default).
 #' @param y_top Logical. Ensures there is space at the top of the y-axis for the
 #'   axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
 #'   elsewhere. If you change this argument you also need to change the argument
-#'   with the same name in \code{\link[theme61]{theme_e61}}.
+#'   with the same name in \link{theme_e61}.
 #' @param expand_left,expand_right Numeric. Add extra space between data points
 #'   and the left/right of the graph. See \link[ggplot2]{expansion} for details.
 #' @param limits One of:
@@ -65,24 +65,36 @@ scale_y_continuous_e61 <- function(limits = NULL,
 
   # Prepares breaks for the rescaled secondary axis if used
   if (isTRUE(rescale_sec)) {
-    sec_labels <- sec_rescale(breaks)
+    sec_breaks <- sec_rescale(breaks)
+    sec_labels <- sec_breaks
     sec_labels[is.na(sec_labels)] <- ""
+    sec_axis$breaks <- sec_breaks
     sec_axis$labels <- sec_labels
   }
 
-  # Put it all together
-  retval <- ggplot2::scale_y_continuous(
-    expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
-    sec.axis = sec_axis,
-    limits = limits,
-    breaks = breaks,
-    ...
+  if(!is.null(limits)){
+    # Put it all together
+    retval <- ggplot2::scale_y_continuous(
+      expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
+      sec.axis = sec_axis,
+      limits = limits,
+      breaks = breaks,
+      ...
     )
+
+  } else {
+    retval <- ggplot2::scale_y_continuous(
+      expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
+      ...
+    )
+  }
 
   class(retval) <- c(class(retval), "scale_e61")
 
-  return(retval)
+  # Set an additional class if rescaled dual axis used
+  if (isTRUE(rescale_sec)) class(retval) <- c(class(retval), "rescale_y")
 
+  return(retval)
 }
 
 #' @param hide_first_last Logical. Defaults to TRUE. Hides the first and
@@ -92,8 +104,8 @@ scale_y_continuous_e61 <- function(limits = NULL,
 #' @export
 
 scale_x_continuous_e61 <- function(limits = NULL,
-                                   expand_left = 0,
-                                   expand_right = 0,
+                                   expand_left = 0.05,
+                                   expand_right = 0.05,
                                    hide_first_last = TRUE,
                                    ...) {
 

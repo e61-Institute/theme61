@@ -1,49 +1,34 @@
 #' Saves ggplot graphs with sensible defaults
 #'
-#' @description Designed to save ggplot graphs made with the e61 theme with
-#'   sensible defaults that ensure the text size is appropriately proportioned
-#'   given default sizing.
+#' Saves ggplot2 graphs made with using theme61. Using \code{save_e61()} is
+#' required to ensure graphs are consistent with the e61 style and formatting.
 #'
-#'   Currently the only file formats supported are \code{.pdf} or \code{.svg}
-#'   (preferred), and \code{.png}. PDF and SVG are modern vector graphics file
-#'   formats which can be scaled up and down in size without blurring or
-#'   becoming pixelated. Use the PNG file format in the rare case that vector
-#'   graphics are not supported.
+#' The supported file formats are SVG, PDF, EPS and PNG.
 #'
-#'   See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
+#' Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
+#' better as they are modern vector graphics file formats which can be scaled up
+#' and down in size without blurring or becoming pixelated.
 #'
-#' @details Setting the correct height and width parameters is quite difficult
-#'   due to the way that ggplot translates ggplot objects from pixels into
-#'   physical dimensions (inches or centimetres). Font sizes are also
-#'   transformed differently to other graph elements which adds another
-#'   dimension of difficulty. This is why \code{save_e61} generally requires you
-#'   to provide your own height and width arguments after some trial and error,
-#'   and produces loud messages if you stick to the defaults, which I have tried
-#'   to make not terrible.
-#'
-#'   If the width/height arguments are off, then the file you output will have
-#'   excess space on the left/right or top/bottom (if the values are too high),
-#'   or the graph itself will be shrunk and look weird (if the values are too
-#'   low).
-#'
-#'   This function tries to support multi-panel graphs generated using
-#'   \code{mpanel_e61} by doubling the default width to 17, but you will need to
-#'   make adjustments to the dimensions to ensure the graph is sized
-#'   appropriately.
+#' PNG should only be used for Twitter posts for compatibility reasons.
 #'
 #' @param filename File name to create on disk. Providing the file format
-#'   extension (e.g. .svg) is optional. The file extension must be lowercase. If
-#'   you want to save multiple files with different formats, see the
-#'   \code{format} argument for details.
-#' @param plot Plot object to save. Defaults to the last plot displayed so
-#'   usually you do not need to provide this explicitly.
-#' @param width Plot width in cm. Defaults to 8.5.
-#' @param height Plot height in cm. The function will attempt to calculate an
-#'   appropriate height based on the labels you have provided, but this is
-#'   sensitive to small changes in the graph text so you should check if the
-#'   automatic value is aesthetically appropriate (no excess whitespace).
-#'   Otherwise, the function will default to a value of 9 but this is unlikely
-#'   to be appropriate.
+#'   extension (e.g. .svg) is suggested when saving to a single file format. The
+#'   file extension must be lowercase. If you want to save to multiple formats,
+#'   do not include the extension, see the \code{format} argument for details.
+#' @param plot (single-panel specific) Name of the plot object to save. Defaults
+#'   to the last plot displayed so usually you do not need to provide this
+#'   argument explicitly.
+#' @param chart_type String. Type of chart. This is used to set sensible chart
+#'   widths based on the width of text in each document. Options are "MN" (for
+#'   micronotes), "RN" (research notes) or "PPT" (PowerPoints).
+#' @param auto_scale Logical. Should the y-axis be scaled automatically. Default
+#'   is TRUE.
+#' @param dim An optional named list specifying the plot height and width.
+#'   Defaults to NULL which means the graph dimensions will be set based on the
+#'   chart type and function-calculated value.
+#' @param max_height Numeric. The maximum height of your plot in cm. This is
+#'   used to constrain the plot resizing algorithm in cases where you want to
+#'   limit the height of your charts.
 #' @param format An optional vector of file formats to save as. For example
 #'   \code{c("svg", "pdf")} will save 2 files with the same name to the same
 #'   location to SVG and PDF formats. If the file format is specified in
@@ -51,34 +36,81 @@
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
-#' @param dim_msg Logical. Set to TRUE if you want to know what dimensions the
-#'   graph was saved to (defaults to FALSE).
-#' @param resize Numeric. Only used when PNG is the file format. Resize the
-#'   graph width and height. You may also need to adjust the \code{pointsize}
-#'   and \code{res} to ensure the text is readable.
-#' @inheritParams grDevices::png
+#' @param base_size Numeric. Chart font size. Default is 10.
+#' @param res Numeric. For saving to PNG only. Increase the size of the saved
+#'   PNG. E.g. \code{res = 2} doubles the size of the saved graph.
+#' @param bg_colour Sets the graph background colour. Defaults to "white".
+#'   Accepts a colour name, hex code or theme61 colour object name. For graphs
+#'   used in research note boxes, set the colour to \code{e61_boxback}.
+#' @param ... (multi-panel specific) Plot objects to put on the panel.
+#' @param plotlist (multi-panel specific) List of plots to combine as an
+#'   multi-panel and save. You can also enter the charts individually as
+#'   arguments to the function.
+#' @param height_adj (multi-panel specific) Rescales the height of the
+#'   multi-panel. The function sets sensible defaults but this provides you with
+#'   manual control if you need it.
+#' @param spacing_adj (multi-panel specific) An optional named list specifying
+#'   the adjustment to the title and subtitle. Rescales the size of the space
+#'   give to the multi-panel title/subtitle. Use if you think the title looks
+#'   too cramped on the chart.
+#' @param rel_heights (multi-panel specific) A numeric vector giving the
+#'   relative proportions of each graph component (title, plots, footer
+#'   (optional)).
+#' @inheritParams labs_e61
+#' @inheritParams cowplot::plot_grid
 #' @return Invisibly returns the file name.
 #' @export
 
-save_e61 <-  function(filename,
-                      plot = ggplot2::last_plot(),
-                      width = NULL,
-                      height = NULL,
-                      format = c("svg", "pdf", "eps", "png"),
-                      save_data = FALSE,
-                      dim_msg = FALSE,
-                      resize = NULL,
-                      pointsize = 12,
-                      res = 72
-                      ) {
+save_e61 <- function(filename,
+                     ...,
+                     plot = last_plot(),
+                     format = c("svg", "pdf", "eps", "png"),
+                     chart_type = c("MN", "RN", "PPT"),
+                     auto_scale = TRUE,
+                     dim = list(height = NULL, width = NULL),
+                     max_height = NULL,
+                     save_data = FALSE,
+                     base_size = 10,
+                     res = 1,
+                     # multi-panel specific arguments
+                     bg_colour = "white",
+                     plotlist = NULL,
+                     title = NULL,
+                     subtitle = NULL,
+                     footnotes = NULL,
+                     sources = NULL,
+                     spacing_adj = list(title = 1, subtitle = 1),
+                     height_adj = NULL,
+                     ncol = 2,
+                     nrow = NULL,
+                     align = c("v", "none", "h", "hv"),
+                     axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
+                     rel_heights = NULL) {
 
+  # Compile plots
+  plots <- c(list(...), plotlist)
 
-  # Guard clauses and failing checks ----------------------------------------
+  # For single-panel graphs
+  if (length(plots) == 0) plots <- list(plot)
 
-  # Enforce file format requirements if a file extension is provided (quietly
-  # permits eps files too)
-  if (grepl("\\..{3}$", filename) && !grepl("\\.(png|svg|pdf|eps)$", filename)) {
-    stop("You must provide a file extension. Only PDF, SVG and PNG file formats are currently supported.")
+  # Guard clauses and checks ------------------------------------------------
+
+  # Check whether the plots are ggplot2 objects
+  plots <- check_plots(plots)
+
+  # Enforce chart type
+  chart_type <- match.arg(chart_type)
+
+  # Check if the save directory exists
+  dir_provided <- grepl("^(.*)\\/.*\\..{3}$", filename)
+  dir_name <- gsub("^(.*)\\/.*\\..{3}$", "\\1", filename)
+
+  if (dir_provided && !dir.exists(dir_name))
+    stop("The directory you are trying to save to does not exist.")
+
+  # Enforce file format requirements if a file extension is provided
+  if (grepl("\\..{3}$", filename) && !grepl("\\.(svg|pdf|eps|png)$", filename)) {
+    stop("You must provide a file extension. Only PDF and SVG file formats are supported.")
   }
 
   # Determine which file formats to save
@@ -92,162 +124,211 @@ save_e61 <-  function(filename,
   }
 
   # Check if the data frame can be written
-  if (save_data && !is.data.frame(plot$data))
+  if (save_data && !is.data.frame(plots[[1]]$data))
     stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
-  # Identify graph attributes -----------------------------------------------
+  # Check list args are valid
+  if (!all(names(dim) %in% c("height", "width")))
+    stop("You have specified invalid list elements in 'dim'.")
 
-  # Check if graph is horizontal
-  is_flip <- isTRUE("CoordFlip" %in% class(ggplot2::ggplot_build(plot)$layout$coord))
-
-  # Check if the graph is a multi-panel generated with mpanel_e61 by
-  # exploiting the fact that those graphs have zero-length labels, while
-  # labs_e61 forces the user to have at least a title (so length > 0 for
-  # single panels)
-  is_multi <- !is.null(attr(plot, "panel_rows"))
+  if (!all(names(spacing_adj) %in% c("title", "subtitle")))
+    stop("You have specified invalid list elements in 'spacing_adj'.")
 
   # Advisory messages -------------------------------------------------------
 
-  # The following checks don't apply when multi-panel graphs are created
-  # Message if theme function not used
-  if (!is_multi && is.null(attr(plot$theme, "t61"))) {
-    cli::cli_text(cli::bg_br_yellow(cli::col_black(
-      "Please remember to use 'theme_e61()' in your ggplot code to ensure the ",
-      "e61 theme is applied.")))
+  ## Check if y-axis label text is good
+  adv_msg <- c()
+
+  y_miss <- c()
+  y_long <- c()
+
+  # Loop through the plots
+  for(i in seq_along(plots)){
+
+    # Skip checks if any of the following criteria are met
+    skip_check <-
+      if (
+        # If a theme61 function is not being used
+        length(plots[[i]]$scales$scales) > 1 &&
+        !"scale_e61" %in% class(plots[[i]]$scales$scales[[2]])
+      ) {
+        TRUE
+      } else if (
+        # If rescaled dual axis scales are used
+        length(plots[[i]]$scales$scales) > 1 &&
+        "rescale_y" %in% class(plots[[i]]$scales$scales[[2]])
+      ) {
+        TRUE
+      } else if (
+        # If y_top is not being used
+        isFALSE(attr(plots[[i]]$theme, "y_top"))
+      ) {
+        TRUE
+      } else {
+        FALSE
+      }
+
+    # Message if the y-axis label text is missing
+    if (
+      # Checks if y is missing or blank
+      (is.null(plots[[i]]$labels$y) || nchar(plots[[i]]$labels$y) == 0) &&
+      !skip_check
+      ) {
+      y_miss <- c(y_miss, i)
+    }
+
+    # Message if the y-axis label text is too long
+    if (
+      # Check label char length
+      isTRUE(nchar(plots[[i]]$labels$y) > 5) &&
+      !skip_check
+      ) {
+      y_long <- c(y_long, i)
+    }
   }
 
-  # Message if package scale_x/y function not used
-  if (!is_multi && !"scale_e61" %in% class(ggplot2::layer_scales(plot)$y)) {
-    cli::cli_text(cli::bg_br_yellow(cli::col_black(
-      "Please remember to use 'scale_x/y_continuous_e61()' in your ggplot code ",
-      "to ensure the graph axes render correctly.")))
+  # Compile the messages
+  if (length(y_miss) > 0) {
+    y_miss <- paste0(
+      "Plot ",
+      paste(y_miss, collapse = ", "),
+      " is missing a y-axis label. Provide the y-axis units for the reader by specifying the 'y' argument in 'labs_e61()'.")
+  } else {
+    y_miss <- NULL
   }
 
-  # Message if colour/fill functions aren't used, message to appear only if a
-  # colour/fill mappping exists
-  if (!is_multi && any(grepl("(colour|color|fill)", names(plot$mapping))) &&
-      !"scale_col_e61" %in% unlist(sapply(plot$scales$scales, class))) {
-    cli::cli_text(cli::bg_br_yellow(cli::col_black(
-      "Please remember to use 'scale_colour/fill_e61()' in your ggplot code ",
-      "to ensure the e61 colour palette is used.")))
+  if (length(y_long) > 0) {
+    y_long <- paste0(
+      "Plot ",
+      paste(y_long, collapse = ", "),
+      " y-axis labels may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label (for example you could use: %, ppt, $b, '000, n)."
+    )
+  } else {
+    y_long <- NULL
   }
 
-  # Height and width setting ------------------------------------------------
+  adv_msg <- c(y_miss, y_long)
 
-  # For multi-panels: Adjust the width to fit the extra panels and send out user
-  # message to specify the height
-  if (is_multi && is.null(width)) {
-    width <- 8.5 * attr(plot, "panel_cols")
+  # Compile and print advisory messages
+  print_adv <- function() {
+    cli::cli_div(theme = list(".bad" = list(color = "#cc0000",
+                                            before = paste0(cli::symbol$cross, " ")),
+                              ".adv" = list(`color` = "#cc0000")
+    )
+    )
+    cli::cli_h1("--- Fix the following issues with your graph ----------------------------------------", class = "adv")
+    cli::cli_ul()
+    sapply(adv_msg, cli::cli_alert, class = "bad")
+    cli::cli_end()
   }
 
-  if (is_multi && is.null(height)) {
-    height <- 7.5 + 7 * (attr(plot, "panel_rows") - 1)
+  if (length(adv_msg) > 0 && is.null(getOption("no_advisory"))) print_adv()
 
-    cli::cli_text(cli::col_green("Note: You are saving a multi-panel graph, save_e61() has automatically set the height to ", height, ", but this value may not be appropriate. Check how the saved graph file looks and adjust the height as required."))
-  }
+  # Require user acknowledgement if there are issues to address
+  # Turn these off in test env
+  if (length(adv_msg) > 0 && !is_testing() && is.null(getOption("no_advisory"))) {
 
-  # Calculate graph height based on the graph labels for normal orientation graphs
-  if (is.null(height) && !is_flip && !is_multi) {
+    # Require user acknowledgement
+    prompt <- ""
+    while (prompt == "") {
+      prompt <- readline(prompt = "Type 'Y' to stop generating the graph or 'N' to continue.")
+    }
 
-    h <- 6.5
-
-    # Calculate the height adjustment needed for...
-
-    # Titles
-    t_adj <-
-      if (!is.null(plot$labels$title)) 0.6 + n_count(plot$labels$title) * 0.3 else 0
-
-    # Subtitles
-    st_adj <-
-      if (!is.null(plot$labels$subtitle)) 0.5 + n_count(plot$labels$subtitle) * 0.3 else 0
-
-    # Captions
-    cp_adj <-
-      if (!is.null(plot$labels$caption)) 0.5 + n_count(plot$labels$caption) * 0.3 else 0
-
-    # Adjustment for width of y-axis label
-    y_adj <-
-      if (!is.null(plot$labels$y)) (nchar(plot$labels$y) - 1) * -0.2 else 0
-
-  height <- h + t_adj + st_adj + cp_adj + y_adj
-
-  cli::cli_text(cli::col_green("Note: save_e61() has automatically set the height to ", height, ". Please open the saved graph file and check if this is actually appropriate for your graph. You may have to adjust the value if the y-axis is particularly wide."))
+    if (prompt == "Y") {
+      return(message("Stopping graph generation based on user request. To turn off this message for the remainder of the session, run `options(no_advisory = TRUE)`."))
+    } else {
+      message("To turn off this message for the remainder of the session, set the `no_advisory` option to TRUE.")
+    }
 
   }
 
-  # Message for the user to specify their own height to dimension graphs
-  # correctly. This message runs after the above so when the automatic height
-  # setting is used it does not trigger.
-  if (is.null(height) || isTRUE(getOption("save_e61.message"))) {
+  # Make graph to save --------------------------------
 
-    cli::cli_text(cli::col_green("Note: When you use ", sQuote("save_e61()"), " to save images with defaults, you should set the ", sQuote("height"), " argument manually to your own value to avoid excess/insufficient whitespace on the rendered image."))
-    cli::cli_text(cli::col_green("Unfortunately the only way to check this is to open the rendered graphic and inspect it visually."))
-    cli::cli_text(cli::col_green("This message is shown if you leave 'height = NULL' and the automatic height functionality is not used. It may be disabled by setting options('save_e61.message' = FALSE). See ?save_e61 for more details."))
+  # Check whether to save an mpanel or a single planel chart - these require
+  # different approaches
+  if (length(plots) > 1) {
+    save_input <- save_multi(
+      filename = filename,
+      format = format,
+      plots = plots,
+      chart_type = chart_type,
+      title = title,
+      subtitle = subtitle,
+      footnotes = footnotes,
+      sources = sources,
+      width = dim$width, # control width of the chart
+      height = dim$height, # control height of the chart
+      max_height = max_height, # control maximum height of the chart
+      auto_scale = auto_scale,
+      title_spacing_adj = spacing_adj$title, # adjust the amount of space given to the title
+      subtitle_spacing_adj = spacing_adj$subtitle, # adjust the amount of space given to the subtitle
+      height_adj = height_adj, # adjust the vertical spacing of the mpanel charts
+      base_size = base_size,
+      ncol = ncol,
+      nrow = nrow,
+      align = align,
+      axis = axis,
+      rel_heights = rel_heights,
+      bg_colour = bg_colour
+    )
+  } else {
 
-    options('save_e61.message' = FALSE)
-  }
-
-  # Fallback default dimensions if not otherwise specified
-  if (is.null(width) && !is_flip) width <- 8.5
-  if (is.null(height) && !is_flip) height <- 9
-
-  # When coord_flip() is used to make a plot horizontal, the default dims are
-  # too small
-  if (is.null(width) && is_flip) width <- 17
-  if (is.null(height) && is_flip) height <- 12
-
-  # Resize elements if a png is to be output
-  if (!is.null(resize)) {
-    if (format != "png")
-      stop("The 'resize' argument is not supported unless the file format is .png")
-    if (!is.numeric(resize))
-      stop("'resize' must be numeric.")
-
-    # Rescale elements as required
-    width <- width * resize
-    height <- height * resize
+    save_input <- save_single(
+      filename = filename,
+      plot = plots[[1]],
+      chart_type = chart_type,
+      auto_scale = auto_scale, # control whether y-axis is scaled
+      width = dim$width, # control width
+      height = dim$height, # control height
+      max_height = max_height, # control max height
+      format = format,
+      base_size = base_size,
+      bg_colour = bg_colour
+    )
   }
 
 
   # Save --------------------------------------------------------------------
-  lapply(format, function(fmt) {
-    file_i <- paste0(filename, ".", fmt)
 
-    switch(
-      fmt,
-      svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height)),
-      eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height)),
-      pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height)),
-      png = png(filename = file_i, width = width, height = height, units = "cm", pointsize = pointsize, res = res)
-    )
-    print(plot)
-    dev.off()
-  })
+  save_graph(
+    graph = save_input$graph,
+    format = format,
+    filename = filename,
+    width = save_input$width,
+    height = save_input$height,
+    bg_colour = bg_colour,
+    res = res
+  )
 
-  # Post-saving messages and functions ---------------------
-  if (dim_msg) cli::cli_text(cli::col_green("The graph height and width have been set to ", height, " and ", width, "."))
+  # Post-saving -------------------------------------------------------------
 
   # Save the data used to make the graph
   if (save_data) {
-    data_name <- gsub("\\.(\\w{3})$", "\\.csv", filename)
-    data.table::fwrite(plot$data, data_name)
+
+    for (i in seq_along(plots)) {
+      data_name <- gsub("\\.(\\w{3})$", paste0(i, ".csv"), filename)
+      data.table::fwrite(plots[[i]]$data, data_name)
+    }
   }
 
   # Opens the graph file if the option is set
   if (as.logical(getOption("open_e61_graph", FALSE))) {
+
     # Put filename back together
     filename <- paste0(filename, ".", format[[1]])
 
     file_to_open <- shQuote(here::here(filename))
+
     out <- try(system2("open", file_to_open))
 
     if (out != 0) warning("Graph file could not be opened.")
   }
 
-  # Invisibly returns the filename because not sure what else is worth
-  # returning? Currently some of the tests rely on the filename being returned
-  # so maybe don't change this without a good reason.
-  invisible(filename)
+  # Invisibly returns the filename/s
+  retval <- paste(filename, format, sep = ".")
+
+  invisible(retval)
+
 }
 
 #' Set option to automatically open files created by \code{save_e61}
@@ -275,11 +356,58 @@ unset_open_graph <- function() {
   invisible(FALSE)
 }
 
-#' Counts the number of occurrences of a line break (\n)
+#' Converts SVG to PNG
 #'
-#' @param text The string to be parsed.
-#' @return Integer counting the number of line breaks in the string.
-#' @noRd
-n_count <- function(text) {
-  nchar(text) - nchar(gsub("\n", "", text, fixed = TRUE))
+#' Converts an SVG file to a PNG file
+#'
+#' @param file_in File path to the SVG image to convert.
+#' @param file_out File path to the PNG image to save. Default saves a file with
+#'   the same name and location (except for the file extension).
+#' @param delete Logical. Delete the original SVG file? (defaults to FALSE)
+#' @param res Numeric. Increase the dimensions of the saved PNG. E.g. \code{res
+#'   = 2} doubles the dimensions of the saved graph.
+#' @return Invisibly returns the file path to the PNG image
+#' @keywords internal
+#' @export
+svg_to_png <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
+
+  if (!grepl(".*\\.svg$", file_in))
+    stop("file_in must be an svg file.")
+
+  if (is.null(file_out)) {
+    file_out <- gsub("(.*)\\.svg$", "\\1.png", file_in)
+  } else if (!grepl(".*\\.png$", file_out)) {
+    stop("file_out must be a png file.")
+  }
+
+  if (res != 1) {
+    file_temp_svg <- "intermed.svg"
+    file_temp_png <- "intermed.png"
+
+    res <- res / 1.25 # For some reason any res > 1 scales 1:1.25...
+
+    rsvg::rsvg_png(svg = file_in, file = file_temp_png)
+
+    g_info <- magick::image_info(magick::image_read(file_temp_png))
+
+    rsvg::rsvg_svg(svg = file_in,
+                   file = file_temp_svg,
+                   width = g_info$width * res,
+                   height = g_info$height * res
+                   )
+
+    rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
+
+    unlink(file_temp_svg)
+    unlink(file_temp_png)
+
+  } else {
+
+    rsvg::rsvg_png(svg = file_in, file = file_out)
+
+  }
+
+  if (delete) unlink(file_in)
+
+  invisible(file_out)
 }

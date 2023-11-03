@@ -15,6 +15,10 @@
 #' axis. Trial and error will be needed to select appropriate scale and shift
 #' values.
 #'
+#' \strong{Note:} Due to the way that ggplot functions interact with the R
+#' environment, you have to run the code that generates the graph \strong{twice}
+#' after you change it before the changes will show up.
+#'
 #' @param values Vector of data that would normally be passed as the y aesthetic
 #'   in the graph.
 #' @param scale Numeric. Multiplicative factor that rescales the axis. For
@@ -22,11 +26,12 @@
 #'   rescale this to 0 to 5.
 #' @param shift Numeric. Moves the axis up and down. For example, if the scale
 #'   was 0 to 5, \code{shift = 5} moves the secondary scale down by 5 units to
-#'   -5 to 0.
+#'   range from -5 to 0.
 #' @rdname dual_y_axis
 #' @export
 #' @examples
 #'
+#' \dontrun{
 #' library(ggplot2)
 #' data <- data.frame(x = 1:5, y1 = 1:5 * 10, y2 = 5:1 - 5)
 #'
@@ -37,22 +42,29 @@
 #'   # Set rescaled_sec = TRUE in scale_y_continuous_e61() to format the breaks correctly.
 #'   # The secondary y-axis label (name = "%") needs to be explicitly specified otherwise it will not appear.
 #'   scale_y_continuous_e61(limits = c(0, 60, 10), sec_axis = sec_axis(~sec_rescale(.), name = "%"), rescale_sec = TRUE) +
-#'   theme_e61() +
 #'   labs_e61(y = "%")
+#' }
 #'
 sec_rescale_inv <- function(values, scale = 1, shift = 0) {
 
-  # Doing a bad thing here, assigning objects to the global environment is
-  # generally frowned upon. But here we need it to be supplied to another
-  # function, scale_function()
-  assign("sec_axis_scale", scale, envir = .GlobalEnv)
-  assign("sec_axis_shift", shift, envir = .GlobalEnv)
+  # Store scale and shift vars to supply to sec_rescale()
+  assign("sec_axis_scale", scale, envir = t61_env)
+  assign("sec_axis_shift", shift, envir = t61_env)
+
+  # Inform the user of the weirdness
+  if (getOption("sec_axis_msg", default = TRUE)) {
+    cli::cli_alert_info("Did your graph not show any change to the secondary axis? Due to weirdness, you need to run the graph code twice after making changes to the secondary axis rescaling. This message appears once per session. To view it again, run `options(sec_axis_msg = TRUE)`.",
+                        wrap = TRUE)
+
+    # Turn off the option after appearing once
+    options(sec_axis_msg = FALSE)
+  }
 
   return ((values + shift) / scale)
 }
 
 #' @rdname dual_y_axis
 #' @export
-sec_rescale <- function(values, scale = sec_axis_scale, shift = sec_axis_shift) {
+sec_rescale <- function(values, scale = t61_env$sec_axis_scale, shift = t61_env$sec_axis_shift) {
   return (values * scale - shift)
 }

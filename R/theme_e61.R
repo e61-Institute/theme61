@@ -2,31 +2,28 @@
 #'
 #' Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
 #' appearance. If you are looking to change the appearance of titles or labels,
-#' check the arguments in \code{\link[theme61]{labs_e61}}, which are probably
-#' what you are looking for.
-#'
-#' \code{scale_y_continuous_e61()} should be used in conjunction with this
-#' function to ensure that theming and axes are applied correctly.
+#' check the arguments in \link{labs_e61}, which are probably what you are
+#' looking for.
 #'
 #' @param y_top Defaults to TRUE. Puts the y-axis title at the top. If you
 #'   change this argument you also need to change the argument with the same
-#'   name in \code{\link[theme61]{scale_y_continuous_e61}}.
+#'   name in \link{scale_y_continuous_e61}.
 #' @param adj Either a single numeric to adjust left and right axis titles
 #'   simultaneously or a vector of 2 numerics to adjust each axis title
 #'   separately. More negative values move the text closer to the graph panel.
-#'   Defaults to -12 which seems to work well for y-axis with 1-3 character-wide
-#'   values.
-#' @param fix_left Optional. Sometimes if the value of the \code{adj} argument
-#'   is too negative, the margins on the left side of the graph start to cut off
-#'   some of the text. Provide a small positive value (5?) to correct this.
-#' @param legend Character. Legend position, use "none" (default) to hide the
-#'   legend.
-#' @param legend_title Logical. Include Legend title? Defaults to FALSE.
+#' @param fix_left Sometimes if the value of the \code{adj} argument is too
+#'   negative, the margins on the left side of the graph start to cut off some
+#'   of the text. Provide a small positive value (5?) to correct this.
+#' @param legend Character. Legend position, "none" (default) hides the legend.
+#' @param legend_title Logical. Include legend title? Defaults to FALSE.
 #' @param aspect_ratio Numeric. Sets the aspect ratio of the graph panel.
-#' @param background Character. Options are "white" (default) or "grey".
+#' @param background Character. Default is "white". For all graphs that you
+#'   save, you should control the background colour using the \code{bg_colour}
+#'   argument in \code{save_e61}, not here.
 #' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #' @param base_size Numeric. Chart font size. Default is 10.
-#' @param base_family Character. Chart font family. Default is Arial.
+#' @param base_family Character. Chart font family. Default for notes is PT
+#'   Sans.
 #' @param base_line_size Numeric. Default line width.
 #' @param base_rect_size Numeric. Default rect width.
 #'
@@ -37,12 +34,11 @@
 #' @examples
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 #'   geom_point() +
-#'   theme_e61() +
-#'   scale_colour_e61(n = 3)
+#'   theme_e61()
 #'
 
 theme_e61 <- function(y_top = TRUE,
-                      adj = -12,
+                      adj = 0,
                       fix_left = 0,
                       legend = c("none", "bottom", "top", "left", "right"),
                       legend_title = FALSE,
@@ -50,7 +46,7 @@ theme_e61 <- function(y_top = TRUE,
                       panel_borders = TRUE,
                       background = "white",
                       base_size = 10,
-                      base_family = "ArialMT",
+                      base_family = "pt-sans",
                       base_line_size = points_to_mm(0.75),
                       base_rect_size = points_to_mm(1)
                       ) {
@@ -106,7 +102,7 @@ theme_e61 <- function(y_top = TRUE,
       axis.ticks = element_line(colour = "black"),
       axis.ticks.y = element_blank(),
       axis.ticks.length = unit(half_line / 2, "pt"),
-      axis.ticks.length.x = unit(-1*half_line / 2, "pt"), # Puts ticks inside graph
+      axis.ticks.length.x = unit(half_line / 2, "pt"), # Puts ticks inside graph
       axis.ticks.length.x.top = NULL,
       axis.ticks.length.x.bottom = NULL,
       axis.ticks.length.y = NULL,
@@ -128,7 +124,6 @@ theme_e61 <- function(y_top = TRUE,
         vjust = 0
       ),
       legend.background = element_rect(colour = NA),
-      legend.title = element_blank(),
       legend.spacing = unit(half_line, "pt"),
       legend.spacing.x = NULL,
       legend.spacing.y = NULL,
@@ -145,7 +140,6 @@ theme_e61 <- function(y_top = TRUE,
       ),
       legend.text.align = 0,
       legend.title.align = NULL,
-      legend.position = legend,
       legend.justification = "center",
       legend.box = "vertical",
       legend.box.margin = margin(0, 0,
@@ -155,7 +149,7 @@ theme_e61 <- function(y_top = TRUE,
       panel.background = element_rect(colour = NA),
       panel.border = element_rect(
         linetype = 1,
-        size = points_to_mm(2),
+        linewidth = points_to_mm(2),
         colour = "black",
         fill = NA
       ),
@@ -208,7 +202,7 @@ theme_e61 <- function(y_top = TRUE,
         family = base_family,
         size = rel(0.8),
         hjust = 0,
-        vjust = 1,
+        vjust = 0.5,
         colour = "black",
         margin = margin(t = 15)
       ),
@@ -222,12 +216,19 @@ theme_e61 <- function(y_top = TRUE,
       complete = TRUE
     )
 
+  # add the basics of the legend
+  ret <- ret +
+    theme(
+      legend.position = legend,
+      legend.title = element_blank()
+    )
+
   # add panel borders if the user requests them
   if (legend_title) {
     ret <- ret %+replace%
       theme(legend.title = element_text(size = rel(1),
-                           margin = margin(l = 0,
-                           r = base_size / 4, unit = "pt")))
+                                        margin = margin(l = 0,
+                                                        r = base_size / 4, unit = "pt")))
   }
 
   # adjust legend direction based on legend position
@@ -256,6 +257,8 @@ theme_e61 <- function(y_top = TRUE,
   # Moves y-axis title to the top
   if (y_top) {
     ret <- ret + y_title_top(adj = adj, fix_left = fix_left)
+  } else {
+    attr(ret, "y_top") <- FALSE
   }
 
   # Add attribute to identify it as a theme61 object
@@ -264,6 +267,97 @@ theme_e61 <- function(y_top = TRUE,
   return(ret)
 }
 
+#' e61 themed spatial maps options
+#'
+#' Applies the e61 theme to ggplot spatial maps to adjust graph appearance. If
+#' you are looking to change the appearance of titles or labels, check the
+#' arguments in \code{\link[theme61]{labs_e61}}, which are probably what you are
+#' looking for.
+#'
+#' @param legend Character. Legend position, "none" (default) hides the legend.
+#' @param legend_title Logical. Include Legend title? Defaults to FALSE.
+#' @param aspect_ratio Numeric. Sets the aspect ratio of the graph panel.
+#' @param base_size Numeric. Chart font size. Default is 10.
+#' @param base_family Character. Chart font family. Default is PT Sans.
+#' @return ggplot2 object
+#' @import ggplot2
+#' @export
+#'
+#' @examples
+#'
+#' \dontrun{
+#' sa3_shp <- strayr::read_absmap("sa32016")
+#'
+#' sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
+#'
+#' ggplot(data = sydney_map) +
+#'   geom_sf(aes(fill = gcc_name_2016)) +
+#'   theme_e61_spatial()
+#' }
+#'
+theme_e61_spatial <- function(
+  legend = c("none", "bottom", "top", "left", "right"),
+  legend_title = FALSE,
+  base_size = 10,
+  base_family = "pt-sans"
+){
+
+  legend <- match.arg(legend)
+
+  half_line <- base_size / 2
+
+  ret <-
+    theme_void() +
+    theme(
+      text = element_text(
+        colour = "black",
+        family = base_family,
+        face = "plain",
+        hjust = 0.5,
+        vjust = 0.5,
+        angle = 0,
+        lineheight = 0.9,
+        debug = FALSE,
+        margin = margin(),
+        size = base_size
+      ),
+      plot.title = element_text(
+        size = rel(1.15),
+        hjust = 0.5,
+        vjust = 1,
+        colour = "black",
+        face = "bold",
+        margin = margin(b = half_line)
+      ),
+      plot.subtitle = element_text(
+        size = rel(1),
+        colour = "black",
+        hjust = 0.5,
+        vjust = 1,
+        margin = margin(
+          t = 0, r = 0, b = base_size * .5, l = 0,
+          unit = "pt"
+        )
+      ),
+      plot.caption = element_text(
+        family = base_family,
+        size = rel(0.8),
+        hjust = 0,
+        vjust = 1,
+        colour = "black",
+        margin = margin(t = 15)
+      ),
+      legend.position = legend,
+      axis.text = element_blank(),
+      axis.ticks = element_blank(),
+      axis.line = element_blank(),
+      panel.border = element_blank()
+    )
+
+  if(legend_title) ret <- ret + theme(legend.title = element_text())
+
+  return(ret)
+}
 
 #' e61 themed graph options in an alternative style
 #'
@@ -276,12 +370,11 @@ theme_e61 <- function(y_top = TRUE,
 #'
 #' @examples
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
-#' geom_point() +
-#' e61_colour_manual(n = 3) +
-#' theme_e61_clean()
+#'   geom_point() +
+#'   theme_e61_alt()
 
-theme_e61_clean <- function(
-    base_family = "Arial",
+theme_e61_alt <- function(
+    base_family = "pt-sans",
     base_size = 12
   ){
   ggthemes::theme_clean() +
@@ -320,18 +413,21 @@ theme_e61_clean <- function(
 #' to squares. This needs to be used in conjunction with some invisible point
 #' geoms so the function has a shape to reshape.
 #'
+#' @param size Numeric. Control the size of the replacement square. Default of 6
+#'   works well when \code{ymin} or \code{ymax} are not present.
 #' @return ggplot object
 #' @export
 #' @examples
-#' ggplot(data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
-#'   aes(x, y, colour = group)) +
+#' ggplot(
+#'   data.frame(x = c(1, 2), y = c(5, 6), group = c("A", "A")),
+#'   aes(x, y, colour = group)
+#'   ) +
 #'   geom_line() +
 #'   geom_point(alpha = 0) + # The required "invisible points"
 #'   square_legend_symbols()
 #'
-
-square_legend_symbols <- function() {
-  ggplot2::guides(colour = ggplot2::guide_legend(override.aes = list(alpha = 1, size = 6, shape = 15)))
+square_legend_symbols <- function(size = 6) {
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = size, shape = 15)))
 }
 
 #' Applies changes to the theme for horizontal bar graphs
@@ -342,23 +438,24 @@ square_legend_symbols <- function() {
 #' code, after theming functions such as \code{theme_e61()} have been called.
 #'
 #' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
-#' the default (-9) works for most graphs. A more negative value moves the
-#' title up, a less negative value moves the title down.
+#' the default works for most graphs. A negative value moves the
+#' title up, a positive value moves the title down.
 #'
 #' @return ggplot object
 #' @import ggplot2
 #' @export
 
-format_flipped_bar <- function(x_adj = -9) {
+format_flip <- function(x_adj = 0) {
   theme(
     panel.grid.major.x = element_line(colour = e61_greylight6, linewidth = points_to_mm(0.5)),
     panel.grid.major.y = element_blank(),
     axis.text.x.top = element_blank(),
     axis.ticks.x.top = element_blank(),
     axis.title.x.top = element_blank(),
-    axis.title.x.bottom = element_text(margin = margin(t = x_adj, b = 5),
-                                       hjust = 1, angle = 0)
-
+    axis.title.x.bottom = element_text(margin = margin(t = -11 + x_adj, b = 5),
+                                       hjust = 1, angle = 0),
+    plot.title.position = "plot",
+    plot.caption.position = "plot"
   )
 
 }
@@ -378,6 +475,16 @@ cm_to_in <- function(cm, round = FALSE) {
     round(inches, 2)
   } else {
     inches
+  }
+}
+
+in_to_cm <- function(inches, round = FALSE) {
+  cm <- 2.54 * inches
+
+  if (isTRUE(round)) {
+    round(cm, 2)
+  } else {
+    cm
   }
 }
 
@@ -406,5 +513,4 @@ y_title_top <- function(adj, fix_left) {
     )
 
   return(ret)
-
 }

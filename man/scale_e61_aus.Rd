@@ -43,8 +43,6 @@ graphing
 }
 \examples{
 
-library(ggplot2)
-
 graph_data <- data.frame(
   state = c("AUS", "ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"),
   value = runif(9)
@@ -52,5 +50,5 @@ graph_data <- data.frame(
 
 ggplot(graph_data, aes(x = state, y = value, fill = state)) +
   geom_col() +
-  e61_fill_aus()
+  scale_fill_e61_aus()
 }

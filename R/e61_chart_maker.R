@@ -27,11 +27,23 @@
 #' }
 
 # Disabling while we figure out a fix for the github repo dependency
-# e61_chart_maker <-
-#   function(
-#     data = NULL,
-#     controls = c("labs", "parameters", "appearance", "filters", "code"),
-#     viewer = getOption(x = "esquisse.viewer", default = "dialog")){
-#
-#     esquisse::esquisser(data, controls, viewer)
-# }
+e61_chart_maker <-
+  function(
+    data = NULL,
+    controls = c("labs", "parameters", "appearance", "filters", "code"),
+    viewer = getOption(x = "esquisse.viewer", default = "dialog")
+    ){
+
+    # check whether the package has been installed, otherwise prompt users to
+    # install it
+    if(!require(esquisse)){
+      remotes::install_github(
+        repo = "JackBuckley/e61-chart-maker",
+        force = TRUE,
+        replace = TRUE,
+        update = "always"
+      )
+    }
+
+    esquisse::esquisser(data, controls, viewer)
+}

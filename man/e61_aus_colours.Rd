@@ -3,7 +3,7 @@
 \docType{data}
 \name{e61_aus_colours}
 \alias{e61_aus_colours}
-\title{Australian jurisidictions colour palette}
+\title{Australian jurisdictions colour palette}
 \format{
 An object of class \code{character} of length 41.
 }

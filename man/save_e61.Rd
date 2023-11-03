@@ -6,92 +6,128 @@
 \usage{
 save_e61(
   filename,
-  plot = ggplot2::last_plot(),
-  width = NULL,
-  height = NULL,
+  ...,
+  plot = last_plot(),
   format = c("svg", "pdf", "eps", "png"),
+  chart_type = c("MN", "RN", "PPT"),
+  auto_scale = TRUE,
+  dim = list(height = NULL, width = NULL),
+  max_height = NULL,
   save_data = FALSE,
-  dim_msg = FALSE,
-  resize = NULL,
-  pointsize = 12,
-  res = 72
+  base_size = 10,
+  res = 1,
+  bg_colour = "white",
+  plotlist = NULL,
+  title = NULL,
+  subtitle = NULL,
+  footnotes = NULL,
+  sources = NULL,
+  spacing_adj = list(title = 1, subtitle = 1),
+  height_adj = NULL,
+  ncol = 2,
+  nrow = NULL,
+  align = c("v", "none", "h", "hv"),
+  axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
+  rel_heights = NULL
 )
 }
 \arguments{
 \item{filename}{File name to create on disk. Providing the file format
-extension (e.g. .svg) is optional. The file extension must be lowercase. If
-you want to save multiple files with different formats, see the
-\code{format} argument for details.}
+extension (e.g. .svg) is suggested when saving to a single file format. The
+file extension must be lowercase. If you want to save to multiple formats,
+do not include the extension, see the \code{format} argument for details.}
 
-\item{plot}{Plot object to save. Defaults to the last plot displayed so
-usually you do not need to provide this explicitly.}
+\item{...}{(multi-panel specific) Plot objects to put on the panel.}
 
-\item{width}{Plot width in cm. Defaults to 8.5.}
-
-\item{height}{Plot height in cm. The function will attempt to calculate an
-appropriate height based on the labels you have provided, but this is
-sensitive to small changes in the graph text so you should check if the
-automatic value is aesthetically appropriate (no excess whitespace).
-Otherwise, the function will default to a value of 9 but this is unlikely
-to be appropriate.}
+\item{plot}{(single-panel specific) Name of the plot object to save. Defaults
+to the last plot displayed so usually you do not need to provide this
+argument explicitly.}
 
 \item{format}{An optional vector of file formats to save as. For example
 \code{c("svg", "pdf")} will save 2 files with the same name to the same
 location to SVG and PDF formats. If the file format is specified in
 \code{filename}, then this argument is ignored.}
 
+\item{chart_type}{String. Type of chart. This is used to set sensible chart
+widths based on the width of text in each document. Options are "MN" (for
+micronotes), "RN" (research notes) or "PPT" (PowerPoints).}
+
+\item{auto_scale}{Logical. Should the y-axis be scaled automatically. Default
+is TRUE.}
+
+\item{dim}{An optional named list specifying the plot height and width.
+Defaults to NULL which means the graph dimensions will be set based on the
+chart type and function-calculated value.}
+
+\item{max_height}{Numeric. The maximum height of your plot in cm. This is
+used to constrain the plot resizing algorithm in cases where you want to
+limit the height of your charts.}
+
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph
 (defaults to FALSE).}
 
-\item{dim_msg}{Logical. Set to TRUE if you want to know what dimensions the
-graph was saved to (defaults to FALSE).}
+\item{base_size}{Numeric. Chart font size. Default is 10.}
 
-\item{resize}{Numeric. Only used when PNG is the file format. Resize the
-graph width and height. You may also need to adjust the \code{pointsize}
-and \code{res} to ensure the text is readable.}
+\item{res}{Numeric. For saving to PNG only. Increase the size of the saved
+PNG. E.g. \code{res = 2} doubles the size of the saved graph.}
 
-\item{pointsize}{the default pointsize of plotted text, interpreted as
-    big points (1/72 inch) at \code{res} ppi.}
+\item{bg_colour}{Sets the graph background colour. Defaults to "white".
+Accepts a colour name, hex code or theme61 colour object name. For graphs
+used in research note boxes, set the colour to \code{e61_boxback}.}
 
-\item{res}{The nominal resolution in ppi which will be recorded in the
-    bitmap file, if a positive integer.  Also used for units other than
-    the default.  If not specified, taken as 72 ppi to set the size of
-    text and line widths.}
+\item{plotlist}{(multi-panel specific) List of plots to combine as an
+multi-panel and save. You can also enter the charts individually as
+arguments to the function.}
+
+\item{title}{The text for the title.}
+
+\item{subtitle}{The text for the subtitle.}
+
+\item{footnotes}{A vector of footnote text strings. Each new string will be
+prepended with *, **, ***, etc. Note you'll need to include the asterisks
+in the title/subtitle yourself. Please be sensible with the number of
+separate points you include in the graph.}
+
+\item{sources}{String vector providing the names of sources for the graph.}
+
+\item{spacing_adj}{(multi-panel specific) An optional named list specifying
+the adjustment to the title and subtitle. Rescales the size of the space
+give to the multi-panel title/subtitle. Use if you think the title looks
+too cramped on the chart.}
+
+\item{height_adj}{(multi-panel specific) Rescales the height of the
+multi-panel. The function sets sensible defaults but this provides you with
+manual control if you need it.}
+
+\item{ncol}{(optional) Number of columns in the plot grid.}
+
+\item{nrow}{(optional) Number of rows in the plot grid.}
+
+\item{align}{(optional) Specifies whether graphs in the grid should be horizontally ("h") or
+vertically ("v") aligned. Options are "none" (default), "hv" (align in both directions), "h", and "v".}
+
+\item{axis}{(optional) Specifies whether graphs should be aligned by the left ("l"), right ("r"), top ("t"), or bottom ("b")
+margins. Options are "none" (default), or a string of any combination of l, r, t, and b in any order (e.g. "tblr" or "rlbt" for aligning all margins).
+Must be specified if any of the graphs are complex (e.g. faceted) and alignment is specified and desired. See \code{\link[cowplot:align_plots]{align_plots()}} for details.}
+
+\item{rel_heights}{(multi-panel specific) A numeric vector giving the
+relative proportions of each graph component (title, plots, footer
+(optional)).}
 }
 \value{
 Invisibly returns the file name.
 }
 \description{
-Designed to save ggplot graphs made with the e61 theme with
-  sensible defaults that ensure the text size is appropriately proportioned
-  given default sizing.
-
-  Currently the only file formats supported are \code{.pdf} or \code{.svg}
-  (preferred), and \code{.png}. PDF and SVG are modern vector graphics file
-  formats which can be scaled up and down in size without blurring or
-  becoming pixelated. Use the PNG file format in the rare case that vector
-  graphics are not supported.
-
-  See \code{\link[ggplot2]{ggsave}} for details on custom function arguments.
+Saves ggplot2 graphs made with using theme61. Using \code{save_e61()} is
+required to ensure graphs are consistent with the e61 style and formatting.
 }
 \details{
-Setting the correct height and width parameters is quite difficult
-  due to the way that ggplot translates ggplot objects from pixels into
-  physical dimensions (inches or centimetres). Font sizes are also
-  transformed differently to other graph elements which adds another
-  dimension of difficulty. This is why \code{save_e61} generally requires you
-  to provide your own height and width arguments after some trial and error,
-  and produces loud messages if you stick to the defaults, which I have tried
-  to make not terrible.
+The supported file formats are SVG, PDF, EPS and PNG.
 
-  If the width/height arguments are off, then the file you output will have
-  excess space on the left/right or top/bottom (if the values are too high),
-  or the graph itself will be shrunk and look weird (if the values are too
-  low).
+Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
+better as they are modern vector graphics file formats which can be scaled up
+and down in size without blurring or becoming pixelated.
 
-  This function tries to support multi-panel graphs generated using
-  \code{mpanel_e61} by doubling the default width to 17, but you will need to
-  make adjustments to the dimensions to ensure the graph is sized
-  appropriately.
+PNG should only be used for Twitter posts for compatibility reasons.
 }
