@@ -219,6 +219,23 @@ test_that("Change background colour", {
   })
 })
 
+test_that("PNG resolution changer works", {
+
+  plot <- minimal_plot
+
+  withr::with_tempdir({
+    suppressWarnings(save_e61("png-1.png", plot))
+    suppressWarnings(save_e61("png-2.png", plot, res = 2))
+    g_info1 <- magick::image_info(magick::image_read("png-1.png"))
+    g_info2 <- magick::image_info(magick::image_read("png-2.png"))
+    expect_equal(g_info1$width * 2, g_info2$width, tolerance = 0.1)
+    expect_equal(g_info1$height * 2, g_info2$height, tolerance = 0.1)
+
+    expect_snapshot_file(suppressWarnings(save_e61("png-1.png", plot)))
+    expect_snapshot_file(suppressWarnings(save_e61("png-2.png", plot, res = 2)))
+  })
+})
+
 # Check whole-graph generation consistency --------------------------------
 
 test_that("Single-panel graph examples", {
