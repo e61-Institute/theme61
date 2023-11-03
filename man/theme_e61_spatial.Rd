@@ -18,7 +18,7 @@ theme_e61_spatial(
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
 
-\item{base_family}{Character. Chart font family. Default is PT-SANS (research notes).}
+\item{base_family}{Character. Chart font family. Default is PT Sans.}
 
 \item{aspect_ratio}{Numeric. Sets the aspect ratio of the graph panel.}
 }
@@ -26,13 +26,14 @@ theme_e61_spatial(
 ggplot2 object
 }
 \description{
-Applies the e61 theme to ggplot spatial maps to adjust graph
-appearance. If you are looking to change the appearance of titles or labels,
-check the arguments in \code{\link[theme61]{labs_e61}}, which are probably
-what you are looking for.
+Applies the e61 theme to ggplot spatial maps to adjust graph appearance. If
+you are looking to change the appearance of titles or labels, check the
+arguments in \code{\link[theme61]{labs_e61}}, which are probably what you are
+looking for.
 }
 \examples{
 
+\dontrun{
 sa3_shp <- strayr::read_absmap("sa32016")
 
 sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
@@ -40,5 +41,6 @@ sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
 ggplot(data = sydney_map) +
   geom_sf(aes(fill = gcc_name_2016)) +
   theme_e61_spatial()
+}
 
 }

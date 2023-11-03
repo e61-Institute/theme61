@@ -15,6 +15,7 @@ save_e61(
   max_height = NULL,
   save_data = FALSE,
   base_size = 10,
+  res = 1,
   bg_colour = "white",
   plotlist = NULL,
   title = NULL,
@@ -67,6 +68,9 @@ same name as the graph that contains the data needed to recreate the graph
 (defaults to FALSE).}
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
+
+\item{res}{Numeric. For saving to PNG only. Increase the size of the saved
+PNG. E.g. \code{res = 2} doubles the size of the saved graph.}
 
 \item{bg_colour}{Sets the graph background colour. Defaults to "white".
 Accepts a colour name, hex code or theme61 colour object name. For graphs

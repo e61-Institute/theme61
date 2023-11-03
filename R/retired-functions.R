@@ -4,7 +4,6 @@
 # message code entirely from v0.4 onwards, as users have had ample warning to
 # fix their code.
 
-
 # Defunct from v0.7 -------------------------------------------------------
 
 #' Deprecated
@@ -35,6 +34,23 @@ mpanel_e61 <- function(...) {
     when = "0.6.0", what = "mpanel_e61()",
     details = "You no longer need to use mpanel_e61() when making multi-panel graphs. Instead, individual panels are directly supplied to save_e61(). See the documentation for save_e61() for more information."
     )
+}
+
+# Deprecate indefinitely ----------------------------------------------
+
+#' Deprecated
+#' @export
+#' @noRd
+mplot_label <- function(...) {
+  lifecycle::deprecate_soft(when = "0.6.0",
+                            what = "mplot_label()",
+                            with = "plot_label()")
+}
+
+mplab <- function(...) {
+  lifecycle::deprecate_soft(when = "0.6.0",
+                            what = "mplab()",
+                            with = "plot_label()")
 }
 
 # # Keep this as an example of a defunct function

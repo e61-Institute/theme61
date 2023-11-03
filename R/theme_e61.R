@@ -269,23 +269,23 @@ theme_e61 <- function(y_top = TRUE,
 
 #' e61 themed spatial maps options
 #'
-#' Applies the e61 theme to ggplot spatial maps to adjust graph
-#' appearance. If you are looking to change the appearance of titles or labels,
-#' check the arguments in \code{\link[theme61]{labs_e61}}, which are probably
-#' what you are looking for.
+#' Applies the e61 theme to ggplot spatial maps to adjust graph appearance. If
+#' you are looking to change the appearance of titles or labels, check the
+#' arguments in \code{\link[theme61]{labs_e61}}, which are probably what you are
+#' looking for.
 #'
 #' @param legend Character. Legend position, "none" (default) hides the legend.
 #' @param legend_title Logical. Include Legend title? Defaults to FALSE.
 #' @param aspect_ratio Numeric. Sets the aspect ratio of the graph panel.
 #' @param base_size Numeric. Chart font size. Default is 10.
-#' @param base_family Character. Chart font family. Default is PT-SANS (research notes).
-#'
+#' @param base_family Character. Chart font family. Default is PT Sans.
 #' @return ggplot2 object
 #' @import ggplot2
 #' @export
 #'
 #' @examples
 #'
+#' \dontrun{
 #' sa3_shp <- strayr::read_absmap("sa32016")
 #'
 #' sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
@@ -293,8 +293,8 @@ theme_e61 <- function(y_top = TRUE,
 #' ggplot(data = sydney_map) +
 #'   geom_sf(aes(fill = gcc_name_2016)) +
 #'   theme_e61_spatial()
+#' }
 #'
-
 theme_e61_spatial <- function(
   legend = c("none", "bottom", "top", "left", "right"),
   legend_title = FALSE,

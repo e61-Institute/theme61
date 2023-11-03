@@ -175,8 +175,8 @@ save_multi <-
         # update labels - for each set the limit as width - knowwidth (axis labels etc.) divided by the number of columns we have
         temp_plot <- update_labs(temp_plot, panel_width)
 
-        # update any mplot label sizes
-        temp_plot <- update_mplot_label(temp_plot, chart_type, base_size)
+        # update any plot label sizes
+        temp_plot <- update_plot_label(temp_plot, chart_type, base_size)
 
         # save the plot
         clean_plotlist[[i]] <- temp_plot

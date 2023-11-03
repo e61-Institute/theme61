@@ -37,6 +37,8 @@
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
 #' @param base_size Numeric. Chart font size. Default is 10.
+#' @param res Numeric. For saving to PNG only. Increase the size of the saved
+#'   PNG. E.g. \code{res = 2} doubles the size of the saved graph.
 #' @param bg_colour Sets the graph background colour. Defaults to "white".
 #'   Accepts a colour name, hex code or theme61 colour object name. For graphs
 #'   used in research note boxes, set the colour to \code{e61_boxback}.
@@ -64,11 +66,12 @@ save_e61 <- function(filename,
                      plot = last_plot(),
                      format = c("svg", "pdf", "eps", "png"),
                      chart_type = c("MN", "RN", "PPT"),
-                     auto_scale = TRUE, # manual control over whether y-axis is scaled
-                     dim = list(height = NULL, width = NULL), # manual control over chart dims
-                     max_height = NULL, # manual control over the maximum height of the chart
+                     auto_scale = TRUE,
+                     dim = list(height = NULL, width = NULL),
+                     max_height = NULL,
                      save_data = FALSE,
-                     base_size = 10, # set the base size for the theme61 font size call
+                     base_size = 10,
+                     res = 1,
                      # multi-panel specific arguments
                      bg_colour = "white",
                      plotlist = NULL,
@@ -77,7 +80,7 @@ save_e61 <- function(filename,
                      footnotes = NULL,
                      sources = NULL,
                      spacing_adj = list(title = 1, subtitle = 1),
-                     height_adj = NULL, # adjust the vertical spacing of the mpanel charts
+                     height_adj = NULL,
                      ncol = 2,
                      nrow = NULL,
                      align = c("v", "none", "h", "hv"),
@@ -293,7 +296,8 @@ save_e61 <- function(filename,
     filename = filename,
     width = save_input$width,
     height = save_input$height,
-    bg_colour = bg_colour
+    bg_colour = bg_colour,
+    res = res
   )
 
   # Post-saving -------------------------------------------------------------
@@ -360,10 +364,12 @@ unset_open_graph <- function() {
 #' @param file_out File path to the PNG image to save. Default saves a file with
 #'   the same name and location (except for the file extension).
 #' @param delete Logical. Delete the original SVG file? (defaults to FALSE)
+#' @param res Numeric. Increase the dimensions of the saved PNG. E.g. \code{res
+#'   = 2} doubles the dimensions of the saved graph.
 #' @return Invisibly returns the file path to the PNG image
 #' @keywords internal
 #' @export
-svg_to_png <- function(file_in, file_out = NULL, delete = FALSE) {
+svg_to_png <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
 
   if (!grepl(".*\\.svg$", file_in))
     stop("file_in must be an svg file.")
@@ -374,7 +380,31 @@ svg_to_png <- function(file_in, file_out = NULL, delete = FALSE) {
     stop("file_out must be a png file.")
   }
 
-  rsvg::rsvg_png(svg = file_in, file = file_out)
+  if (res != 1) {
+    file_temp_svg <- "intermed.svg"
+    file_temp_png <- "intermed.png"
+
+    res <- res / 1.25 # For some reason any res > 1 scales 1:1.25...
+
+    rsvg::rsvg_png(svg = file_in, file = file_temp_png)
+
+    g_info <- magick::image_info(magick::image_read(file_temp_png))
+
+    rsvg::rsvg_svg(svg = file_in,
+                   file = file_temp_svg,
+                   width = g_info$width * res,
+                   height = g_info$height * res
+                   )
+    rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
+
+    unlink(file_temp_svg)
+    unlink(file_temp_png)
+
+  } else {
+
+    rsvg::rsvg_png(svg = file_in, file = file_out)
+
+  }
 
   if (delete) unlink(file_in)
 

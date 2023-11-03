@@ -23,9 +23,8 @@
 #'    scale_colour_e61() +
 #'    theme_e61()
 
-scale_colour_e61 <- function(n = 0,
-                             reverse = F,
-                             discrete = T,
+scale_colour_e61 <- function(reverse = FALSE,
+                             discrete = TRUE,
                              aesthetics = "colour",
                              palette = c("light", "dark", "diverging", "grey"),
                              ...) {
@@ -48,8 +47,7 @@ scale_colour_e61 <- function(n = 0,
 
 #' @rdname scale_e61
 #' @export
-scale_fill_e61 <- function(n = 0,
-                           reverse = FALSE,
+scale_fill_e61 <- function(reverse = FALSE,
                            discrete = TRUE,
                            aesthetics = "fill",
                            palette = c("light", "dark", "diverging", "grey"),

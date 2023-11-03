@@ -2,7 +2,7 @@
 
 #' Helper function to actually perform the saving functionality
 #' @noRd
-save_graph <- function(graph, format, filename, width, height, bg_colour) {
+save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
   lapply(format, function(fmt) {
 
     file_i <- paste0(filename, ".", fmt)
@@ -27,7 +27,7 @@ save_graph <- function(graph, format, filename, width, height, bg_colour) {
 
     # Save a PNG if required
     if (fmt == "png") {
-      svg_to_png(file_temp, paste0(filename, ".png"), delete = TRUE)
+      svg_to_png(file_temp, paste0(filename, ".png"), delete = TRUE, res = res)
     }
   })
 }

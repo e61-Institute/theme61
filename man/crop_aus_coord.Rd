@@ -15,8 +15,8 @@ in a map.
 \examples{
   \dontrun{
     ggplot(strayr::read_absmap("aus2021")) +
-    geom_sf() +
-    crop_aus_coord()
+      geom_sf() +
+      crop_aus_coord()
   }
 
 }

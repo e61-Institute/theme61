@@ -516,24 +516,24 @@ get_font_size <- function(plot, elem = "text", parent = "text"){
   return(text_size)
 }
 
-#' Update the size of mplot labels
+#' Update the size of plot labels
 #' @noRd
-update_mplot_label <- function(plot, chart_type, base_size){
+update_plot_label <- function(plot, chart_type, base_size){
 
   for (i in seq_along(plot$layers)){
 
-    # 1 - check whether it has geom_text or geom_label arguments (this is what mplot labels are)
-    layer_class <- plot$layers[[i]]$geom %>% class()
+    # 1 - check whether it has geom_text or geom_label arguments (this is what plot labels are)
+    layer_class <- class(plot$layers[[i]]$geom)
 
     if("GeomText" %in% layer_class || "GeomLabel" %in% layer_class){
 
-      # 2 - check whether it is an mplot_label that can be adjusted
+      # 2 - check whether it is an plot_label that can be adjusted
       label <- plot$layers[[i]]$aes_params$label
 
       label_size <- plot$layers[[i]]$aes_params$size
 
       # 3 - check that it has the adjustment attribute
-      if(!is.null(attr(label, "adj_mplot_label"))){
+      if(!is.null(attr(label, "adj_plot_label"))){
 
         # 4 - get the base size of a micronote
         mn_base_size <- get_base_size(chart_type = "MN")
