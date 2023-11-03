@@ -68,7 +68,11 @@ This article provides some examples to help you figure out what elements you can
 
 ## The colour palette
 
-```{r theme61-colours, echo = FALSE, out.width='80%'}
+This is the e61 Institute colour palette. 
+
+All the colours are package objects that can be selected by using the appropriate name. For example, `e61_tealdark3` selects the colour 'Teal dark' with the shade in column '3'.
+
+```{r theme61-colours, echo = FALSE}
 source("colour-palette.R")
 knitr::include_graphics(here::here("man/figures/g-palette-colours.svg"))
 ```
@@ -79,9 +83,7 @@ When making graphs, you should follow the below workflow.
 
 Save your graph using `save_e61()`. Do **not** use the Export button in the Plots tab or `ggsave()`.
 
-Start by creating a graph using the 'normal' stuff: `ggplot(data, aes(x, y)) + geom_blah()`
-
-Then:
+Start by creating a graph using the 'normal' stuff: `ggplot(data, aes(x, y)) + geom_blah()`. Then:
 
 - Add plot labelling: `mplot_label()` or `plot_label()`
 - Add titles, axes labels, footnotes and sources: `labs_e61(title = "Title", subtitle = "Subtitle", footnotes = "Footnotes", sources = c("Source 1", "Source 2"), y = "%")`
@@ -233,7 +235,7 @@ g <- ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
 save_e61(here::here("man/figures/g-flip.svg"))
 ```
 
-```{r, echo=FALSE, out.width='80%'}
+```{r, echo=FALSE}
 knitr::include_graphics(here::here("man/figures/g-flip.svg"))
 ```
 
@@ -285,7 +287,9 @@ save_e61(here::here("man/figures/g-dual.svg"))
 knitr::include_graphics(here::here("man/figures/g-dual.svg"))
 ```
 
-### Point range (for regression coefficients) graph {#ptrange}.
+### Point range graph {#ptrange}
+
+`geom_pointrange()` is useful for plotting regression coefficients. If you are plotting coefficients over time, e.g. for an event study, including a `geom_line()` can also help show the passage of time.
 
 ```{r}
 g <- ggplot(pt_rg_data, aes(x, y, ymin = ymin, ymax = ymax)) + 
@@ -367,9 +371,9 @@ g4 <-
   )
 ```
 
-Then we use the `save_e61()` to put the graphs together.
+Then we use `save_e61()` to put the graphs together.
 
-```{r, echo=FALSE}
+```{r}
 save_e61(
     g1, g2, g3, g4,
     filename = here::here("man/figures/g-multi.svg"),
