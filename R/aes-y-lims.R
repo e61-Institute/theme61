@@ -112,7 +112,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
 
     # if they are the same value then, then update to return something more
     # interesting
-    if(min_y == max_y) min_y <- get_aes_num(min_y, diff = 0, "next_smallest")
+    if(min_y == max_y) min_y <- get_aes_num(min_y, diff = NULL, "next_smallest")
 
     # check whether the chart is a bar chart or not
     is_bar <- is_barchart(plot)
@@ -283,10 +283,15 @@ get_aes_num <- function(y_val, diff, type = c("next_largest", "next_smallest")) 
   aes_y_points <- data.table::data.table(points = c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100))
   aes_y_points[, points_adj := adj * points]
 
-  # check whether we are scaling the order of magnitude up by too much, or
-  # whether we would be better off just adding another 100 points
-  order_mag_diff <- ceiling(log10(diff))
   order_mag <- ceiling(log10(adj * y_val))
+
+  # if no difference is supplied, set the difference order of magnitude to a very large
+  # number - this ensures we don't try to do the funky scaling below
+  if(is.null(diff)){
+    order_mag_diff <- 1e100
+  } else {
+    order_mag_diff <- ceiling(log10(diff))
+  }
 
   # if the difference is of a lesser order of magnitude than the number, then
   # adjust the y-vale to take into account this difference -
