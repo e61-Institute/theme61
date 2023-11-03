@@ -452,7 +452,7 @@ format_flip <- function(x_adj = 0) {
     axis.text.x.top = element_blank(),
     axis.ticks.x.top = element_blank(),
     axis.title.x.top = element_blank(),
-    axis.title.x.bottom = element_text(margin = margin(t = -9 + x_adj, b = 5),
+    axis.title.x.bottom = element_text(margin = margin(t = -11 + x_adj, b = 5),
                                        hjust = 1, angle = 0),
     plot.title.position = "plot",
     plot.caption.position = "plot"
