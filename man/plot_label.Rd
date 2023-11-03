@@ -57,11 +57,10 @@ box around the text which could be useful sometimes.}
 ggplot2 object
 }
 \description{
-Wrapper function around \code{annotate()} that helps you add labels for
-lines, columns or other elements directly onto the graph plot as a
-replacement for legends outside the plot area.
-}
-\details{
-Automatically chooses the correct colour in the theme61 colour palette if you
-provide the total number of labels, and the relative ordering of each label.
+Add text labels for lines, columns or other elements directly
+  onto the graph plot. This is preferred over using legends.
+
+  Automatically chooses the correct colour in the theme61 colour palette if
+  you provide the total number of labels and the relative ordering of each
+  label.
 }
