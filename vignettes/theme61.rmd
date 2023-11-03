@@ -85,7 +85,7 @@ Save your graph using `save_e61()`. Do **not** use the Export button in the Plot
 
 Start by creating a graph using the 'normal' stuff: `ggplot(data, aes(x, y)) + geom_blah()`. Then:
 
-- Add plot labelling: `mplot_label()` or `plot_label()`
+- Add plot labelling: `plot_label()`
 - Add titles, axes labels, footnotes and sources: `labs_e61(title = "Title", subtitle = "Subtitle", footnotes = "Footnotes", sources = c("Source 1", "Source 2"), y = "%")`
 - (optional) Use `theme_e61()` if you want to add a legend, or change its position. Other aspects of `theme_e61()` are now added by default. 
 - (optional) Format the x and y axes scales: `scale_y_continuous_e61()`, `scale_x_continuous_e61()`. Your y-axis will be automatically scaled when you save your chart using `save_e61()` but if you do not like the automatic scaling then you can always scale your axes manually.
@@ -98,7 +98,7 @@ Start by creating a graph using the 'normal' stuff: `ggplot(data, aes(x, y)) + g
 ```{r}
 g <- ggplot(data_3, aes(x = year, y = value, colour = category)) + 
   geom_line() +
-  mplot_label(c("Food and\nTobacco", "Household\nOperation", "Medical and\nHealth"),
+  plot_label(c("Food and\nTobacco", "Household\nOperation", "Medical and\nHealth"),
               c(1944, 1954, 1953),
               c(65, 55, 25)) +
   labs_e61(
@@ -120,7 +120,7 @@ knitr::include_graphics(here::here("man/figures/g-line.svg"))
 ```{r}
 g <- ggplot(data_3, aes(x = year, y = value, fill = category)) + 
   geom_col(position = "dodge") +
-  mplot_label(c("Food and\nTobacco", "Household\nOperation", "Medical and\nHealth"),
+  plot_label(c("Food and\nTobacco", "Household\nOperation", "Medical and\nHealth"),
               c(1936, 1943, 1950),
               c(80, 80, 80)) +
   labs_e61(
@@ -154,7 +154,7 @@ mtcars2 <- within(mtcars, {
 # Graph
 g <- ggplot(mtcars2, aes(x = wt, y = mpg, colour = gear)) +
   geom_point() +
-  mplot_label(
+  plot_label(
     label = c("3 cyl", "4 cyl", "5 cyl"),
     x = c(4, 2.7, 2.5),
     y = c(23, 35, 15)
@@ -206,7 +206,7 @@ g <- ggplot(mpg, aes(x = cty, fill = factor(cyl))) +
     sources = "mpg dataset",
     y = "dens",
   ) +
-  mplot_label(label = c("3 cyl", "5 cyl", "6 cyl", "8 cyl"),
+  plot_label(label = c("3 cyl", "5 cyl", "6 cyl", "8 cyl"),
               x = c(25, 24, 16, 12),
               y = c(0.1, 0.35, 0.25, 0.25))
 
@@ -223,7 +223,7 @@ knitr::include_graphics(here::here("man/figures/g-dens.svg"))
 g <- ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
   geom_col(position = "dodge") +
   coord_flip() +
-  mplot_label(c("1940", "1960"),
+  plot_label(c("1940", "1960"),
               c(1.8, 2.2),
               c(15, 50)) +
   labs_e61(
@@ -277,7 +277,7 @@ g <- ggplot(data_dual, aes(x = year)) +
   scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b",
                          sec_axis = sec_axis(~sec_rescale(.), name = "$b"), 
                          rescale_sec = TRUE) +
-  mplot_label(c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
+  plot_label(c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
               c(1945, 1948),
               c(75, 40))
 ```
@@ -322,7 +322,7 @@ First we make the sub-plots as their own graph.
 g1 <-
   ggplot(data_3, aes(x = year, y = value, colour = category)) +
   geom_line() +
-  mplot_label(c("Food and\nTobacco", "Household\nOperation", "Medical and\nHealth"),
+  plot_label(c("Food and\nTobacco", "Household\nOperation", "Medical and\nHealth"),
               c(1944, 1954, 1953),
               c(65, 55, 25)) +
   labs_e61(
@@ -334,7 +334,7 @@ g2 <- ggplot(data_dual, aes(x = year)) +
     geom_line(aes(y = `Food and Tobacco`), colour = palette_e61(2)[[1]]) +
     geom_line(aes(y = `Personal Care`), colour = palette_e61(2)[[2]]) +
     scale_y_continuous_e61(limits = c(0, 100, 25)) +
-  mplot_label(
+  plot_label(
     c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
     c(1945, 1952),
     c(75, 15)
@@ -347,7 +347,7 @@ g2 <- ggplot(data_dual, aes(x = year)) +
 g3 <-
   ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
   geom_col(position = "dodge") +
-  mplot_label(c("1940", "1960"),
+  plot_label(c("1940", "1960"),
               c(1.55, 2.05),
               c(15, 50)) +
   labs_e61(
@@ -360,7 +360,7 @@ g4 <-
   geom_line(aes(y = value), colour = palette_e61(2)[[1]]) +
   geom_col(aes(y = change), fill = palette_e61(2)[[2]]) +
   scale_y_continuous_e61(limits = c(0, 100, 20)) +
-  mplot_label(
+  plot_label(
     c("Aggregate", "Change from\n5 years ago"),
     c(1941, 1952),
     c(55, 25)

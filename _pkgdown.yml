@@ -9,7 +9,6 @@ reference:
   - add_baseline
   - labs_e61
   - plot_label
-  - mplot_label
 
 - title: Formatting
   contents:

@@ -33,45 +33,11 @@ Labels make more efficient use of the available space on a graph by removing the
 
 Finally, labels are more aesthetic than legends.
 
-## How-to guide
-
-### Simple cases using `plot_label()`
+## Adding labels with `plot_label()`
 
 The simplest way to add plot labels is to use the `plot_label()` function in `theme61`. The following code provides an example. Most of the code is to set up the mock data and create a graph, the only two lines that are important are the `plot_label()` lines.
 
-**If you have more than one label you should use `mplot_label()`**, which is introduced in the next section.
-
-`plot_label()` requires you to provide the text of the label (`label`), the `x` and `y` positioning, the total number of different colours/labels to plot (`n_labs`), and which number element you are currently plotting (`n`). For more information, see the documentation (`?plot_label`).
-
-```{r}
-# Mock data
-graph_data <- CJ(
-  x = 2000:2020,
-  source = c("Source A", "Source B")
-)
-
-graph_data[source == "Source A", y := seq(0, by = 0.25, length = 21)]
-graph_data[source == "Source B", y := seq(0, by = 1, length = 21)]
-
-# Graph
-graph <- ggplot(graph_data, aes(x, y, colour = source)) +
-  geom_line(linewidth = 1) +
-  plot_label(label = "Source A", x = 2016, y = 6, n_labs = 2, n = 1) +
-  plot_label(label = "Source B", x = 2016, y = 13, n_labs = 2, n = 2) +
-  labs_e61(
-    title = "Simple Case Using plot_label()",
-    sources = c("e61 Institute"),
-    x = NULL, y = "n"
-  )
-
-save_e61(here::here("man/figures/label-fig-1.svg"), graph)
-knitr::include_graphics(here::here("man/figures/label-fig-1.svg"))
-
-```
-
-### Adding multiple labels using `mplot_label()`
-
-When you have multiple plot labels, `mplot_label()` allows you to add them in one function. 
+`plot_label()` requires you to provide the text of the label (`label`), and the `x` and `y` positioning. For more information, see the documentation (`?plot_label`).
 
 When using this function, make sure the wording of the vector of label names in the label argument are exactly the same as the colour/fill aesthetic being plotted, and the order of the label vector matches the order of the colour/fill aesthetic for the ordering of the colours.  
 
@@ -90,25 +56,29 @@ graph_data[source == "Source B", y := seq(0, by = 1, length = 21)]
 # Graph
 graph <- ggplot(graph_data, aes(x, y, colour = source)) +
   geom_line(linewidth = 1) +
-  mplot_label(
+  plot_label(
     label = levels(graph_data$source),
     x = c(2016, 2016),
     y = c(6, 13)
   ) +
   labs_e61(
-    title = "Multiple Labels Using mplot_label()",
+    title = "Plot Labels Using plot_label()",
     sources = c("e61 Institute"),
     x = NULL, y = "n"
   )
 
-save_e61(here::here("man/figures/label-fig-2.svg"), graph)
-knitr::include_graphics(here::here("man/figures/label-fig-2.svg"))
+save_e61(here::here("man/figures/label-plot-label.svg"), graph)
+knitr::include_graphics(here::here("man/figures/label-plot-label.svg"))
 
 ```
 
-### Dealing with facets
+## Alternatives when things are fiddly
 
-When you have a faceted graph, using `plot_label()` or `mplot_label()` will not work properly. This is because the annotations will appear in the same position on all the facets and there is no way to prevent this. This is problematic because the labels are unnecessarily repeating themselves, and the correct position of the text on one facet may be different on each facet (e.g. if the height of the columns differs across facets).
+There are two situations where using `plot_label()` may not work. When labeling faceted graphs or when wanting to add a lot of labels.
+
+### Facets
+
+When you have a faceted graph, `plot_label()` will not work properly. This is because the annotations will appear in the same position on all the facets and there is no way to prevent this. This is problematic because the labels are unnecessarily repeating themselves, and the correct position of the text on one facet may be different on each facet (e.g. if the height of the columns differs across facets).
 
 There is a way to get around this problem using the `data.frame` approach to labelling the graph.
 
@@ -149,12 +119,12 @@ graph <- ggplot(graph_data, aes(x, y, fill = group)) +
     x = NULL, y = "n"
   )
 
-save_e61(here::here("man/figures/label-fig-3.svg"), graph)
-knitr::include_graphics(here::here("man/figures/label-fig-3.svg"))
+save_e61(here::here("man/figures/label-facet.svg"), graph)
+knitr::include_graphics(here::here("man/figures/label-facet.svg"))
 
 ```
 
-### Dealing with many categories
+### Many categories
 
 Sometimes you have many categories, far too many to want to plot manually even with the `data.frame` approach. If you are willing to sacrifice the ability to specify the exact location of each label, you could use `geom_text_repel()` to add appropriately coloured text labels for each colour/fill aesthetic. 
 
@@ -189,7 +159,7 @@ graph <- ggplot(graph_data, aes(x = year, y = value, fill = source)) +
     x = NULL, y = "n"
   )
 
-save_e61(here::here("man/figures/label-fig-4.svg"), graph)
-knitr::include_graphics(here::here("man/figures/label-fig-4.svg"))
+save_e61(here::here("man/figures/label-cats.svg"), graph)
+knitr::include_graphics(here::here("man/figures/label-cats.svg"))
 
 ```

@@ -141,8 +141,8 @@ save_single <- function(
   plot <- update_labs(plot, tot_panel_width)
 
   if(!is_spatial_chart){
-    # update the mplot_labels
-    plot <- update_mplot_label(plot, chart_type, base_size)
+    # update the plot_labels
+    plot <- update_plot_label(plot, chart_type, base_size)
 
     # update y-axis labels
     plot <- update_y_axis_labels(plot)

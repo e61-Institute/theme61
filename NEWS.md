@@ -18,11 +18,11 @@ Most of these improvements are applied when you save graphs using `save_e61()`, 
 
 #### Other changes
 
+* All functionality in `mplot_label()` has been combined into `plot_label()`. `mplot_label()` is now deprecated and users just need to rename all instances of `mplot_label()` to `plot_label()`.
 * Added console messages to help correct common graphing mistakes.
 * Changed default font of graphs to 'PT Sans' to be consistent with research note font.
-* Allow rotation of labels in `mplot_label()`.
+* Allow rotation of labels in `plot_label()`.
 * Renamed `add_zeroline()` to `add_baseline()`, and `e61_palette()` to `palette_e61()`.
-* Added aliases for `plot_label()` (`plab()`) and `mplot_label()` (`mplab()`) to let you type slightly less code.
 
 #### Bug fixes and documentation updates
 
