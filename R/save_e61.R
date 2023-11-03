@@ -395,6 +395,7 @@ svg_to_png <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
                    width = g_info$width * res,
                    height = g_info$height * res
                    )
+
     rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
 
     unlink(file_temp_svg)
