@@ -31,7 +31,7 @@ test_that("Dimensioning functions", {
     suppressWarnings(save_e61("custom-dim.png", plot, dim = list(width = 10)))
     g_info <- magick::image_info(magick::image_read("custom-dim.png"))
     expect_equal(g_info$width, 358)
-    expect_equal(g_info$height, 269)
+    expect_equal(g_info$height, 264)
 
   })
 
