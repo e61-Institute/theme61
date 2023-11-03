@@ -40,23 +40,20 @@ reference:
 
 navbar:
   structure:
-    left: [home, standards, reference, articles, news]
+    left: [home, reference, articles, news]
     right: [github]
   components:
     home:
       text: "Get started"
       href: articles/theme61.html
-    standards:
-      text: "Graph standards"
-      href: articles/graph-standards.html
     reference:
       text: Reference
       href: reference/index.html
     articles:
       text: Articles
       menu:
-      - text: "Graph standards"
-        href: articles/graph-standards.html
+      - text: "Get started"
+        href: articles/theme61.html
       - text: "Adding on-graph labels"
         href: articles/ongraph-labels.html
     news:
