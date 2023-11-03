@@ -66,8 +66,6 @@ save_multi <-
     y_lab_max_size <- 0
     max_break_width <- 0
 
-    warn <- F
-
     for(i in seq_along(plots)){
 
       temp_plot <- plots[[i]]
@@ -79,7 +77,7 @@ save_multi <-
       if(auto_scale) {
 
         # update the scales to aesthetic values
-        temp_plot <- update_scales(temp_plot, auto_scale, warn = F)
+        temp_plot <- update_scales(temp_plot, auto_scale)
 
         # update the text and margin sizes
         legend_title <- temp_plot$theme$legend.title
