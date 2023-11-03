@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,15 +39,12 @@
   <a class="nav-link" href="../articles/theme61.html">Get started</a>
 </li>
 <li class="nav-item">
-  <a class="nav-link" href="../articles/graph-standards.html">Graph standards</a>
-</li>
-<li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/graph-standards.html">Graph standards</a>
+    <a class="dropdown-item" href="../articles/theme61.html">Get started</a>
     <a class="dropdown-item" href="../articles/ongraph-labels.html">Adding on-graph labels</a>
   </div>
 </li>
@@ -104,58 +101,17 @@ narrower than it otherwise would be.</p>
 <p>Finally, labels are more aesthetic than legends.</p>
 </div>
 <div class="section level2">
-<h2 id="how-to-guide">How-to guide<a class="anchor" aria-label="anchor" href="#how-to-guide"></a>
+<h2 id="adding-labels-with-plot_label">Adding labels with <code>plot_label()</code><a class="anchor" aria-label="anchor" href="#adding-labels-with-plot_label"></a>
 </h2>
-<div class="section level3">
-<h3 id="simple-cases-using-plot_label">Simple cases using <code>plot_label()</code><a class="anchor" aria-label="anchor" href="#simple-cases-using-plot_label"></a>
-</h3>
 <p>The simplest way to add plot labels is to use the
 <code><a href="../reference/plot_label.html">plot_label()</a></code> function in <code>theme61</code>. The
 following code provides an example. Most of the code is to set up the
 mock data and create a graph, the only two lines that are important are
 the <code><a href="../reference/plot_label.html">plot_label()</a></code> lines.</p>
-<p><strong>If you have more than one label you should use
-<code><a href="../reference/mplot_label.html">mplot_label()</a></code></strong>, which is introduced in the next
-section.</p>
 <p><code><a href="../reference/plot_label.html">plot_label()</a></code> requires you to provide the text of the
-label (<code>label</code>), the <code>x</code> and <code>y</code>
-positioning, the total number of different colours/labels to plot
-(<code>n_labs</code>), and which number element you are currently
-plotting (<code>n</code>). For more information, see the documentation
+label (<code>label</code>), and the <code>x</code> and <code>y</code>
+positioning. For more information, see the documentation
 (<code><a href="../reference/plot_label.html">?plot_label</a></code>).</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Mock data</span></span>
-<span><span class="va">graph_data</span> <span class="op">&lt;-</span> <span class="fu">CJ</span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="fl">2000</span><span class="op">:</span><span class="fl">2020</span>,</span>
-<span>  source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Source A"</span>, <span class="st">"Source B"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">graph_data</span><span class="op">[</span><span class="va">source</span> <span class="op">==</span> <span class="st">"Source A"</span>, <span class="va">y</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, by <span class="op">=</span> <span class="fl">0.25</span>, length <span class="op">=</span> <span class="fl">21</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="va">graph_data</span><span class="op">[</span><span class="va">source</span> <span class="op">==</span> <span class="st">"Source B"</span>, <span class="va">y</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, by <span class="op">=</span> <span class="fl">1</span>, length <span class="op">=</span> <span class="fl">21</span><span class="op">)</span><span class="op">]</span></span>
-<span></span>
-<span><span class="co"># Graph</span></span>
-<span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">graph_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, colour <span class="op">=</span> <span class="va">source</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/plot_label.html">plot_label</a></span><span class="op">(</span>label <span class="op">=</span> <span class="st">"Source A"</span>, x <span class="op">=</span> <span class="fl">2016</span>, y <span class="op">=</span> <span class="fl">6</span>, n_labs <span class="op">=</span> <span class="fl">2</span>, n <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/plot_label.html">plot_label</a></span><span class="op">(</span>label <span class="op">=</span> <span class="st">"Source B"</span>, x <span class="op">=</span> <span class="fl">2016</span>, y <span class="op">=</span> <span class="fl">13</span>, n_labs <span class="op">=</span> <span class="fl">2</span>, n <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/scale_e61.html">scale_colour_e61</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
-<span>    title <span class="op">=</span> <span class="st">"Simple Case Using plot_label()"</span>,</span>
-<span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span><span class="op">)</span>,</span>
-<span>    x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"n"</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-fig-1.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-fig-1.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/label-fig-1.svg"><!-- --></p>
-</div>
-<div class="section level3">
-<h3 id="adding-multiple-labels-using-mplot_label">Adding multiple labels using <code>mplot_label()</code><a class="anchor" aria-label="anchor" href="#adding-multiple-labels-using-mplot_label"></a>
-</h3>
-<p>When you have multiple plot labels, <code><a href="../reference/mplot_label.html">mplot_label()</a></code> allows
-you to add them in one function.</p>
 <p>When using this function, make sure the wording of the vector of
 label names in the label argument are exactly the same as the
 colour/fill aesthetic being plotted, and the order of the label vector
@@ -164,7 +120,7 @@ colours.</p>
 <p>One way to ensure this is by setting the column in the data to be an
 ordered factor, and calling the label names using
 <code>levels(data$col_name)</code>.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Mock data</span></span>
 <span><span class="va">graph_data</span> <span class="op">&lt;-</span> <span class="fu">CJ</span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fl">2000</span><span class="op">:</span><span class="fl">2020</span>,</span>
@@ -177,34 +133,37 @@ ordered factor, and calling the label names using
 <span><span class="co"># Graph</span></span>
 <span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">graph_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, colour <span class="op">=</span> <span class="va">source</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/mplot_label.html">mplot_label</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/plot_label.html">plot_label</a></span><span class="op">(</span></span>
 <span>    label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">graph_data</span><span class="op">$</span><span class="va">source</span><span class="op">)</span>,</span>
 <span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2016</span>, <span class="fl">2016</span><span class="op">)</span>,</span>
 <span>    y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">13</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/scale_e61.html">scale_colour_e61</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
-<span>    title <span class="op">=</span> <span class="st">"Multiple Labels Using mplot_label()"</span>,</span>
+<span>    title <span class="op">=</span> <span class="st">"Plot Labels Using plot_label()"</span>,</span>
 <span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span><span class="op">)</span>,</span>
 <span>    x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"n"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-fig-2.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-fig-2.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/label-fig-2.svg"><!-- --></p>
+<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-plot-label.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-plot-label.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/label-plot-label.svg"><!-- --></p>
 </div>
+<div class="section level2">
+<h2 id="alternatives-when-things-are-fiddly">Alternatives when things are fiddly<a class="anchor" aria-label="anchor" href="#alternatives-when-things-are-fiddly"></a>
+</h2>
+<p>There are two situations where using <code><a href="../reference/plot_label.html">plot_label()</a></code> may
+not work. When labeling faceted graphs or when wanting to add a lot of
+labels.</p>
 <div class="section level3">
-<h3 id="dealing-with-facets">Dealing with facets<a class="anchor" aria-label="anchor" href="#dealing-with-facets"></a>
+<h3 id="facets">Facets<a class="anchor" aria-label="anchor" href="#facets"></a>
 </h3>
-<p>When you have a faceted graph, using <code><a href="../reference/plot_label.html">plot_label()</a></code> or
-<code><a href="../reference/mplot_label.html">mplot_label()</a></code> will not work properly. This is because the
-annotations will appear in the same position on all the facets and there
-is no way to prevent this. This is problematic because the labels are
-unnecessarily repeating themselves, and the correct position of the text
-on one facet may be different on each facet (e.g. if the height of the
-columns differs across facets).</p>
+<p>When you have a faceted graph, <code><a href="../reference/plot_label.html">plot_label()</a></code> will not
+work properly. This is because the annotations will appear in the same
+position on all the facets and there is no way to prevent this. This is
+problematic because the labels are unnecessarily repeating themselves,
+and the correct position of the text on one facet may be different on
+each facet (e.g. if the height of the columns differs across
+facets).</p>
 <p>There is a way to get around this problem using the
 <code>data.frame</code> approach to labelling the graph.</p>
 <p>The <code>data.frame</code> approach uses a helper
@@ -221,7 +180,7 @@ labels on facet “B” they are missing and hence nothing is plotted.</p>
 <p>As an aside, if you want to put one label on the first facet and the
 second label on another facet, then in the <code>facet</code> column,
 simply allocate the first label to “A” and the second to “B”.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Mock data</span></span>
 <span><span class="va">graph_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  facet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"B"</span><span class="op">)</span>,</span>
@@ -245,29 +204,26 @@ simply allocate the first label to “A” and the second to “B”.</p>
 <span>  <span class="co"># The label arg add the text, the colour arg ensures the text colour matches </span></span>
 <span>  <span class="co"># the lines they are identifying.</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">graph_labels</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, label <span class="op">=</span> <span class="va">group</span>, colour <span class="op">=</span> <span class="va">group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/scale_e61.html">scale_colour_e61</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/scale_e61.html">scale_fill_e61</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/scale_e61.html">scale_colour_e61</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Facetted Case Using a Helper data.frame"</span>,</span>
 <span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span><span class="op">)</span>,</span>
 <span>    x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"n"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-fig-3.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-fig-3.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/label-fig-3.svg"><!-- --></p>
+<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-facet.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-facet.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/label-facet.svg"><!-- --></p>
 </div>
 <div class="section level3">
-<h3 id="dealing-with-many-categories">Dealing with many categories<a class="anchor" aria-label="anchor" href="#dealing-with-many-categories"></a>
+<h3 id="many-categories">Many categories<a class="anchor" aria-label="anchor" href="#many-categories"></a>
 </h3>
 <p>Sometimes you have many categories, far too many to want to plot
 manually even with the <code>data.frame</code> approach. If you are
 willing to sacrifice the ability to specify the exact location of each
 label, you could use <code>geom_text_repel()</code> to add appropriately
 coloured text labels for each colour/fill aesthetic.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Mock data</span></span>
 <span><span class="va">graph_data</span> <span class="op">&lt;-</span> <span class="fu">CJ</span><span class="op">(</span></span>
 <span>  year <span class="op">=</span> <span class="fl">2000</span><span class="op">:</span><span class="fl">2020</span>,</span>
@@ -289,21 +245,18 @@ coloured text labels for each colour/fill aesthetic.</p>
 <span>                  <span class="co"># This hides the line that joins the label to the graph element</span></span>
 <span>                  segment.color <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>                  size <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/theme_e61.html">theme_e61</a></span><span class="op">(</span>fix_left <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># Extends the right-side of the graph to create room for the labels</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">2026</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/scale_e61.html">scale_fill_e61</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/scale_e61.html">scale_colour_e61</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/scale_e61.html">scale_colour_e61</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Use geom_text_repel to Show Many Labels Automatically"</span>,</span>
 <span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span><span class="op">)</span>,</span>
 <span>    x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"n"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-fig-4.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-fig-4.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/label-fig-4.svg"><!-- --></p>
+<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-cats.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-cats.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/label-cats.svg"><!-- --></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

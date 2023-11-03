@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,16 +21,13 @@
       <ul class="navbar-nav me-auto"><li class="nav-item">
   <a class="nav-link" href="../articles/theme61.html">Get started</a>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../articles/graph-standards.html">Graph standards</a>
-</li>
 <li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/graph-standards.html">Graph standards</a>
+    <a class="dropdown-item" href="../articles/theme61.html">Get started</a>
     <a class="dropdown-item" href="../articles/ongraph-labels.html">Adding on-graph labels</a>
   </div>
 </li>
@@ -74,9 +71,9 @@
         <dd>Add e61 logo to graph</dd>
       </dl><dl><dt>
           
-          <code><a href="add_zeroline.html">add_zeroline()</a></code> 
+          <code><a href="add_baseline.html">add_baseline()</a></code> 
         </dt>
-        <dd>Adds a thin black line at y = 0</dd>
+        <dd>Adds a thin black line</dd>
       </dl><dl><dt>
           
           <code><a href="labs_e61.html">labs_e61()</a></code> 
@@ -84,14 +81,9 @@
         <dd>Add graph titles and footers in the e61 style</dd>
       </dl><dl><dt>
           
-          <code><a href="plot_label.html">plot_label()</a></code> 
+          <code><a href="plot_label.html">plot_label()</a></code> <code><a href="plot_label.html">plab()</a></code> <code><a href="plot_label.html">mplab()</a></code> 
         </dt>
-        <dd>Add On-graph Labels to Graphs</dd>
-      </dl><dl><dt>
-          
-          <code><a href="mplot_label.html">mplot_label()</a></code> 
-        </dt>
-        <dd>Add multiple on-graph labels to graphs</dd>
+        <dd>Add on-graph labels to graphs</dd>
       </dl></div><div class="section level2">
       <h2 id="formatting">Formatting<a class="anchor" aria-label="anchor" href="#formatting"></a></h2>
       
@@ -105,19 +97,14 @@
 
       <dl><dt>
           
-          <code><a href="e61_palette.html">e61_palette()</a></code> 
-        </dt>
-        <dd>Create e61 colour palette</dd>
-      </dl><dl><dt>
-          
-          <code><a href="format_flipped_bar.html">format_flipped_bar()</a></code> 
+          <code><a href="format_flip.html">format_flip()</a></code> 
         </dt>
         <dd>Applies changes to the theme for horizontal bar graphs</dd>
       </dl><dl><dt>
           
-          <code><a href="mpanel_e61.html">mpanel_e61()</a></code> 
+          <code><a href="save_e61.html">save_e61()</a></code> 
         </dt>
-        <dd>Create a multi-panel graph with e61 formatting</dd>
+        <dd>Saves ggplot graphs with sensible defaults</dd>
       </dl><dl><dt>
           
           <code><a href="square_legend_symbols.html">square_legend_symbols()</a></code> 
@@ -130,14 +117,14 @@
         <dd>e61 themed graph options</dd>
       </dl><dl><dt>
           
-          <code><a href="theme_e61_clean.html">theme_e61_clean()</a></code> 
+          <code><a href="theme_e61_alt.html">theme_e61_alt()</a></code> 
         </dt>
         <dd>e61 themed graph options in an alternative style</dd>
       </dl><dl><dt>
           
-          <code><a href="save_e61.html">save_e61()</a></code> 
+          <code><a href="theme_e61_spatial.html">theme_e61_spatial()</a></code> 
         </dt>
-        <dd>Saves ggplot graphs with sensible defaults</dd>
+        <dd>e61 themed spatial maps options</dd>
       </dl></div><div class="section level2">
       <h2 id="scales">Scales<a class="anchor" aria-label="anchor" href="#scales"></a></h2>
       
@@ -188,6 +175,11 @@ graphing</dd>
         <dd>Crops maps of Australia to exclude outlying territories</dd>
       </dl><dl><dt>
           
+          <code><a href="e61_chart_maker.html">e61_chart_maker()</a></code> 
+        </dt>
+        <dd>An add-in to easily create plots with ggplot2</dd>
+      </dl><dl><dt>
+          
           <code><a href="e61_map.html">e61_map()</a></code> 
         </dt>
         <dd>Wrapper function for ggmap to produce a map layer in e61 format</dd>
@@ -209,9 +201,19 @@ graphing</dd>
 
       <dl><dt>
           
+          <code><a href="palette_e61.html">palette_e61()</a></code> 
+        </dt>
+        <dd>Create e61 colour palette</dd>
+      </dl><dl><dt>
+          
           <code><a href="e61_aus_colours.html">e61_aus_colours</a></code> 
         </dt>
-        <dd>Australian jurisidictions colour palette</dd>
+        <dd>Australian jurisdictions colour palette</dd>
+      </dl><dl><dt>
+          
+          <code><a href="e61_boxback.html">e61_boxback</a></code> 
+        </dt>
+        <dd>Hex code for the colour of research and micro note Box backgrounds</dd>
       </dl><dl><dt>
           
           <code><a href="e61_bluedark.html">e61_bluedark</a></code> 

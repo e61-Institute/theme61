@@ -16,7 +16,7 @@ desired, the discrete argument can be set to FALSE."><!-- mathjax --><script src
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,16 +27,13 @@ desired, the discrete argument can be set to FALSE."><!-- mathjax --><script src
       <ul class="navbar-nav me-auto"><li class="nav-item">
   <a class="nav-link" href="../articles/theme61.html">Get started</a>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../articles/graph-standards.html">Graph standards</a>
-</li>
 <li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/graph-standards.html">Graph standards</a>
+    <a class="dropdown-item" href="../articles/theme61.html">Get started</a>
     <a class="dropdown-item" href="../articles/ongraph-labels.html">Adding on-graph labels</a>
   </div>
 </li>
@@ -74,17 +71,17 @@ desired, the <code>discrete</code> argument can be set to <code>FALSE</code>.</p
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">scale_colour_e61</span><span class="op">(</span></span>
-<span>  n <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  reverse <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  discrete <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  aesthetics <span class="op">=</span> <span class="st">"colour"</span>,</span>
 <span>  palette <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"light"</span>, <span class="st">"dark"</span>, <span class="st">"diverging"</span>, <span class="st">"grey"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">scale_fill_e61</span><span class="op">(</span></span>
-<span>  n <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  reverse <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  discrete <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  aesthetics <span class="op">=</span> <span class="st">"fill"</span>,</span>
 <span>  palette <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"light"</span>, <span class="st">"dark"</span>, <span class="st">"diverging"</span>, <span class="st">"grey"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -92,12 +89,7 @@ desired, the <code>discrete</code> argument can be set to <code>FALSE</code>.</p
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>n</dt>
-<dd><p>Numeric. The number of colours in your colour scale, required for
-discrete scales.</p></dd>
-
-
-<dt>reverse</dt>
+    <dl><dt>reverse</dt>
 <dd><p>Logical. TRUE reverses the colour order. Defaults to FALSE.</p></dd>
 
 
@@ -150,11 +142,9 @@ as output</p></li>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">mtcars</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">wt</span>, y <span class="op">=</span> <span class="va">mpg</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">cyl</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>   <span class="fu">scale_colour_e61</span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>   <span class="fu">scale_colour_e61</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>   <span class="fu"><a href="theme_e61.html">theme_e61</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="scale_e61-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>

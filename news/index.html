@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,15 +22,12 @@
   <a class="nav-link" href="../articles/theme61.html">Get started</a>
 </li>
 <li class="nav-item">
-  <a class="nav-link" href="../articles/graph-standards.html">Graph standards</a>
-</li>
-<li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/graph-standards.html">Graph standards</a>
+    <a class="dropdown-item" href="../articles/theme61.html">Get started</a>
     <a class="dropdown-item" href="../articles/ongraph-labels.html">Adding on-graph labels</a>
   </div>
 </li>
@@ -58,6 +55,36 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.0" id="theme61-060">theme61 0.6.0<a class="anchor" aria-label="anchor" href="#theme61-060"></a></h2>
+<p>06 Nov 2023</p>
+<div class="section level5">
+<h5 id="automatic-graph-sizing-and-y-axis-colour-and-fill-scaling-0-6-0">Automatic graph sizing, and y-axis, colour and fill scaling<a class="anchor" aria-label="anchor" href="#automatic-graph-sizing-and-y-axis-colour-and-fill-scaling-0-6-0"></a></h5>
+<p>This is a major breaking change. Your code will be simpler but may need some changes to work.</p>
+<p>Most of these improvements are applied when you save graphs using <code><a href="../reference/save_e61.html">save_e61()</a></code>, so will not show up in the preview.</p>
+<ul><li>Graphs now automatically size themselves correctly. You no longer need to figure out the appropriate graph height.</li>
+<li>Titles, subtitles and footnotes will automatically scale to fit the panel width.</li>
+<li>Y-axis will automatically set limits and breaks to aesthetic defaults. You can override this by providing your own limits using <code><a href="../reference/e61_axes.html">scale_y_continuous_e61()</a></code>.</li>
+<li>Colour/fill will automatically apply the e61 Institute colour palette. This works if you define a fill/colour variable in your main <code>ggplot</code> call (e.g. <code>ggplot(data, aes(x, y, fill = fill))</code>). You no longer need to specify the number of colours when using <code>scale_colour/fill_e61()</code>.</li>
+<li>Added different default graph dimensions for micro notes, research notes and PowerPoint presentations.</li>
+</ul><p>These features are implemented directly in <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">theme61::ggplot()</a></code>. This masks the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code> function in <code>ggplot2</code> so if you wish to call the original function you need to specify the namespace like so <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot()</a></code>. Make sure you load <code>theme61</code> <em>after</em> <code>ggplot2</code> otherwise the correct functions will not be called.</p>
+</div>
+<div class="section level5">
+<h5 id="other-changes-0-6-0">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-0-6-0"></a></h5>
+<ul><li>All functionality in <code>mplot_label()</code> has been combined into <code><a href="../reference/plot_label.html">plot_label()</a></code>. <code>mplot_label()</code> is now deprecated and users need to rename all instances of <code>mplot_label()</code> to <code><a href="../reference/plot_label.html">plot_label()</a></code>.</li>
+<li>
+<code>mpanel_e61()</code> has been retired as functionality has been incorporated directly into <code><a href="../reference/save_e61.html">save_e61()</a></code>.</li>
+<li>Added console messages to help correct common graphing mistakes.</li>
+<li>Changed default font of graphs to ‘PT Sans’ to be consistent with research note font.</li>
+<li>Allow rotation of labels in <code><a href="../reference/plot_label.html">plot_label()</a></code>.</li>
+<li>Renamed <code>add_zeroline()</code> to <code><a href="../reference/add_baseline.html">add_baseline()</a></code>, and <code>e61_palette()</code> to <code><a href="../reference/palette_e61.html">palette_e61()</a></code>.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="bug-fixes-and-documentation-updates-0-6-0">Bug fixes and documentation updates<a class="anchor" aria-label="anchor" href="#bug-fixes-and-documentation-updates-0-6-0"></a></h5>
+<ul><li>Fixed an issue where saving graphs with no title created whitespace above the plot.</li>
+<li>Documentation and vignettes rewritten to reflect new workflow.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.0" id="theme61-050">theme61 0.5.0<a class="anchor" aria-label="anchor" href="#theme61-050"></a></h2>
 <p>26 May 2023</p>
 <div class="section level5">
@@ -68,9 +95,9 @@
 <h5 id="newchanged-functionality-0-5-0">New/changed functionality<a class="anchor" aria-label="anchor" href="#newchanged-functionality-0-5-0"></a></h5>
 <ul><li>Add ability to save graphs in multiple formats at once using the new <code>format</code> argument in <code><a href="../reference/save_e61.html">save_e61()</a></code>.</li>
 <li>Add support in <code><a href="../reference/save_e61.html">save_e61()</a></code> for saving images in PDF format for compatibility with LaTeX.</li>
-<li>Change the default alignment of plot labels to left-align and added a new argument <code>hjust</code> to <code><a href="../reference/plot_label.html">plot_label()</a></code>/<code><a href="../reference/mplot_label.html">mplot_label()</a></code> to change the alignment.</li>
-<li>Added the ability to add a white box around text in <code><a href="../reference/plot_label.html">plot_label()</a></code>/<code><a href="../reference/mplot_label.html">mplot_label()</a></code> through <code>geom</code> argument.</li>
-<li>Added <code>y</code> argument to <code><a href="../reference/add_zeroline.html">add_zeroline()</a></code> so you can put your zero line at values other than zero.</li>
+<li>Change the default alignment of plot labels to left-align and added a new argument <code>hjust</code> to <code><a href="../reference/plot_label.html">plot_label()</a></code>/<code>mplot_label()</code> to change the alignment.</li>
+<li>Added the ability to add a white box around text in <code><a href="../reference/plot_label.html">plot_label()</a></code>/<code>mplot_label()</code> through <code>geom</code> argument.</li>
+<li>Added <code>y</code> argument to <code>add_zeroline()</code> so you can put your zero line at values other than zero.</li>
 <li>Added argument to <code><a href="../reference/e61_axes.html">scale_x_continuous_e61()</a></code> to add back the first/last labels that are removed by default.</li>
 <li>Slightly increased default size of plot labels to match size of axis text.</li>
 <li>
@@ -80,12 +107,12 @@
 <h5 id="bug-fixes-0-5-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-0"></a></h5>
 <ul><li>Permanent fix to the bug that was temporarily bodged in v0.4.1. Now dates can be entered as strings in <code><a href="../reference/plot_label.html">plot_label()</a></code> and they will be converted to dates.</li>
 <li>Fixed a bug in <code><a href="../reference/e61_axes.html">scale_y_continuous_e61()</a></code> that made <code>y_top</code> stop working and also refactored the code.</li>
-<li>Fixed a bug in <code><a href="../reference/mplot_label.html">mplot_label()</a></code> that didn’t allow a vector of colours to be supplied.</li>
+<li>Fixed a bug in <code>mplot_label()</code> that didn’t allow a vector of colours to be supplied.</li>
 </ul></div>
 <div class="section level5">
 <h5 id="documentation-updates-0-5-0">Documentation updates<a class="anchor" aria-label="anchor" href="#documentation-updates-0-5-0"></a></h5>
 <ul><li>Added a new Graph standards vignette based on masterclass materials.</li>
-<li>Added more documentation explaining how <code>rel_heights</code> in <code><a href="../reference/mpanel_e61.html">mpanel_e61()</a></code> works.</li>
+<li>Added more documentation explaining how <code>rel_heights</code> in <code>mpanel_e61()</code> works.</li>
 <li>Miscellaneous minor documentation improvements.</li>
 </ul></div>
 </div>
@@ -97,7 +124,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="theme61-040">theme61 0.4.0<a class="anchor" aria-label="anchor" href="#theme61-040"></a></h2>
 <p>21 Apr 2023</p>
-<ul><li>Add the ability to make multi-panel graphs via <code><a href="../reference/mpanel_e61.html">mpanel_e61()</a></code> (referring to combining multiple discrete graphs into a single panel, not faceted graphs).</li>
+<ul><li>Add the ability to make multi-panel graphs via <code>mpanel_e61()</code> (referring to combining multiple discrete graphs into a single panel, not faceted graphs).</li>
 <li>Add dual y-axis support allowing for graphs with secondary y-axes with different scales to be created.</li>
 <li>Add experimental automatic graph height calculation in <code><a href="../reference/save_e61.html">save_e61()</a></code>, which should reduce the need for users to manually specify <code>height</code> when saving graphs.</li>
 <li>Add argument to <code><a href="../reference/save_e61.html">save_e61()</a></code> to allow you to save the data used to produce the graph as a csv.</li>
@@ -107,15 +134,15 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.1" id="theme61-031">theme61 0.3.1<a class="anchor" aria-label="anchor" href="#theme61-031"></a></h2>
 <p>15 Mar 2023</p>
-<ul><li>Refactored <code><a href="../reference/mplot_label.html">mplot_label()</a></code> to use <code><a href="../reference/plot_label.html">plot_label()</a></code> as the underlying function rather than a <code>data.frame</code> and <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text()</a></code>. This fixed two bugs where the function throws an error if <code>colour</code> is an aesthetic in <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code> <code>aes</code> and the <code>x</code> argument was not automatically converting dates.</li>
+<ul><li>Refactored <code>mplot_label()</code> to use <code><a href="../reference/plot_label.html">plot_label()</a></code> as the underlying function rather than a <code>data.frame</code> and <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text()</a></code>. This fixed two bugs where the function throws an error if <code>colour</code> is an aesthetic in <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code> <code>aes</code> and the <code>x</code> argument was not automatically converting dates.</li>
 <li>Changed the colour palette so the third colour is now dark blue rather than grey.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="theme61-030">theme61 0.3.0<a class="anchor" aria-label="anchor" href="#theme61-030"></a></h2>
 <p>09 Mar 2023</p>
 <ul><li>Add new function <code>format_flip_bar_charts()</code> that applies most of the formatting needed to make horizontal bar graphs pretty.</li>
-<li>Add new functions <code><a href="../reference/plot_label.html">plot_label()</a></code> and <code><a href="../reference/mplot_label.html">mplot_label()</a></code> that make it easier to add on-graph plot labels. <code><a href="../reference/mplot_label.html">mplot_label()</a></code> is the vectorised version that lets you do multiple labels in one function.</li>
-<li>Add new function <code><a href="../reference/add_zeroline.html">add_zeroline()</a></code> to add an appropriately formatted black line along the zero y-axis.</li>
+<li>Add new functions <code><a href="../reference/plot_label.html">plot_label()</a></code> and <code>mplot_label()</code> that make it easier to add on-graph plot labels. <code>mplot_label()</code> is the vectorised version that lets you do multiple labels in one function.</li>
+<li>Add new function <code>add_zeroline()</code> to add an appropriately formatted black line along the zero y-axis.</li>
 <li>New functionality in <code><a href="../reference/e61_axes.html">scale_y_continuous_e61()</a></code> to specify break intervals directly in the <code>limits</code> argument.</li>
 <li>New vignette explaining how and why to use on-graph labelling over legends.</li>
 <li>Add new messages and information to <code><a href="../reference/save_e61.html">save_e61()</a></code> to try and explain why users need to set their own dimensions to get good graph aesthetics.</li>
@@ -139,7 +166,7 @@
 <ul><li>Adds a base map function <code><a href="../reference/e61_map.html">e61_map()</a></code> with sensible defaults for mapping.</li>
 <li>Improvements to the automatic discrete colour palette selection.</li>
 <li>Changes to the theme to fix graphs at a 0.75 aspect ratio.</li>
-<li>Added an alternate minimal theme called <code><a href="../reference/theme_e61_clean.html">theme_e61_clean()</a></code>.</li>
+<li>Added an alternate minimal theme called <code>theme_e61_clean()</code>.</li>
 <li>New add-in that creates charts based on <code>esquisse</code>.</li>
 <li>Updated <code><a href="../reference/save_e61.html">save_e61()</a></code> to allow you to save plots other than the most recently generated one.</li>
 <li>Many functions have been renamed to more closely align with existing ggplot2 function names, with <code>_e61</code> appended to them, for example <code>e61_colour_manual</code> now becomes <code>scale_colour_e61</code>. The old functions have now been deprecated and will be made defunct in future versions. Please stop using them and use the new functions instead.</li>

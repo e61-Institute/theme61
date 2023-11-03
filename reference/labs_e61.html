@@ -12,7 +12,7 @@ adjustment needed."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,16 +23,13 @@ adjustment needed."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
       <ul class="navbar-nav me-auto"><li class="nav-item">
   <a class="nav-link" href="../articles/theme61.html">Get started</a>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../articles/graph-standards.html">Graph standards</a>
-</li>
 <li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/graph-standards.html">Graph standards</a>
+    <a class="dropdown-item" href="../articles/theme61.html">Get started</a>
     <a class="dropdown-item" href="../articles/ongraph-labels.html">Adding on-graph labels</a>
   </div>
 </li>
@@ -72,12 +69,9 @@ adjustment needed.</p>
 <span>  subtitle <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  footnotes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sources <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  title_max_char <span class="op">=</span> <span class="fl">35</span>,</span>
-<span>  subtitle_max_char <span class="op">=</span> <span class="fl">45</span>,</span>
-<span>  footnote_max_char <span class="op">=</span> <span class="fl">55</span>,</span>
-<span>  title_wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  subtitle_wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  footnote_wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  title_wrap <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  subtitle_wrap <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  footnote_wrap <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/waiver.html" class="external-link">waiver</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -105,16 +99,12 @@ separate points you include in the graph.</p></dd>
 <dd><p>String vector providing the names of sources for the graph.</p></dd>
 
 
-<dt>title_max_char, subtitle_max_char, footnote_max_char</dt>
-<dd><p>Numeric. Set the
-maximum number of characters per line in the title, subtitle, sources or
-footnotes. The default is roughly appropriate for the default graph
-dimensions in <code>e61_save</code>.</p></dd>
-
-
 <dt>title_wrap, subtitle_wrap, footnote_wrap</dt>
-<dd><p>Logical. Enables text wrapping
-for the title, subtitle, sources or footnotes. Defaults to TRUE.</p></dd>
+<dd><p>Numeric or
+logical. Set the maximum number of characters per line in the title,
+subtitle and footer text. Set to <code>FALSE</code> if you want to turn off text
+wrapping. The default is usually appropriate for the default graph
+dimensions in <a href="save_e61.html">save_e61</a>.</p></dd>
 
 
 <dt>x, y</dt>
@@ -123,7 +113,7 @@ is blank (NULL) by default.</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Additional graph component titles (optional).</p></dd>
+<dd><p>Additional optional arguments passed to <a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a>.</p></dd>
 
 </dl></div>
     <div class="section level2">

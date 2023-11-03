@@ -7,9 +7,6 @@
     <loc>https://e61-institute.github.io/theme61/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/articles/graph-standards.html</loc>
-  </url>
-  <url>
     <loc>https://e61-institute.github.io/theme61/articles/index.html</loc>
   </url>
   <url>
@@ -31,10 +28,10 @@
     <loc>https://e61-institute.github.io/theme61/pull_request_template.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/reference/add_e61_logo.html</loc>
+    <loc>https://e61-institute.github.io/theme61/reference/add_baseline.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/reference/add_zeroline.html</loc>
+    <loc>https://e61-institute.github.io/theme61/reference/add_e61_logo.html</loc>
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/crop_aus_coord.html</loc>
@@ -101,6 +98,12 @@
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/e61_bluelight8.html</loc>
+  </url>
+  <url>
+    <loc>https://e61-institute.github.io/theme61/reference/e61_boxback.html</loc>
+  </url>
+  <url>
+    <loc>https://e61-institute.github.io/theme61/reference/e61_chart_maker.html</loc>
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/e61_coraldark.html</loc>
@@ -322,9 +325,6 @@
     <loc>https://e61-institute.github.io/theme61/reference/e61_orangelight8.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/reference/e61_palette.html</loc>
-  </url>
-  <url>
     <loc>https://e61-institute.github.io/theme61/reference/e61_skydark.html</loc>
   </url>
   <url>
@@ -433,7 +433,7 @@
     <loc>https://e61-institute.github.io/theme61/reference/e61_teallight8.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/reference/format_flipped_bar.html</loc>
+    <loc>https://e61-institute.github.io/theme61/reference/format_flip.html</loc>
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/index.html</loc>
@@ -442,10 +442,10 @@
     <loc>https://e61-institute.github.io/theme61/reference/labs_e61.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/reference/mpanel_e61.html</loc>
+    <loc>https://e61-institute.github.io/theme61/reference/palette_e61.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/reference/mplot_label.html</loc>
+    <loc>https://e61-institute.github.io/theme61/reference/pdf_to_png.html</loc>
   </url>
   <url>
     <loc>https://e61-institute.github.io/theme61/reference/plot_label.html</loc>
@@ -466,9 +466,15 @@
     <loc>https://e61-institute.github.io/theme61/reference/square_legend_symbols.html</loc>
   </url>
   <url>
+    <loc>https://e61-institute.github.io/theme61/reference/svg_to_png.html</loc>
+  </url>
+  <url>
     <loc>https://e61-institute.github.io/theme61/reference/theme_e61.html</loc>
   </url>
   <url>
-    <loc>https://e61-institute.github.io/theme61/reference/theme_e61_clean.html</loc>
+    <loc>https://e61-institute.github.io/theme61/reference/theme_e61_alt.html</loc>
+  </url>
+  <url>
+    <loc>https://e61-institute.github.io/theme61/reference/theme_e61_spatial.html</loc>
   </url>
 </urlset>
