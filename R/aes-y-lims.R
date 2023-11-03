@@ -41,7 +41,7 @@ update_scales <- function(plot, auto_scale){
     # if the y-var class is NULL, send a warning message about the auto updating of chart scales
   } else if (!check_y_var & is.null(getOption("warn_y_var"))){
 
-    warning("Could not identify the class of the y variable. This prevents the y-axis scales from being automatically updated to aesthetic values. To address this issue check that you have not edited the variable within your ggplot call (e.g. aes(y = 100 * var)). Instead make any changes before passing the dataset to ggplot (e.g. data %>% mutate(new_var = 100 * var) %>% ggplot(...)).")
+    warning("Could not identify the class of the y variable. This prevents the y-axis scales from being automatically updated to aesthetic values.")
     options(warn_y_var = TRUE)
   }
 
