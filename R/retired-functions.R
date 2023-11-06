@@ -24,6 +24,17 @@ e61_palette <- function(...) {
                             with = "palette_e61()")
 }
 
+#' Deprecated
+#' @export
+#' @noRd
+set_open_graph <- function(...) {
+  lifecycle::deprecate_soft(when = "0.6.1",
+                            what = "set_open_graph()",
+                            with = "set_open_graph_browser()",
+                            details = "Graphs now automatically appear in the Viewer pane when saved with save_e61(), so setting the option to open in the browser is now unnecessary."
+                            )
+}
+
 # Defunct from v0.8 -----------------------------------------------------
 
 #' Defunct
