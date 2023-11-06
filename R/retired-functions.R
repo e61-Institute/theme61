@@ -61,7 +61,7 @@ mplot_label <- function(...) {
 mplab <- function(...) {
   lifecycle::deprecate_soft(when = "0.6.0",
                             what = "mplab()",
-                            with = "plot_label()")
+                            with = "plab()")
 }
 
 # # Keep this as an example of a defunct function

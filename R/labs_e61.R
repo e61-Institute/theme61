@@ -56,6 +56,18 @@ labs_e61 <- function(title = NULL,
                      ...
                      ) {
 
+  # Deprecation code
+  lifecycle::deprecate_stop(when = "0.6.0",
+                            what = "scale_colour_e61(title_max_char)",
+                            details = c("!" = "Please remove it from your function call."))
+  lifecycle::deprecate_stop(when = "0.6.0",
+                            what = "scale_colour_e61(subtitle_max_char)",
+                            details = c("!" = "Please remove it from your function call."))
+  lifecycle::deprecate_stop(when = "0.6.0",
+                            what = "scale_colour_e61(footnote_max_char)",
+                            details = c("!" = "Please remove it from your function call."))
+
+
   # check the title and subtitle are strings
   sapply(list(title, subtitle), function(x){
     if (!is.null(x) && !is.character(x)){

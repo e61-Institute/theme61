@@ -3,7 +3,6 @@
 \name{plot_label}
 \alias{plot_label}
 \alias{plab}
-\alias{mplab}
 \title{Add on-graph labels to graphs}
 \usage{
 plot_label(
@@ -27,8 +26,6 @@ plab(
   geom = c("text", "label"),
   angle = 0
 )
-
-mplab(...)
 }
 \arguments{
 \item{label}{String vector. Label text to be displayed.}

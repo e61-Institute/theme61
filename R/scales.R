@@ -29,6 +29,10 @@ scale_colour_e61 <- function(reverse = FALSE,
                              palette = c("light", "dark", "diverging", "grey"),
                              ...) {
 
+  lifecycle::deprecate_stop(when = "0.6.0",
+                            what = "scale_colour_e61(n)",
+                            details = c("!" = "Please remove it from your function call."))
+
   palette <- match.arg(palette)
 
   if (discrete) {
@@ -52,6 +56,10 @@ scale_fill_e61 <- function(reverse = FALSE,
                            aesthetics = "fill",
                            palette = c("light", "dark", "diverging", "grey"),
                            ...) {
+
+  lifecycle::deprecate_stop(when = "0.6.0",
+                            what = "scale_colour_e61(n)",
+                            details = c("!" = "Please remove it from your function call."))
 
   palette <- match.arg(palette)
 
