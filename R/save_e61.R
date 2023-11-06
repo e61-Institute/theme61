@@ -389,6 +389,8 @@ svg_to_png <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
   }
 
   if (res != 1) {
+    # This approach to rescaling starts by saving a rescaled SVG before
+    # converting it to PNG. Hence the need for temp files.
     file_temp_svg <- "intermed.svg"
     file_temp_png <- "intermed.png"
 

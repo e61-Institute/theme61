@@ -15,5 +15,5 @@ This function is used for its side effects.
 \description{
 Previous versions of theme61 opened graphs in the browser instead of the
 Viewer pane. You can bring back this functionality by running this function,
-which alters a session-wide option.
+which sets a session-wide option.
 }
