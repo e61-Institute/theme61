@@ -10,9 +10,15 @@
 #' @noRd
 check_pkg_ver <- function(test = FALSE) {
   # Checks Github for latest version of theme61
-  releases <- gh::gh("GET /repos/{owner}/{repo}/releases",
+  releases <- try(gh::gh("GET /repos/{owner}/{repo}/releases",
                      owner = "e61-institute",
-                     repo = "theme61")
+                     repo = "theme61",
+                     .max_wait = 5),
+                  silent = TRUE)
+
+  # Early return if there is a network error for any reason
+  if(inherits(releases, "try-error"))
+    return(warning("R could not check if your version of theme61 is up-to-date."))
 
   latest_v <- releases[[1]][["tag_name"]]
   latest_v <- gsub("v", "", latest_v, fixed = TRUE)
