@@ -337,8 +337,8 @@ save_e61 <- function(filename,
     out <- try(system2("open", file_to_open))
 
     if (out != 0) warning("Graph file could not be opened")
-  } else {
-
+  } else if (interactive()) {
+    # Only run this in interactive mode
     # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
     temp_file <- tempfile(fileext = paste0(".", format[[1]]))
     file.copy(filename, temp_file)
