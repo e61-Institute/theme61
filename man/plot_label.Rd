@@ -51,5 +51,5 @@ ggplot2 object
 }
 \description{
 Add text labels for lines, columns or other elements directly
-  onto the graph plot. This is preferred over using legends.
+onto the graph plot. This is preferred over using legends.
 }

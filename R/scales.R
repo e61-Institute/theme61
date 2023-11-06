@@ -3,13 +3,14 @@
 #' The colour and fill scales are designed for discrete scales. If the data are
 #' continuous, we recommend binning the data as this often makes it easier to
 #' distinguish between values than a continuous scale. If a continuous scale is
-#' desired, the \code{discrete} argument can be set to \code{FALSE}.
+#' desired, the `discrete` argument can be set to `FALSE`.
 #'
 #' @param reverse Logical. TRUE reverses the colour order. Defaults to FALSE.
 #' @param discrete Logical. Indicate whether to use a discrete scale. Defaults
 #'   to TRUE.
 #' @param palette Character. The specific e61 palette for continuous scales.
 #'   Must be supplied if a continuous scale is used.
+#' @param n `r lifecycle::badge("deprecated")` n is no longer used.
 #' @inheritDotParams ggplot2::scale_colour_manual
 #'
 #' @return ggplot2 object

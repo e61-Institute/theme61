@@ -28,7 +28,7 @@ ggplot2 object
 \description{
 Applies the e61 theme to ggplot spatial maps to adjust graph appearance. If
 you are looking to change the appearance of titles or labels, check the
-arguments in \code{\link[theme61]{labs_e61}}, which are probably what you are
+arguments in \code{\link[=labs_e61]{labs_e61()}}, which are probably what you are
 looking for.
 }
 \examples{

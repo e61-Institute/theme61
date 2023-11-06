@@ -12,10 +12,10 @@
 #' @details The primary purpose of this function is to correctly format footer
 #'   text without requiring the user to guess where to put manual line breaks
 #'   for long footnotes or put in "Sources:" themselves. It does this by
-#'   transforming the \code{footnotes} and \code{sources} arguments into nicely
-#'   formatted text that goes into the \code{caption} argument in ggplot2's
-#'   \code{labs()} function. Thus, if you are using \code{footnotes} or
-#'   \code{sources}, do not supply a \code{caption} argument as well.
+#'   transforming the `footnotes` and `sources` arguments into nicely
+#'   formatted text that goes into the `caption` argument in ggplot2's
+#'   `labs()` function. Thus, if you are using `footnotes` or
+#'   `sources`, do not supply a `caption` argument as well.
 #'
 #' @param title The text for the title.
 #' @param subtitle The text for the subtitle.
@@ -28,10 +28,11 @@
 #'   is blank (NULL) by default.
 #' @param title_wrap,subtitle_wrap,footnote_wrap Numeric or
 #'   logical. Set the maximum number of characters per line in the title,
-#'   subtitle and footer text. Set to \code{FALSE} if you want to turn off text
+#'   subtitle and footer text. Set to `FALSE` if you want to turn off text
 #'   wrapping. The default is usually appropriate for the default graph
-#'   dimensions in \link{save_e61}.
-#' @param ... Additional optional arguments passed to \link[ggplot2]{labs}.
+#'   dimensions in [save_e61].
+#' @param title_max_char,subtitle_max_char,footnote_max_char `r lifecycle::badge("deprecated")` No longer supported; use `title_wrap`, `subtitle_wrap` or `footnote_wrap` instead.
+#' @param ... Additional optional arguments passed to [labs][ggplot2::labs].
 #'
 #' @export
 #' @examples
@@ -62,17 +63,17 @@ labs_e61 <- function(title = NULL,
   # Deprecation code
   if (!missing("title_max_char"))
     lifecycle::deprecate_stop(when = "0.6.0",
-                              what = "scale_colour_e61(title_max_char)",
+                              what = "labs_e61(title_max_char)",
                               details = c("!" = "Please remove it from your function call."))
 
   if (!missing("subtitle_max_char"))
     lifecycle::deprecate_stop(when = "0.6.0",
-                              what = "scale_colour_e61(subtitle_max_char)",
+                              what = "labs_e61(subtitle_max_char)",
                               details = c("!" = "Please remove it from your function call."))
 
   if (!missing("footnote_max_char"))
     lifecycle::deprecate_stop(when = "0.6.0",
-                              what = "scale_colour_e61(footnote_max_char)",
+                              what = "labs_e61(footnote_max_char)",
                               details = c("!" = "Please remove it from your function call."))
 
 

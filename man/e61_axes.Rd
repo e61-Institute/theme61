@@ -26,13 +26,13 @@ scale_x_continuous_e61(
 \arguments{
 \item{limits}{One of:
 \itemize{
-  \item{A numeric vector of length three providing the limits of the scale
-  and the increment between each axis tick, e.g. \code{c(0, 25, 5)} will
-  set the axis to range from 0 to 25, with increments of 5 per tick.}
-  \item{A numeric vector of length two providing the minimum and maximum
-  limits of the scale. The break increments will be automatically chosen.}
-  \item{\code{NULL} to use the default scale range.}
-  }}
+\item{A numeric vector of length three providing the limits of the scale
+and the increment between each axis tick, e.g. \code{c(0, 25, 5)} will
+set the axis to range from 0 to 25, with increments of 5 per tick.}
+\item{A numeric vector of length two providing the minimum and maximum
+limits of the scale. The break increments will be automatically chosen.}
+\item{\code{NULL} to use the default scale range.}
+}}
 
 \item{sec_axis}{Defaults to duplicating the y-axis so it shows on the left
 and right. To add a rescaled secondary axis, see the documentation for
@@ -47,7 +47,7 @@ elsewhere. If you change this argument you also need to change the argument
 with the same name in \link{theme_e61}.}
 
 \item{expand_bottom, expand_top}{Numeric. Add extra space between data points
-and the top/bottom of the graph. See \link[ggplot2]{expansion} for details.}
+and the top/bottom of the graph. See \link[ggplot2:expansion]{expansion} for details.}
 
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous}}
@@ -83,7 +83,7 @@ transformation with \code{\link[scales:trans_new]{scales::trans_new()}}.}
   }}
 
 \item{expand_left, expand_right}{Numeric. Add extra space between data points
-and the left/right of the graph. See \link[ggplot2]{expansion} for details.}
+and the left/right of the graph. See \link[ggplot2:expansion]{expansion} for details.}
 
 \item{hide_first_last}{Logical. Defaults to TRUE. Hides the first and
 last x-axis labels to avoid overlapping with the bottom of the y-axis.}

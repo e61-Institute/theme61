@@ -2,24 +2,24 @@
 #'
 #' Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
 #' appearance. If you are looking to change the appearance of titles or labels,
-#' check the arguments in \link{labs_e61}, which are probably what you are
+#' check the arguments in [labs_e61], which are probably what you are
 #' looking for.
 #'
 #' @param y_top Defaults to TRUE. Puts the y-axis title at the top. If you
 #'   change this argument you also need to change the argument with the same
-#'   name in \link{scale_y_continuous_e61}.
+#'   name in [scale_y_continuous_e61].
 #' @param adj Either a single numeric to adjust left and right axis titles
 #'   simultaneously or a vector of 2 numerics to adjust each axis title
 #'   separately. More negative values move the text closer to the graph panel.
-#' @param fix_left Sometimes if the value of the \code{adj} argument is too
+#' @param fix_left Sometimes if the value of the `adj` argument is too
 #'   negative, the margins on the left side of the graph start to cut off some
 #'   of the text. Provide a small positive value (5?) to correct this.
 #' @param legend Character. Legend position, "none" (default) hides the legend.
 #' @param legend_title Logical. Include legend title? Defaults to FALSE.
 #' @param aspect_ratio Numeric. Sets the aspect ratio of the graph panel.
 #' @param background Character. Default is "white". For all graphs that you
-#'   save, you should control the background colour using the \code{bg_colour}
-#'   argument in \code{save_e61}, not here.
+#'   save, you should control the background colour using the `bg_colour`
+#'   argument in `save_e61`, not here.
 #' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #' @param base_size Numeric. Chart font size. Default is 10.
 #' @param base_family Character. Chart font family. Default for notes is PT
@@ -271,7 +271,7 @@ theme_e61 <- function(y_top = TRUE,
 #'
 #' Applies the e61 theme to ggplot spatial maps to adjust graph appearance. If
 #' you are looking to change the appearance of titles or labels, check the
-#' arguments in \code{\link[theme61]{labs_e61}}, which are probably what you are
+#' arguments in [theme61::labs_e61()], which are probably what you are
 #' looking for.
 #'
 #' @param legend Character. Legend position, "none" (default) hides the legend.
@@ -414,7 +414,7 @@ theme_e61_alt <- function(
 #' geoms so the function has a shape to reshape.
 #'
 #' @param size Numeric. Control the size of the replacement square. Default of 6
-#'   works well when \code{ymin} or \code{ymax} are not present.
+#'   works well when `ymin` or `ymax` are not present.
 #' @return ggplot object
 #' @export
 #' @examples
@@ -432,10 +432,10 @@ square_legend_symbols <- function(size = 6) {
 
 #' Applies changes to the theme for horizontal bar graphs
 #'
-#' Horizontal bar graphs made with \code{coord_flip()} require some changes to
-#' the \code{theme()} in order to look proper. This function wraps those changes
+#' Horizontal bar graphs made with `coord_flip()` require some changes to
+#' the `theme()` in order to look proper. This function wraps those changes
 #' up in a convenient function that should be appended at the end of the graph
-#' code, after theming functions such as \code{theme_e61()} have been called.
+#' code, after theming functions such as `theme_e61()` have been called.
 #'
 #' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
 #' the default works for most graphs. A negative value moves the

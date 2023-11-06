@@ -28,7 +28,9 @@ save_e61(
   nrow = NULL,
   align = c("v", "none", "h", "hv"),
   axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-  rel_heights = NULL
+  rel_heights = NULL,
+  width = NULL,
+  height = NULL
 )
 }
 \arguments{
@@ -114,6 +116,8 @@ Must be specified if any of the graphs are complex (e.g. faceted) and alignment 
 \item{rel_heights}{(multi-panel specific) A numeric vector giving the
 relative proportions of each graph component (title, plots, footer
 (optional)).}
+
+\item{width, height}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} width and height are no longer supported; use \code{dim} instead.}
 }
 \value{
 Invisibly returns the file name.

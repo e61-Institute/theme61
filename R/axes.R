@@ -4,26 +4,26 @@
 #' This includes removing white space at the beginning and end of each axis.
 #'
 #' @param expand_bottom,expand_top Numeric. Add extra space between data points
-#'   and the top/bottom of the graph. See \link[ggplot2]{expansion} for details.
+#'   and the top/bottom of the graph. See [expansion][ggplot2::expansion] for details.
 #' @param sec_axis Defaults to duplicating the y-axis so it shows on the left
 #'   and right. To add a rescaled secondary axis, see the documentation for
-#'   \link{dual_y_axis}. Set to FALSE to hide the secondary axis.
+#'   [dual_y_axis]. Set to FALSE to hide the secondary axis.
 #' @param rescale_sec Logical. Set this to TRUE if you are using a rescaled
 #'   secondary axis, otherwise leave it as FALSE (default).
 #' @param y_top Logical. Ensures there is space at the top of the y-axis for the
 #'   axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
 #'   elsewhere. If you change this argument you also need to change the argument
-#'   with the same name in \link{theme_e61}.
+#'   with the same name in [theme_e61].
 #' @param expand_left,expand_right Numeric. Add extra space between data points
-#'   and the left/right of the graph. See \link[ggplot2]{expansion} for details.
+#'   and the left/right of the graph. See [expansion][ggplot2::expansion] for details.
 #' @param limits One of:
 #'   \itemize{
 #'     \item{A numeric vector of length three providing the limits of the scale
-#'     and the increment between each axis tick, e.g. \code{c(0, 25, 5)} will
+#'     and the increment between each axis tick, e.g. `c(0, 25, 5)` will
 #'     set the axis to range from 0 to 25, with increments of 5 per tick.}
 #'     \item{A numeric vector of length two providing the minimum and maximum
 #'     limits of the scale. The break increments will be automatically chosen.}
-#'     \item{\code{NULL} to use the default scale range.}
+#'     \item{`NULL` to use the default scale range.}
 #'     }
 #' @inheritDotParams ggplot2::scale_y_continuous name oob na.value trans guide
 #'   position

@@ -6,6 +6,8 @@
 
 # Defunct from v0.7 -------------------------------------------------------
 
+# Also remove a bunch of defunct function arguments in labs_e61, plot_label, save_e61 and scales
+
 #' Deprecated
 #' @export
 #' @noRd
