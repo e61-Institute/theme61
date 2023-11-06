@@ -337,7 +337,7 @@ save_e61 <- function(filename,
   # Invisibly returns the filename/s
   retval <- paste(filename, format, sep = ".")
 
-  invisible(filename)
+  invisible(retval)
 
 }
 
@@ -345,7 +345,7 @@ save_e61 <- function(filename,
 #'
 #' Previous versions of theme61 opened graphs in the browser instead of the
 #' Viewer pane. You can bring back this functionality by running this function,
-#' which alters a session-wide option.
+#' which sets a session-wide option.
 #'
 #' @return This function is used for its side effects.
 #' @rdname open_graph_browser
