@@ -85,15 +85,20 @@ save_e61 <- function(filename,
                      nrow = NULL,
                      align = c("v", "none", "h", "hv"),
                      axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-                     rel_heights = NULL) {
+                     rel_heights = NULL,
+                     width = NULL,
+                     height = NULL) {
 
   # Deprecation messages
-  lifecycle::deprecate_stop(when = "0.6.0",
-                            what = "save_e61(width)",
-                            details = c("!" = "It has been replaced with the `dim` argument which takes a named list like `list(width = 10, height = 10)`."))
-  lifecycle::deprecate_stop(when = "0.6.0",
-                            what = "save_e61(height)",
-                            details = c("!" = "It has been replaced with the `dim` argument which takes a named list like `list(width = 10, height = 10)`."))
+  if (!missing("width"))
+    lifecycle::deprecate_stop(when = "0.6.0",
+                              what = "save_e61(width)",
+                              details = c("!" = "It has been replaced with the `dim` argument which takes a named list like `list(width = 10, height = 10)`."))
+
+  if (!missing("height"))
+    lifecycle::deprecate_stop(when = "0.6.0",
+                              what = "save_e61(height)",
+                              details = c("!" = "It has been replaced with the `dim` argument which takes a named list like `list(width = 10, height = 10)`."))
 
 
   # Compile plots

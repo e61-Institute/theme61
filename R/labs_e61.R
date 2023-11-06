@@ -53,19 +53,27 @@ labs_e61 <- function(title = NULL,
                      footnote_wrap = NULL,
                      x = NULL,
                      y = ggplot2::waiver(),
+                     title_max_char = NULL,
+                     subtitle_max_char = NULL,
+                     footnote_max_char = NULL,
                      ...
                      ) {
 
   # Deprecation code
-  lifecycle::deprecate_stop(when = "0.6.0",
-                            what = "scale_colour_e61(title_max_char)",
-                            details = c("!" = "Please remove it from your function call."))
-  lifecycle::deprecate_stop(when = "0.6.0",
-                            what = "scale_colour_e61(subtitle_max_char)",
-                            details = c("!" = "Please remove it from your function call."))
-  lifecycle::deprecate_stop(when = "0.6.0",
-                            what = "scale_colour_e61(footnote_max_char)",
-                            details = c("!" = "Please remove it from your function call."))
+  if (!missing("title_max_char"))
+    lifecycle::deprecate_stop(when = "0.6.0",
+                              what = "scale_colour_e61(title_max_char)",
+                              details = c("!" = "Please remove it from your function call."))
+
+  if (!missing("subtitle_max_char"))
+    lifecycle::deprecate_stop(when = "0.6.0",
+                              what = "scale_colour_e61(subtitle_max_char)",
+                              details = c("!" = "Please remove it from your function call."))
+
+  if (!missing("footnote_max_char"))
+    lifecycle::deprecate_stop(when = "0.6.0",
+                              what = "scale_colour_e61(footnote_max_char)",
+                              details = c("!" = "Please remove it from your function call."))
 
 
   # check the title and subtitle are strings
