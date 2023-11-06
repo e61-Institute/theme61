@@ -6,6 +6,8 @@
 
 # Defunct from v0.7 -------------------------------------------------------
 
+# Also remove a bunch of defunct function arguments in labs_e61, plot_label, save_e61 and scales
+
 #' Deprecated
 #' @export
 #' @noRd
@@ -61,7 +63,7 @@ mplot_label <- function(...) {
 mplab <- function(...) {
   lifecycle::deprecate_soft(when = "0.6.0",
                             what = "mplab()",
-                            with = "plot_label()")
+                            with = "plab()")
 }
 
 # # Keep this as an example of a defunct function

@@ -44,3 +44,4 @@ BugReports: https://github.com/e61-institute/theme61/issues
 RoxygenNote: 7.2.3
 Depends: 
     R (>= 4.2.2)
+Roxygen: list(markdown = TRUE)

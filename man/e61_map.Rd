@@ -20,7 +20,7 @@ e.g \code{c(top = -33, right = 151, bottom = -34, left = 150)}}
 maptype if needed}
 }
 \description{
-Simple wrapper around \code{\link[ggmap]{get_stamenmap}} that makes it easier to
+Simple wrapper around \code{\link[ggmap:get_stamenmap]{ggmap::get_stamenmap()}} that makes it easier to
 overlay a map layer for geographical data in ggplot
 }
 \details{

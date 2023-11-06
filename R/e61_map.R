@@ -1,12 +1,12 @@
 #' Wrapper function for ggmap to produce a map layer in e61 format
 #'
-#' Simple wrapper around \code{\link[ggmap]{get_stamenmap}} that makes it easier to
+#' Simple wrapper around [ggmap::get_stamenmap()] that makes it easier to
 #' overlay a map layer for geographical data in ggplot
 #'
 #' @details The primary purpose of this function is to add a map layer with major place
 #' names and roads from Stamen's map server to plot under geographical data.
 #' @param bbox A named vector of coordinates decribing the extent of your map,
-#' e.g \code{c(top = -33, right = 151, bottom = -34, left = 150)}
+#' e.g `c(top = -33, right = 151, bottom = -34, left = 150)`
 #' @param adjust Adjust default zoom value
 #' @param maptype Set as the default map type for the e61 style, you can change to another
 #' maptype if needed

@@ -125,7 +125,3 @@ plot_lab_ <-
 #' @rdname plot_label
 #' @export
 plab <- plot_label
-
-#' @rdname plot_label
-#' @export
-mplab <- plot_label

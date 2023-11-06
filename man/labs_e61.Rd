@@ -14,6 +14,9 @@ labs_e61(
   footnote_wrap = NULL,
   x = NULL,
   y = ggplot2::waiver(),
+  title_max_char = NULL,
+  subtitle_max_char = NULL,
+  footnote_max_char = NULL,
   ...
 )
 }
@@ -38,7 +41,9 @@ dimensions in \link{save_e61}.}
 \item{x, y}{String to set the x- and y-axis titles. Note that the x-axis title
 is blank (NULL) by default.}
 
-\item{...}{Additional optional arguments passed to \link[ggplot2]{labs}.}
+\item{title_max_char, subtitle_max_char, footnote_max_char}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} No longer supported; use \code{title_wrap}, \code{subtitle_wrap} or \code{footnote_wrap} instead.}
+
+\item{...}{Additional optional arguments passed to \link[ggplot2:labs]{labs}.}
 }
 \description{
 Provides support for well-formatted titles and footer text with minimal user
@@ -52,12 +57,12 @@ The arguments in the function allow you to make changes to the text
 formatting if required.
 
 The primary purpose of this function is to correctly format footer
-  text without requiring the user to guess where to put manual line breaks
-  for long footnotes or put in "Sources:" themselves. It does this by
-  transforming the \code{footnotes} and \code{sources} arguments into nicely
-  formatted text that goes into the \code{caption} argument in ggplot2's
-  \code{labs()} function. Thus, if you are using \code{footnotes} or
-  \code{sources}, do not supply a \code{caption} argument as well.
+text without requiring the user to guess where to put manual line breaks
+for long footnotes or put in "Sources:" themselves. It does this by
+transforming the \code{footnotes} and \code{sources} arguments into nicely
+formatted text that goes into the \code{caption} argument in ggplot2's
+\code{labs()} function. Thus, if you are using \code{footnotes} or
+\code{sources}, do not supply a \code{caption} argument as well.
 }
 \examples{
   ggplot() +
