@@ -14,9 +14,6 @@
 #'   insert it in current script.
 #' @export
 #'
-#' @importFrom shiny dialogViewer browserViewer runGadget paneViewer
-#'   reactiveValues
-#'
 #' @examples
 #' \dontrun{
 #' # Launch e61_chart_maker in RStudio :
