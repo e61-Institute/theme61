@@ -311,44 +311,52 @@ save_e61 <- function(filename,
     }
   }
 
-  # Opens the graph file if the option is set
-  if (as.logical(getOption("open_e61_graph", FALSE))) {
+  # Opens the graph file in the Viewer or browser
 
-    # Put filename back together
-    filename <- paste0(filename, ".", format[[1]])
+  # Put filename back together
+  file_to_open <- paste0(filename, ".", format[[1]])
 
-    file_to_open <- shQuote(here::here(filename))
+  if (isTRUE(getOption("open_e61_graph", FALSE))) {
+    file_to_open <- shQuote(here::here(file_to_open))
 
     out <- try(system2("open", file_to_open))
 
-    if (out != 0) warning("Graph file could not be opened.")
+    if (out != 0) warning("Graph file could not be opened")
+  } else {
+
+    # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
+    temp_file <- tempfile(fileext = paste0(".", format[[1]]))
+    file.copy(filename, temp_file)
+
+    out <- try(rstudioapi::viewer(temp_file))
+
+    if (!is.null(out)) warning("Graph file could not be opened.")
+
   }
 
   # Invisibly returns the filename/s
   retval <- paste(filename, format, sep = ".")
 
-  invisible(retval)
+  invisible(filename)
 
 }
 
-#' Set option to automatically open files created by \code{save_e61}
+#' Set option to open graphs in the browser instead of the Viewer pane
 #'
-#' These functions set and unset a session-wide option to automatically open
-#' files created by \code{save_e61}. This is useful when you want to look at the
-#' graph you have just created, such as when you are trying to figure out label
-#' locations or graph dimensions and don't want to manually navigate to the file
-#' location every time.
+#' Previous versions of theme61 opened graphs in the browser instead of the
+#' Viewer pane. You can bring back this functionality by running this function,
+#' which alters a session-wide option.
 #'
 #' @return This function is used for its side effects.
-#' @rdname set_open_graph
+#' @rdname open_graph_browser
 #' @export
-set_open_graph <- function() {
+set_open_graph_browser <- function() {
   options(open_e61_graph = TRUE)
 
   invisible(TRUE)
 }
 
-#' @rdname set_open_graph
+#' @rdname open_graph_browser
 #' @export
 unset_open_graph <- function() {
   options(open_e61_graph = FALSE)
