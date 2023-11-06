@@ -27,7 +27,7 @@ reference:
   - crop_aus_coord
   - e61_chart_maker
   - e61_map
-  - set_open_graph
+  - set_open_graph_browser
   - unset_open_graph
 
 - title: Colours
