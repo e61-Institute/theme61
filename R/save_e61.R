@@ -224,23 +224,23 @@ save_e61 <- function(filename,
 
   if (length(adv_msg) > 0 && is.null(getOption("no_advisory"))) print_adv()
 
-  # Require user acknowledgement if there are issues to address
-  # Turn these off in test env
-  if (length(adv_msg) > 0 && !is_testing() && is.null(getOption("no_advisory"))) {
-
-    # Require user acknowledgement
-    prompt <- ""
-    while (prompt == "") {
-      prompt <- readline(prompt = "Type 'Y' to stop generating the graph or 'N' to continue.")
-    }
-
-    if (prompt == "Y") {
-      return(message("Stopping graph generation based on user request. To turn off this message for the remainder of the session, run `options(no_advisory = TRUE)`."))
-    } else {
-      message("To turn off this message for the remainder of the session, set the `no_advisory` option to TRUE.")
-    }
-
-  }
+  # # Require user acknowledgement if there are issues to address
+  # # Turn these off in test env
+  # if (length(adv_msg) > 0 && !is_testing() && is.null(getOption("no_advisory"))) {
+  #
+  #   # Require user acknowledgement
+  #   prompt <- ""
+  #   while (prompt == "") {
+  #     prompt <- readline(prompt = "Type 'Y' to stop generating the graph or 'N' to continue.")
+  #   }
+  #
+  #   if (prompt == "Y") {
+  #     return(message("Stopping graph generation based on user request. To turn off this message for the remainder of the session, run `options(no_advisory = TRUE)`."))
+  #   } else {
+  #     message("To turn off this message for the remainder of the session, set the `no_advisory` option to TRUE.")
+  #   }
+  #
+  # }
 
   # Make graph to save --------------------------------
 
