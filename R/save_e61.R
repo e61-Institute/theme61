@@ -341,7 +341,7 @@ save_e61 <- function(filename,
     # Only run this in interactive mode
     # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
     temp_file <- tempfile(fileext = paste0(".", format[[1]]))
-    file.copy(filename, temp_file)
+    file.copy(file_to_open, temp_file)
 
     out <- try(rstudioapi::viewer(temp_file))
 
