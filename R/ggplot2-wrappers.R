@@ -91,7 +91,7 @@ ggsave <- function(...) {
   if (!isTRUE(getOption("quiet_wrap")))
     cli::cli_bullets(c("x" = "Your function arguments have been passed to save_e61() automatically. Please use save_e61() instead of ggsave() to ensure your graphs conform to the e61 style correctly. If you still want to use ggplot2's ggsave(), provide the namespace explicitly."))
 
-  ggplot2::ggsave(...)
+  save_e61(...)
 }
 
 #' Masks ggplot2::labs to encourage users to use labs_e61
