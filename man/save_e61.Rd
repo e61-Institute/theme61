@@ -2,7 +2,7 @@
 % Please edit documentation in R/save_e61.R
 \name{save_e61}
 \alias{save_e61}
-\title{Saves ggplot graphs with sensible defaults}
+\title{Save graphs with theme61 styles and defaults}
 \usage{
 save_e61(
   filename,
@@ -46,9 +46,9 @@ to the last plot displayed so usually you do not need to provide this
 argument explicitly.}
 
 \item{format}{An optional vector of file formats to save as. For example
-\code{c("svg", "pdf")} will save 2 files with the same name to the same
-location to SVG and PDF formats. If the file format is specified in
-\code{filename}, then this argument is ignored.}
+\code{c("svg", "pdf")} will save 2 files with the same name to the same location
+to SVG and PDF formats. If the file format is specified in \code{filename}, then
+this argument is ignored.}
 
 \item{chart_type}{String. Type of chart. This is used to set sensible chart
 widths based on the width of text in each document. Options are "MN" (for
@@ -117,21 +117,21 @@ Must be specified if any of the graphs are complex (e.g. faceted) and alignment 
 relative proportions of each graph component (title, plots, footer
 (optional)).}
 
-\item{width, height}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} width and height are no longer supported; use \code{dim} instead.}
+\item{width, height}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} width and height are
+no longer supported; use \code{dim} instead.}
 }
 \value{
 Invisibly returns the file name.
 }
 \description{
-Saves ggplot2 graphs made with using theme61. Using \code{save_e61()} is
-required to ensure graphs are consistent with the e61 style and formatting.
+Saves ggplot2 graphs made with using theme61. Using \code{save_e61()} is required
+to ensure graphs are consistent with the e61 style and formatting.
 }
 \details{
 The supported file formats are SVG, PDF, EPS and PNG.
 
 Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 better as they are modern vector graphics file formats which can be scaled up
-and down in size without blurring or becoming pixelated.
-
-PNG should only be used for Twitter posts for compatibility reasons.
+and down in size without blurring or becoming pixelated. PNG should only be
+used for Twitter posts for compatibility reasons.
 }
