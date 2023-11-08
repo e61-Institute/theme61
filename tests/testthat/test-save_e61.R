@@ -73,8 +73,8 @@ test_that("Y-axis label messages", {
 
   # No message if y_top is FALSE
   p <- minimal_plot +
-    labs_e61(y = "Long y-axis label") +
-    scale_y_continuous_e61(y_top = FALSE)
+    labs_e61(y = NULL) +
+    theme_e61(y_top = FALSE)
 
   suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p),
                                      class = "cliMessage"),
