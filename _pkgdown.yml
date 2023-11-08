@@ -22,11 +22,13 @@ reference:
   - starts_with("scale_")
   - starts_with("sec_rescale")
 
+- title: Maps
+  contents:
+  - has_concept("map functions")
+
 - title: Miscellaneous
   contents:
-  - crop_aus_coord
   - e61_chart_maker
-  - e61_map
   - set_open_graph_browser
   - unset_open_graph
 

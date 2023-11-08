@@ -6,6 +6,7 @@
 #' in a map.
 #'
 #' @export
+#' @family map functions
 #' @examples
 #'   \dontrun{
 #'     ggplot(strayr::read_absmap("aus2021")) +

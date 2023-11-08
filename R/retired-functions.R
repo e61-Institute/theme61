@@ -11,6 +11,15 @@
 #' Deprecated
 #' @export
 #' @noRd
+e61_map <- function(...) {
+  lifecycle::deprecate_soft(when = "0.6.1",
+                            what = "e61_map()",
+                            with = "add_map_e61()")
+}
+
+#' Deprecated
+#' @export
+#' @noRd
 add_zeroline <- function(...) {
   lifecycle::deprecate_soft(when = "0.6.0",
                             what = "add_zeroline()",
