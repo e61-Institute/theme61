@@ -226,38 +226,21 @@ save_e61 <- function(filename,
 
   adv_msg <- c(y_miss, y_long)
 
-  # Compile and print advisory messages
+  # Compile advisory messages
   print_adv <- function() {
     cli::cli_div(theme = list(".bad" = list(color = "#cc0000",
                                             before = paste0(cli::symbol$cross, " ")),
                               ".adv" = list(`color` = "#cc0000")
     )
     )
-    cli::cli_h1("--- Fix the following issues with your graph ----------------------------------------", class = "adv")
+    cli::cli_h1("--- Your graph may have some issues to address ----------------------------------------", class = "adv")
     cli::cli_ul()
     sapply(adv_msg, cli::cli_alert, class = "bad")
     cli::cli_end()
   }
 
+  # Print advisory messages
   if (length(adv_msg) > 0 && is.null(getOption("no_advisory"))) print_adv()
-
-  # # Require user acknowledgement if there are issues to address
-  # # Turn these off in test env
-  # if (length(adv_msg) > 0 && !is_testing() && is.null(getOption("no_advisory"))) {
-  #
-  #   # Require user acknowledgement
-  #   prompt <- ""
-  #   while (prompt == "") {
-  #     prompt <- readline(prompt = "Type 'Y' to stop generating the graph or 'N' to continue.")
-  #   }
-  #
-  #   if (prompt == "Y") {
-  #     return(message("Stopping graph generation based on user request. To turn off this message for the remainder of the session, run `options(no_advisory = TRUE)`."))
-  #   } else {
-  #     message("To turn off this message for the remainder of the session, set the `no_advisory` option to TRUE.")
-  #   }
-  #
-  # }
 
   # Make graph to save --------------------------------
 
