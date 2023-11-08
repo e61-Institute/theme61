@@ -74,9 +74,10 @@ test_that("Y-axis label messages", {
   # No message if y_top is FALSE
   p <- minimal_plot +
     labs_e61(y = "Long y-axis label") +
-    theme_e61(y_top = FALSE)
+    scale_y_continuous_e61(y_top = FALSE)
 
-  suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p)),
+  suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p),
+                                     class = "cliMessage"),
                    classes = c("messages", "warning"))
 
   # No message if non-theme61 scale functions are used.
@@ -95,6 +96,63 @@ test_that("Y-axis label messages", {
     suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p)),
                      classes = c("messages", "warning"))
   })
+})
+
+test_that("Y-axis customisation options", {
+  p <- minimal_plot
+
+  # Limits, sec_axis, y_top
+  p1 <- p +
+    scale_y_continuous_e61(limits = c(0, 1.5, 0.5)) +
+    labs_e61(title = "Y-scale testing")
+
+  # Limits, sec_axis, no y_top
+  p2 <- p +
+    theme_e61(y_top = FALSE) +
+    scale_y_continuous_e61(limits = c(0, 1.5, 0.5)) +
+    labs_e61(title = "Y-scale testing", y = NULL)
+
+  # Limits, no sec_axis, no y_top
+  p3 <- p +
+    theme_e61(y_top = FALSE) +
+    scale_y_continuous_e61(limits = c(0, 1.5, 0.5), sec_axis = FALSE) +
+    labs_e61(title = "Y-scale testing", y = NULL)
+
+  # Limits, no sec_axis, y_top
+  p4 <- p +
+    scale_y_continuous_e61(limits = c(0, 1.5, 0.5), sec_axis = FALSE) +
+    labs_e61(title = "Y-scale testing")
+
+  # No limits, sec_axis, y_top
+  p5 <- p + labs_e61(title = "Y-scale testing")
+
+  # No limits, sec_axis, no y_top
+  p6 <- p +
+    theme_e61(y_top = FALSE) +
+    labs_e61(title = "Y-scale testing", y = NULL)
+
+  # No limits, no sec_axis, y_top
+  p7 <- p +
+    scale_y_continuous_e61(sec_axis = FALSE) +
+    labs_e61(title = "Y-scale testing")
+
+  # No limits, no sec_axis, no y_top
+  p8 <- p +
+    theme_e61(y_top = FALSE) +
+    scale_y_continuous_e61(sec_axis = FALSE) +
+    labs_e61(title = "Y-scale testing", y = NULL)
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test1.svg", p1)))
+    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test2.svg", p2)))
+    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test3.svg", p3)))
+    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test4.svg", p4)))
+    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test5.svg", p5)))
+    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test6.svg", p6)))
+    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test7.svg", p7)))
+    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test8.svg", p8)))
+  })
+
 })
 
 test_that("Directory existence checker", {

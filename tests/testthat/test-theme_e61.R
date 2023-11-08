@@ -49,4 +49,3 @@ test_that("square_legend_symbols is working", {
   })
 
 })
-
