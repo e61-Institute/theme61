@@ -507,9 +507,9 @@ y_title_top <- function(adj, fix_left) {
   }
 
   ret <-
-    ggplot2::theme(
-      axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 5 + fix_left, r = adj_left), vjust = 1, angle = 0),
-      axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = adj_right, r = 5), vjust = 1, angle = 0)
+    theme(
+      axis.title.y.left = element_text(margin = margin(l = 5 + fix_left, r = adj_left), vjust = 1, angle = 0),
+      axis.title.y.right = element_text(margin = margin(l = adj_right, r = 5), vjust = 1, angle = 0)
     )
 
   return(ret)
