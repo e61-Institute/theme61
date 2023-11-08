@@ -176,7 +176,9 @@ save_e61 <- function(filename,
         TRUE
       } else if (
         # If y_top is not being used
-        isFALSE(attr(plots[[i]]$theme, "y_top"))
+        isTRUE(attr(plots[[i]]$theme, "no_y_top")) ||
+        (length(plots[[i]]$scales$scales) > 1 &&
+         "no_y_top" %in% class(plots[[i]]$scales$scales[[2]]))
       ) {
         TRUE
       } else {

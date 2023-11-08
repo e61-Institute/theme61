@@ -89,10 +89,14 @@ scale_y_continuous_e61 <- function(limits = NULL,
     )
   }
 
+  # Set a class if e61 scales are used
   class(retval) <- c(class(retval), "scale_e61")
 
   # Set an additional class if rescaled dual axis used
   if (isTRUE(rescale_sec)) class(retval) <- c(class(retval), "rescale_y")
+
+  # Set an additional class if no y_top requested
+  if (isFALSE(y_top)) class(retval) <- c(class(retval), "no_y_top")
 
   return(retval)
 }

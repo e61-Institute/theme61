@@ -258,7 +258,7 @@ theme_e61 <- function(y_top = TRUE,
   if (y_top) {
     ret <- ret + y_title_top(adj = adj, fix_left = fix_left)
   } else {
-    attr(ret, "y_top") <- FALSE
+    attr(ret, "no_y_top") <- TRUE
   }
 
   # Add attribute to identify it as a theme61 object
