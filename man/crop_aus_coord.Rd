@@ -20,3 +20,9 @@ in a map.
   }
 
 }
+\seealso{
+Other map functions: 
+\code{\link{add_map_e61}()},
+\code{\link{theme_e61_spatial}()}
+}
+\concept{map functions}

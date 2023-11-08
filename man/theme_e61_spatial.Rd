@@ -44,3 +44,9 @@ ggplot(data = sydney_map) +
 }
 
 }
+\seealso{
+Other map functions: 
+\code{\link{add_map_e61}()},
+\code{\link{crop_aus_coord}()}
+}
+\concept{map functions}

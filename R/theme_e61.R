@@ -282,6 +282,7 @@ theme_e61 <- function(y_top = TRUE,
 #' @return ggplot2 object
 #' @import ggplot2
 #' @export
+#' @family map functions
 #'
 #' @examples
 #'
