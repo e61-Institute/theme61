@@ -37,7 +37,7 @@ ggplot <-
 
     fill_var_name <- ggplot2::quo_name(mapping$fill)
 
-    if (is.null(data[[fill_var_name]]) && stringr::str_detect(fill_var_name, "^factor\\(")){
+    if (is.null(data[[fill_var_name]]) && stringr::str_detect(fill_var_name, "^(as\\.)?factor\\(")){
 
       fill_var_class <- "factor"
 
