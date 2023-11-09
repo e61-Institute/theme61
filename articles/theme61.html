@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,7 +39,7 @@
   <a class="nav-link" href="../articles/theme61.html">Get started</a>
 </li>
 <li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
+  <a class="nav-link" href="../reference/index.html">Function docs</a>
 </li>
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
@@ -49,7 +49,7 @@
   </div>
 </li>
 <li class="nav-item">
-  <a class="nav-link" href="../news/index.html">News</a>
+  <a class="nav-link" href="../news/index.html">Updates</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -99,15 +99,6 @@ comprehensive information on the full customisability of the
 package.</p>
 </div>
 <div class="section level2">
-<h2 id="the-colour-palette">The colour palette<a class="anchor" aria-label="anchor" href="#the-colour-palette"></a>
-</h2>
-<p>This is the e61 Institute colour palette.</p>
-<p>All the colours are package objects that can be selected by using the
-appropriate name. For example, <code>e61_tealdark3</code> selects the
-colour ‘Teal dark’ with the shade in column ‘3’.</p>
-<p><img src="../reference/figures/g-palette-colours.svg" width="60%" style="display: block; margin: auto;"></p>
-</div>
-<div class="section level2">
 <h2 id="correct-workflow">Correct workflow<a class="anchor" aria-label="anchor" href="#correct-workflow"></a>
 </h2>
 <p>When making graphs, you should follow the below workflow.</p>
@@ -133,6 +124,15 @@ do not like the automatic scaling then you can always scale your axes
 manually.</li>
 <li>Save the graph: <code><a href="../reference/save_e61.html">save_e61()</a></code>.</li>
 </ul>
+</div>
+<div class="section level2">
+<h2 id="the-colour-palette">The colour palette<a class="anchor" aria-label="anchor" href="#the-colour-palette"></a>
+</h2>
+<p>This is the e61 Institute colour palette.</p>
+<p>All the colours are package objects that can be selected by using the
+appropriate name. For example, <code>e61_tealdark3</code> selects the
+colour ‘Teal dark’ with the shade in column ‘3’.</p>
+<p><img src="../reference/figures/g-palette-colours.svg" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="graph-examples">Graph examples<a class="anchor" aria-label="anchor" href="#graph-examples"></a>
@@ -301,15 +301,23 @@ future).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">data_dual</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">`Food and Tobacco`</span><span class="op">)</span>, colour <span class="op">=</span> <span class="fu"><a href="../reference/palette_e61.html">palette_e61</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="co"># All the action is in the next two lines</span></span>
+<span>  <span class="co"># All the action is in the next 5 lines</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="../reference/dual_y_axis.html">sec_rescale_inv</a></span><span class="op">(</span><span class="va">`Personal Care`</span>, scale <span class="op">=</span> <span class="fl">0.1</span>, shift <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>            colour <span class="op">=</span> <span class="fu"><a href="../reference/palette_e61.html">palette_e61</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span>, <span class="fl">25</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"$b"</span>,</span>
-<span>                         sec_axis <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html" class="external-link">sec_axis</a></span><span class="op">(</span><span class="op">~</span><span class="fu"><a href="../reference/dual_y_axis.html">sec_rescale</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"$b"</span><span class="op">)</span>, </span>
+<span>                         <span class="co"># Usually you don't need to supply scale and shift again but to get the vignette to run you do here</span></span>
+<span>                         sec_axis <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html" class="external-link">sec_axis</a></span><span class="op">(</span><span class="op">~</span><span class="fu"><a href="../reference/dual_y_axis.html">sec_rescale</a></span><span class="op">(</span><span class="va">.</span>, scale <span class="op">=</span> <span class="fl">0.1</span>, shift <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"$b"</span><span class="op">)</span>, </span>
 <span>                         rescale_sec <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/plot_label.html">plot_label</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Food and Tobacco\n(LHS)"</span>, <span class="st">"Personal Care\n(RHS)"</span><span class="op">)</span>,</span>
 <span>              <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1945</span>, <span class="fl">1948</span><span class="op">)</span>,</span>
-<span>              <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">75</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>              <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">75</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="st">"US Personal Expenditures*"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"1940-1960"</span>,</span>
+<span>    footnotes <span class="op">=</span> <span class="st">"Data comes from the built-in USPersonalExpenditure dataset."</span>,</span>
+<span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span>, <span class="st">"'datasets' package"</span><span class="op">)</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"$b"</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="../reference/figures/g-dual.svg" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">

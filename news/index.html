@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,7 +22,7 @@
   <a class="nav-link" href="../articles/theme61.html">Get started</a>
 </li>
 <li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
+  <a class="nav-link" href="../reference/index.html">Function docs</a>
 </li>
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
@@ -32,7 +32,7 @@
   </div>
 </li>
 <li class="active nav-item">
-  <a class="nav-link" href="../news/index.html">News</a>
+  <a class="nav-link" href="../news/index.html">Updates</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
@@ -54,6 +54,17 @@
       <small>Source: <a href="https://github.com/e61-institute/theme61/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.1" id="theme61-061">theme61 0.6.1<a class="anchor" aria-label="anchor" href="#theme61-061"></a></h2>
+<p>09 Nov 2023</p>
+<ul><li>Graphs will automatically appear in the Viewer pane when you save them with <code><a href="../reference/save_e61.html">save_e61()</a></code>.</li>
+<li>For users of base maps, there is now a new function <code><a href="../reference/setup_stadia_maps.html">setup_stadia_maps()</a></code> to help you register an API key with Stadia Maps.</li>
+<li>Fixed changes to base maps that meant <code>e61_map()</code> no longer worked and renamed the function to <code><a href="../reference/add_map_e61.html">add_map_e61()</a></code>.</li>
+<li>
+<code>as.factor</code> no longer breaks variable detection in <code><a href="../reference/scale_e61.html">scale_colour_e61()</a></code>.</li>
+<li>Fixed various issues with y-axis labels and scales.</li>
+<li>Workaround for a 401 Authentication error when loading the package.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.0" id="theme61-060">theme61 0.6.0<a class="anchor" aria-label="anchor" href="#theme61-060"></a></h2>
 <p>06 Nov 2023</p>
@@ -89,7 +100,7 @@
 <p>26 May 2023</p>
 <div class="section level5">
 <h5 id="new-functions-0-5-0">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-5-0"></a></h5>
-<ul><li>Added new functions <code><a href="../reference/set_open_graph.html">set_open_graph()</a></code> and <code><a href="../reference/set_open_graph.html">unset_open_graph()</a></code> which toggle an option to automatically open a graph that has been created with <code><a href="../reference/save_e61.html">save_e61()</a></code>. Helpful for your workflow when perfecting graphs.</li>
+<ul><li>Added new functions <code>set_open_graph()</code> and <code><a href="../reference/open_graph_browser.html">unset_open_graph()</a></code> which toggle an option to automatically open a graph that has been created with <code><a href="../reference/save_e61.html">save_e61()</a></code>. Helpful for your workflow when perfecting graphs.</li>
 </ul></div>
 <div class="section level5">
 <h5 id="newchanged-functionality-0-5-0">New/changed functionality<a class="anchor" aria-label="anchor" href="#newchanged-functionality-0-5-0"></a></h5>
@@ -163,7 +174,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="theme61-020">theme61 0.2.0<a class="anchor" aria-label="anchor" href="#theme61-020"></a></h2>
 <p>14 Dec 2022</p>
-<ul><li>Adds a base map function <code><a href="../reference/e61_map.html">e61_map()</a></code> with sensible defaults for mapping.</li>
+<ul><li>Adds a base map function <code>e61_map()</code> with sensible defaults for mapping.</li>
 <li>Improvements to the automatic discrete colour palette selection.</li>
 <li>Changes to the theme to fix graphs at a 0.75 aspect ratio.</li>
 <li>Added an alternate minimal theme called <code>theme_e61_clean()</code>.</li>

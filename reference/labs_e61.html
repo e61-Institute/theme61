@@ -12,7 +12,7 @@ adjustment needed."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,7 +24,7 @@ adjustment needed."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
   <a class="nav-link" href="../articles/theme61.html">Get started</a>
 </li>
 <li class="active nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
+  <a class="nav-link" href="../reference/index.html">Function docs</a>
 </li>
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
@@ -34,7 +34,7 @@ adjustment needed."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
   </div>
 </li>
 <li class="nav-item">
-  <a class="nav-link" href="../news/index.html">News</a>
+  <a class="nav-link" href="../news/index.html">Updates</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
@@ -74,6 +74,9 @@ adjustment needed.</p>
 <span>  footnote_wrap <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/waiver.html" class="external-link">waiver</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  title_max_char <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  subtitle_max_char <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  footnote_max_char <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -112,6 +115,10 @@ dimensions in <a href="save_e61.html">save_e61</a>.</p></dd>
 is blank (NULL) by default.</p></dd>
 
 
+<dt>title_max_char, subtitle_max_char, footnote_max_char</dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> No longer supported; use <code>title_wrap</code>, <code>subtitle_wrap</code> or <code>footnote_wrap</code> instead.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional optional arguments passed to <a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a>.</p></dd>
 
@@ -123,12 +130,12 @@ formatting features of this function.</p>
 <p>The arguments in the function allow you to make changes to the text
 formatting if required.</p>
 <p>The primary purpose of this function is to correctly format footer
-  text without requiring the user to guess where to put manual line breaks
-  for long footnotes or put in "Sources:" themselves. It does this by
-  transforming the <code>footnotes</code> and <code>sources</code> arguments into nicely
-  formatted text that goes into the <code>caption</code> argument in ggplot2's
-  <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs()</a></code> function. Thus, if you are using <code>footnotes</code> or
-  <code>sources</code>, do not supply a <code>caption</code> argument as well.</p>
+text without requiring the user to guess where to put manual line breaks
+for long footnotes or put in "Sources:" themselves. It does this by
+transforming the <code>footnotes</code> and <code>sources</code> arguments into nicely
+formatted text that goes into the <code>caption</code> argument in ggplot2's
+<code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs()</a></code> function. Thus, if you are using <code>footnotes</code> or
+<code>sources</code>, do not supply a <code>caption</code> argument as well.</p>
     </div>
 
     <div class="section level2">

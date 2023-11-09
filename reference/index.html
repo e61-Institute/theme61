@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,7 +22,7 @@
   <a class="nav-link" href="../articles/theme61.html">Get started</a>
 </li>
 <li class="active nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
+  <a class="nav-link" href="../reference/index.html">Function docs</a>
 </li>
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
@@ -32,7 +32,7 @@
   </div>
 </li>
 <li class="nav-item">
-  <a class="nav-link" href="../news/index.html">News</a>
+  <a class="nav-link" href="../news/index.html">Updates</a>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
@@ -81,7 +81,7 @@
         <dd>Add graph titles and footers in the e61 style</dd>
       </dl><dl><dt>
           
-          <code><a href="plot_label.html">plot_label()</a></code> <code><a href="plot_label.html">plab()</a></code> <code><a href="plot_label.html">mplab()</a></code> 
+          <code><a href="plot_label.html">plot_label()</a></code> <code><a href="plot_label.html">plab()</a></code> 
         </dt>
         <dd>Add on-graph labels to graphs</dd>
       </dl></div><div class="section level2">
@@ -104,7 +104,7 @@
           
           <code><a href="save_e61.html">save_e61()</a></code> 
         </dt>
-        <dd>Saves ggplot graphs with sensible defaults</dd>
+        <dd>Save graphs with theme61 styles and defaults</dd>
       </dl><dl><dt>
           
           <code><a href="square_legend_symbols.html">square_legend_symbols()</a></code> 
@@ -158,6 +158,37 @@ graphing</dd>
         </dt>
         <dd>Dual y-axis graphing functions</dd>
       </dl></div><div class="section level2">
+      <h2 id="maps">Maps<a class="anchor" aria-label="anchor" href="#maps"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="add_map_e61.html">add_map_e61()</a></code> 
+        </dt>
+        <dd>Add an underlying base map to ggplot maps</dd>
+      </dl><dl><dt>
+          
+          <code><a href="crop_aus_coord.html">crop_aus_coord()</a></code> 
+        </dt>
+        <dd>Crops maps of Australia to exclude outlying territories</dd>
+      </dl><dl><dt>
+          
+          <code><a href="setup_stadia_maps.html">setup_stadia_maps()</a></code> 
+        </dt>
+        <dd>Setup Stadia Maps API</dd>
+      </dl><dl><dt>
+          
+          <code><a href="theme_e61_spatial.html">theme_e61_spatial()</a></code> 
+        </dt>
+        <dd>e61 themed spatial maps options</dd>
+      </dl></div><div class="section level2">
       <h2 id="miscellaneous">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous"></a></h2>
       
       
@@ -170,24 +201,14 @@ graphing</dd>
 
       <dl><dt>
           
-          <code><a href="crop_aus_coord.html">crop_aus_coord()</a></code> 
-        </dt>
-        <dd>Crops maps of Australia to exclude outlying territories</dd>
-      </dl><dl><dt>
-          
           <code><a href="e61_chart_maker.html">e61_chart_maker()</a></code> 
         </dt>
         <dd>An add-in to easily create plots with ggplot2</dd>
       </dl><dl><dt>
           
-          <code><a href="e61_map.html">e61_map()</a></code> 
+          <code><a href="open_graph_browser.html">set_open_graph_browser()</a></code> <code><a href="open_graph_browser.html">unset_open_graph()</a></code> 
         </dt>
-        <dd>Wrapper function for ggmap to produce a map layer in e61 format</dd>
-      </dl><dl><dt>
-          
-          <code><a href="set_open_graph.html">set_open_graph()</a></code> <code><a href="set_open_graph.html">unset_open_graph()</a></code> 
-        </dt>
-        <dd>Set option to automatically open files created by <code>save_e61</code></dd>
+        <dd>Set option to open graphs in the browser instead of the Viewer pane</dd>
       </dl></div><div class="section level2">
       <h2 id="colours">Colours<a class="anchor" aria-label="anchor" href="#colours"></a></h2>
       
