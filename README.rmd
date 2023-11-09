@@ -42,4 +42,4 @@ The [package website](https://e61-institute.github.io/theme61/) contains a lot o
 
 Start by reading the [Get started](articles/theme61.html) article.
 
-There is also a wealth of information contained in the individual function documentation that answers common usage questions.
+There is also a wealth of information contained in the individual [function documentation](reference/index.html) that answers common usage questions.
