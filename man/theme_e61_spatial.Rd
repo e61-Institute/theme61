@@ -28,7 +28,7 @@ ggplot2 object
 \description{
 Applies the e61 theme to ggplot spatial maps to adjust graph appearance. If
 you are looking to change the appearance of titles or labels, check the
-arguments in \code{\link[theme61]{labs_e61}}, which are probably what you are
+arguments in \code{\link[=labs_e61]{labs_e61()}}, which are probably what you are
 looking for.
 }
 \examples{
@@ -44,3 +44,10 @@ ggplot(data = sydney_map) +
 }
 
 }
+\seealso{
+Other map functions: 
+\code{\link{add_map_e61}()},
+\code{\link{crop_aus_coord}()},
+\code{\link{setup_stadia_maps}()}
+}
+\concept{map functions}

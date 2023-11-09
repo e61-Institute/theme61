@@ -9,7 +9,7 @@ crop_aus_coord()
 \description{
 The ABS default shapefiles for Australia include outlying islands that are
 of limited interest in any maps we produce. This function provides sensible
-co-ordinates via \code{\link[ggplot2]{coord_sf}} that crops out those islands
+co-ordinates via \code{\link[ggplot2:ggsf]{ggplot2::coord_sf()}} that crops out those islands
 in a map.
 }
 \examples{
@@ -20,3 +20,10 @@ in a map.
   }
 
 }
+\seealso{
+Other map functions: 
+\code{\link{add_map_e61}()},
+\code{\link{setup_stadia_maps}()},
+\code{\link{theme_e61_spatial}()}
+}
+\concept{map functions}

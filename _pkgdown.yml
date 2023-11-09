@@ -22,12 +22,14 @@ reference:
   - starts_with("scale_")
   - starts_with("sec_rescale")
 
+- title: Maps
+  contents:
+  - has_concept("map functions")
+
 - title: Miscellaneous
   contents:
-  - crop_aus_coord
   - e61_chart_maker
-  - e61_map
-  - set_open_graph
+  - set_open_graph_browser
   - unset_open_graph
 
 - title: Colours
@@ -46,17 +48,17 @@ navbar:
       text: "Get started"
       href: articles/theme61.html
     reference:
-      text: Reference
+      text: "Function docs"
       href: reference/index.html
     articles:
-      text: Articles
+      text: "Articles"
       menu:
       - text: "Get started"
         href: articles/theme61.html
       - text: "Adding on-graph labels"
         href: articles/ongraph-labels.html
     news:
-      text: News
+      text: "Updates"
       href: news/index.html
     github:
       icon: fab fa-github fa-lg

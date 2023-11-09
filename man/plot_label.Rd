@@ -3,7 +3,6 @@
 \name{plot_label}
 \alias{plot_label}
 \alias{plab}
-\alias{mplab}
 \title{Add on-graph labels to graphs}
 \usage{
 plot_label(
@@ -27,8 +26,6 @@ plab(
   geom = c("text", "label"),
   angle = 0
 )
-
-mplab(...)
 }
 \arguments{
 \item{label}{String vector. Label text to be displayed.}
@@ -54,5 +51,5 @@ ggplot2 object
 }
 \description{
 Add text labels for lines, columns or other elements directly
-  onto the graph plot. This is preferred over using legends.
+onto the graph plot. This is preferred over using legends.
 }

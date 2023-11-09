@@ -144,8 +144,8 @@ save_single <- function(
     # update the plot_labels
     plot <- update_plot_label(plot, chart_type, base_size)
 
-    # update y-axis labels
-    plot <- update_y_axis_labels(plot)
+    # update y-axis labels - if it is a y-top label
+    if(isFALSE(attr(plot$theme, "no_y_top"))) plot <- update_y_axis_labels(plot)
   }
 
 

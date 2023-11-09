@@ -1,20 +1,19 @@
-#' Saves ggplot graphs with sensible defaults
+#' Save graphs with theme61 styles and defaults
 #'
-#' Saves ggplot2 graphs made with using theme61. Using \code{save_e61()} is
-#' required to ensure graphs are consistent with the e61 style and formatting.
+#' Saves ggplot2 graphs made with using theme61. Using `save_e61()` is required
+#' to ensure graphs are consistent with the e61 style and formatting.
 #'
 #' The supported file formats are SVG, PDF, EPS and PNG.
 #'
 #' Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 #' better as they are modern vector graphics file formats which can be scaled up
-#' and down in size without blurring or becoming pixelated.
-#'
-#' PNG should only be used for Twitter posts for compatibility reasons.
+#' and down in size without blurring or becoming pixelated. PNG should only be
+#' used for Twitter posts for compatibility reasons.
 #'
 #' @param filename File name to create on disk. Providing the file format
 #'   extension (e.g. .svg) is suggested when saving to a single file format. The
 #'   file extension must be lowercase. If you want to save to multiple formats,
-#'   do not include the extension, see the \code{format} argument for details.
+#'   do not include the extension, see the `format` argument for details.
 #' @param plot (single-panel specific) Name of the plot object to save. Defaults
 #'   to the last plot displayed so usually you do not need to provide this
 #'   argument explicitly.
@@ -30,18 +29,18 @@
 #'   used to constrain the plot resizing algorithm in cases where you want to
 #'   limit the height of your charts.
 #' @param format An optional vector of file formats to save as. For example
-#'   \code{c("svg", "pdf")} will save 2 files with the same name to the same
-#'   location to SVG and PDF formats. If the file format is specified in
-#'   \code{filename}, then this argument is ignored.
+#'   `c("svg", "pdf")` will save 2 files with the same name to the same location
+#'   to SVG and PDF formats. If the file format is specified in `filename`, then
+#'   this argument is ignored.
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
 #' @param base_size Numeric. Chart font size. Default is 10.
 #' @param res Numeric. For saving to PNG only. Increase the size of the saved
-#'   PNG. E.g. \code{res = 2} doubles the size of the saved graph.
+#'   PNG. E.g. `res = 2` doubles the size of the saved graph.
 #' @param bg_colour Sets the graph background colour. Defaults to "white".
 #'   Accepts a colour name, hex code or theme61 colour object name. For graphs
-#'   used in research note boxes, set the colour to \code{e61_boxback}.
+#'   used in research note boxes, set the colour to `e61_boxback`.
 #' @param ... (multi-panel specific) Plot objects to put on the panel.
 #' @param plotlist (multi-panel specific) List of plots to combine as an
 #'   multi-panel and save. You can also enter the charts individually as
@@ -56,6 +55,8 @@
 #' @param rel_heights (multi-panel specific) A numeric vector giving the
 #'   relative proportions of each graph component (title, plots, footer
 #'   (optional)).
+#' @param width,height `r lifecycle::badge("deprecated")` width and height are
+#'   no longer supported; use `dim` instead.
 #' @inheritParams labs_e61
 #' @inheritParams cowplot::plot_grid
 #' @return Invisibly returns the file name.
@@ -85,7 +86,21 @@ save_e61 <- function(filename,
                      nrow = NULL,
                      align = c("v", "none", "h", "hv"),
                      axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-                     rel_heights = NULL) {
+                     rel_heights = NULL,
+                     width = NULL,
+                     height = NULL) {
+
+  # Deprecation messages
+  if (!missing("width"))
+    lifecycle::deprecate_stop(when = "0.6.0",
+                              what = "save_e61(width)",
+                              details = c("!" = "It has been replaced with the `dim` argument which takes a named list like `list(width = 10, height = 10)`."))
+
+  if (!missing("height"))
+    lifecycle::deprecate_stop(when = "0.6.0",
+                              what = "save_e61(height)",
+                              details = c("!" = "It has been replaced with the `dim` argument which takes a named list like `list(width = 10, height = 10)`."))
+
 
   # Compile plots
   plots <- c(list(...), plotlist)
@@ -161,7 +176,9 @@ save_e61 <- function(filename,
         TRUE
       } else if (
         # If y_top is not being used
-        isFALSE(attr(plots[[i]]$theme, "y_top"))
+        isTRUE(attr(plots[[i]]$theme, "no_y_top")) ||
+        (length(plots[[i]]$scales$scales) > 1 &&
+         "no_y_top" %in% class(plots[[i]]$scales$scales[[2]]))
       ) {
         TRUE
       } else {
@@ -209,38 +226,21 @@ save_e61 <- function(filename,
 
   adv_msg <- c(y_miss, y_long)
 
-  # Compile and print advisory messages
+  # Compile advisory messages
   print_adv <- function() {
     cli::cli_div(theme = list(".bad" = list(color = "#cc0000",
                                             before = paste0(cli::symbol$cross, " ")),
                               ".adv" = list(`color` = "#cc0000")
     )
     )
-    cli::cli_h1("--- Fix the following issues with your graph ----------------------------------------", class = "adv")
+    cli::cli_h1("--- Your graph may have some issues to address ----------------------------------------", class = "adv")
     cli::cli_ul()
     sapply(adv_msg, cli::cli_alert, class = "bad")
     cli::cli_end()
   }
 
+  # Print advisory messages
   if (length(adv_msg) > 0 && is.null(getOption("no_advisory"))) print_adv()
-
-  # # Require user acknowledgement if there are issues to address
-  # # Turn these off in test env
-  # if (length(adv_msg) > 0 && !is_testing() && is.null(getOption("no_advisory"))) {
-  #
-  #   # Require user acknowledgement
-  #   prompt <- ""
-  #   while (prompt == "") {
-  #     prompt <- readline(prompt = "Type 'Y' to stop generating the graph or 'N' to continue.")
-  #   }
-  #
-  #   if (prompt == "Y") {
-  #     return(message("Stopping graph generation based on user request. To turn off this message for the remainder of the session, run `options(no_advisory = TRUE)`."))
-  #   } else {
-  #     message("To turn off this message for the remainder of the session, set the `no_advisory` option to TRUE.")
-  #   }
-  #
-  # }
 
   # Make graph to save --------------------------------
 
@@ -311,17 +311,27 @@ save_e61 <- function(filename,
     }
   }
 
-  # Opens the graph file if the option is set
-  if (as.logical(getOption("open_e61_graph", FALSE))) {
+  # Opens the graph file in the Viewer or browser
 
-    # Put filename back together
-    filename <- paste0(filename, ".", format[[1]])
+  # Put filename back together
+  file_to_open <- paste0(filename, ".", format[[1]])
 
-    file_to_open <- shQuote(here::here(filename))
+  if (isTRUE(getOption("open_e61_graph", FALSE))) {
+    file_to_open <- shQuote(here::here(file_to_open))
 
     out <- try(system2("open", file_to_open))
 
-    if (out != 0) warning("Graph file could not be opened.")
+    if (out != 0) warning("Graph file could not be opened")
+  } else if (interactive()) {
+    # Only run this in interactive mode
+    # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
+    temp_file <- tempfile(fileext = paste0(".", format[[1]]))
+    file.copy(file_to_open, temp_file)
+
+    out <- try(rstudioapi::viewer(temp_file))
+
+    if (!is.null(out)) warning("Graph file could not be opened.")
+
   }
 
   # Invisibly returns the filename/s
@@ -331,24 +341,22 @@ save_e61 <- function(filename,
 
 }
 
-#' Set option to automatically open files created by \code{save_e61}
+#' Set option to open graphs in the browser instead of the Viewer pane
 #'
-#' These functions set and unset a session-wide option to automatically open
-#' files created by \code{save_e61}. This is useful when you want to look at the
-#' graph you have just created, such as when you are trying to figure out label
-#' locations or graph dimensions and don't want to manually navigate to the file
-#' location every time.
+#' Previous versions of theme61 opened graphs in the browser instead of the
+#' Viewer pane. You can bring back this functionality by running this function,
+#' which sets a session-wide option.
 #'
 #' @return This function is used for its side effects.
-#' @rdname set_open_graph
+#' @rdname open_graph_browser
 #' @export
-set_open_graph <- function() {
+set_open_graph_browser <- function() {
   options(open_e61_graph = TRUE)
 
   invisible(TRUE)
 }
 
-#' @rdname set_open_graph
+#' @rdname open_graph_browser
 #' @export
 unset_open_graph <- function() {
   options(open_e61_graph = FALSE)
@@ -364,8 +372,8 @@ unset_open_graph <- function() {
 #' @param file_out File path to the PNG image to save. Default saves a file with
 #'   the same name and location (except for the file extension).
 #' @param delete Logical. Delete the original SVG file? (defaults to FALSE)
-#' @param res Numeric. Increase the dimensions of the saved PNG. E.g. \code{res
-#'   = 2} doubles the dimensions of the saved graph.
+#' @param res Numeric. Increase the dimensions of the saved PNG. E.g. `res
+#'   = 2` doubles the dimensions of the saved graph.
 #' @return Invisibly returns the file path to the PNG image
 #' @keywords internal
 #' @export
@@ -381,6 +389,8 @@ svg_to_png <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
   }
 
   if (res != 1) {
+    # This approach to rescaling starts by saving a rescaled SVG before
+    # converting it to PNG. Hence the need for temp files.
     file_temp_svg <- "intermed.svg"
     file_temp_png <- "intermed.png"
 

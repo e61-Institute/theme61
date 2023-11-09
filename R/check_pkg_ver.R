@@ -10,9 +10,15 @@
 #' @noRd
 check_pkg_ver <- function(test = FALSE) {
   # Checks Github for latest version of theme61
-  releases <- gh::gh("GET /repos/{owner}/{repo}/releases",
+  releases <- try(gh::gh("GET /repos/{owner}/{repo}/releases",
                      owner = "e61-institute",
-                     repo = "theme61")
+                     repo = "theme61",
+                     .max_wait = 5),
+                  silent = TRUE)
+
+  # Early return if there is a network error for any reason
+  if(inherits(releases, "try-error"))
+    return(cli::cli_alert_warning("R could not check if your version of theme61 is up-to-date."))
 
   latest_v <- releases[[1]][["tag_name"]]
   latest_v <- gsub("v", "", latest_v, fixed = TRUE)
@@ -26,17 +32,20 @@ check_pkg_ver <- function(test = FALSE) {
     latest_v <- "0.9.0"
   }
 
-  # Print a warning to update the package if it is out-of-date
+  # Prompts to update the package if it is out-of-date
   if (inst_v < latest_v) {
 
     resp <- ""
-    while (resp != "Ok") {
+    while (!resp %in% c("Y", "N")) {
       cli::cli_alert_warning(
-        "Your version of theme61 is out-of-date. Run `remotes::install_github('e61-institute/theme61')` to update. Type 'Ok' to continue.",
+        "Your version of theme61 is out-of-date. Enter 'Y' to update or 'N' to ignore.",
         wrap = TRUE)
 
       resp <- readline()
     }
+
+    if (resp == "Y" && !test)
+      remotes::install_github("e61-institute/theme61", dependencies = TRUE, upgrade = "always")
   }
 
   invisible(NULL)

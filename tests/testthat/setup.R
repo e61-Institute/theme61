@@ -2,3 +2,7 @@
 minimal_plot <-
   ggplot(data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y)) +
   geom_point()
+
+minimal_plot_label <-
+  ggplot(data.frame(x = c(0, 3), y = c(0, 3)), aes(x, y)) +
+  geom_point()

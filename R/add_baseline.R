@@ -1,7 +1,7 @@
 #' Adds a thin black line
 #'
 #' Adds a thin black line (by default at y = 0). This is useful shorthand for
-#' when you would otherwise have to use \code{geom_hline}, which by default adds
+#' when you would otherwise have to use `geom_hline`, which by default adds
 #' a black line that is too thick.
 #'
 #' Some examples of when you want a baseline include whenever the y-axis on your

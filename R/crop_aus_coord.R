@@ -2,10 +2,11 @@
 #'
 #' The ABS default shapefiles for Australia include outlying islands that are
 #' of limited interest in any maps we produce. This function provides sensible
-#' co-ordinates via \code{\link[ggplot2]{coord_sf}} that crops out those islands
+#' co-ordinates via [ggplot2::coord_sf()] that crops out those islands
 #' in a map.
 #'
 #' @export
+#' @family map functions
 #' @examples
 #'   \dontrun{
 #'     ggplot(strayr::read_absmap("aus2021")) +

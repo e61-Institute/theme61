@@ -1,31 +1,31 @@
 #' Dual y-axis graphing functions
 #'
-#' \code{ggplot2}, by design, makes it rather difficult to create graphs where
+#' `ggplot2`, by design, makes it rather difficult to create graphs where
 #' the primary and secondary y-axis are on different scales. Hadley Wickham
 #' claims this is to prevent people from abusing secondary y-axis to show dodgy
 #' correlations (investment banking-style). However, sometimes they have valid
 #' uses and the following functions enable this with as little fiddliness as
 #' possible.
 #'
-#' \code{sec_rescale_inv} is used in the geom that will be displayed on the
-#' secondary axis. \code{sec_rescale} is used in the \code{sec_axis} argument of
-#' \code{scale_y_continuous_e61}.
+#' `sec_rescale_inv` is used in the geom that will be displayed on the
+#' secondary axis. `sec_rescale` is used in the `sec_axis` argument of
+#' `scale_y_continuous_e61`.
 #'
 #' See the examples for how to use the two functions to manipulate the secondary
 #' axis. Trial and error will be needed to select appropriate scale and shift
 #' values.
 #'
-#' \strong{Note:} Due to the way that ggplot functions interact with the R
-#' environment, you have to run the code that generates the graph \strong{twice}
+#' **Note:** Due to the way that ggplot functions interact with the R
+#' environment, you have to run the code that generates the graph **twice**
 #' after you change it before the changes will show up.
 #'
 #' @param values Vector of data that would normally be passed as the y aesthetic
 #'   in the graph.
 #' @param scale Numeric. Multiplicative factor that rescales the axis. For
-#'   example, if the scale was originally 0 to 50, then \code{scale = 0.1} would
+#'   example, if the scale was originally 0 to 50, then `scale = 0.1` would
 #'   rescale this to 0 to 5.
 #' @param shift Numeric. Moves the axis up and down. For example, if the scale
-#'   was 0 to 5, \code{shift = 5} moves the secondary scale down by 5 units to
+#'   was 0 to 5, `shift = 5` moves the secondary scale down by 5 units to
 #'   range from -5 to 0.
 #' @rdname dual_y_axis
 #' @export

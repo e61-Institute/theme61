@@ -6,6 +6,17 @@
 
 # Defunct from v0.7 -------------------------------------------------------
 
+# Also remove a bunch of defunct function arguments in labs_e61, plot_label, save_e61 and scales
+
+#' Deprecated
+#' @export
+#' @noRd
+e61_map <- function(...) {
+  lifecycle::deprecate_soft(when = "0.6.1",
+                            what = "e61_map()",
+                            with = "add_map_e61()")
+}
+
 #' Deprecated
 #' @export
 #' @noRd
@@ -22,6 +33,17 @@ e61_palette <- function(...) {
   lifecycle::deprecate_soft(when = "0.6.0",
                             what = "e61_palette()",
                             with = "palette_e61()")
+}
+
+#' Deprecated
+#' @export
+#' @noRd
+set_open_graph <- function(...) {
+  lifecycle::deprecate_soft(when = "0.6.1",
+                            what = "set_open_graph()",
+                            with = "set_open_graph_browser()",
+                            details = "Graphs now automatically appear in the Viewer pane when saved with save_e61(), so setting the option to open in the browser is now unnecessary."
+                            )
 }
 
 # Defunct from v0.8 -----------------------------------------------------
@@ -50,7 +72,7 @@ mplot_label <- function(...) {
 mplab <- function(...) {
   lifecycle::deprecate_soft(when = "0.6.0",
                             what = "mplab()",
-                            with = "plot_label()")
+                            with = "plab()")
 }
 
 # # Keep this as an example of a defunct function

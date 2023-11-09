@@ -8,7 +8,7 @@
 #'   function, or choose one in global environment after loading.
 #' @param controls Controls menu to be displayed. Use `NULL` to hide all menus.
 #' @param viewer Where to display the gadget: "dialog", "pane" or
-#'   "browser" (see \code{\link[shiny]{viewer}}).
+#'   "browser" (see [shiny::viewer()]).
 #'
 #' @return You can view code used to produce the chart, copy it or
 #'   insert it in current script.
