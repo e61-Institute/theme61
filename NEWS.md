@@ -1,3 +1,14 @@
+# theme61 0.6.1
+
+09 Nov 2023
+
+* Graphs will automatically appear in the Viewer pane when you save them with `save_e61()`.
+* For users of base maps, there is now a new function `setup_stadia_maps()` to help you register an API key with Stadia Maps.
+* Fixed changes to base maps that meant `e61_map()` no longer worked and renamed the function to `add_map_e61()`.
+* `as.factor` no longer breaks variable detection in `scale_colour_e61()`.
+* Fixed various issues with y-axis labels and scales.
+* Workaround for a 401 Authentication error when loading the package.
+
 # theme61 0.6.0
 
 06 Nov 2023
