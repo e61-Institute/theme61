@@ -30,6 +30,8 @@ test_that("Graphs produced with manipulated secondary axes work", {
                            rescale_sec = TRUE) +
     labs_e61(y = "%")
 
+  save_e61(tempfile(fileext = ".svg"))
+
   # Test shift up and down
   ggplot(data.frame(x = 1, y1 = 10, y2 = 30), aes(x)) +
     geom_point(aes(y = y1), colour = "red") +
@@ -38,5 +40,7 @@ test_that("Graphs produced with manipulated secondary axes work", {
                            sec_axis = sec_axis(~sec_rescale(.), name = "%"),
                            rescale_sec = TRUE) +
     labs_e61(y = "%")
+
+  save_e61(tempfile(fileext = ".svg"))
 
 })
