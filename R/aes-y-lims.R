@@ -10,8 +10,7 @@ update_scales <- function(plot, auto_scale){
   # check if no y-axis label was set in theme_e61
   no_y_top <- isTRUE(attr(plot$theme, "no_y_top"))
 
-  if (no_y_top) cli::cli_alert_info("Moving y-axis label back to the side of the graph.",
-                                    class = "message")
+  if (no_y_top) cli::cli_alert_info("Moving y-axis label back to the side of the graph.")
 
   # if we don't have a numeric y-variable then check whether the plot contains geom_density or geom_histogram (GeomBar without a y-variable)
   if (!check_y_var) {
