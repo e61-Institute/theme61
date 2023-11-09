@@ -48,17 +48,17 @@ navbar:
       text: "Get started"
       href: articles/theme61.html
     reference:
-      text: Reference
+      text: "Function docs"
       href: reference/index.html
     articles:
-      text: Articles
+      text: "Articles"
       menu:
       - text: "Get started"
         href: articles/theme61.html
       - text: "Adding on-graph labels"
         href: articles/ongraph-labels.html
     news:
-      text: News
+      text: "Updates"
       href: news/index.html
     github:
       icon: fab fa-github fa-lg
