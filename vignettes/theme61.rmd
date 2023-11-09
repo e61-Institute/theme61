@@ -66,17 +66,6 @@ You should read this article to help you understand how to create graphs followi
 
 This article provides some examples to help you figure out what elements you can change. The function documentation provides comprehensive information on the full customisability of the package.
 
-## The colour palette
-
-This is the e61 Institute colour palette. 
-
-All the colours are package objects that can be selected by using the appropriate name. For example, `e61_tealdark3` selects the colour 'Teal dark' with the shade in column '3'.
-
-```{r theme61-colours, echo = FALSE}
-source("colour-palette.R")
-knitr::include_graphics(here::here("man/figures/g-palette-colours.svg"))
-```
-
 ## Correct workflow
 
 When making graphs, you should follow the below workflow. 
@@ -90,6 +79,17 @@ Start by creating a graph using the 'normal' stuff: `ggplot(data, aes(x, y)) + g
 - (optional) Use `theme_e61()` if you want to add a legend, or change its position. Other aspects of `theme_e61()` are now added by default. 
 - (optional) Format the x and y axes scales: `scale_y_continuous_e61()`, `scale_x_continuous_e61()`. Your y-axis will be automatically scaled when you save your chart using `save_e61()` but if you do not like the automatic scaling then you can always scale your axes manually.
 - Save the graph: `save_e61()`.
+
+## The colour palette
+
+This is the e61 Institute colour palette. 
+
+All the colours are package objects that can be selected by using the appropriate name. For example, `e61_tealdark3` selects the colour 'Teal dark' with the shade in column '3'.
+
+```{r theme61-colours, echo = FALSE}
+source("colour-palette.R")
+knitr::include_graphics(here::here("man/figures/g-palette-colours.svg"))
+```
 
 ## Graph examples
 
