@@ -155,9 +155,9 @@ update_chart_scales <- function(plot, auto_scale, sec_axis, no_y_top){
     } else if (!no_y_top && sec_axis) {
       plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis())
     } else if (no_y_top && !sec_axis) {
-      plot <- plot + scale_y_continuous_e61(limits = lims, y_top = FALSE)
+      plot <- plot + scale_y_continuous_e61(limits = lims, y_top = FALSE, sec_axis = FALSE)
     } else if (!no_y_top && !sec_axis) {
-      plot <- plot + scale_y_continuous_e61(limits = lims)
+      plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE)
     }
   })
 

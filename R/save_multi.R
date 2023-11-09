@@ -167,8 +167,11 @@ save_multi <-
 
         temp_plot <- clean_plotlist[[i]]
 
-        # update y-axis labels
-        suppressMessages({temp_plot <- update_y_axis_labels(temp_plot, max_break_width, y_lab_max_size)})
+        # update y-axis labels - if the y-axis labels are set to the top
+        suppressMessages({
+          if(isFALSE(attr(temp_plot$theme, "no_y_top")))
+            temp_plot <- update_y_axis_labels(temp_plot, max_break_width, y_lab_max_size)
+        })
 
         # update labels - for each set the limit as width - knowwidth (axis labels etc.) divided by the number of columns we have
         temp_plot <- update_labs(temp_plot, panel_width)

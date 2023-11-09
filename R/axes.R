@@ -96,7 +96,8 @@ scale_y_continuous_e61 <- function(limits = NULL,
   if (isTRUE(rescale_sec)) class(retval) <- c(class(retval), "rescale_y")
 
   # Set an additional class if no y_top requested
-  if (isFALSE(y_top)) class(retval) <- c(class(retval), "no_y_top")
+  if (isFALSE(y_top))
+    class(retval) <- c(class(retval), "no_y_top")
 
   return(retval)
 }

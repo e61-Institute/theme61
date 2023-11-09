@@ -242,7 +242,6 @@ theme_e61 <- function(y_top = TRUE,
       theme(panel.border = element_blank())
   }
 
-
   # Adds a grey background option
   if (background == "grey" |  background == "box") {
     ret <- ret + theme(rect = element_rect(fill = e61_greylight6))
@@ -257,6 +256,9 @@ theme_e61 <- function(y_top = TRUE,
   # Moves y-axis title to the top
   if (y_top) {
     ret <- ret + y_title_top(adj = adj, fix_left = fix_left)
+
+    attr(ret, "no_y_top") <- FALSE
+
   } else {
     attr(ret, "no_y_top") <- TRUE
   }
