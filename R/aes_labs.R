@@ -106,6 +106,7 @@ update_labs <- function(plot, plot_width){
 #' text_type - Is the text for a title, subtitle or caption (footnotes and sources)
 #' font_size - Numeric. Size of the font of the text.
 #' plot_width - Numeric. Width of the plot.
+#' @importFrom dplyr `%>%`
 #' @noRd
 rescale_text <- function(text, text_type, font_size, plot_width){
 
