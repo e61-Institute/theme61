@@ -149,17 +149,19 @@ update_chart_scales <- function(plot, auto_scale, sec_axis, no_y_top){
   # rescale the axis and apply requested customisations
   lims <- if (exists("aes_lims")) aes_lims else y_scale_lims
 
-  suppressWarnings({
-    if (no_y_top && sec_axis) {
-      plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), y_top = FALSE)
-    } else if (!no_y_top && sec_axis) {
-      plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis())
-    } else if (no_y_top && !sec_axis) {
-      plot <- plot + scale_y_continuous_e61(limits = lims, y_top = FALSE, sec_axis = FALSE)
-    } else if (!no_y_top && !sec_axis) {
-      plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE)
-    }
-  })
+  if(auto_scale && length(y_scale_lims) < 3){
+    suppressWarnings({
+      if (no_y_top && sec_axis) {
+        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), y_top = FALSE)
+      } else if (!no_y_top && sec_axis) {
+        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis())
+      } else if (no_y_top && !sec_axis) {
+        plot <- plot + scale_y_continuous_e61(limits = lims, y_top = FALSE, sec_axis = FALSE)
+      } else if (!no_y_top && !sec_axis) {
+        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE)
+      }
+    })
+  }
 
   return(plot)
 }
