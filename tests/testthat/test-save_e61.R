@@ -412,7 +412,8 @@ test_that("Single-panel graph examples", {
   data <- data.frame(x = rnorm(1000))
 
   p <- ggplot(data, aes(x)) +
-    geom_histogram(bins = 20)
+    geom_histogram(bins = 20) +
+    scale_y_continuous_e61()
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-hist.svg", p)))
@@ -421,7 +422,8 @@ test_that("Single-panel graph examples", {
   ## geom_density graph ----
   p <- ggplot(data, aes(x)) +
     geom_density() +
-    labs_e61(y = "dens")
+    labs_e61(y = "dens") +
+    scale_y_continuous_e61()
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-single-cont-dens.svg", p)))
