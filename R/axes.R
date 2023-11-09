@@ -85,6 +85,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
   } else {
     retval <- ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
+      sec.axis = sec_axis,
       ...
     )
   }

@@ -17,7 +17,14 @@ ggplot <-
     y_var_class <- class(data[[y_var_name]])
 
     if (any(y_var_class %in% c("numeric", "integer"))) {
-      p <- p + scale_y_continuous_e61(y_top = T)
+
+      if(max(data[[y_var_name]]) == min(data[[y_var_name]])){
+
+        p <- p + scale_y_continuous_e61(y_top = T, expand_bottom = 0.15, expand_top = 0.15)
+
+      } else {
+        p <- p + scale_y_continuous_e61(y_top = T)
+      }
     }
   }
 
