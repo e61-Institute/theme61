@@ -271,7 +271,7 @@ assign("sec_axis_shift", 0, envir = t61_env)
 ```{r}
 g <- ggplot(data_dual, aes(x = year)) + 
   geom_line(aes(y = `Food and Tobacco`), colour = palette_e61(2)[[1]]) +
-  # All the action is in the next two lines
+  # All the action is in the next 5 lines
   geom_line(aes(y = sec_rescale_inv(`Personal Care`, scale = 0.1, shift = 0)), 
             colour = palette_e61(2)[[2]]) +
   scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b",
@@ -279,7 +279,15 @@ g <- ggplot(data_dual, aes(x = year)) +
                          rescale_sec = TRUE) +
   plot_label(c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
               c(1945, 1948),
-              c(75, 40))
+              c(75, 40)) +
+  labs_e61(
+    title = "US Personal Expenditures*",
+    subtitle = "1940-1960",
+    footnotes = "Data comes from the built-in USPersonalExpenditure dataset.",
+    sources = c("e61 Institute", "'datasets' package"),
+    y = "$b"
+  )
+
 ```
 
 ```{r, echo=FALSE}
