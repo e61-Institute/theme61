@@ -77,6 +77,7 @@ test_that("Y-axis label messages", {
     theme_e61(y_top = FALSE)
 
   suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p),
+                                     message = ".*missing a y-axis label.*",
                                      class = "cliMessage"),
                    classes = c("messages", "warning"))
 
@@ -109,13 +110,13 @@ test_that("Y-axis customisation options", {
   # Limits, sec_axis, no y_top
   p2 <- p +
     theme_e61(y_top = FALSE) +
-    scale_y_continuous_e61(limits = c(0, 1.5, 0.5)) +
+    scale_y_continuous_e61(limits = c(0, 1.5, 0.5), y_top = FALSE) +
     labs_e61(title = "Y-scale testing", y = NULL)
 
   # Limits, no sec_axis, no y_top
   p3 <- p +
     theme_e61(y_top = FALSE) +
-    scale_y_continuous_e61(limits = c(0, 1.5, 0.5), sec_axis = FALSE) +
+    scale_y_continuous_e61(limits = c(0, 1.5, 0.5), sec_axis = FALSE, y_top = FALSE) +
     labs_e61(title = "Y-scale testing", y = NULL)
 
   # Limits, no sec_axis, y_top
