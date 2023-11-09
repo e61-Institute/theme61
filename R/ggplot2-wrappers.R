@@ -17,7 +17,14 @@ ggplot <-
     y_var_class <- class(data[[y_var_name]])
 
     if (any(y_var_class %in% c("numeric", "integer"))) {
-      p <- p + scale_y_continuous_e61(y_top = T)
+
+      if(max(data[[y_var_name]]) == min(data[[y_var_name]])){
+
+        p <- p + scale_y_continuous_e61(y_top = T, expand_bottom = 0.15, expand_top = 0.15)
+
+      } else {
+        p <- p + scale_y_continuous_e61(y_top = T)
+      }
     }
   }
 
@@ -37,7 +44,7 @@ ggplot <-
 
     fill_var_name <- ggplot2::quo_name(mapping$fill)
 
-    if (is.null(data[[fill_var_name]]) && stringr::str_detect(fill_var_name, "^factor\\(")){
+    if (is.null(data[[fill_var_name]]) && stringr::str_detect(fill_var_name, "^(as\\.)?factor\\(")){
 
       fill_var_class <- "factor"
 
@@ -91,7 +98,7 @@ ggsave <- function(...) {
   if (!isTRUE(getOption("quiet_wrap")))
     cli::cli_bullets(c("x" = "Your function arguments have been passed to save_e61() automatically. Please use save_e61() instead of ggsave() to ensure your graphs conform to the e61 style correctly. If you still want to use ggplot2's ggsave(), provide the namespace explicitly."))
 
-  ggplot2::ggsave(...)
+  save_e61(...)
 }
 
 #' Masks ggplot2::labs to encourage users to use labs_e61

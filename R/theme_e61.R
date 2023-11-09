@@ -242,7 +242,6 @@ theme_e61 <- function(y_top = TRUE,
       theme(panel.border = element_blank())
   }
 
-
   # Adds a grey background option
   if (background == "grey" |  background == "box") {
     ret <- ret + theme(rect = element_rect(fill = e61_greylight6))
@@ -257,8 +256,11 @@ theme_e61 <- function(y_top = TRUE,
   # Moves y-axis title to the top
   if (y_top) {
     ret <- ret + y_title_top(adj = adj, fix_left = fix_left)
+
+    attr(ret, "no_y_top") <- FALSE
+
   } else {
-    attr(ret, "y_top") <- FALSE
+    attr(ret, "no_y_top") <- TRUE
   }
 
   # Add attribute to identify it as a theme61 object
@@ -508,9 +510,9 @@ y_title_top <- function(adj, fix_left) {
   }
 
   ret <-
-    ggplot2::theme(
-      axis.title.y.left = ggplot2::element_text(margin = ggplot2::margin(l = 5 + fix_left, r = adj_left), vjust = 1, angle = 0),
-      axis.title.y.right = ggplot2::element_text(margin = ggplot2::margin(l = adj_right, r = 5), vjust = 1, angle = 0)
+    theme(
+      axis.title.y.left = element_text(margin = margin(l = 5 + fix_left, r = adj_left), vjust = 1, angle = 0),
+      axis.title.y.right = element_text(margin = margin(l = adj_right, r = 5), vjust = 1, angle = 0)
     )
 
   return(ret)

@@ -1,15 +1,14 @@
-#' Saves ggplot graphs with sensible defaults
+#' Save graphs with theme61 styles and defaults
 #'
-#' Saves ggplot2 graphs made with using theme61. Using `save_e61()` is
-#' required to ensure graphs are consistent with the e61 style and formatting.
+#' Saves ggplot2 graphs made with using theme61. Using `save_e61()` is required
+#' to ensure graphs are consistent with the e61 style and formatting.
 #'
 #' The supported file formats are SVG, PDF, EPS and PNG.
 #'
 #' Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 #' better as they are modern vector graphics file formats which can be scaled up
-#' and down in size without blurring or becoming pixelated.
-#'
-#' PNG should only be used for Twitter posts for compatibility reasons.
+#' and down in size without blurring or becoming pixelated. PNG should only be
+#' used for Twitter posts for compatibility reasons.
 #'
 #' @param filename File name to create on disk. Providing the file format
 #'   extension (e.g. .svg) is suggested when saving to a single file format. The
@@ -30,9 +29,9 @@
 #'   used to constrain the plot resizing algorithm in cases where you want to
 #'   limit the height of your charts.
 #' @param format An optional vector of file formats to save as. For example
-#'   `c("svg", "pdf")` will save 2 files with the same name to the same
-#'   location to SVG and PDF formats. If the file format is specified in
-#'   `filename`, then this argument is ignored.
+#'   `c("svg", "pdf")` will save 2 files with the same name to the same location
+#'   to SVG and PDF formats. If the file format is specified in `filename`, then
+#'   this argument is ignored.
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
@@ -56,7 +55,8 @@
 #' @param rel_heights (multi-panel specific) A numeric vector giving the
 #'   relative proportions of each graph component (title, plots, footer
 #'   (optional)).
-#' @param width,height `r lifecycle::badge("deprecated")` width and height are no longer supported; use `dim` instead.
+#' @param width,height `r lifecycle::badge("deprecated")` width and height are
+#'   no longer supported; use `dim` instead.
 #' @inheritParams labs_e61
 #' @inheritParams cowplot::plot_grid
 #' @return Invisibly returns the file name.
@@ -176,7 +176,9 @@ save_e61 <- function(filename,
         TRUE
       } else if (
         # If y_top is not being used
-        isFALSE(attr(plots[[i]]$theme, "y_top"))
+        isTRUE(attr(plots[[i]]$theme, "no_y_top")) ||
+        (length(plots[[i]]$scales$scales) > 1 &&
+         "no_y_top" %in% class(plots[[i]]$scales$scales[[2]]))
       ) {
         TRUE
       } else {
@@ -224,38 +226,21 @@ save_e61 <- function(filename,
 
   adv_msg <- c(y_miss, y_long)
 
-  # Compile and print advisory messages
+  # Compile advisory messages
   print_adv <- function() {
     cli::cli_div(theme = list(".bad" = list(color = "#cc0000",
                                             before = paste0(cli::symbol$cross, " ")),
                               ".adv" = list(`color` = "#cc0000")
     )
     )
-    cli::cli_h1("--- Fix the following issues with your graph ----------------------------------------", class = "adv")
+    cli::cli_h1("--- Your graph may have some issues to address ----------------------------------------", class = "adv")
     cli::cli_ul()
     sapply(adv_msg, cli::cli_alert, class = "bad")
     cli::cli_end()
   }
 
+  # Print advisory messages
   if (length(adv_msg) > 0 && is.null(getOption("no_advisory"))) print_adv()
-
-  # # Require user acknowledgement if there are issues to address
-  # # Turn these off in test env
-  # if (length(adv_msg) > 0 && !is_testing() && is.null(getOption("no_advisory"))) {
-  #
-  #   # Require user acknowledgement
-  #   prompt <- ""
-  #   while (prompt == "") {
-  #     prompt <- readline(prompt = "Type 'Y' to stop generating the graph or 'N' to continue.")
-  #   }
-  #
-  #   if (prompt == "Y") {
-  #     return(message("Stopping graph generation based on user request. To turn off this message for the remainder of the session, run `options(no_advisory = TRUE)`."))
-  #   } else {
-  #     message("To turn off this message for the remainder of the session, set the `no_advisory` option to TRUE.")
-  #   }
-  #
-  # }
 
   # Make graph to save --------------------------------
 

@@ -14,7 +14,6 @@
 #'   `stamen_toner_lite`.
 #' @return A ggmap object
 #' @export
-#' @rdname e61_map
 #' @family map functions
 #' @examples
 #'
@@ -80,7 +79,6 @@ add_map_e61 <-
 #' [https://client.stadiamaps.com/signup/].
 #'
 #' @export
-#' @rdname e61_map
 #' @family map functions
 setup_stadia_maps <- function() {
 

@@ -1,6 +1,5 @@
 test_that("Single plot label works", {
-  p1 <-
-    ggplot() +
+  p1 <- minimal_plot_label +
     plot_label(label = "Plot 1", x = 2, y = 2)
 
   withr::with_tempdir({
@@ -30,10 +29,11 @@ test_that("Specifying custom colours works in plot_label()", {
 })
 
 test_that("Text and label plot labels work", {
-  p1 <- ggplot() +
-    plot_label("label", 2, 2, geom = "label")
+  p1 <- minimal_plot_label +
+    plot_label("label", 2, 2, geom = "label") +
+    scale_y_continuous_e61()
 
-  p2 <- ggplot() +
+  p2 <- minimal_plot_label +
     plot_label("text", 2, 2, geom = "text")
 
   withr::with_tempdir({
@@ -63,7 +63,7 @@ test_that("Specifying incorrect length of label characteristics fails", {
 
 test_that("Changing horizontal alignment of text works", {
 
-  p1 <- ggplot() +
+  p1 <- minimal_plot_label +
     plot_label("Left-aligned text", 2, 2, hjust = 0) +
     plot_label("Centre-aligned text", 2, 2.1, hjust = 0.5) +
     plot_label("Right-aligned text", 2, 2.2, hjust = 1)
@@ -75,19 +75,19 @@ test_that("Changing horizontal alignment of text works", {
 
 test_that("Label rotation works", {
 
-  p1 <- ggplot() +
+  p1 <- minimal_plot_label +
     plot_label("Normal text", 2, 2, angle = 90) +
     plot_label("Vertical text", 2, 2.3, angle = 0) +
     plot_label("Diagonal text", 2, 2.15, angle = 45) +
-    ylim(2, 2.3)
+    scale_y_continuous_e61(limits = c(2, 2.4))
 
   # Test it works with plot_label too
-  p2 <- ggplot() +
+  p2 <- minimal_plot_label +
     plot_label(c("Normal text", "Vertical text", "Diagonal text"),
                 x = rep(2, 3),
                 y = c(2, 2.3, 2.15),
                 angle = c(90, 0, 45)) +
-    ylim(2, 2.3)
+    scale_y_continuous_e61(limits = c(2, 2.4))
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-label-rotate.svg", p1)))

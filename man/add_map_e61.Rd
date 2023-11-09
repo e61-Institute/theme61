@@ -2,7 +2,6 @@
 % Please edit documentation in R/e61_map.R
 \name{add_map_e61}
 \alias{add_map_e61}
-\alias{setup_stadia_maps}
 \title{Add an underlying base map to ggplot maps}
 \usage{
 add_map_e61(
@@ -10,8 +9,6 @@ add_map_e61(
   adjust = 0,
   maptype = "stamen_toner_lite"
 )
-
-setup_stadia_maps()
 }
 \arguments{
 \item{bbox}{A named vector of numeric coordinates defining the extent of your
@@ -32,14 +29,6 @@ Wrapper around \code{\link[ggmap:get_stadiamap]{ggmap::get_stadiamap()}} that ma
 map underneath a ggplot-based map. The default map type (Stamen's Toner Lite
 map) is designed to be unintrusive so the focus remains on the data being
 visualised.
-
-Using Stadia Maps (formerly Stamen Maps) tiles requires setting up a free API
-key and registering it in your R session, this helper function helps you set
-up your session accordingly.
-}
-\details{
-To get an API key, you must sign up at
-\link{https://client.stadiamaps.com/signup/}.
 }
 \examples{
 
@@ -60,10 +49,7 @@ sa3 <- dplyr::filter(strayr::read_absmap("sa32021"), gcc_code_2021 == "1GSYD") #
 \seealso{
 Other map functions: 
 \code{\link{crop_aus_coord}()},
-\code{\link{theme_e61_spatial}()}
-
-Other map functions: 
-\code{\link{crop_aus_coord}()},
+\code{\link{setup_stadia_maps}()},
 \code{\link{theme_e61_spatial}()}
 }
 \concept{map functions}
