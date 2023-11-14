@@ -156,14 +156,14 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 
     text_lengths <- lapply(footnote_text, get_text_width, font_size = font_size)
 
-    footnote_data <- data.frame(footnote_text = unlist(footnote_text), text_width = unlist(text_lengths))
+    footnote_data <- data.table::data.table(footnote_text = unlist(footnote_text), text_width = unlist(text_lengths))
 
-    footnote_data <- footnote_data %>%
-      dplyr::filter(text_width != 0) %>%
-      dplyr::mutate(footnote_text = stringr::str_replace_all(footnote_text, "[\r\n]" , " "))
+    footnote_data <- footnote_data |>
+      _[text_width != 0] |>
+      _[, footnote_text := stringr::str_replace_all(footnote_text, "[\r\n]" , " ")]
 
     # number footnotes and then split into words
-    footnote_data <- footnote_data %>% dplyr::mutate(footnote_num = dplyr::row_number())
+    footnote_data[, footnote_num := 1:.N]
 
     if(nrow(footnote_data) > 0){
 
@@ -174,20 +174,17 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 
         text_lines[[i]] <- get_lines(footnote_data$footnote_text[i], font_size, plot_width)
 
-        text_lines[[i]] <- text_lines[[i]] %>% dplyr::mutate(footnote_num = i)
+        text_lines[[i]][, footnote_num := i]
       }
 
-      text_lines <- dplyr::bind_rows(text_lines)
+      text_lines <- data.table::rbindlist(text_lines)
 
       # combine text into a caption along with the sources
-      footnote_data <- text_lines |>
-        dplyr::group_by(footnote_num) |>
-        dplyr::summarise(footnote = paste(collapsed_text, collapse = "\n"))
+      footnote_data <-
+        text_lines[, .(footnote = paste(collapsed_text, collapse = "\n")), by = footnote_num]
 
-      footnote_data <- footnote_data |>
-        dplyr::ungroup() |>
-        dplyr::mutate(footnote = paste(strrep("*", as.numeric(footnote_num)), footnote)) |>
-        dplyr::summarise(footnotes = paste(footnote, collapse = "\n"))
+      footnote_data[, footnote := paste(strrep("*", as.numeric(footnote_num)), footnote)]
+      footnote_data <- footnote_data[, .(footnotes = paste(footnote, collapse = "\n"))]
 
       footnote_text <- footnote_data$footnotes[1]
 
@@ -240,11 +237,10 @@ get_lines <- function(text, font_size, plot_width){
 
   # split text into words and calculate the length of each word
   words <- split_text_into_words(text)
-
-  words <- words %>% dplyr::mutate(word_width = get_text_width(paste0(word, " "), font_size))
+  words[, word_width := get_text_width(paste0(word, " "), font_size)]
 
   # assign words to different lines based on the cumulative length
-  words <- words %>% dplyr::mutate(cumsum_word_width = cumsum(word_width) / plot_width)
+  words[, cumsum_word_width := cumsum(word_width) / plot_width]
 
   check_lines <- T
   i <- 1
@@ -253,40 +249,32 @@ get_lines <- function(text, font_size, plot_width){
   while(check_lines){
 
     # check whether we can create a line (i.e. some words are under the limit), otherwise take the first word and try again
-    temp_line <- words %>% dplyr::filter(cumsum_word_width <= 1)
+    temp_line <- words[cumsum_word_width <= 1]
 
     if(nrow(temp_line) == 0){
 
-      text_lines[[i]] <- words |>
-        dplyr::ungroup() |>
-        dplyr::filter(dplyr::row_number() == 1) |>
-        dplyr::mutate(line = i)
+      text_lines[[i]] <- words[1][, line := i]
 
-      words <- words |>
-        dplyr::ungroup() |>
-        dplyr::filter(dplyr::row_number() > 1)
+      words <- words[-1]
 
     } else {
-      text_lines[[i]] <- words %>%
-        dplyr::filter(cumsum_word_width <= 1) %>%
-        dplyr::mutate(line = i)
+      text_lines[[i]] <- words[cumsum_word_width <= 1][, line := i]
 
-      words <- words %>% dplyr::filter(cumsum_word_width > 1)
+      words <- words[cumsum_word_width > 1]
+
     }
 
-    words <- words |> dplyr::mutate(cumsum_word_width = cumsum(word_width) / plot_width)
+    words <- words[, cumsum_word_width := cumsum(word_width) / plot_width]
 
     i <- i + 1
 
     if(nrow(words) == 0) break
   }
 
-  text_lines <- text_lines |> dplyr::bind_rows()
+  text_lines <- data.table::rbindlist(text_lines)
 
   # combine lines
-  text_lines <- text_lines |>
-    dplyr::group_by(line) |>
-    dplyr::summarise(collapsed_text = paste(word, collapse = " "))
+  text_lines <- text_lines[, .(collapsed_text = paste(word, collapse = " ")), by = line]
 
   return(text_lines)
 }
@@ -329,10 +317,10 @@ split_text_into_words <- function(text) {
   # if we have been pased an empty string, return an empty string
   if(length(words) == 0){
 
-    data.frame(word = "", text = text, stringsAsFactors = FALSE)
+    data.table::data.table(word = "", text = text)
 
   } else {
-    data.frame(word = words, text = text, stringsAsFactors = FALSE)
+    data.table::data.table(word = words, text = text)
   }
 }
 
