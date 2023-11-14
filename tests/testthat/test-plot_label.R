@@ -64,9 +64,9 @@ test_that("Specifying incorrect length of label characteristics fails", {
 test_that("Changing horizontal alignment of text works", {
 
   p1 <- minimal_plot_label +
-    plot_label("Left-aligned text", 2, 2, hjust = 0) +
-    plot_label("Centre-aligned text", 2, 2.1, hjust = 0.5) +
-    plot_label("Right-aligned text", 2, 2.2, hjust = 1)
+    plot_label("Left-aligned text", 2, 1.5, hjust = 0) +
+    plot_label("Centre-aligned text", 2, 2, hjust = 0.5) +
+    plot_label("Right-aligned text", 2, 2.5, hjust = 1)
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-label-horiz-align-change.svg", p1)))
@@ -76,10 +76,10 @@ test_that("Changing horizontal alignment of text works", {
 test_that("Label rotation works", {
 
   p1 <- minimal_plot_label +
-    plot_label("Normal text", 2, 2, angle = 90) +
-    plot_label("Vertical text", 2, 2.3, angle = 0) +
-    plot_label("Diagonal text", 2, 2.15, angle = 45) +
-    scale_y_continuous_e61(limits = c(2, 2.4))
+    plot_label("Normal text", 0.5, 1.5, angle = 90) +
+    plot_label("Vertical text", 1.5, 1.5, angle = 0) +
+    plot_label("Diagonal text", 2.5, 1.5, angle = 45) +
+    scale_y_continuous_e61(limits = c(0, 3))
 
   # Test it works with plot_label too
   p2 <- minimal_plot_label +
