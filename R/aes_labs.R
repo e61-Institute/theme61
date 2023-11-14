@@ -106,7 +106,6 @@ update_labs <- function(plot, plot_width){
 #' text_type - Is the text for a title, subtitle or caption (footnotes and sources)
 #' font_size - Numeric. Size of the font of the text.
 #' plot_width - Numeric. Width of the plot.
-#' @importFrom dplyr `%>%`
 #' @noRd
 rescale_text <- function(text, text_type, font_size, plot_width){
 
@@ -119,17 +118,18 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 
     text <- get_lines(text, font_size, plot_width)
 
-    text <- text %>%
-      dplyr::summarise(text = paste(collapsed_text, collapse = "\n")) %>%
-      dplyr::pull(text)
+    text <- paste(text$collapsed_text, collapse = "\n")
 
     # make sure we don't have only one word hanging on the last line
     if(stringr::str_detect(text, "\\\n\\S+$")){
 
-      last_two_words <- stringr::str_extract(text, "\\S+\\\n\\S+$") %>% stringr::str_replace_all("\\\n", " ")
-      text <- stringr::str_remove(text, "\\S+\\\n\\S+$")
+      last_two_words <-
+        stringr::str_extract(text, "\\S+\\\n\\S+$") |>
+        stringr::str_replace_all("\\\n", " ")
 
-      text <- paste(text, "\n", last_two_words)
+      text <- text |>
+        stringr::str_remove("\\S+\\\n\\S+$") |>
+        paste("\n", last_two_words)
     }
 
   # another rule for footnotes
@@ -138,9 +138,9 @@ rescale_text <- function(text, text_type, font_size, plot_width){
     footnote_text <- stringr::str_replace_all(text, "\\\n", " ")
 
     sources <-
-      stringr::str_extract(footnote_text, "(?<=Sources{0,1}\\:).*$") %>%
-      stringr::str_split(";") %>%
-      unlist() %>%
+      stringr::str_extract(footnote_text, "(?<=Sources{0,1}\\:).*$") |>
+      stringr::str_split(";") |>
+      unlist() |>
       stringr::str_squish()
 
     # remove sources - if we have them
@@ -180,13 +180,13 @@ rescale_text <- function(text, text_type, font_size, plot_width){
       text_lines <- dplyr::bind_rows(text_lines)
 
       # combine text into a caption along with the sources
-      footnote_data <- text_lines %>%
-        dplyr::group_by(footnote_num) %>%
+      footnote_data <- text_lines |>
+        dplyr::group_by(footnote_num) |>
         dplyr::summarise(footnote = paste(collapsed_text, collapse = "\n"))
 
-      footnote_data <- footnote_data %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(footnote = paste(strrep("*", as.numeric(footnote_num)), footnote)) %>%
+      footnote_data <- footnote_data |>
+        dplyr::ungroup() |>
+        dplyr::mutate(footnote = paste(strrep("*", as.numeric(footnote_num)), footnote)) |>
         dplyr::summarise(footnotes = paste(footnote, collapse = "\n"))
 
       footnote_text <- footnote_data$footnotes[1]
@@ -257,12 +257,14 @@ get_lines <- function(text, font_size, plot_width){
 
     if(nrow(temp_line) == 0){
 
-      text_lines[[i]] <- words %>%
-        dplyr::ungroup() %>%
-        dplyr::filter(dplyr::row_number() == 1) %>%
+      text_lines[[i]] <- words |>
+        dplyr::ungroup() |>
+        dplyr::filter(dplyr::row_number() == 1) |>
         dplyr::mutate(line = i)
 
-      words <- words %>% dplyr::ungroup() %>% dplyr::filter(dplyr::row_number() > 1)
+      words <- words |>
+        dplyr::ungroup() |>
+        dplyr::filter(dplyr::row_number() > 1)
 
     } else {
       text_lines[[i]] <- words %>%
@@ -272,18 +274,18 @@ get_lines <- function(text, font_size, plot_width){
       words <- words %>% dplyr::filter(cumsum_word_width > 1)
     }
 
-    words <- words %>% dplyr::mutate(cumsum_word_width = cumsum(word_width) / plot_width)
+    words <- words |> dplyr::mutate(cumsum_word_width = cumsum(word_width) / plot_width)
 
     i <- i + 1
 
     if(nrow(words) == 0) break
   }
 
-  text_lines <- text_lines %>% dplyr::bind_rows()
+  text_lines <- text_lines |> dplyr::bind_rows()
 
   # combine lines
-  text_lines <- text_lines %>%
-    dplyr::group_by(line) %>%
+  text_lines <- text_lines |>
+    dplyr::group_by(line) |>
     dplyr::summarise(collapsed_text = paste(word, collapse = " "))
 
   return(text_lines)
@@ -317,7 +319,7 @@ get_text_height <- function(text, font_size = 10) {
   return(ret)
 }
 
-#' Split a character string into it's individual words
+#' Split a character string into its individual words
 #' text - Text to be split into individual words.
 #' @noRd
 split_text_into_words <- function(text) {
