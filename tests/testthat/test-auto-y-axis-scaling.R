@@ -35,7 +35,7 @@ test_that("Functionality in auto y-axis scaling works", {
   expect_equal(get_aes_limits(160, 740), list(150, 750, 100))
 
 
-  # Test aesthetic tic marks ----
+  # Test aesthetic tick marks ----
 
   # Test correct function
   expect_equal(get_aes_ticks(0, 50), 10)
