@@ -12,7 +12,7 @@ test_that("String dates get converted to date dates properly", {
 
   retval <- plot_label("Label", x = "2020-01-01", y = 1)
 
-  expect_equal(class(retval[[1]]$data$x), "Date")
+  expect_equal(class(retval$data$x), "Date")
 
 })
 
@@ -20,11 +20,11 @@ test_that("Specifying custom colours works in plot_label()", {
 
   # Default colours
   retval <- plot_label("Test", "2020-01-01", 1)
-  expect_equal(retval[[1]]$aes_params$colour, palette_e61(1))
+  expect_equal(retval$aes_params$colour, palette_e61(1))
 
   # Custom colours
   retval <- plot_label("Test", "2020-01-01", 1, colour = "#000000")
-  expect_equal(retval[[1]]$aes_params$colour, "#000000")
+  expect_equal(retval$aes_params$colour, "#000000")
 
 })
 
@@ -92,6 +92,48 @@ test_that("Label rotation works", {
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-label-rotate.svg", p1)))
     expect_snapshot_file(suppressWarnings(save_e61("plot-label-rotate-multi.svg", p2)))
+  })
+
+})
+
+test_that("Labels work on facets", {
+
+  data <- data.frame(
+    x = rep(c(1, 2), 2),
+    y = rep(c(1, 2), 2),
+    f_var = factor(c(1, 1, 2, 2)),
+    group = factor(c(1, 2, 1, 2))
+  )
+
+  # Place labels on 1 facet only
+  p1 <- ggplot(data, aes(x, y, colour = group)) +
+    facet_wrap(~f_var) +
+    geom_point() +
+    scale_y_continuous_e61(c(0, 3, 1)) +
+    plot_label(
+      label = c("Lab 1", "Lab 2"),
+      x = c(1.25, 1.75),
+      y = c(1, 2),
+      facet_name = "f_var",
+      facet_value = "1"
+    )
+
+  # Place 1 labels on 1 facet and the other label on the other
+  p2 <- ggplot(data, aes(x, y, colour = group)) +
+    facet_wrap(~f_var) +
+    geom_point() +
+    scale_y_continuous_e61(c(0, 3, 1)) +
+    plot_label(
+      label = c("Lab 1", "Lab 2"),
+      x = c(1.25, 1.75),
+      y = c(1, 2),
+      facet_name = "f_var",
+      facet_value = c("1", "2")
+    )
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("facets.svg", p1)))
+    expect_snapshot_file(suppressWarnings(save_e61("alternating-facets.svg", p2)))
   })
 
 })
