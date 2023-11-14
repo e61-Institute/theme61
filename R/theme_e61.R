@@ -282,7 +282,6 @@ theme_e61 <- function(y_top = TRUE,
 #' @param base_size Numeric. Chart font size. Default is 10.
 #' @param base_family Character. Chart font family. Default is PT Sans.
 #' @return ggplot2 object
-#' @import ggplot2
 #' @export
 #' @family map functions
 #'
@@ -444,7 +443,6 @@ square_legend_symbols <- function(size = 6) {
 #' title up, a positive value moves the title down.
 #'
 #' @return ggplot object
-#' @import ggplot2
 #' @export
 
 format_flip <- function(x_adj = 0) {
