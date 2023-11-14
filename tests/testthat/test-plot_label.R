@@ -3,7 +3,7 @@ test_that("Single plot label works", {
     plot_label(label = "Plot 1", x = 2, y = 2)
 
   withr::with_tempdir({
-    suppressWarnings(expect_snapshot_file(save_e61("plot-label-compare-plot.svg", p1)))
+    suppressWarnings(expect_snapshot_file(save_e61("compare-plot.svg", p1)))
   })
 
 })
@@ -37,8 +37,8 @@ test_that("Text and label plot labels work", {
     plot_label("text", 2, 2, geom = "text")
 
   withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("plot-label-label.svg", p1)))
-    expect_snapshot_file(suppressWarnings(save_e61("plot-label-text.svg", p2)))
+    expect_snapshot_file(suppressWarnings(save_e61("label.svg", p1)))
+    expect_snapshot_file(suppressWarnings(save_e61("text.svg", p2)))
   })
 
 })
@@ -69,7 +69,7 @@ test_that("Changing horizontal alignment of text works", {
     plot_label("Right-aligned text", 2, 2.2, hjust = 1)
 
   withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("plot-label-horiz-align-change.svg", p1)))
+    expect_snapshot_file(suppressWarnings(save_e61("horiz-align-change.svg", p1)))
   })
 })
 
@@ -90,8 +90,8 @@ test_that("Label rotation works", {
     scale_y_continuous_e61(limits = c(2, 2.4))
 
   withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("plot-label-rotate.svg", p1)))
-    expect_snapshot_file(suppressWarnings(save_e61("plot-label-rotate-multi.svg", p2)))
+    expect_snapshot_file(suppressWarnings(save_e61("rotate.svg", p1)))
+    expect_snapshot_file(suppressWarnings(save_e61("rotate-multi.svg", p2)))
   })
 
 })
