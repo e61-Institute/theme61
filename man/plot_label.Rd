@@ -13,7 +13,9 @@ plot_label(
   size = 3.5,
   hjust = 0,
   geom = c("text", "label"),
-  angle = 0
+  angle = 0,
+  facet_name = NULL,
+  facet_value = NULL
 )
 
 plab(
@@ -24,7 +26,9 @@ plab(
   size = 3.5,
   hjust = 0,
   geom = c("text", "label"),
-  angle = 0
+  angle = 0,
+  facet_name = NULL,
+  facet_value = NULL
 )
 }
 \arguments{
@@ -34,17 +38,25 @@ plab(
 
 \item{y}{Numeric or string vector. Y-axis positions of the label text.}
 
-\item{colour}{Optional vector of manually-selected colours. Default uses the
-order of colours in the e61 palette.}
+\item{colour}{(optional) Vector of colour names or strings. Default uses the
+e61 palette.}
 
-\item{size}{Integer. Size of the text, the default size should be appropriate
-in most cases.}
+\item{size}{(optional) Integer. Size of the text, the default size should be
+appropriate in most cases.}
 
-\item{hjust}{A numeric value from 0-1. Adjusts the alignment of the text. 0
-left-aligns (default), 0.5 centre-aligns and 1 right-aligns.}
+\item{hjust}{(optional) A numeric value from 0-1. Adjusts the alignment of
+the text. 0 left-aligns (default), 0.5 centre-aligns and 1 right-aligns.}
 
-\item{geom}{String. Either "text" (default) or "label". "label" adds a white
-box around the text which could be useful sometimes.}
+\item{geom}{(optional) String. Either "text" (default) or "label". "label"
+adds a white box around the text which could be useful sometimes.}
+
+\item{angle}{(optional) Numeric. Rotate the labels. Defaults to 0 which is
+normal left-to-right text.}
+
+\item{facet_name, facet_value}{(optional) String. Specify the name of the
+facetting variable in \code{facet_name} and the panel to show the labels in
+using \code{facet_value}. Defaults to NULL which shows the labels on all facets.
+You must specify both \code{facet_name} and \code{facet_value} or leave both as NULL.}
 }
 \value{
 ggplot2 object
