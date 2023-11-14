@@ -368,7 +368,6 @@ theme_e61_spatial <- function(
 #' @param base_family Character. Chart font family. Default is Arial.
 #'
 #' @return ggplot2 object
-#' @import ggplot2 ggthemes
 #' @export
 #'
 #' @examples
