@@ -656,7 +656,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
       ret_second_value <- temp_data |>
         _[, diff := aes_second - aes_second_value] |>
         _[diff >= 0] |>
-        data.table::setorder(-diff) |>
+        data.table::setorder(diff) |>
         head(1) |>
         _$aes_second
 
