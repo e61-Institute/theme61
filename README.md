@@ -29,4 +29,5 @@ a lot of information on how to use theme61.
 Start by reading the [Get started](articles/theme61.html) article.
 
 There is also a wealth of information contained in the individual
-function documentation that answers common usage questions.
+[function documentation](reference/index.html) that answers common usage
+questions.
