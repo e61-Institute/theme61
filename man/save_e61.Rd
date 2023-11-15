@@ -12,6 +12,7 @@ save_e61(
   chart_type = c("MN", "RN", "PPT"),
   auto_scale = TRUE,
   dim = list(height = NULL, width = NULL),
+  pad_width = 0,
   max_height = NULL,
   save_data = FALSE,
   base_size = 10,
@@ -60,6 +61,9 @@ is TRUE.}
 \item{dim}{An optional named list specifying the plot height and width.
 Defaults to NULL which means the graph dimensions will be set based on the
 chart type and function-calculated value.}
+
+\item{pad_width}{Add optional argument which adds padding to the width of a
+chart. The default is 0 cm.}
 
 \item{max_height}{Numeric. The maximum height of your plot in cm. This is
 used to constrain the plot resizing algorithm in cases where you want to
