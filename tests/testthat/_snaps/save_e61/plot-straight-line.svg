@@ -45,7 +45,7 @@
 <polyline points='21.33,85.31 244.99,85.31 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
 <polyline points='21.33,57.36 244.99,57.36 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
 <polyline points='21.33,29.40 244.99,29.40 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
-<polyline points='31.49,57.36 234.82,57.36 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<polyline points='31.49,57.36 234.82,57.36 ' style='stroke-width: 1.07; stroke: #008080; stroke-linecap: butt;' />
 <rect x='21.33' y='1.44' width='223.66' height='167.75' style='stroke-width: 1.50;' />
 </g>
 <g clip-path='url(#cpMC4wMHwyNjYuMzF8MC4wMHwxOTYuMzQ=)'>
