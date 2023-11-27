@@ -18,12 +18,12 @@ ggplot <-
 
     if (any(y_var_class %in% c("numeric", "integer"))) {
 
-      if(max(data[[y_var_name]]) == min(data[[y_var_name]])){
+      if(max(data[[y_var_name]], na.rm = TRUE) == min(data[[y_var_name]], na.rm = TRUE)){
 
-        p <- p + scale_y_continuous_e61(y_top = T, expand_bottom = 0.15, expand_top = 0.15)
+        p <- p + scale_y_continuous_e61(y_top = TRUE, expand_bottom = 0.15, expand_top = 0.15)
 
       } else {
-        p <- p + scale_y_continuous_e61(y_top = T)
+        p <- p + scale_y_continuous_e61(y_top = TRUE)
       }
     }
   }

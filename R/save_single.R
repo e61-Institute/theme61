@@ -10,6 +10,7 @@ save_single <- function(
     max_height, # manual control over the maximum height of the chart
     format,
     base_size,
+    pad_width,
     bg_colour
     ) {
 
@@ -193,6 +194,9 @@ save_single <- function(
       height <- max_height
     }
   }
+
+  # Add width padding
+  width <- width + pad_width
 
   # Return objects needed to save the graph ----
   retval <- list(graph = plot,
