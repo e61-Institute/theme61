@@ -8,6 +8,86 @@ test_that("Single plot label works", {
 
 })
 
+test_that("Multi-plot labels work", {
+
+  # aes - colour
+  data <- data.frame(
+    x = c(0, 1, 0, 1, 0, 1),
+    y = c(1.1, 1.1, 2.1, 2.1, 3.1, 3.1),
+    group = factor(c(1, 1, 2, 2, 3, 3))
+  )
+
+  p <- ggplot(data, aes(x, y, colour = group)) +
+    geom_line() +
+    plot_label(c("1", "2", "3"),
+               rep(0.5, 3),
+               c(1.3, 2.3, 3.3))
+
+  withr::with_tempdir({
+    suppressWarnings(expect_snapshot_file(save_e61("multi-label-plot-col.svg", p)))
+  })
+
+  # aes - fill
+  data <- data.frame(
+    x = c(0, 1, 0, 1),
+    y = c(1, 1, 2, 2),
+    group = factor(c(1, 1, 2, 2))
+  )
+
+  p <- ggplot(data, aes(x, y, fill = group)) +
+    geom_col(position = "dodge") +
+    plot_label(c("1", "2"),
+               c(0, 1),
+               c(1.2, 2.2))
+
+  withr::with_tempdir({
+    suppressWarnings(expect_snapshot_file(save_e61("multi-label-plot-fill.svg", p)))
+  })
+
+  # Works with facets too
+  data <- data.frame(
+    x = rep(c(0, 1, 0, 1, 0, 1), 2),
+    y = rep(c(1.1, 1.1, 2.1, 2.1, 3.1, 3.1), 2),
+    group = factor(rep(c(1, 1, 2, 2, 3, 3), 2)),
+    facet = c(rep("A", 6), rep("B", 6))
+  )
+
+  p <- ggplot(data, aes(x, y, colour = group)) +
+    facet_wrap(~facet) +
+    geom_line() +
+    scale_y_continuous_e61(c(1, 4, 1)) +
+    plot_label(c("1", "2", "3"),
+               rep(0.5, 3),
+               c(1.3, 2.3, 3.3),
+               facet_name = "facet", facet_value = "A")
+
+  withr::with_tempdir({
+    suppressWarnings(expect_snapshot_file(save_e61("multi-label-facet-plot.svg", p)))
+  })
+
+})
+
+test_that("Plots with additional aes still work", {
+
+  data <- data.frame(
+    x = c(0, 1, 0, 1),
+    y = c(0.5, 0.5, 1.5, 1.5),
+    linetype = factor(c(1, 1, 2, 2))
+  )
+
+  p <- ggplot(data, aes(x, y, linetype = linetype)) +
+    geom_line() +
+    scale_y_continuous_e61(c(0, 2, 1)) +
+    plot_label(c("Solid", "Dotted"),
+               c(0.25, 0.25),
+               c(0.75, 1.75))
+
+  withr::with_tempdir({
+    suppressWarnings(expect_snapshot_file(save_e61("label-with-extra-aes.svg", p)))
+  })
+
+})
+
 test_that("String dates get converted to date dates properly", {
 
   retval <- plot_label("Label", x = "2020-01-01", y = 1)
