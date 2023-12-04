@@ -48,7 +48,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
   if (!is.null(limits) && is.numeric(limits)) {
 
     if (length(limits) == 3) {
-      breaks <- seq(limits[[1]], limits[[2]], limits[[3]])
+      breaks <- round(seq(limits[[1]], limits[[2]], limits[[3]]), 10)
 
       # Hides the last break to make space for the unit label
       if (isTRUE(y_top)) breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
@@ -121,7 +121,7 @@ scale_x_continuous_e61 <- function(limits = NULL,
   if (!is.null(limits) && is.numeric(limits)) {
 
     if (length(limits) == 3) {
-      breaks <- seq(limits[[1]], limits[[2]], limits[[3]])
+      breaks <- round(seq(limits[[1]], limits[[2]], limits[[3]]), 10)
 
       # Hides the first and last break
       if (hide_first_last) {
