@@ -54,8 +54,6 @@ plot_label <-
       colour <- rep(colour, length(label))
     } else if (length(colour) != length(label)) {
       stop("The number of colours must equal the number of labels.")
-    } else if (length(colour) == length(label)) {
-      colour <- palette_e61(length(label))
     }
 
     # Set up facets
