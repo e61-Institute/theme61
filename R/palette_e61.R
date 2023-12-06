@@ -43,18 +43,18 @@ get_palette <- function(n) {
   } else if (n == 3) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
-                 e61_bluedark1)
+                 e61_orangedark1)
   } else if (n == 4) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
-                 e61_bluedark1,
-                 e61_orangedark1)
+                 e61_orangedark1,
+                 e61_maroonlight1)
   } else if (n == 5) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
-                 e61_bluedark1,
                  e61_orangelight1,
-                 e61_orangedark1)
+                 e61_orangedark1,
+                 e61_maroonlight1)
   } else if (n == 6) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
