@@ -37,7 +37,7 @@ test_that("Multi-plot labels work", {
   p <- ggplot(data, aes(x, y, fill = group)) +
     geom_col(position = "dodge") +
     plot_label(c("1", "2"),
-               c(0, 1),
+               c(-0.25, 0.25),
                c(1.2, 2.2))
 
   withr::with_tempdir({
@@ -75,7 +75,7 @@ test_that("Plots with additional aes still work", {
     linetype = factor(c(1, 1, 2, 2))
   )
 
-  p <- ggplot(data, aes(x, y, linetype = linetype)) +
+  p <- ggplot(data, aes(x, y, colour = linetype, linetype = linetype)) +
     geom_line() +
     scale_y_continuous_e61(c(0, 2, 1)) +
     plot_label(c("Solid", "Dotted"),
@@ -99,12 +99,31 @@ test_that("String dates get converted to date dates properly", {
 test_that("Specifying custom colours works in plot_label()", {
 
   # Default colours
-  retval <- plot_label("Test", "2020-01-01", 1)
+  retval <- plot_label("Test", 1, 1)
   expect_equal(retval$aes_params$colour, palette_e61(1))
 
   # Custom colours
-  retval <- plot_label("Test", "2020-01-01", 1, colour = "#000000")
+  retval <- plot_label("Test", 1, 1, colour = "#000000")
   expect_equal(retval$aes_params$colour, "#000000")
+
+  retval <- plot_label(
+    c("Test 1", "Test 2"),
+    c(1, 1),
+    c(1, 2),
+    colour = c("#000000", "#cccccc"))
+  expect_equal(retval$aes_params$colour, c("#000000", "#cccccc"))
+
+  p <-
+    minimal_plot_label +
+    plot_label(
+      c("Test 1", "Test 2"),
+      c(1, 1),
+      c(1, 2),
+      colour = c("#000000", "#cccccc"))
+
+  withr::with_tempdir({
+    suppressWarnings(expect_snapshot_file(save_e61("label-cust-colours.svg", p)))
+  })
 
 })
 
@@ -155,18 +174,19 @@ test_that("Changing horizontal alignment of text works", {
 
 test_that("Label rotation works", {
 
+  # Separate plot_labels work
   p1 <- minimal_plot_label +
     plot_label("Normal text", 0.5, 1.5, angle = 90) +
     plot_label("Vertical text", 1.5, 1.5, angle = 0) +
     plot_label("Diagonal text", 2.5, 1.5, angle = 45) +
     scale_y_continuous_e61(limits = c(0, 3))
 
-  # Test it works with plot_label too
+  # plot_label with multiple angles works
   p2 <- minimal_plot_label +
     plot_label(c("Normal text", "Vertical text", "Diagonal text"),
                 x = rep(2, 3),
-                y = c(2, 2.3, 2.15),
-                angle = c(90, 0, 45)) +
+                y = c(2.1, 2.3, 2.15),
+                angle = c(0, 90, 45)) +
     scale_y_continuous_e61(limits = c(2, 2.4))
 
   withr::with_tempdir({
