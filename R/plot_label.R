@@ -97,13 +97,15 @@ plot_label <-
       retval <- geom_text(
         data = plot_lab_data,
         mapping = aes(x, y, label = label),
-        colour = colour, size = size, hjust = hjust, angle = angle
+        colour = colour, size = size, hjust = hjust, angle = angle,
+        inherit.aes = FALSE
       )
     } else if (geom == "label") {
       retval <- geom_label(
         data = plot_lab_data,
         mapping = aes(x, y, label = label),
-        colour = colour, size = size, hjust = hjust, angle = angle
+        colour = colour, size = size, hjust = hjust, angle = angle,
+        inherit.aes = FALSE
       )
     }
 
