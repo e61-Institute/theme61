@@ -13,125 +13,125 @@
 
 #' Hex code for the colour: e61 Blue Dark
 #'
-#' #003039
+#' #10485E
 #'
 'e61_bluedark'
 
 #' Hex code for the colour: e61 Blue Dark 1
 #'
-#' #003039
+#' #10485E
 #'
 'e61_bluedark1'
 
 
 #' Hex code for the colour: e61 Blue Dark 2
 #'
-#' #204a52
+#' #2B5C6F
 #'
 'e61_bluedark2'
 
 
 #' Hex code for the colour: e61 Blue Dark 3
 #'
-#' #40646b
+#' #467081
 #'
 'e61_bluedark3'
 
 
 #' Hex code for the colour: e61 Blue Dark 4
 #'
-#' #607e83
+#' #618492
 #'
 'e61_bluedark4'
 
 
 #' Hex code for the colour: e61 Blue Dark 5
 #'
-#' #80979c
+#' #7D99A3
 #'
 'e61_bluedark5'
 
 
 #' Hex code for the colour: e61 Blue Dark 6
 #'
-#' #9fb1b5
+#' #98ADB5
 #'
 'e61_bluedark6'
 
 
 #' Hex code for the colour: e61 Blue Dark 7
 #'
-#' #bfcbce
+#' #B3C1C7
 #'
 'e61_bluedark7'
 
 
 #' Hex code for the colour: e61 Blue Dark 8
 #'
-#' #dfe5e6
+#' #CED5D8
 #'
 'e61_bluedark8'
 
 
 #' Hex code for the colour: e61 Blue Light
 #'
-#' #004f54
+#' #196F91
 #'
 'e61_bluelight'
 
 
 #' Hex code for the colour: e61 Blue Light 1
 #'
-#' #004f54
+#' #196F91
 #'
 'e61_bluelight1'
 
 
 #' Hex code for the colour: e61 Blue Light 2
 #'
-#' #206569
+#' #337E9C
 #'
 'e61_bluelight2'
 
 
 #' Hex code for the colour: e61 Blue Light 3
 #'
-#' #407b7f
+#' #4D8DA7
 #'
 'e61_bluelight3'
 
 
 #' Hex code for the colour: e61 Blue Light 4
 #'
-#' #609194
+#' #679DB2
 #'
 'e61_bluelight4'
 
 
 #' Hex code for the colour: e61 Blue Light 5
 #'
-#' #80a7aa
+#' #81ACBD
 #'
 'e61_bluelight5'
 
 
 #' Hex code for the colour: e61 Blue Light 6
 #'
-#' #9fbdbf
+#' #9BBBC8
 #'
 'e61_bluelight6'
 
 
 #' Hex code for the colour: e61 Blue Light 7
 #'
-#' #bfd3d4
+#' #B5CBD3
 #'
 'e61_bluelight7'
 
 
 #' Hex code for the colour: e61 Blue Light 8
 #'
-#' #dfe9ea
+#' #CFDADE
 #'
 'e61_bluelight8'
 
@@ -390,126 +390,126 @@
 
 #' Hex code for the colour: e61 Orange Light
 #'
-#' #ffa557
+#' #FFC537
 #'
 'e61_orangelight'
 
 
 #' Hex code for the colour: e61 Orange Light 1
 #'
-#' #ffa557
+#' #FFC537
 #'
 'e61_orangelight1'
 
 
 #' Hex code for the colour: e61 Orange Light 2
 #'
-#' #ffb06c
+#' #FCC94D
 #'
 'e61_orangelight2'
 
 
 #' Hex code for the colour: e61 Orange Light 3
 #'
-#' #ffbb81
+#' #F9CE63
 #'
 'e61_orangelight3'
 
 
 #' Hex code for the colour: e61 Orange Light 4
 #'
-#' #ffc796
+#' #F7D27A
 #'
 'e61_orangelight4'
 
 
 #' Hex code for the colour: e61 Orange Light 5
 #'
-#' #ffd2ab
+#' #F4D790
 #'
 'e61_orangelight5'
 
 
 #' Hex code for the colour: e61 Orange Light 6
 #'
-#' #ffddc0
+#' #F1DCA6
 #'
 'e61_orangelight6'
 
 
 #' Hex code for the colour: e61 Orange Light 7
 #'
-#' #ffe8d5
+#' #EFE0BD
 #'
 'e61_orangelight7'
 
 
 #' Hex code for the colour: e61 Orange Light 8
 #'
-#' #fff4ea
+#' #ECE5D3
 #'
 'e61_orangelight8'
 
 
 #' Hex code for the colour: e61 Orange Dark
 #'
-#' #c96b18
+#' #ED7F00
 #'
 'e61_orangedark'
 
 
 #' Hex code for the colour: e61 Orange Dark 1
 #'
-#' #c96b18
+#' #ED7F00
 #'
 'e61_orangedark1'
 
 
 #' Hex code for the colour: e61 Orange Dark 2
 #'
-#' #d07e35
+#' #EC8C1D
 #'
 'e61_orangedark2'
 
 
 #' Hex code for the colour: e61 Orange Dark 3
 #'
-#' #d79052
+#' #EC993A
 #'
 'e61_orangedark3'
 
 
 #' Hex code for the colour: e61 Orange Dark 4
 #'
-#' #dda36f
+#' #EBA757
 #'
 'e61_orangedark4'
 
 
 #' Hex code for the colour: e61 Orange Dark 5
 #'
-#' #e4b58b
+#' #EBB475
 #'
 'e61_orangedark5'
 
 
 #' Hex code for the colour: e61 Orange Dark 6
 #'
-#' #ebc7a8
+#' #EBC192
 #'
 'e61_orangedark6'
 
 
 #' Hex code for the colour: e61 Orange Dark 7
 #'
-#' #f2dac5
+#' #EACFAF
 #'
 'e61_orangedark7'
 
 
 #' Hex code for the colour: e61 Orange Dark 8
 #'
-#' #f8ece2
+#' #EADCCC
 #'
 'e61_orangedark8'
 

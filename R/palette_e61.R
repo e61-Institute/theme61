@@ -43,18 +43,18 @@ get_palette <- function(n) {
   } else if (n == 3) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
-                 e61_bluedark1)
+                 e61_orangedark1)
   } else if (n == 4) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
-                 e61_bluedark1,
-                 e61_orangedark1)
+                 e61_orangedark1,
+                 e61_maroonlight1)
   } else if (n == 5) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
-                 e61_bluedark1,
                  e61_orangelight1,
-                 e61_orangedark1)
+                 e61_orangedark1,
+                 e61_maroonlight1)
   } else if (n == 6) {
     palette <- c(e61_skylight1,
                  e61_tealdark1,
@@ -139,7 +139,6 @@ get_palette <- function(n) {
 #' @inheritDotParams grDevices::colorRampPalette
 #'
 #' @noRd
-
 e61_pal <- function(
     palette = c("light", "dark", "diverging", "grey"),
     reverse = FALSE,
@@ -152,4 +151,16 @@ e61_pal <- function(
   if (reverse) pal <- rev(pal)
 
   grDevices::colorRampPalette(pal, ...)
+}
+
+#' Generates an 8 gradient colour palette
+#'
+#' @param colour Vector of colours to generate.
+#' @param base_gradient A shade of grey that acts as the end of the gradient
+#'   ramp.
+#' @noRd
+gen_palette <- function(colour, base_gradient = "#eaeaea") {
+  lapply(colour, function(x) {
+    rev(grDevices::colorRampPalette(c(base_gradient, x))(9))[1:8]
+    })
 }

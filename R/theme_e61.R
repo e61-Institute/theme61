@@ -282,7 +282,6 @@ theme_e61 <- function(y_top = TRUE,
 #' @param base_size Numeric. Chart font size. Default is 10.
 #' @param base_family Character. Chart font family. Default is PT Sans.
 #' @return ggplot2 object
-#' @import ggplot2
 #' @export
 #' @family map functions
 #'
@@ -368,7 +367,6 @@ theme_e61_spatial <- function(
 #' @param base_family Character. Chart font family. Default is Arial.
 #'
 #' @return ggplot2 object
-#' @import ggplot2 ggthemes
 #' @export
 #'
 #' @examples
@@ -446,7 +444,6 @@ square_legend_symbols <- function(size = 6) {
 #' @param y_top Logical. Defaults to TRUE. Set to FALSE to prevent y-axis label from being positioned in-line with the axis values. Only set this if you also set `y_top = FALSE` in `theme_e61()` and `scale_y_continuous_e61()`.
 #'
 #' @return ggplot object
-#' @import ggplot2
 #' @export
 
 format_flip <- function(x_adj = 0, y_top = TRUE) {

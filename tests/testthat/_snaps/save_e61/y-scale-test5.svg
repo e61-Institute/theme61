@@ -42,8 +42,8 @@
 <polyline points='21.07,185.05 245.25,185.05 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
 <polyline points='21.07,129.00 245.25,129.00 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
 <polyline points='21.07,72.96 245.25,72.96 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
-<circle cx='31.26' cy='185.05' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
-<circle cx='235.06' cy='72.96' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
+<circle cx='31.26' cy='185.05' r='1.95' style='stroke-width: 0.71; stroke: #008080; fill: #008080;' />
+<circle cx='235.06' cy='72.96' r='1.95' style='stroke-width: 0.71; stroke: #008080; fill: #008080;' />
 <rect x='21.07' y='16.91' width='224.18' height='168.14' style='stroke-width: 1.50;' />
 </g>
 <g clip-path='url(#cpMC4wMHwyNjYuMzF8MC4wMHwyMDAuNTk=)'>

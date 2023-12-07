@@ -14,6 +14,8 @@ library(ggrepel)
 library(data.table)
 devtools::load_all()
 
+set.seed(42)
+
 knitr::opts_chunk$set(
   echo = TRUE,
   message = FALSE,
@@ -72,59 +74,57 @@ knitr::include_graphics(here::here("man/figures/label-plot-label.svg"))
 
 ```
 
-## Alternatives when things are fiddly
+## Facets
 
-There are two situations where using `plot_label()` may not work. When labeling faceted graphs or when wanting to add a lot of labels.
-
-### Facets
-
-When you have a faceted graph, `plot_label()` will not work properly. This is because the annotations will appear in the same position on all the facets and there is no way to prevent this. This is problematic because the labels are unnecessarily repeating themselves, and the correct position of the text on one facet may be different on each facet (e.g. if the height of the columns differs across facets).
-
-There is a way to get around this problem using the `data.frame` approach to labelling the graph.
-
-The `data.frame` approach uses a helper `data.frame` that contains all the information needed to plot the text and then uses `geom_text()` to add the text to the graph. 
-
-In addition to the label text, x and y positions, you also need to include a `facet` column in the `data.frame`. Note that we only provide one of the facets, in this case "A". Notice that we also set this column to be a factor column with **two** levels, "A" and "B". This step is important, as what it does internally is plot the graph label on facet "A", and then when it goes to plot the labels on facet "B" they are missing and hence nothing is plotted.
-
-As an aside, if you want to put one label on the first facet and the second label on another facet, then in the `facet` column, simply allocate the first label to "A" and the second to "B".
+When you have a facetted graph, you must specify the `facet_name` and `facet_value` arguments in `plot_label()`. 
 
 ```{r}
-# Mock data
-graph_data <- data.frame(
-  facet = c("A", "A", "B", "B"),
-  x = 1,
-  y = c(10, 15, 10, 15),
-  group = c("P", "Q", "P", "Q")
+data <- data.frame(
+  x = rep(c(1, 2), 2),
+  y = rep(c(1, 2), 2),
+  f_var = factor(c(1, 1, 2, 2)),
+  group = factor(c(1, 2, 1, 2))
 )
 
-graph_labels <- data.frame(
-  x = c(0.75, 1.25),
-  y = c(12, 17),
-  group = c("P", "Q"),
-  facet = factor("A", c("A", "B"))
-)
+p1 <- 
+  ggplot(data, aes(x, y, colour = group)) +    
+  facet_wrap(~f_var) +
+  geom_point() +
+  scale_y_continuous_e61(c(0, 3, 1)) +
+  plot_label(
+    label = c("Label 1", "Label 2"),
+    x = c(1, 1.85),
+    y = c(1.2, 2.2),
+    facet_name = "f_var",
+    facet_value = "1"
+  ) 
 
-# Graph
-graph <- ggplot(graph_data, aes(x, y, fill = group)) +
-  facet_wrap(~facet) +
-  geom_col(position = "dodge") +
-  # This geom_text adds the labels
-  # The label arg add the text, the colour arg ensures the text colour matches 
-  # the lines they are identifying.
-  geom_text(data = graph_labels, aes(x, y, label = group, colour = group)) +
-  scale_colour_e61() +
-  labs_e61(
-    title = "Facetted Case Using a Helper data.frame",
-    sources = c("e61 Institute"),
-    x = NULL, y = "n"
+save_e61(here::here("man/figures/label-facet-1.svg"), p1)
+knitr::include_graphics(here::here("man/figures/label-facet-1.svg"))
+```
+
+If you want to place the labels on different facets, simply supply a vector to `facet_value` with which facet you want each label to appear in.
+
+```{r}
+p2 <- ggplot(data, aes(x, y, colour = group)) +
+  facet_wrap(~f_var) +
+  geom_point() +
+  scale_y_continuous_e61(c(0, 3, 1)) +
+  plot_label(
+    label = c("Label 1", "Label 2"),
+    x = c(1, 1.85),
+    y = c(1.2, 2.2),
+    facet_name = "f_var",
+    facet_value = c("1", "2")
   )
 
-save_e61(here::here("man/figures/label-facet.svg"), graph)
-knitr::include_graphics(here::here("man/figures/label-facet.svg"))
+save_e61(here::here("man/figures/label-facet-2.svg"), p2)
+knitr::include_graphics(here::here("man/figures/label-facet-2.svg"))
+
 
 ```
 
-### Many categories
+## Graphs with many categories
 
 Sometimes you have many categories, far too many to want to plot manually even with the `data.frame` approach. If you are willing to sacrifice the ability to specify the exact location of each label, you could use `geom_text_repel()` to add appropriately coloured text labels for each colour/fill aesthetic. 
 

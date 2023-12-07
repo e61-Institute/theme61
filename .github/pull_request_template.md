@@ -5,7 +5,7 @@
 
 - [ ] I have written tests covering functions I have added or changed.
 - [ ] I have run tests and they all pass.
-- [ ] I have ensured all new functions will show up in the `_pkgdown.yml` file.
+- [ ] I have ensured all new functions will show up in the `_pkgdown.yml` file and run `pkgdown::check_pkgdown()`.
 - [ ] I have updated `DESCRIPTION` with any new package dependencies and the new package version number.
 - [ ] I have updated `NEWS.md` with a brief description of my changes.
 - [ ] I have updated the package documentation with `devtools::document()`.

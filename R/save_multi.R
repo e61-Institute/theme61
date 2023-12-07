@@ -16,6 +16,7 @@ save_multi <-
            title_spacing_adj, # adjust the amount of space given to the title
            subtitle_spacing_adj, # adjust the amount of space given to the subtitle
            base_size, # set the base size for the theme61 font size call
+           pad_width,
            height_adj, # adjust the vertical spacing of the mpanel charts
            ncol,
            nrow,
@@ -352,6 +353,9 @@ save_multi <-
       ncol = 1,
       rel_heights = rel_heights
     )
+
+    # Add width padding
+    width <- width + pad_width
 
     # Return objects needed to save the graph ----
     retval <- list(graph = gg,

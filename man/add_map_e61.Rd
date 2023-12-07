@@ -33,7 +33,8 @@ visualised.
 \examples{
 
 library(sf)
-sa3 <- dplyr::filter(strayr::read_absmap("sa32021"), gcc_code_2021 == "1GSYD") # let's just look at Sydney
+sa3 <- strayr::read_absmap("sa32021")
+sa3 <- sa3[sa3$gcc_code_2021 == "1GSYD", ] # let's just look at Sydney
 
  ggplot(sa3) +
  add_map_e61(bbox = c(

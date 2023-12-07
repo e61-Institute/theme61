@@ -43,7 +43,7 @@
 <polyline points='26.33,121.62 239.99,121.62 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
 <polyline points='26.33,81.56 239.99,81.56 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
 <polyline points='26.33,41.50 239.99,41.50 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
-<polyline points='36.04,11.88 57.61,73.47 79.24,65.26 100.80,130.12 122.37,75.92 143.94,132.91 165.57,89.27 187.14,110.88 208.71,143.07 230.28,131.86 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<polyline points='36.04,11.88 57.61,73.47 79.24,65.26 100.80,130.12 122.37,75.92 143.94,132.91 165.57,89.27 187.14,110.88 208.71,143.07 230.28,131.86 ' style='stroke-width: 1.07; stroke: #008080; stroke-linecap: butt;' />
 <rect x='26.33' y='1.44' width='213.66' height='160.25' style='stroke-width: 1.50;' />
 </g>
 <g clip-path='url(#cpMC4wMHwyNjYuMzF8MC4wMHwxODguODQ=)'>
