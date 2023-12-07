@@ -15,6 +15,7 @@ save_e61(
   pad_width = 0,
   max_height = NULL,
   save_data = FALSE,
+  print_info = FALSE,
   base_size = 10,
   res = 1,
   bg_colour = "white",
@@ -72,6 +73,9 @@ limit the height of your charts.}
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph
 (defaults to FALSE).}
+
+\item{print_info}{Logical. Set to TRUE if you want graph dimensions and other
+information printed to the console (defaults to FALSE).}
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
 

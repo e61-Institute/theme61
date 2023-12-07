@@ -26,7 +26,7 @@
 #'   Defaults to NULL which means the graph dimensions will be set based on the
 #'   chart type and function-calculated value.
 #' @param pad_width Add optional argument which adds padding to the width of a
-#' chart. The default is 0 cm.
+#'   chart. The default is 0 cm.
 #' @param max_height Numeric. The maximum height of your plot in cm. This is
 #'   used to constrain the plot resizing algorithm in cases where you want to
 #'   limit the height of your charts.
@@ -37,6 +37,8 @@
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
+#' @param print_info Logical. Set to TRUE if you want graph dimensions and other
+#'   information printed to the console (defaults to FALSE).
 #' @param base_size Numeric. Chart font size. Default is 10.
 #' @param res Numeric. For saving to PNG only. Increase the size of the saved
 #'   PNG. E.g. `res = 2` doubles the size of the saved graph.
@@ -74,6 +76,7 @@ save_e61 <- function(filename,
                      pad_width = 0,
                      max_height = NULL,
                      save_data = FALSE,
+                     print_info = FALSE,
                      base_size = 10,
                      res = 1,
                      bg_colour = "white",
@@ -306,6 +309,11 @@ save_e61 <- function(filename,
   )
 
   # Post-saving -------------------------------------------------------------
+
+  # Print information on saving parameters
+  if (print_info) {
+    cli::cli_alert_info("Graph width = {round(save_input$width, 4)} and height = {round(save_input$height, 4)}.")
+  }
 
   # Save the data used to make the graph
   if (save_data) {
