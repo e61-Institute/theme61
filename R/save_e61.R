@@ -399,7 +399,9 @@ svg_to_png <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
     file_temp_svg <- "intermed.svg"
     file_temp_png <- "intermed.png"
 
-    res <- res / 1.25 # For some reason any res > 1 scales 1:1.25...
+    # For some reason this changed at some point and the scaling is fine now.
+    # Keeping this here in case it reverts back in the future.
+    # res <- res / 1.25 # For some reason any res > 1 scales 1:1.25...
 
     rsvg::rsvg_png(svg = file_in, file = file_temp_png)
 
