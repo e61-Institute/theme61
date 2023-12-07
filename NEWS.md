@@ -1,3 +1,21 @@
+# theme61 0.6.2
+
+XX XXX 202X
+
+#### Improved functionality
+
+* Improvements to `plot_label`: now supports facetted graphs! As well as other back-end changes.
+* We now have new shades of e61 Blue Dark `#10485E`, Blue Light `#196F91`, Orange Dark `#ED7F00` and Orange Light `#FFC537`. These changes aim to improve the contrast between colours when they are all used in the same graph.
+* Added an argument to `save_e61` to fix an issue with `y_top = FALSE` not positioning the y-axis label correctly.
+* Change the default colour of single line graphs from black to e61 Teal Dark.
+* Changed the ordering of when colours appear in the default e61 palette.
+
+#### Bug fixes
+
+* Fix a weird edge case with y-axis breaks relating to the oddities of floating point maths.
+* theme61 would blow up uninformatively if you tried to supply graph data containing `NA` or `NaN`. Now catches this.
+* Removed the dplyr dependency.
+
 # theme61 0.6.1
 
 09 Nov 2023
