@@ -237,3 +237,45 @@ test_that("Labels work on facets", {
   })
 
 })
+
+test_that("Labels work on facets", {
+
+  data <- data.frame(
+    x = rep(c(1, 2), 2),
+    y = rep(c(1, 2), 2),
+    f_var = factor(c(1, 1, 2, 2)),
+    group = factor(c(1, 2, 1, 2))
+  )
+
+  # Place labels on 1 facet only
+  p1 <- ggplot(data, aes(x, y, colour = group)) +
+    facet_wrap(~f_var) +
+    geom_point() +
+    scale_y_continuous_e61(c(0, 3, 1)) +
+    plot_label(
+      label = c("Lab 1", "Lab 2"),
+      x = c(1.25, 1.75),
+      y = c(1, 2),
+      facet_name = "f_var",
+      facet_value = "1"
+    )
+
+  # Place 1 labels on 1 facet and the other label on the other
+  p2 <- ggplot(data, aes(x, y, colour = group)) +
+    facet_wrap(~f_var) +
+    geom_point() +
+    scale_y_continuous_e61(c(0, 3, 1)) +
+    plot_label(
+      label = c("Lab 1", "Lab 2"),
+      x = c(1.25, 1.75),
+      y = c(1, 2),
+      facet_name = "f_var",
+      facet_value = c("1", "2")
+    )
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("facets.svg", p1)))
+    expect_snapshot_file(suppressWarnings(save_e61("alternating-facets.svg", p2)))
+  })
+
+})
