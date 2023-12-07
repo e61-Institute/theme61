@@ -143,6 +143,13 @@ test_that("Y-axis customisation options", {
     scale_y_continuous_e61(sec_axis = FALSE) +
     labs_e61(title = "Y-scale testing", y = NULL)
 
+  # Flipped graph, no y_top
+  p9 <- p +
+    theme_e61(y_top = FALSE) +
+    coord_flip() +
+    labs_e61(title = "Flipped graph with no y_top",
+             y = "Long y-axis text")
+
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("y-scale-test1.svg", p1)))
     expect_snapshot_file(suppressWarnings(save_e61("y-scale-test2.svg", p2)))
@@ -152,6 +159,7 @@ test_that("Y-axis customisation options", {
     expect_snapshot_file(suppressWarnings(save_e61("y-scale-test6.svg", p6)))
     expect_snapshot_file(suppressWarnings(save_e61("y-scale-test7.svg", p7)))
     expect_snapshot_file(suppressWarnings(save_e61("y-scale-test8.svg", p8)))
+    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test9.svg", p9)))
   })
 
 })
