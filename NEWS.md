@@ -1,9 +1,10 @@
 # theme61 0.6.2
 
-XX XXX 202X
+11 Dec 2023
 
 #### Improved functionality
 
+* theme61 now requires an R version of at least 4.3.0.
 * Improvements to `plot_label`: now supports facetted graphs! As well as other back-end changes.
 * We now have new shades of e61 Blue Dark `#10485E`, Blue Light `#196F91`, Orange Dark `#ED7F00` and Orange Light `#FFC537`. These changes aim to improve the contrast between colours when they are all used in the same graph.
 * Added an argument to `save_e61` to fix an issue with `y_top = FALSE` not positioning the y-axis label correctly.
