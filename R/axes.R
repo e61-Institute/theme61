@@ -4,18 +4,20 @@
 #' This includes removing white space at the beginning and end of each axis.
 #'
 #' @param expand_bottom,expand_top Numeric. Add extra space between data points
-#'   and the top/bottom of the graph. See [expansion][ggplot2::expansion] for details.
-#' @param sec_axis Defaults to duplicating the y-axis so it shows on the left
-#'   and right. To add a rescaled secondary axis, see the documentation for
-#'   [dual_y_axis]. Set to FALSE to hide the secondary axis.
+#'   and the top/bottom of the graph. See [expansion][ggplot2::expansion] for
+#'   details.
+#' @param sec_axis Logical. Defaults to duplicating the y-axis so it shows on
+#'   the left and right. Set to FALSE to hide the secondary axis.
 #' @param rescale_sec Logical. Set this to TRUE if you are using a rescaled
-#'   secondary axis, otherwise leave it as FALSE (default).
+#'   secondary axis, otherwise leave it as FALSE (default). To add a rescaled
+#'   secondary axis, see the documentation for [sec_rescale].
 #' @param y_top Logical. Ensures there is space at the top of the y-axis for the
 #'   axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
 #'   elsewhere. If you change this argument you also need to change the argument
 #'   with the same name in [theme_e61].
 #' @param expand_left,expand_right Numeric. Add extra space between data points
-#'   and the left/right of the graph. See [expansion][ggplot2::expansion] for details.
+#'   and the left/right of the graph. See [expansion][ggplot2::expansion] for
+#'   details.
 #' @param limits One of:
 #'   \itemize{
 #'     \item{A numeric vector of length three providing the limits of the scale
@@ -46,7 +48,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
   if (!is.null(limits) && is.numeric(limits)) {
 
     if (length(limits) == 3) {
-      breaks <- seq(limits[[1]], limits[[2]], limits[[3]])
+      breaks <- round(seq(limits[[1]], limits[[2]], limits[[3]]), 10)
 
       # Hides the last break to make space for the unit label
       if (isTRUE(y_top)) breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
@@ -119,7 +121,7 @@ scale_x_continuous_e61 <- function(limits = NULL,
   if (!is.null(limits) && is.numeric(limits)) {
 
     if (length(limits) == 3) {
-      breaks <- seq(limits[[1]], limits[[2]], limits[[3]])
+      breaks <- round(seq(limits[[1]], limits[[2]], limits[[3]]), 10)
 
       # Hides the first and last break
       if (hide_first_last) {

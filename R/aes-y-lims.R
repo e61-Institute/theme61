@@ -622,7 +622,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
       next
     }
 
-    temp_data <- expand.grid(aes_first = aes_first_value, aes_second = aes_pairs)
+    temp_data <- data.table::CJ(aes_first = aes_first_value, aes_second = aes_pairs)
 
     # 3 - get the pair that is closest to the aesthetic value of the second number
     # For the aesthetic number, if they are both positive or both negative we want the value just below the second number
@@ -630,32 +630,35 @@ get_aes_pair <- function(y_val_1, y_val_2){
       aes_second_value <- get_aes_num(second_value, diff = abs(second_value - aes_first_value), type = "next_smallest")
 
       # adjust for the second aesthetic value
-      ret_second_value <- temp_data %>%
-        dplyr::mutate(diff = aes_second - aes_second_value) %>%
-        dplyr::filter(diff <= 0, abs(aes_second) <= abs(second_value)) %>%
-        dplyr::slice_max(diff, n = 1, with_ties = F) %>%
-        dplyr::pull(aes_second)
+      ret_second_value <- temp_data |>
+        _[, diff := aes_second - aes_second_value] |>
+        _[diff <= 0 & abs(aes_second) <= abs(second_value)] |>
+        data.table::setorder(-diff) |>
+        head(1) |>
+        _$aes_second
 
     } else if(second_value < 0) {
 
       aes_second_value <- get_aes_num(second_value, diff = abs(second_value - aes_first_value), type = "next_largest")
 
       # adjust for the second aesthetic value
-      ret_second_value <- temp_data %>%
-        dplyr::mutate(diff = aes_second - aes_second_value) %>%
-        dplyr::filter(diff <= 0) %>%
-        dplyr::slice_max(diff, n = 1, with_ties = F) %>%
-        dplyr::pull(aes_second)
+      ret_second_value <- temp_data |>
+        _[, diff := aes_second - aes_second_value] |>
+        _[diff <= 0] |>
+        data.table::setorder(-diff) |>
+        head(1) |>
+        _$aes_second
 
     } else if(second_value > 0) {
       aes_second_value <- get_aes_num(second_value, diff = abs(second_value - aes_first_value), type = "next_largest")
 
       # adjust for the second aesthetic value
-      ret_second_value <- temp_data %>%
-        dplyr::mutate(diff = aes_second - aes_second_value) %>%
-        dplyr::filter(diff >= 0) %>%
-        dplyr::slice_min(diff, n = 1, with_ties = F) %>%
-        dplyr::pull(aes_second)
+      ret_second_value <- temp_data |>
+        _[, diff := aes_second - aes_second_value] |>
+        _[diff >= 0] |>
+        data.table::setorder(diff) |>
+        head(1) |>
+        _$aes_second
 
     } else {
       ret_second_value <- 0

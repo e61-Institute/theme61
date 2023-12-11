@@ -18,7 +18,8 @@
 #' @examples
 #'
 #' library(sf)
-#' sa3 <- dplyr::filter(strayr::read_absmap("sa32021"), gcc_code_2021 == "1GSYD") # let's just look at Sydney
+#' sa3 <- strayr::read_absmap("sa32021")
+#' sa3 <- sa3[sa3$gcc_code_2021 == "1GSYD", ] # let's just look at Sydney
 #'
 #'  ggplot(sa3) +
 #'  add_map_e61(bbox = c(
@@ -40,6 +41,14 @@ add_map_e61 <-
   adjust = 0,
   maptype = "stamen_toner_lite") {
 
+    # Check if req version of ggmap is installed
+    inst_v <- packageVersion("ggmap")
+    if (inst_v < "3.0.2") {
+      cli::cli_alert_warning("Your installed version of ggmap does not support Stadia Maps. Running `setup_stadia_maps()` to help you set up...")
+      return(setup_stadia_maps())
+    }
+
+    # Check if API key is setup
     if (!ggmap::has_stadiamaps_key()) stop("You must provide a Stadia Maps API key to load map tiles, see `setup_stadia_maps()`.")
 
     # Some guards for common mistakes
@@ -84,11 +93,11 @@ setup_stadia_maps <- function() {
 
   # Check if ggmap package version has the required functions, install from Github if it doesn't
   inst_v <- packageVersion("ggmap")
-  if (inst_v <= "3.0.2") {
+  if (inst_v < "3.0.2") {
     install_prompt <- ""
 
     while (install_prompt == "") {
-      install_prompt <- readline("Your installed version of ggmap is does not support downloading Stadia Map tiles. Enter 'Y' to update or 'Y' to exit.")
+      install_prompt <- readline("Your installed version of ggmap is does not support downloading Stadia Map tiles. Enter 'Y' to update or 'N' to exit.")
     }
 
     if (install_prompt == "Y") {

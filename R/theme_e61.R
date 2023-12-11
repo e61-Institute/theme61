@@ -282,7 +282,6 @@ theme_e61 <- function(y_top = TRUE,
 #' @param base_size Numeric. Chart font size. Default is 10.
 #' @param base_family Character. Chart font family. Default is PT Sans.
 #' @return ggplot2 object
-#' @import ggplot2
 #' @export
 #' @family map functions
 #'
@@ -368,7 +367,6 @@ theme_e61_spatial <- function(
 #' @param base_family Character. Chart font family. Default is Arial.
 #'
 #' @return ggplot2 object
-#' @import ggplot2 ggthemes
 #' @export
 #'
 #' @examples
@@ -443,23 +441,40 @@ square_legend_symbols <- function(size = 6) {
 #' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
 #' the default works for most graphs. A negative value moves the
 #' title up, a positive value moves the title down.
+#' @param y_top Logical. Defaults to TRUE. Set to FALSE to prevent y-axis label from being positioned in-line with the axis values. Only set this if you also set `y_top = FALSE` in `theme_e61()` and `scale_y_continuous_e61()`.
 #'
 #' @return ggplot object
-#' @import ggplot2
 #' @export
 
-format_flip <- function(x_adj = 0) {
-  theme(
-    panel.grid.major.x = element_line(colour = e61_greylight6, linewidth = points_to_mm(0.5)),
-    panel.grid.major.y = element_blank(),
-    axis.text.x.top = element_blank(),
-    axis.ticks.x.top = element_blank(),
-    axis.title.x.top = element_blank(),
-    axis.title.x.bottom = element_text(margin = margin(t = -11 + x_adj, b = 5),
-                                       hjust = 1, angle = 0),
-    plot.title.position = "plot",
-    plot.caption.position = "plot"
-  )
+format_flip <- function(x_adj = 0, y_top = TRUE) {
+
+  retval <-
+    theme(
+      panel.grid.major.x = element_line(colour = e61_greylight6, linewidth = points_to_mm(0.5)),
+      panel.grid.major.y = element_blank(),
+      axis.text.x.top = element_blank(),
+      axis.ticks.x.top = element_blank(),
+      axis.title.x.top = element_blank(),
+      plot.title.position = "plot",
+      plot.caption.position = "plot"
+    )
+
+  if (y_top) {
+
+    retval <- retval +
+      theme(axis.title.x.bottom = element_text(
+        margin = margin(t = -11 + x_adj, b = 5),
+        hjust = 1, angle = 0))
+
+  } else {
+
+    retval <- retval +
+      theme(axis.title.x.bottom = element_text(
+        margin = margin(t = 0, b = 5),
+        hjust = 0.5, angle = 0))
+  }
+
+  return(retval)
 
 }
 
