@@ -2,16 +2,16 @@
 #'
 #' Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
 #' appearance. If you are looking to change the appearance of titles or labels,
-#' check the arguments in [labs_e61], which are probably what you are
-#' looking for.
+#' check the arguments in [labs_e61], which are probably what you are looking
+#' for.
 #'
-#' @param y_top Defaults to TRUE. Puts the y-axis title at the top. If you
-#'   change this argument you also need to change the argument with the same
+#' @param y_top Logical. Puts the y-axis title at the top. Defaults to TRUE. If
+#'   you change this argument you also need to change the argument with the same
 #'   name in [scale_y_continuous_e61].
 #' @param adj Either a single numeric to adjust left and right axis titles
 #'   simultaneously or a vector of 2 numerics to adjust each axis title
 #'   separately. More negative values move the text closer to the graph panel.
-#' @param fix_left Sometimes if the value of the `adj` argument is too
+#' @param fix_left Numeric. Sometimes if the value of the `adj` argument is too
 #'   negative, the margins on the left side of the graph start to cut off some
 #'   of the text. Provide a small positive value (5?) to correct this.
 #' @param legend Character. Legend position, "none" (default) hides the legend.
