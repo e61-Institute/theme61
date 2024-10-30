@@ -141,9 +141,16 @@ save_single <- function(
   # update the width after this check
   width <- tot_panel_width + known_wd
 
-  plot <- update_labs(plot, tot_panel_width)
+  # If the chart has had the coords flipped, then allow the labels (titles, footnotes etc.) to be the width of the panel + left axis
+  if (isTRUE("CoordFlip" %in% class(ggplot_build(plot)$layout$coord))){
+    plot <- update_labs(plot, tot_panel_width + 0.85 * left_axis_width)
+
+  } else {
+    plot <- update_labs(plot, tot_panel_width)
+  }
 
   if(!is_spatial_chart){
+
     # update the plot_labels
     plot <- update_plot_label(plot, chart_type, base_size)
 
