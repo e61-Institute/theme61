@@ -361,6 +361,11 @@ update_y_axis_labels <- function(plot,
     # # get the maximum offset and compare to the
     # y_lab_max_size <- y_lab_max_size * .pt * 10
 
+    # This is old code that used to be necessary but it no longer is as the way ggplot calculates margin
+    # spacing has changed
+    # # get the maximum offset and compare to the
+    # y_lab_max_size <- y_lab_max_size * .pt * 10
+
     # max_offset <- pmax(y_lab_max_size, max_break_width)
     adj_width <- max_break_width
 
