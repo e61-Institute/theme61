@@ -344,14 +344,14 @@ update_y_axis_labels <- function(plot, max_break_width = NULL, y_lab_max_size = 
   # otherwise we have a multi panel and need to take into account the width of the widest label
   } else {
 
-    # get the maximum offset and compare to the
-    y_lab_max_size <- y_lab_max_size * .pt * 10
-
-    max_offset <- pmax(y_lab_max_size, max_break_width)
-
-    y_lab_size <- get_text_width(plot$labels$y, font_size = y_font_size) * .pt * 10
-
-    diff <- max_offset - y_lab_size
+    # # get the maximum offset and compare to the
+    # y_lab_max_size <- y_lab_max_size * .pt * 10
+    #
+    # max_offset <- pmax(y_lab_max_size, max_break_width)
+    #
+    # y_lab_size <- get_text_width(plot$labels$y, font_size = y_font_size) * .pt * 10
+    #
+    # diff <- max_offset - y_lab_size
 
     adj_width <- max_break_width - 1 # + diff
   }
