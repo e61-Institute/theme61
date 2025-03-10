@@ -353,7 +353,7 @@ update_y_axis_labels <- function(plot, max_break_width = NULL, y_lab_max_size = 
 
     diff <- max_offset - y_lab_size
 
-    adj_width <- max_break_width + diff
+    adj_width <- max_break_width - 1 # + diff
   }
 
   # add the break adjustment to the plot
