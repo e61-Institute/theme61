@@ -11,9 +11,15 @@
 #' @param adj Either a single numeric to adjust left and right axis titles
 #'   simultaneously or a vector of 2 numerics to adjust each axis title
 #'   separately. More negative values move the text closer to the graph panel.
+<<<<<<< HEAD
 #' @param fix_left Numeric. Sometimes if the value of the `adj` argument is too
 #'   negative, the margins on the left side of the graph start to cut off some
 #'   of the text. Provide a small positive value (5?) to correct this.
+=======
+#' @param fix_left Sometimes if the value of the `adj` argument is too negative,
+#'   the margins on the left side of the graph start to cut off some of the
+#'   text. Provide a small positive value (5?) to correct this.
+>>>>>>> a70b19d (add legend position inside)
 #' @param legend Character. Legend position, "none" (default) hides the legend.
 #' @param legend_position A numeric vector of length two setting the placement
 #'   of legends that have the "inside" position. Takes values between 0 and 1.
@@ -57,7 +63,11 @@ theme_e61 <- function(y_top = TRUE,
   legend <- match.arg(legend)
 
   if (legend == "inside") {
+<<<<<<< HEAD
     if (!is.numeric(legend_position) || length(legend_position) != 2)
+=======
+    if (!is.numeric(legend_position) | length(legend_position) != 2)
+>>>>>>> a70b19d (add legend position inside)
       stop("legend_position needs to be a length two numeric vector.")
 
     if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
@@ -329,7 +339,11 @@ theme_e61_spatial <- function(
   legend <- match.arg(legend)
 
   if (legend == "inside") {
+<<<<<<< HEAD
     if (!is.numeric(legend_position) || length(legend_position) != 2)
+=======
+    if (!is.numeric(legend_position) | length(legend_position) != 2)
+>>>>>>> a70b19d (add legend position inside)
       stop("legend_position needs to be a length two numeric vector.")
 
     if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
