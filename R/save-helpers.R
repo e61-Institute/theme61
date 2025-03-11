@@ -8,7 +8,7 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
     file_i <- paste0(filename, ".", fmt)
 
     # Create a temp name for png
-    if (fmt == "png") file_temp <- tempfile(fileext = ".svg")
+    if (fmt == "png" | fmt == "jpg") file_temp <- tempfile(fileext = ".svg")
 
     # add very slight width buffer
     width <- width + 0.1
@@ -18,8 +18,9 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
       svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
       eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
       pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
-      # When saving PNG we save the SVG first then convert it to PNG
-      png = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
+      # When saving PNG or JPEG we save the SVG first then convert it to PNG or JPEG
+      png = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
+      jpg = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
     )
 
     print(graph)
@@ -27,7 +28,10 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
 
     # Save a PNG if required
     if (fmt == "png") {
-      svg_to_png(file_temp, paste0(filename, ".png"), delete = TRUE, res = res)
+      svg_to_bitmap(file_temp, paste0(filename, ".png"), delete = TRUE, res = res)
+
+    } else if(fmt == "jpg") {
+      svg_to_bitmap(file_temp, paste0(filename, ".jpg"), delete = TRUE, res = res)
     }
   })
 }

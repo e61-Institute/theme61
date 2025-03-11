@@ -8,7 +8,7 @@ save_e61(
   filename,
   ...,
   plot = last_plot(),
-  format = c("svg", "pdf", "eps", "png"),
+  format = c("svg", "pdf", "eps", "png", "jpg"),
   chart_type = c("MN", "RN", "PPT"),
   auto_scale = TRUE,
   dim = list(height = NULL, width = NULL),
