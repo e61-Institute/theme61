@@ -1,4 +1,17 @@
-# theme61 0.6.2
+# theme61 0.6.3
+
+11 Mar 2025
+
+#### Improved functionality
+
+* The `chart_type` argument in `save_e61` has been updated so that it now allows you to adjust the aspect ratio of your chart in an easy and consistent way. There are three valid values `Normal` (aspect ratio of 0.75), `Wide` (aspect ratio of 0.5) and `Square` (aspect ratio of 1). You can also supply a list of values to `save_e61` if you are saving multiple charts.
+* Added the ability to save JPEGs. This functions in a similar way to how PNGs are currently saved - you can use the `res` argument in `save_e61` to adjust the resolution.
+
+#### Bug fixes
+
+* Fixed an issue where y-axis labels were not being aligned correctly when saving multiple plots at the same time. 
+* Fixed an issue where where you could not use a * in footnotes (e.g. for describing the level of statistical significance) without `save_e61` interpreting this as a new footnote.
+
 
 11 Dec 2023
 
