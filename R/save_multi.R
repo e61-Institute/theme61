@@ -28,13 +28,10 @@ save_multi <-
 
     # Set maximum width based on output type ----------------------------------
 
-    if(is.null(chart_type)) chart_type <- "MN"
+    if(is.null(chart_type)) chart_type <- "Normal"
 
-    max_width <- get_plot_width(chart_type)
-    max_height <- get_plot_width(chart_type)
-
-    # Update the base size based on the type of chart (MN, RN etc.) being produced
-    base_size <- base_size * max_width / get_plot_width("MN")
+    max_width <- 18.59
+    max_height <- 18.59
 
 
     # Set width -------------------------------------------------------------
@@ -70,6 +67,27 @@ save_multi <-
     for(i in seq_along(plots)){
 
       temp_plot <- plots[[i]]
+
+
+      # Update the aspect ratio
+      if(length(chart_type) > 1) {
+        chart_type_temp <- chart_type[i]
+
+      } else {
+        chart_type_temp <- chart_type
+      }
+
+      if(chart_type_temp == "Wide") {
+        temp_plot <- temp_plot + theme(aspect.ratio = 0.5)
+
+      } else if(chart_type_temp == "Square") {
+
+        temp_plot <- temp_plot + theme(aspect.ratio = 1)
+
+      } else if(chart_type_temp == "Normal") {
+
+        temp_plot <- temp_plot + theme(aspect.ratio = 0.75)
+      }
 
       # set the background colour
       temp_plot <- temp_plot + theme(rect = element_rect(fill = bg_colour))

@@ -17,9 +17,10 @@
 #' @param plot (single-panel specific) Name of the plot object to save. Defaults
 #'   to the last plot displayed so usually you do not need to provide this
 #'   argument explicitly.
-#' @param chart_type String. Type of chart. This is used to set sensible chart
-#'   widths based on the width of text in each document. Options are "MN" (for
-#'   micronotes), "RN" (research notes) or "PPT" (PowerPoints).
+#' @param chart_type String, or vector of strings if saving multiple plots.
+#'   Type of chart. This is used to set sensible chart widths based on the type
+#'   of plot you are saving. Options are "Normal" (default; for normal charts),
+#    "Wide" (for time series notes) or "Square" (for scatter plots).
 #' @param auto_scale Logical. Should the y-axis be scaled automatically. Default
 #'   is TRUE.
 #' @param dim An optional named list specifying the plot height and width.
@@ -70,7 +71,7 @@ save_e61 <- function(filename,
                      ...,
                      plot = last_plot(),
                      format = c("svg", "pdf", "eps", "png", "jpg"),
-                     chart_type = c("MN", "RN", "PPT"),
+                     chart_type = "Normal",
                      auto_scale = TRUE,
                      dim = list(height = NULL, width = NULL),
                      pad_width = 0,
@@ -119,8 +120,20 @@ save_e61 <- function(filename,
   # Check whether the plots are ggplot2 objects
   plots <- check_plots(plots)
 
+
   # Enforce chart type
-  chart_type <- match.arg(chart_type)
+  if(length(chart_type) == 1){
+
+    if(!chart_type %in% c("Normal", "Wide", "Square"))
+      stop("Invalid chart type. All chart types must be one of 'Normal', 'Wide' or 'Square'.")
+
+  } else if(length(chart_type) > 1){
+
+    for(i in 1:length(chart_type)){
+      if(!chart_type[i] %in% c("Normal", "Wide", "Square"))
+        stop("Invalid chart type. All chart types must be one of 'Normal', 'Wide' or 'Square'.")
+    }
+  }
 
   # Check if the save directory exists
   dir_provided <- grepl("^(.*)\\/.*\\..{3}$", filename)

@@ -84,25 +84,25 @@ get_plot_width <- function(chart_type){
   return(max_width)
 }
 
-#' Get the base size of the plot
-#' @noRd
-get_base_size <- function(chart_type, plot_base_size = 10){
-
-  # update the base size if the chart is not for a micronote
-  if(chart_type == "RN"){
-
-    plot_base_size <- plot_base_size * get_plot_width("RN") / get_plot_width("MN")
-
-  } else if(chart_type == "PPT"){
-
-    plot_base_size <- plot_base_size * get_plot_width("PPT") / get_plot_width("MN")
-
-  } else {
-    plot_base_size <- plot_base_size * 20 / get_plot_width("MN")
-  }
-
-  return(plot_base_size)
-}
+#' #' Get the base size of the plot
+#' #' @noRd
+#' get_base_size <- function(chart_type, plot_base_size = 10){
+#'
+#'   # update the base size if the chart is not for a micronote
+#'   if(chart_type == "RN"){
+#'
+#'     plot_base_size <- plot_base_size * get_plot_width("RN") / get_plot_width("MN")
+#'
+#'   } else if(chart_type == "PPT"){
+#'
+#'     plot_base_size <- plot_base_size * get_plot_width("PPT") / get_plot_width("MN")
+#'
+#'   } else {
+#'     plot_base_size <- plot_base_size * 20 / get_plot_width("MN")
+#'   }
+#'
+#'   return(plot_base_size)
+#' }
 
 #' Replication of testthat::is_testing() so we can turn off some functionality
 #' in the test env.

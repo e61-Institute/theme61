@@ -532,7 +532,7 @@ update_plot_label <- function(plot, chart_type, base_size){
       if(!is.null(attr(label, "adj_plot_label"))){
 
         # 4 - get the base size of a micronote
-        mn_base_size <- get_base_size(chart_type = "MN")
+        mn_base_size <- 10
 
         # 5 - update the size - this will depend on the chart width and base text size
         plot$layers[[i]]$aes_params$size <- 3.5 * base_size / mn_base_size

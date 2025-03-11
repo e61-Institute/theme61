@@ -35,12 +35,9 @@ save_single <- function(
 
   # Set maximum width based on output type ----------------------------------
 
-  if(is.null(chart_type)) chart_type <- "MN"
+  if(is.null(chart_type)) chart_type <- "Normal"
 
-  max_width <- get_plot_width(chart_type)
-
-  # update the base size variable
-  base_size <- base_size * max_width / get_plot_width("MN")
+  max_width <- 18.59
 
   # update the base size without removing the legend
   if(is_spatial_chart){
@@ -67,6 +64,25 @@ save_single <- function(
 
   plot <- plot + theme(rect = element_rect(fill = bg_colour))
 
+
+  # Update the aspect ratio -------------------------------------------------
+
+  # Only keep one chart if a list has been supplied
+  if(length(chart_type) > 1) {
+
+    chart_type <- chart_type[1]
+    warning(paste0("Multiple chart types supplied, using first in list, which is: ", chart_type, "."))
+  }
+
+  if(chart_type == "Normal") {
+    plot <- plot + theme(aspect.ratio = 0.75)
+
+  } else if(chart_type == "Square") {
+    plot <- plot + theme(aspect.ratio = 1)
+
+  } else if(chart_type == "Wide") {
+    plot <- plot + theme(aspect.ratio = 0.5)
+  }
 
   # Update y-axis limits ----------------------------------------------------
 
