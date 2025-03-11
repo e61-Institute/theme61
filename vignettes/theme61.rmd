@@ -6,6 +6,17 @@ vignette: >
   %\VignetteIndexEntry{Introduction to theme61}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
+resource_files:
+  - "../man/figures/g-palette-colours.svg"
+  - "../man/figures/g-line.svg"
+  - "../man/figures/g-col.svg"
+  - "../man/figures/g-scatter.svg"
+  - "../man/figures/g-facet.svg"
+  - "../man/figures/g-dens.svg"
+  - "../man/figures/g-flip.svg"
+  - "../man/figures/g-dual.svg"
+  - "../man/figures/g-ptrg.svg"
+  - "../man/figures/g-multi.svg"
 ---
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
@@ -88,7 +99,7 @@ All the colours are package objects that can be selected by using the appropriat
 
 ```{r theme61-colours, echo = FALSE}
 source("colour-palette.R")
-knitr::include_graphics(here::here("man/figures/g-palette-colours.svg"))
+knitr::include_graphics("../man/figures/g-palette-colours.svg")
 ```
 
 ## Graph examples
@@ -108,11 +119,11 @@ g <- ggplot(data_3, aes(x = year, y = value, colour = category)) +
     sources = c("e61 Institute", "'datasets' package"),
     y = "$b"
   )
-save_e61(here::here("man/figures/g-line.svg"))
+save_e61("../man/figures/g-line.svg")
 ```
 
 ```{r, echo=FALSE}
-knitr::include_graphics(here::here("man/figures/g-line.svg"))
+knitr::include_graphics("../man/figures/g-line.svg")
 ```
 
 ### Column graph {#column}
@@ -131,12 +142,12 @@ g <- ggplot(data_3, aes(x = year, y = value, fill = category)) +
     y = "$b"
   )
 
-save_e61(here::here("man/figures/g-col.svg"))
+save_e61("../man/figures/g-col.svg")
 
 ```
 
 ```{r, echo=FALSE}
-knitr::include_graphics(here::here("man/figures/g-col.svg"))
+knitr::include_graphics("../man/figures/g-col.svg")
 ```
 
 ### Scatter graph {#scatter}
@@ -167,11 +178,11 @@ g <- ggplot(mtcars2, aes(x = wt, y = mpg, colour = gear)) +
     y = "mpg"
   )
 
-save_e61(here::here("man/figures/g-scatter.svg"))
+save_e61("../man/figures/g-scatter.svg")
 ```
 
 ```{r, echo=FALSE}
-knitr::include_graphics(here::here("man/figures/g-scatter.svg"))
+knitr::include_graphics("../man/figures/g-scatter.svg")
 ```
 
 ### Faceted scatter graph {#facet}
@@ -188,11 +199,11 @@ g <- ggplot(mtcars2, aes(x = wt, y = mpg)) +
     y = "mpg"
   )
 
-save_e61(here::here("man/figures/g-facet.svg"))
+save_e61("../man/figures/g-facet.svg")
 ```
 
 ```{r, echo=FALSE, out.width='100%'}
-knitr::include_graphics(here::here("man/figures/g-facet.svg"))
+knitr::include_graphics("../man/figures/g-facet.svg")
 ```
 
 ### Density graph {#density}
@@ -210,11 +221,11 @@ g <- ggplot(mpg, aes(x = cty, fill = factor(cyl))) +
               x = c(25, 24, 16, 12),
               y = c(0.1, 0.35, 0.25, 0.25))
 
-save_e61(here::here("man/figures/g-dens.svg"))
+save_e61("../man/figures/g-dens.svg")
 ```
 
 ```{r, echo=FALSE}
-knitr::include_graphics(here::here("man/figures/g-dens.svg"))
+knitr::include_graphics("../man/figures/g-dens.svg")
 ```
 
 ### Horizontal bar graph {#flippedbar}
@@ -232,11 +243,11 @@ g <- ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
   ) +
   format_flip()
 
-save_e61(here::here("man/figures/g-flip.svg"))
+save_e61("../man/figures/g-flip.svg")
 ```
 
 ```{r, echo=FALSE}
-knitr::include_graphics(here::here("man/figures/g-flip.svg"))
+knitr::include_graphics("../man/figures/g-flip.svg")
 ```
 
 ### Rescaled secondary axis graph {#secaxis}
@@ -285,8 +296,8 @@ g <- ggplot(data_dual, aes(x = year)) +
 ```
 
 ```{r, echo=FALSE}
-save_e61(here::here("man/figures/g-dual.svg"))
-knitr::include_graphics(here::here("man/figures/g-dual.svg"))
+save_e61("../man/figures/g-dual.svg")
+knitr::include_graphics("../man/figures/g-dual.svg")
 ```
 
 ### Point range graph {#ptrange}
@@ -304,11 +315,11 @@ g <- ggplot(pt_rg_data, aes(x, y, ymin = ymin, ymax = ymax)) +
     sources = c("e61 Institute"),
     y = "%"
   )
-save_e61(here::here("man/figures/g-ptrg.svg"))
+save_e61("../man/figures/g-ptrg.svg")
 ```
 
 ```{r, echo=FALSE}
-knitr::include_graphics(here::here("man/figures/g-ptrg.svg"))
+knitr::include_graphics("../man/figures/g-ptrg.svg")
 ```
 
 
@@ -378,7 +389,7 @@ Then we use `save_e61()` to put the graphs together.
 ```{r}
 save_e61(
     g1, g2, g3, g4,
-    filename = here::here("man/figures/g-multi.svg"),
+    filename = "../man/figures/g-multi.svg",
     title = "US Personal Expenditures*",
     footnotes = "Data comes from the built-in USPersonalExpenditure dataset.",
     sources = c("e61 Institute", "'datasets' package")
@@ -386,5 +397,5 @@ save_e61(
 ```
 
 ```{r, echo=FALSE, out.width='100%'}
-knitr::include_graphics(here::here("man/figures/g-multi.svg"))
+knitr::include_graphics("../man/figures/g-multi.svg")
 ```

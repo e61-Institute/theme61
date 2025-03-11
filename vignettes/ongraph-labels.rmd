@@ -6,6 +6,11 @@ vignette: >
   %\VignetteIndexEntry{Adding on-graph labels}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
+resource_files:
+  - "../man/figures/label-plot-label.svg"
+  - "../man/figures/label-facet-1.svg"
+  - "../man/figures/label-facet-2.svg"
+  - "../man/figures/label-cats.svg"
 ---
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
@@ -69,8 +74,8 @@ graph <- ggplot(graph_data, aes(x, y, colour = source)) +
     x = NULL, y = "n"
   )
 
-save_e61(here::here("man/figures/label-plot-label.svg"), graph)
-knitr::include_graphics(here::here("man/figures/label-plot-label.svg"))
+save_e61("../man/figures/label-plot-label.svg", graph)
+knitr::include_graphics("../man/figures/label-plot-label.svg")
 
 ```
 
@@ -99,8 +104,8 @@ p1 <-
     facet_value = "1"
   ) 
 
-save_e61(here::here("man/figures/label-facet-1.svg"), p1)
-knitr::include_graphics(here::here("man/figures/label-facet-1.svg"))
+save_e61("../man/figures/label-facet-1.svg", p1)
+knitr::include_graphics("../man/figures/label-facet-1.svg")
 ```
 
 If you want to place the labels on different facets, simply supply a vector to `facet_value` with which facet you want each label to appear in.
@@ -118,8 +123,8 @@ p2 <- ggplot(data, aes(x, y, colour = group)) +
     facet_value = c("1", "2")
   )
 
-save_e61(here::here("man/figures/label-facet-2.svg"), p2)
-knitr::include_graphics(here::here("man/figures/label-facet-2.svg"))
+save_e61("../man/figures/label-facet-2.svg", p2)
+knitr::include_graphics("../man/figures/label-facet-2.svg")
 
 
 ```
@@ -159,7 +164,7 @@ graph <- ggplot(graph_data, aes(x = year, y = value, fill = source)) +
     x = NULL, y = "n"
   )
 
-save_e61(here::here("man/figures/label-cats.svg"), graph)
-knitr::include_graphics(here::here("man/figures/label-cats.svg"))
+save_e61("../man/figures/label-cats.svg", graph)
+knitr::include_graphics("../man/figures/label-cats.svg")
 
 ```
