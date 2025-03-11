@@ -6,6 +6,7 @@ update_labs <- function(plot, plot_width){
 
   p <- ggplotGrob(plot)
 
+
   # Title ----
 
   # First check whether the title has already been manually wrapped
@@ -135,7 +136,9 @@ rescale_text <- function(text, text_type, font_size, plot_width){
   # another rule for footnotes
   } else if(text_type == "caption"){
 
-    footnote_text <- stringr::str_replace_all(text, "\\\n", " ")
+    footnote_text <- stringr::str_replace_all(text, "\\\n\\*", " new_footnote\\*")
+    footnote_text <- stringr::str_replace_all(footnote_text, "\\\n", " ")
+    footnote_text <- stringr::str_remove(footnote_text, pattern = "^\\* ")
 
     sources <-
       stringr::str_extract(footnote_text, "(?<=Sources{0,1}\\:).*$") |>
@@ -152,7 +155,9 @@ rescale_text <- function(text, text_type, font_size, plot_width){
     }
 
     # split footnotes up if there are multiple and drop those with length 0
-    footnote_text <- stringr::str_split(footnote_text, "\\*+\\s*")
+    footnote_text <- stringr::str_split(footnote_text, "new_footnote\\*+\\s*")
+
+    footnote_text <- lapply(footnote_text, stringr::str_remove_all, pattern = "new_footnote")
 
     text_lengths <- lapply(footnote_text, get_text_width, font_size = font_size)
 
