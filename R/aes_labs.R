@@ -332,8 +332,13 @@ split_text_into_words <- function(text) {
 #' Update y-axis label spacing so that they are aesthetic
 #' plot - Plot object to adjust.
 #' y_lab_max_size - for multi-panels the max size of the y-axis labels
+#' panel_width - width of the panels in the chart
 #' @noRd
-update_y_axis_labels <- function(plot, max_break_width = NULL, y_lab_max_size = NULL){
+update_y_axis_labels <- function(plot,
+                                 max_break_width = NULL,
+                                 y_lab_max_size = NULL,
+                                 any_neg_break = FALSE,
+                                 any_dec_break = FALSE) {
 
   # get the difference in the label size
   y_font_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
@@ -346,22 +351,24 @@ update_y_axis_labels <- function(plot, max_break_width = NULL, y_lab_max_size = 
 
     adj_width <- get_y_break_width(plot)
 
-  # otherwise we have a multi panel and need to take into account the width of the widest label
+    if(adj_width > 20) spacing <- spacing + 1.2 * y_font_size
+
+  # otherwise we have a multi panel and need to take into account the width of the widest break label
   } else {
 
-    # # get the maximum offset and compare to the
-    # y_lab_max_size <- y_lab_max_size * .pt * 10
-    #
-    # max_offset <- pmax(y_lab_max_size, max_break_width)
-    #
-    # y_lab_size <- get_text_width(plot$labels$y, font_size = y_font_size) * .pt * 10
-    #
-    # diff <- max_offset - y_lab_size
+    # get the maximum offset and compare to the
+    y_lab_max_size <- y_lab_max_size * .pt * 10
 
-    adj_width <- max_break_width - 1 # + diff
+    adj_width <- max_break_width
+
+    # increase the adjustment if there are decimal places and negatives
+    if(any_neg_break) adj_width <- adj_width + 2
+
+    if(any_dec_break) adj_width <- adj_width + 2
+
+    if(max_break_width > 20) adj_width <- adj_width - 4
   }
 
-  # add the break adjustment to the plot
   plot <- plot +
     theme(
       axis.title.y.left = element_text(margin = margin(l = spacing, r = - adj_width), vjust = 1, hjust = 1, angle = 0),
@@ -371,10 +378,10 @@ update_y_axis_labels <- function(plot, max_break_width = NULL, y_lab_max_size = 
   return(plot)
 }
 
-#' Get the width of y-axis break labels
+#' Get the y-axis breaks for a chart
 #' plot - Plot object to adjust.
 #' @noRd
-get_y_break_width <- function(plot){
+get_y_breaks <- function(plot){
 
   # get the break text size
   p_build <- ggplot_build(plot)
@@ -398,7 +405,7 @@ get_y_break_width <- function(plot){
 
       aes_lims <- y_scale_lims
 
-    # otherwise we'll need to re calculate what the aesthetic limits will look like
+      # otherwise we'll need to re calculate what the aesthetic limits will look like
     } else {
 
       # check whether the chart is a bar chart or not
@@ -420,7 +427,7 @@ get_y_break_width <- function(plot){
           aes_lims <- c(min_y, max_y, tick)
         }
 
-      # otherwise have a look at the data
+        # otherwise have a look at the data
       } else {
 
         # this looks at the underlying chart data and returns the min and the max y values
@@ -449,6 +456,17 @@ get_y_break_width <- function(plot){
     }
   }
 
+  return(breaks)
+}
+
+#' Get the width of y-axis break labels
+#' Plot - Plot object to adjust.
+#' @noRd
+get_y_break_width <- function(plot){
+
+  breaks <- get_y_breaks(plot)
+  break_text_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
+
   # take the absolute value of the breaks if required
   neg_breaks <- ifelse(breaks < 0, "-", "")
 
@@ -467,6 +485,22 @@ get_y_break_width <- function(plot){
   break_width_pt <- .pt * max_break_width * 10 # so convert to points
 
   return(break_width_pt)
+}
+
+#' Check whether the y-breaks have negatives or decimal places - these break multi facet plots
+#' plot - Plot object to adjust.
+#' @noRd
+check_y_break_type <- function(plot){
+
+  breaks <- get_y_breaks(plot)
+
+  # Check whether there are any negative breaks
+  has_neg <- any(breaks < 0, na.rm = T)
+
+  # Check whether there are any breaks with decimal places in them
+  has_dec <- any(stringr::str_detect(breaks, "\\."), na.rm = T)
+
+  return(list("any_neg" = has_neg, "any_dec" = has_dec))
 }
 
 #' Get the font size of text from a particular aspect of a ggplot

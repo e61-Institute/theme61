@@ -71,7 +71,7 @@ save_e61 <- function(filename,
                      ...,
                      plot = last_plot(),
                      format = c("svg", "pdf", "eps", "png", "jpg"),
-                     chart_type = "Normal",
+                     chart_type = NULL,
                      auto_scale = TRUE,
                      dim = list(height = NULL, width = NULL),
                      pad_width = 0,
@@ -120,9 +120,11 @@ save_e61 <- function(filename,
   # Check whether the plots are ggplot2 objects
   plots <- check_plots(plots)
 
-
   # Enforce chart type
-  if(length(chart_type) == 1){
+  if(is.null(chart_type)){
+    chart_type <- "Other"
+
+  } else if(length(chart_type) == 1){
 
     if(!chart_type %in% c("Normal", "Wide", "Square"))
       stop("Invalid chart type. All chart types must be one of 'Normal', 'Wide' or 'Square'.")
