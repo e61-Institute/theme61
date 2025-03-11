@@ -296,6 +296,29 @@ test_that("PNG resolution changer works", {
   })
 })
 
+test_that("Preview mode works", {
+  p <- minimal_plot
+
+  withr::with_tempdir({
+
+    # Check that the file is saved if preview is FALSE
+    suppressWarnings(save_e61("plot.svg", p, preview = FALSE))
+    expect_true(file.exists("plot.svg"))
+    unlink("plot.svg")
+
+    # Check that no file is saved in preview mode
+    expect_message(save_e61("plot.svg", p, preview = TRUE),
+                   ".*Preview mode is activated.*")
+    expect_false(file.exists("plot.svg"))
+
+    # It is not possible to check if the graph appears in the Viewer pane
+    # automatically, so run the below code to manually check functionality if
+    # required.
+
+    # save_e61(p, preview = TRUE)
+  })
+})
+
 # Check whole-graph generation consistency --------------------------------
 
 test_that("Single-panel graph examples", {
