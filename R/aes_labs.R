@@ -343,17 +343,19 @@ update_y_axis_labels <- function(plot, max_break_width = NULL, y_lab_max_size = 
 
   # otherwise we have a multi panel and need to take into account the width of the widest label
   } else {
+    
+    # This is old code that used to be necessary but it no longer is as the way ggplot calculates margin 
+    # spacing has changed
+    # # get the maximum offset and compare to the
+    # y_lab_max_size <- y_lab_max_size * .pt * 10
 
-    # get the maximum offset and compare to the
-    y_lab_max_size <- y_lab_max_size * .pt * 10
+    # max_offset <- pmax(y_lab_max_size, max_break_width)
 
-    max_offset <- pmax(y_lab_max_size, max_break_width)
+    # y_lab_size <- get_text_width(plot$labels$y, font_size = y_font_size) * .pt * 10
 
-    y_lab_size <- get_text_width(plot$labels$y, font_size = y_font_size) * .pt * 10
+    # diff <- max_offset - y_lab_size
 
-    diff <- max_offset - y_lab_size
-
-    adj_width <- max_break_width + diff
+    adj_width <- max_break_width - 1 # + diff
   }
 
   # add the break adjustment to the plot
