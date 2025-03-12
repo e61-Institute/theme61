@@ -1,9 +1,10 @@
 # theme61 0.6.3
 
-11 Mar 2025
+12 Mar 2025
 
 #### Improved functionality
 
+* Add preview mode to `save_e61` that does not save the file but allows the graph to be viewed in the Viewer pane.
 * The `chart_type` argument in `save_e61` has been updated so that it now allows you to adjust the aspect ratio of your chart in an easy and consistent way. There are three valid values `normal` (aspect ratio of 0.75), `wide` (aspect ratio of 0.5) and `square` (aspect ratio of 1). You can also supply a list of values to `save_e61` if you are saving multiple charts.
 * Added the ability to save JPEGs. This functions in a similar way to how PNGs are currently saved - you can use the `res` argument in `save_e61` to adjust the resolution.
 
@@ -11,7 +12,13 @@
 
 * Fixed an issue where y-axis labels were not being aligned correctly when saving multiple plots at the same time. 
 * Fixed an issue where where you could not use a * in footnotes (e.g. for describing the level of statistical significance) without `save_e61` interpreting this as a new footnote.
+* Fixed legend positioning argument that broke due to ggplot2 3.5.0 release.
+* Fixed issue with y-axis labels being out-of-position in certain graphs.
+* Replaced an uninformative error message when y-axis limits did not include the full range of the data with a more informative error message.
+* Fixed image rendering issues on the website (I think).
 
+
+# theme61 0.6.2
 
 11 Dec 2023
 

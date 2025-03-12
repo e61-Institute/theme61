@@ -5,7 +5,8 @@
 \title{e61 themed spatial maps options}
 \usage{
 theme_e61_spatial(
-  legend = c("none", "bottom", "top", "left", "right"),
+  legend = c("none", "bottom", "top", "left", "right", "inside"),
+  legend_position = NULL,
   legend_title = FALSE,
   base_size = 10,
   base_family = "pt-sans"
@@ -13,6 +14,9 @@ theme_e61_spatial(
 }
 \arguments{
 \item{legend}{Character. Legend position, "none" (default) hides the legend.}
+
+\item{legend_position}{A numeric vector of length two setting the placement
+of legends that have the "inside" position. Takes values between 0 and 1.}
 
 \item{legend_title}{Logical. Include Legend title? Defaults to FALSE.}
 
@@ -28,8 +32,8 @@ ggplot2 object
 \description{
 Applies the e61 theme to ggplot spatial maps to adjust graph appearance. If
 you are looking to change the appearance of titles or labels, check the
-arguments in \code{\link[=labs_e61]{labs_e61()}}, which are probably what you are
-looking for.
+arguments in \code{\link[=labs_e61]{labs_e61()}}, which are probably what you are looking
+for.
 }
 \examples{
 

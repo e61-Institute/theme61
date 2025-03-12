@@ -6,3 +6,4 @@ minimal_plot <-
 minimal_plot_label <-
   ggplot(data.frame(x = c(0, 3), y = c(0, 3)), aes(x, y)) +
   geom_point()
+

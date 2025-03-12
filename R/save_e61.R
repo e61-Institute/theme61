@@ -39,7 +39,9 @@
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
 #' @param print_info Logical. Set to TRUE if you want graph dimensions and other
-#'   information printed to the console (defaults to FALSE).
+#'   information printed to the console. Defaults to FALSE.
+#' @param preview Logical. Set to TRUE to show a preview of the graph in the
+#'   Viewer pane but not save to disk. Defaults to FALSE.
 #' @param base_size Numeric. Chart font size. Default is 10.
 #' @param res Numeric. For saving to PNG only. Increase the size of the saved
 #'   PNG. E.g. `res = 2` doubles the size of the saved graph.
@@ -67,7 +69,7 @@
 #' @return Invisibly returns the file name.
 #' @export
 
-save_e61 <- function(filename,
+save_e61 <- function(filename = NULL,
                      ...,
                      plot = last_plot(),
                      format = c("svg", "pdf", "eps", "png", "jpg"),
@@ -76,6 +78,7 @@ save_e61 <- function(filename,
                      dim = list(height = NULL, width = NULL),
                      pad_width = 0,
                      max_height = NULL,
+                     preview = FALSE,
                      save_data = FALSE,
                      print_info = FALSE,
                      base_size = 10,
@@ -108,7 +111,6 @@ save_e61 <- function(filename,
                               what = "save_e61(height)",
                               details = c("!" = "It has been replaced with the `dim` argument which takes a named list like `list(width = 10, height = 10)`."))
 
-
   # Compile plots
   plots <- c(list(...), plotlist)
 
@@ -135,6 +137,15 @@ save_e61 <- function(filename,
       if(!chart_type[i] %in% c("normal", "wide", "square"))
         stop("Invalid chart type. All chart types must be one of 'normal', 'wide' or 'square'.")
     }
+  }
+
+  # Check if filename has been provided when preview mode is FALSE
+  if (!preview && is.null(filename)) stop("You must provide a file path to save the graph.")
+
+  # Override save directory with temp file if preview mode is TRUE
+  if (preview) {
+    cli::cli_alert_info("Preview mode is activated, file will not be saved to disk.")
+    filename <- tempfile(fileext = ".svg")
   }
 
   # Check if the save directory exists
