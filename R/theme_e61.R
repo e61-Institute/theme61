@@ -64,10 +64,14 @@ theme_e61 <- function(y_top = TRUE,
 
   if (legend == "inside") {
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (!is.numeric(legend_position) || length(legend_position) != 2)
 =======
     if (!is.numeric(legend_position) | length(legend_position) != 2)
 >>>>>>> a70b19d (add legend position inside)
+=======
+    if (!is.numeric(legend_position) || length(legend_position) != 2)
+>>>>>>> 213aca0 (correct booleans)
       stop("legend_position needs to be a length two numeric vector.")
 
     if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
@@ -340,10 +344,14 @@ theme_e61_spatial <- function(
 
   if (legend == "inside") {
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (!is.numeric(legend_position) || length(legend_position) != 2)
 =======
     if (!is.numeric(legend_position) | length(legend_position) != 2)
 >>>>>>> a70b19d (add legend position inside)
+=======
+    if (!is.numeric(legend_position) || length(legend_position) != 2)
+>>>>>>> 213aca0 (correct booleans)
       stop("legend_position needs to be a length two numeric vector.")
 
     if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
