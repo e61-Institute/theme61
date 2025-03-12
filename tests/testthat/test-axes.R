@@ -132,3 +132,18 @@ test_that("Functionality in auto y-axis scaling works", {
   expect_equal(get_aes_num(1700, diff = 9000, type = "next_smallest"), 1500)
   expect_equal(get_aes_num(0.17, diff = 90, type = "next_smallest"), 0.15)
 })
+
+test_that("Unsuitable custom limits throw error message", {
+
+  data <- data.frame(x = seq(1, 10, 1), y = runif(10, 3, 6))
+
+  ggplot(data, aes(x, y)) +
+    geom_point() +
+    scale_y_continuous_e61(limits = c(0, 10, 2))
+
+  ggplot(data, aes(x, y)) +
+    geom_point() +
+    scale_y_continuous_e61(limits = c(0, 2, 1))
+
+
+})
