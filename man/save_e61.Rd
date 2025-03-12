@@ -9,7 +9,7 @@ save_e61(
   ...,
   plot = last_plot(),
   format = c("svg", "pdf", "eps", "png", "jpg"),
-  chart_type = c("MN", "RN", "PPT"),
+  chart_type = NULL,
   auto_scale = TRUE,
   dim = list(height = NULL, width = NULL),
   pad_width = 0,
@@ -52,9 +52,9 @@ argument explicitly.}
 to SVG and PDF formats. If the file format is specified in \code{filename}, then
 this argument is ignored.}
 
-\item{chart_type}{String. Type of chart. This is used to set sensible chart
-widths based on the width of text in each document. Options are "MN" (for
-micronotes), "RN" (research notes) or "PPT" (PowerPoints).}
+\item{chart_type}{String, or vector of strings if saving multiple plots.
+Type of chart. This is used to set sensible chart widths based on the type
+of plot you are saving. Options are "Normal" (default; for normal charts),}
 
 \item{auto_scale}{Logical. Should the y-axis be scaled automatically. Default
 is TRUE.}
