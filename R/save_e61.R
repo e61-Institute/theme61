@@ -125,7 +125,7 @@ save_e61 <- function(filename = NULL,
   chart_type <- match.arg(chart_type)
 
   # Check if filename has been provided when preview mode is FALSE
-  if (!preview & is.null(filename)) stop("You must provide a file path to save the graph.")
+  if (!preview && is.null(filename)) stop("You must provide a file path to save the graph.")
 
   # Override save directory with temp file if preview mode is TRUE
   if (preview) {
