@@ -6,7 +6,8 @@ Mostly bug fixes with some minor functionality additions.
 
 * Add preview mode to `save_e61` that does not save the file but allows the graph to be viewed in the Viewer pane.
 * Fixed legend positioning argument that broke due to ggplot2 3.5.0 release.
-* Fixed issue with y-axis labels being out-of-position.
+* Fixed issue with y-axis labels being out-of-position in certain graphs.
+* Replaced an uninformative error message when y-axis limits did not include the full range of the data with a more informative error message.
 * Fixed image rendering issues on the website (I think).
 
 # theme61 0.6.2
