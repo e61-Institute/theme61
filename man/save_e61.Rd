@@ -5,7 +5,7 @@
 \title{Save graphs with theme61 styles and defaults}
 \usage{
 save_e61(
-  filename,
+  filename = NULL,
   ...,
   plot = last_plot(),
   format = c("svg", "pdf", "eps", "png"),
@@ -14,6 +14,7 @@ save_e61(
   dim = list(height = NULL, width = NULL),
   pad_width = 0,
   max_height = NULL,
+  preview = FALSE,
   save_data = FALSE,
   print_info = FALSE,
   base_size = 10,
@@ -70,12 +71,15 @@ chart. The default is 0 cm.}
 used to constrain the plot resizing algorithm in cases where you want to
 limit the height of your charts.}
 
+\item{preview}{Logical. Set to TRUE to show a preview of the graph in the
+Viewer pane but not save to disk. Defaults to FALSE.}
+
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph
 (defaults to FALSE).}
 
 \item{print_info}{Logical. Set to TRUE if you want graph dimensions and other
-information printed to the console (defaults to FALSE).}
+information printed to the console. Defaults to FALSE.}
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
 

@@ -8,7 +8,8 @@ theme_e61(
   y_top = TRUE,
   adj = 0,
   fix_left = 0,
-  legend = c("none", "bottom", "top", "left", "right"),
+  legend = c("none", "bottom", "top", "left", "right", "inside"),
+  legend_position = NULL,
   legend_title = FALSE,
   aspect_ratio = 0.75,
   panel_borders = TRUE,
@@ -28,11 +29,14 @@ name in \link{scale_y_continuous_e61}.}
 simultaneously or a vector of 2 numerics to adjust each axis title
 separately. More negative values move the text closer to the graph panel.}
 
-\item{fix_left}{Sometimes if the value of the \code{adj} argument is too
-negative, the margins on the left side of the graph start to cut off some
-of the text. Provide a small positive value (5?) to correct this.}
+\item{fix_left}{Sometimes if the value of the \code{adj} argument is too negative,
+the margins on the left side of the graph start to cut off some of the
+text. Provide a small positive value (5?) to correct this.}
 
 \item{legend}{Character. Legend position, "none" (default) hides the legend.}
+
+\item{legend_position}{A numeric vector of length two setting the placement
+of legends that have the "inside" position. Takes values between 0 and 1.}
 
 \item{legend_title}{Logical. Include legend title? Defaults to FALSE.}
 
@@ -59,8 +63,8 @@ ggplot2 object
 \description{
 Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
 appearance. If you are looking to change the appearance of titles or labels,
-check the arguments in \link{labs_e61}, which are probably what you are
-looking for.
+check the arguments in \link{labs_e61}, which are probably what you are looking
+for.
 }
 \examples{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +

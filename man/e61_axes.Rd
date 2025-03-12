@@ -68,17 +68,8 @@ bounds values with \code{NA}.
 \item \code{\link[scales:oob]{scales::squish_infinite()}} for squishing infinite values into range.
 }}
     \item{\code{na.value}}{Missing values will be replaced with this value.}
-    \item{\code{trans}}{For continuous scales, the name of a transformation object
-or the object itself. Built-in transformations include "asn", "atanh",
-"boxcox", "date", "exp", "hms", "identity", "log", "log10", "log1p", "log2",
-"logit", "modulus", "probability", "probit", "pseudo_log", "reciprocal",
-"reverse", "sqrt" and "time".
-
-A transformation object bundles together a transform, its inverse,
-and methods for generating breaks and labels. Transformation objects
-are defined in the scales package, and are called \verb{<name>_trans} (e.g.,
-\code{\link[scales:boxcox_trans]{scales::boxcox_trans()}}). You can create your own
-transformation with \code{\link[scales:trans_new]{scales::trans_new()}}.}
+    \item{\code{trans}}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Deprecated in favour of
+\code{transform}.}
     \item{\code{guide}}{A function used to create a guide or its name. See
 \code{\link[ggplot2:guides]{guides()}} for more information.}
   }}
