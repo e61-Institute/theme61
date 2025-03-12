@@ -27,7 +27,6 @@ test_that("Dimensioning functions", {
     suppressWarnings(expect_no_error(save_e61("custom-dim.png", plot, dim = list(width = 10))))
 
   })
-
 })
 
 test_that("Flipped coord formatting", {

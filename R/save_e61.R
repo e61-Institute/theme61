@@ -453,7 +453,7 @@ svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
 
   } else {
 
-    if(fmt == "svg"){
+    if(fmt == "png"){
       rsvg::rsvg_png(svg = file_in, file = file_out)
 
     } else if(fmt == "jpg"){
