@@ -439,7 +439,7 @@ svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
                    height = g_info$height * res
                    )
 
-    if(fmt == "svg"){
+    if(fmt == "png"){
       rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
 
     } else if(fmt == "jpg"){
