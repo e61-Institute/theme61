@@ -73,6 +73,9 @@ the height.}
 \item{preview}{Logical. Set to TRUE to show a preview of the graph in the
 Viewer pane but not save to disk. Defaults to FALSE.}
 
+\item{preview}{Logical. Set to TRUE to show a preview of the graph in the
+Viewer pane but not save to disk. Defaults to FALSE.}
+
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph
 (defaults to FALSE).}
