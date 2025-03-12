@@ -239,7 +239,7 @@ test_that("Multiple file saving", {
     suppressWarnings(save_e61("test_file", g))
 
     expect_setequal(list.files(pattern = "test_file.*"),
-                    c("test_file.svg", "test_file.pdf", "test_file.eps", "test_file.png"))
+                    c("test_file.svg", "test_file.pdf", "test_file.eps", "test_file.png", "test_file.jpg"))
   })
 
   # Error if invalid filename used
