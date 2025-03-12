@@ -6,6 +6,7 @@ update_labs <- function(plot, plot_width){
 
   p <- ggplotGrob(plot)
 
+
   # Title ----
 
   # First check whether the title has already been manually wrapped
@@ -135,7 +136,9 @@ rescale_text <- function(text, text_type, font_size, plot_width){
   # another rule for footnotes
   } else if(text_type == "caption"){
 
-    footnote_text <- stringr::str_replace_all(text, "\\\n", " ")
+    footnote_text <- stringr::str_replace_all(text, "\\\n\\*", " new_footnote\\*")
+    footnote_text <- stringr::str_replace_all(footnote_text, "\\\n", " ")
+    footnote_text <- stringr::str_remove(footnote_text, pattern = "^\\* ")
 
     sources <-
       stringr::str_extract(footnote_text, "(?<=Sources{0,1}\\:).*$") |>
@@ -152,7 +155,9 @@ rescale_text <- function(text, text_type, font_size, plot_width){
     }
 
     # split footnotes up if there are multiple and drop those with length 0
-    footnote_text <- stringr::str_split(footnote_text, "\\*+\\s*")
+    footnote_text <- stringr::str_split(footnote_text, "new_footnote\\*+\\s*")
+
+    footnote_text <- lapply(footnote_text, stringr::str_remove_all, pattern = "new_footnote")
 
     text_lengths <- lapply(footnote_text, get_text_width, font_size = font_size)
 
@@ -327,8 +332,13 @@ split_text_into_words <- function(text) {
 #' Update y-axis label spacing so that they are aesthetic
 #' plot - Plot object to adjust.
 #' y_lab_max_size - for multi-panels the max size of the y-axis labels
+#' panel_width - width of the panels in the chart
 #' @noRd
-update_y_axis_labels <- function(plot, max_break_width = NULL, y_lab_max_size = NULL){
+update_y_axis_labels <- function(plot,
+                                 max_break_width = NULL,
+                                 y_lab_max_size = NULL,
+                                 any_neg_break = FALSE,
+                                 any_dec_break = FALSE) {
 
   # get the difference in the label size
   y_font_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
@@ -341,24 +351,28 @@ update_y_axis_labels <- function(plot, max_break_width = NULL, y_lab_max_size = 
 
     adj_width <- get_y_break_width(plot)
 
-  # otherwise we have a multi panel and need to take into account the width of the widest label
+    if(adj_width > 20) spacing <- spacing + 1.2 * y_font_size
+
+  # otherwise we have a multi panel and need to take into account the width of the widest break label
   } else {
-    
-    # This is old code that used to be necessary but it no longer is as the way ggplot calculates margin 
+
+    # This is old code that used to be necessary but it no longer is as the way ggplot calculates margin
     # spacing has changed
     # # get the maximum offset and compare to the
     # y_lab_max_size <- y_lab_max_size * .pt * 10
 
     # max_offset <- pmax(y_lab_max_size, max_break_width)
+    adj_width <- max_break_width
 
-    # y_lab_size <- get_text_width(plot$labels$y, font_size = y_font_size) * .pt * 10
+    # increase the adjustment if there are decimal places and negatives
+    if(any_neg_break) adj_width <- adj_width + 2
 
-    # diff <- max_offset - y_lab_size
+    if(any_dec_break) adj_width <- adj_width + 2
 
-    adj_width <- max_break_width - 1 # + diff
+    if(max_break_width > 20) adj_width <- adj_width - 4
+
   }
 
-  # add the break adjustment to the plot
   plot <- plot +
     theme(
       axis.title.y.left = element_text(margin = margin(l = spacing, r = - adj_width), vjust = 1, hjust = 1, angle = 0),
@@ -368,10 +382,10 @@ update_y_axis_labels <- function(plot, max_break_width = NULL, y_lab_max_size = 
   return(plot)
 }
 
-#' Get the width of y-axis break labels
+#' Get the y-axis breaks for a chart
 #' plot - Plot object to adjust.
 #' @noRd
-get_y_break_width <- function(plot){
+get_y_breaks <- function(plot){
 
   # get the break text size
   p_build <- ggplot_build(plot)
@@ -395,7 +409,7 @@ get_y_break_width <- function(plot){
 
       aes_lims <- y_scale_lims
 
-    # otherwise we'll need to re calculate what the aesthetic limits will look like
+      # otherwise we'll need to re calculate what the aesthetic limits will look like
     } else {
 
       # check whether the chart is a bar chart or not
@@ -417,7 +431,7 @@ get_y_break_width <- function(plot){
           aes_lims <- c(min_y, max_y, tick)
         }
 
-      # otherwise have a look at the data
+        # otherwise have a look at the data
       } else {
 
         # this looks at the underlying chart data and returns the min and the max y values
@@ -446,6 +460,17 @@ get_y_break_width <- function(plot){
     }
   }
 
+  return(breaks)
+}
+
+#' Get the width of y-axis break labels
+#' Plot - Plot object to adjust.
+#' @noRd
+get_y_break_width <- function(plot){
+
+  breaks <- get_y_breaks(plot)
+  break_text_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
+
   # take the absolute value of the breaks if required
   neg_breaks <- ifelse(breaks < 0, "-", "")
 
@@ -464,6 +489,22 @@ get_y_break_width <- function(plot){
   break_width_pt <- .pt * max_break_width * 10 # so convert to points
 
   return(break_width_pt)
+}
+
+#' Check whether the y-breaks have negatives or decimal places - these break multi facet plots
+#' plot - Plot object to adjust.
+#' @noRd
+check_y_break_type <- function(plot){
+
+  breaks <- get_y_breaks(plot)
+
+  # Check whether there are any negative breaks
+  has_neg <- any(breaks < 0, na.rm = T)
+
+  # Check whether there are any breaks with decimal places in them
+  has_dec <- any(stringr::str_detect(breaks, "\\."), na.rm = T)
+
+  return(list("any_neg" = has_neg, "any_dec" = has_dec))
 }
 
 #' Get the font size of text from a particular aspect of a ggplot
@@ -528,11 +569,8 @@ update_plot_label <- function(plot, chart_type, base_size){
       # 3 - check that it has the adjustment attribute
       if(!is.null(attr(label, "adj_plot_label"))){
 
-        # 4 - get the base size of a micronote
-        mn_base_size <- get_base_size(chart_type = "MN")
-
-        # 5 - update the size - this will depend on the chart width and base text size
-        plot$layers[[i]]$aes_params$size <- 3.5 * base_size / mn_base_size
+        # 4 - update the size - this will depend on the chart width and base text size
+        plot$layers[[i]]$aes_params$size <- 3.5 * base_size / 10
       }
     }
   }

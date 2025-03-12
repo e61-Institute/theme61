@@ -8,7 +8,7 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
     file_i <- paste0(filename, ".", fmt)
 
     # Create a temp name for png
-    if (fmt == "png") file_temp <- tempfile(fileext = ".svg")
+    if (fmt == "png" | fmt == "jpg") file_temp <- tempfile(fileext = ".svg")
 
     # add very slight width buffer
     width <- width + 0.1
@@ -18,8 +18,9 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
       svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
       eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
       pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
-      # When saving PNG we save the SVG first then convert it to PNG
-      png = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
+      # When saving PNG or JPEG we save the SVG first then convert it to PNG or JPEG
+      png = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
+      jpg = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
     )
 
     print(graph)
@@ -27,7 +28,10 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
 
     # Save a PNG if required
     if (fmt == "png") {
-      svg_to_png(file_temp, paste0(filename, ".png"), delete = TRUE, res = res)
+      svg_to_bitmap(file_temp, paste0(filename, ".png"), delete = TRUE, res = res)
+
+    } else if(fmt == "jpg") {
+      svg_to_bitmap(file_temp, paste0(filename, ".jpg"), delete = TRUE, res = res)
     }
   })
 }
@@ -52,53 +56,6 @@ check_plots <- function(plots){
   return(temp_list)
 }
 
-#' Get the correct plot width based on the chart type
-#' @noRd
-get_plot_width <- function(chart_type){
-
-  # Set the maximum width based on the type of outputs
-  if(chart_type == "MN"){
-
-    max_width <- 18.59 # based on 215.9mm page width and 15mm margins either side
-
-  } else if(chart_type == "RN"){
-
-    max_width <- 13.985 # based on 338.7mm page width, 20mm margins, 15mm column sep and 2 columns (i.e. divide the remainder by 2)
-
-  } else if(chart_type == "PPT"){
-
-    max_width <- 31.32
-
-  } else if(is.null(chart_type)){
-
-    max_width <- 20
-
-  } else {
-    stop("Invalid chart type. Please select from one of the following: 'MN' for micronotes, 'RN' for research notes, 'PPT' for powerpoint slides, or leave blank to use default maximum widths")
-  }
-
-  return(max_width)
-}
-
-#' Get the base size of the plot
-#' @noRd
-get_base_size <- function(chart_type, plot_base_size = 10){
-
-  # update the base size if the chart is not for a micronote
-  if(chart_type == "RN"){
-
-    plot_base_size <- plot_base_size * get_plot_width("RN") / get_plot_width("MN")
-
-  } else if(chart_type == "PPT"){
-
-    plot_base_size <- plot_base_size * get_plot_width("PPT") / get_plot_width("MN")
-
-  } else {
-    plot_base_size <- plot_base_size * 20 / get_plot_width("MN")
-  }
-
-  return(plot_base_size)
-}
 
 #' Replication of testthat::is_testing() so we can turn off some functionality
 #' in the test env.

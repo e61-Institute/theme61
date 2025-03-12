@@ -23,12 +23,21 @@
 <g clip-path='url(#cpMC4wMHw1MjkuODB8MC4wMHw0NzQuODY=)'>
 </g>
 <defs>
+<<<<<<< HEAD
+  <clipPath id='cpMC4wMHw1MjkuODB8Ny42MHw0NTguMzY='>
+    <rect x='0.000000000000050' y='7.60' width='529.80' height='450.77' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw1MjkuODB8Ny42MHw0NTguMzY=)'>
+<rect x='0.000000000000064' y='7.60' width='529.80' height='450.77' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF;' />
+=======
   <clipPath id='cpMC4wMHw1MjkuODB8MTIuMDV8NDYyLjgx'>
     <rect x='0.000000000000050' y='12.05' width='529.80' height='450.77' />
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHw1MjkuODB8MTIuMDV8NDYyLjgx)'>
 <rect x='0.000000000000064' y='12.05' width='529.80' height='450.77' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF;' />
+>>>>>>> 51c2fafbb717f9c4b633cfb6954a8389b5eaa74f
 </g>
 <g clip-path='url(#cpMC4wMHw1MjkuODB8MC4wMHw0NzQuODY=)'>
 </g>
