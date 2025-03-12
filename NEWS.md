@@ -4,7 +4,7 @@
 
 #### Improved functionality
 
-* The `chart_type` argument in `save_e61` has been updated so that it now allows you to adjust the aspect ratio of your chart in an easy and consistent way. There are three valid values `Normal` (aspect ratio of 0.75), `Wide` (aspect ratio of 0.5) and `Square` (aspect ratio of 1). You can also supply a list of values to `save_e61` if you are saving multiple charts.
+* The `chart_type` argument in `save_e61` has been updated so that it now allows you to adjust the aspect ratio of your chart in an easy and consistent way. There are three valid values `normal` (aspect ratio of 0.75), `wide` (aspect ratio of 0.5) and `square` (aspect ratio of 1). You can also supply a list of values to `save_e61` if you are saving multiple charts.
 * Added the ability to save JPEGs. This functions in a similar way to how PNGs are currently saved - you can use the `res` argument in `save_e61` to adjust the resolution.
 
 #### Bug fixes

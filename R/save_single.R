@@ -35,7 +35,7 @@ save_single <- function(
 
   # Set maximum width based on output type ----------------------------------
 
-  if(is.null(chart_type)) chart_type <- "Normal"
+  if(is.null(chart_type)) chart_type <- "normal"
 
   max_width <- 18.59
 
@@ -74,13 +74,13 @@ save_single <- function(
     warning(paste0("Multiple chart types supplied, using first in list, which is: ", chart_type, "."))
   }
 
-  if(chart_type == "Normal") {
+  if(chart_type == "normal") {
     plot <- plot + theme(aspect.ratio = 0.75)
 
-  } else if(chart_type == "Square") {
+  } else if(chart_type == "square") {
     plot <- plot + theme(aspect.ratio = 1)
 
-  } else if(chart_type == "Wide") {
+  } else if(chart_type == "wide") {
     plot <- plot + theme(aspect.ratio = 0.5)
   }
 

@@ -56,53 +56,6 @@ check_plots <- function(plots){
   return(temp_list)
 }
 
-#' Get the correct plot width based on the chart type
-#' @noRd
-get_plot_width <- function(chart_type){
-
-  # Set the maximum width based on the type of outputs
-  if(chart_type == "MN"){
-
-    max_width <- 18.59 # based on 215.9mm page width and 15mm margins either side
-
-  } else if(chart_type == "RN"){
-
-    max_width <- 13.985 # based on 338.7mm page width, 20mm margins, 15mm column sep and 2 columns (i.e. divide the remainder by 2)
-
-  } else if(chart_type == "PPT"){
-
-    max_width <- 31.32
-
-  } else if(is.null(chart_type)){
-
-    max_width <- 20
-
-  } else {
-    stop("Invalid chart type. Please select from one of the following: 'MN' for micronotes, 'RN' for research notes, 'PPT' for powerpoint slides, or leave blank to use default maximum widths")
-  }
-
-  return(max_width)
-}
-
-#' #' Get the base size of the plot
-#' #' @noRd
-#' get_base_size <- function(chart_type, plot_base_size = 10){
-#'
-#'   # update the base size if the chart is not for a micronote
-#'   if(chart_type == "RN"){
-#'
-#'     plot_base_size <- plot_base_size * get_plot_width("RN") / get_plot_width("MN")
-#'
-#'   } else if(chart_type == "PPT"){
-#'
-#'     plot_base_size <- plot_base_size * get_plot_width("PPT") / get_plot_width("MN")
-#'
-#'   } else {
-#'     plot_base_size <- plot_base_size * 20 / get_plot_width("MN")
-#'   }
-#'
-#'   return(plot_base_size)
-#' }
 
 #' Replication of testthat::is_testing() so we can turn off some functionality
 #' in the test env.

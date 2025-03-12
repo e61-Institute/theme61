@@ -77,14 +77,14 @@ save_multi <-
         chart_type_temp <- chart_type
       }
 
-      if(chart_type_temp == "Wide") {
+      if(chart_type_temp == "wide") {
         temp_plot <- temp_plot + theme(aspect.ratio = 0.5)
 
-      } else if(chart_type_temp == "Square") {
+      } else if(chart_type_temp == "square") {
 
         temp_plot <- temp_plot + theme(aspect.ratio = 1)
 
-      } else if(chart_type_temp == "Normal") {
+      } else if(chart_type_temp == "normal") {
 
         temp_plot <- temp_plot + theme(aspect.ratio = 0.75)
       }

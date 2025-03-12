@@ -19,8 +19,8 @@
 #'   argument explicitly.
 #' @param chart_type String, or vector of strings if saving multiple plots.
 #'   Type of chart. This is used to set sensible chart widths based on the type
-#'   of plot you are saving. Options are "Normal" (default; for normal charts),
-#    "Wide" (for time series notes) or "Square" (for scatter plots).
+#'   of plot you are saving. Options are "normal" (default; for normal charts),
+#    "wide" (for time series graphs) or "square" (for scatter plots).
 #' @param auto_scale Logical. Should the y-axis be scaled automatically. Default
 #'   is TRUE.
 #' @param dim An optional named list specifying the plot height and width.
@@ -122,18 +122,18 @@ save_e61 <- function(filename,
 
   # Enforce chart type
   if(is.null(chart_type)){
-    chart_type <- "Other"
+    chart_type <- "normal"
 
   } else if(length(chart_type) == 1){
 
-    if(!chart_type %in% c("Normal", "Wide", "Square"))
-      stop("Invalid chart type. All chart types must be one of 'Normal', 'Wide' or 'Square'.")
+    if(!chart_type %in% c("normal", "wide", "square"))
+      stop("Invalid chart type. All chart types must be one of 'normal', 'wide' or 'square'.")
 
   } else if(length(chart_type) > 1){
 
     for(i in 1:length(chart_type)){
-      if(!chart_type[i] %in% c("Normal", "Wide", "Square"))
-        stop("Invalid chart type. All chart types must be one of 'Normal', 'Wide' or 'Square'.")
+      if(!chart_type[i] %in% c("normal", "wide", "square"))
+        stop("Invalid chart type. All chart types must be one of 'normal', 'wide' or 'square'.")
     }
   }
 
