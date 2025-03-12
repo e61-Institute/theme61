@@ -17,6 +17,7 @@
 * Replaced an uninformative error message when y-axis limits did not include the full range of the data with a more informative error message.
 * Fixed image rendering issues on the website (I think).
 
+
 # theme61 0.6.2
 
 11 Dec 2023

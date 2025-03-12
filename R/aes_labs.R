@@ -357,11 +357,14 @@ update_y_axis_labels <- function(plot,
   } else {
 
     # This is old code that used to be necessary but it no longer is as the way ggplot calculates margin
+<<<<<<< HEAD
     # spacing has changed
     # # get the maximum offset and compare to the
     # y_lab_max_size <- y_lab_max_size * .pt * 10
 
     # This is old code that used to be necessary but it no longer is as the way ggplot calculates margin
+=======
+>>>>>>> 1e84192 (Minor bug fixes and improved functionality (#237))
     # spacing has changed
     # # get the maximum offset and compare to the
     # y_lab_max_size <- y_lab_max_size * .pt * 10
