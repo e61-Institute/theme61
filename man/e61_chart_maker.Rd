@@ -11,22 +11,22 @@ e61_chart_maker(
 )
 }
 \arguments{
-\item{data}{a data.frame, you can pass a data.frame explicitly to the
+\item{data}{A data.frame, you can pass a data.frame explicitly to the
 function, or choose one in global environment after loading.}
 
-\item{controls}{Controls menu to be displayed. Use \code{NULL} to hide all menus.}
+\item{controls}{Character. Controls menu to be displayed. Use \code{NULL} to hide
+all menus.}
 
-\item{viewer}{Where to display the gadget: "dialog", "pane" or
+\item{viewer}{Character. Where to display the gadget: "dialog", "pane" or
 "browser" (see \code{\link[shiny:viewer]{shiny::viewer()}}).}
 }
 \value{
-You can view code used to produce the chart, copy it or
-insert it in current script.
+You can view code used to produce the chart, copy it or insert it in
+current script.
 }
 \description{
-Select data to be used and map variables to aesthetics to
-produce a chart, customise common elements and get code to reproduce the
-chart.
+Select data to be used and map variables to aesthetics to produce a chart,
+customise common elements and get code to reproduce the chart.
 }
 \examples{
 \dontrun{

@@ -28,13 +28,8 @@ save_multi <-
 
     # Set maximum width based on output type ----------------------------------
 
-    if(is.null(chart_type)) chart_type <- "MN"
-
-    max_width <- get_plot_width(chart_type)
-    max_height <- get_plot_width(chart_type)
-
-    # Update the base size based on the type of chart (MN, RN etc.) being produced
-    base_size <- base_size * max_width / get_plot_width("MN")
+    max_width <- 18.59
+    max_height <- 18.59
 
 
     # Set width -------------------------------------------------------------
@@ -66,10 +61,33 @@ save_multi <-
     max_right_axis_width <- 0
     y_lab_max_size <- 0
     max_break_width <- 0
+    any_neg_break <- FALSE
+    any_dec_break <- FALSE
 
     for(i in seq_along(plots)){
 
       temp_plot <- plots[[i]]
+
+
+      # Update the aspect ratio
+      if(length(chart_type) > 1) {
+        chart_type_temp <- chart_type[i]
+
+      } else {
+        chart_type_temp <- chart_type
+      }
+
+      if(chart_type_temp == "wide") {
+        temp_plot <- temp_plot + theme(aspect.ratio = 0.5)
+
+      } else if(chart_type_temp == "square") {
+
+        temp_plot <- temp_plot + theme(aspect.ratio = 1)
+
+      } else if(chart_type_temp == "normal") {
+
+        temp_plot <- temp_plot + theme(aspect.ratio = 0.75)
+      }
 
       # set the background colour
       temp_plot <- temp_plot + theme(rect = element_rect(fill = bg_colour))
@@ -120,6 +138,13 @@ save_multi <-
       break_width <- get_y_break_width(temp_plot)
       max_break_width <- pmax(break_width, max_break_width, na.rm = T)
 
+      # track whether any label has a - or . - these are measured poorly in the multi plots for some reason
+
+      break_type <- check_y_break_type(temp_plot)
+
+      any_neg_break <- any(break_type$any_neg, any_neg_break, na.rm = T)
+      any_dec_break <- any(break_type$any_dec, any_dec_break, na.rm = T)
+
       # keep track of the max right axis and left axis widths as all charts are set to have the same dimensions
       right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r"))
       max_right_axis_width <- pmax(max_right_axis_width, right_axis_width)
@@ -157,7 +182,7 @@ save_multi <-
 
     # Divide the free width by the number of columns (panels) we have
     panel_width <- free_wd / ncol # width of each panel
-    panel_height <- panel_width * max_panel_asps # height of each panel (width * aspect ratio)
+    panel_height <- panel_width * max_panel_asps # height of the tallest panel (width * aspect ratio)
 
 
     # Update the labels -------------------------------------------------------
@@ -171,7 +196,7 @@ save_multi <-
         # update y-axis labels - if the y-axis labels are set to the top
         suppressMessages({
           if(isFALSE(attr(temp_plot$theme, "no_y_top")))
-            temp_plot <- update_y_axis_labels(temp_plot, max_break_width, y_lab_max_size)
+            temp_plot <- update_y_axis_labels(temp_plot, max_break_width, y_lab_max_size, any_neg_break, any_dec_break)
         })
 
         # update labels - for each set the limit as width - knowwidth (axis labels etc.) divided by the number of columns we have

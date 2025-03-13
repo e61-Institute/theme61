@@ -5,15 +5,16 @@
 \title{Save graphs with theme61 styles and defaults}
 \usage{
 save_e61(
-  filename,
+  filename = NULL,
   ...,
   plot = last_plot(),
-  format = c("svg", "pdf", "eps", "png"),
-  chart_type = c("MN", "RN", "PPT"),
+  format = c("svg", "pdf", "eps", "png", "jpg"),
+  chart_type = NULL,
   auto_scale = TRUE,
   dim = list(height = NULL, width = NULL),
   pad_width = 0,
   max_height = NULL,
+  preview = FALSE,
   save_data = FALSE,
   print_info = FALSE,
   base_size = 10,
@@ -47,44 +48,46 @@ do not include the extension, see the \code{format} argument for details.}
 to the last plot displayed so usually you do not need to provide this
 argument explicitly.}
 
-\item{format}{An optional vector of file formats to save as. For example
-\code{c("svg", "pdf")} will save 2 files with the same name to the same location
-to SVG and PDF formats. If the file format is specified in \code{filename}, then
-this argument is ignored.}
+\item{format}{A string vector of file formats to save as. Accepts "svg",
+"pdf", "eps", "png". For example \code{c("svg", "pdf")} will save 2 files with
+the same name to the same location to SVG and PDF formats. If the file
+format is specified in \code{filename}, then this argument is ignored.}
 
-\item{chart_type}{String. Type of chart. This is used to set sensible chart
-widths based on the width of text in each document. Options are "MN" (for
-micronotes), "RN" (research notes) or "PPT" (PowerPoints).}
+\item{chart_type}{String, or vector of strings if saving multiple plots.
+Type of chart. This is used to set sensible chart widths based on the type
+of plot you are saving. Options are "normal" (default; for normal charts),}
 
-\item{auto_scale}{Logical. Should the y-axis be scaled automatically. Default
-is TRUE.}
+\item{auto_scale}{Logical. Scale the y-axis automatically. Default is TRUE.}
 
-\item{dim}{An optional named list specifying the plot height and width.
-Defaults to NULL which means the graph dimensions will be set based on the
-chart type and function-calculated value.}
+\item{dim}{A named list specifying the plot height and width. Defaults to
+NULL which means the graph dimensions will be calculated automatically.}
 
-\item{pad_width}{Add optional argument which adds padding to the width of a
-chart. The default is 0 cm.}
+\item{pad_width}{Numeric. Add horizontal whitespace to the sides of the
+graph. Defaults to no additional padding.}
 
 \item{max_height}{Numeric. The maximum height of your plot in cm. This is
 used to constrain the plot resizing algorithm in cases where you want to
-limit the height of your charts.}
+limit the height of your charts. Defaults to NULL which does not restrict
+the height.}
+
+\item{preview}{Logical. Set to TRUE to show a preview of the graph in the
+Viewer pane but not save to disk. Defaults to FALSE.}
 
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph
 (defaults to FALSE).}
 
 \item{print_info}{Logical. Set to TRUE if you want graph dimensions and other
-information printed to the console (defaults to FALSE).}
+information printed to the console. Defaults to FALSE.}
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
 
-\item{res}{Numeric. For saving to PNG only. Increase the size of the saved
+\item{res}{Numeric. For saving to PNG only. Rescale the size of the saved
 PNG. E.g. \code{res = 2} doubles the size of the saved graph.}
 
-\item{bg_colour}{Sets the graph background colour. Defaults to "white".
-Accepts a colour name, hex code or theme61 colour object name. For graphs
-used in research note boxes, set the colour to \code{e61_boxback}.}
+\item{bg_colour}{Set the graph background colour. Accepts a colour name, hex
+code or theme61 colour object name. Defaults to "white". For graphs used in
+research note boxes, set the colour to \code{e61_boxback}.}
 
 \item{plotlist}{(multi-panel specific) List of plots to combine as an
 multi-panel and save. You can also enter the charts individually as
@@ -101,10 +104,10 @@ separate points you include in the graph.}
 
 \item{sources}{String vector providing the names of sources for the graph.}
 
-\item{spacing_adj}{(multi-panel specific) An optional named list specifying
-the adjustment to the title and subtitle. Rescales the size of the space
-give to the multi-panel title/subtitle. Use if you think the title looks
-too cramped on the chart.}
+\item{spacing_adj}{(multi-panel specific) A named list specifying the
+adjustment to the title and subtitle. Rescales the size of the space given
+to the multi-panel title/subtitle. Use if you think the title looks too
+cramped on the chart.}
 
 \item{height_adj}{(multi-panel specific) Rescales the height of the
 multi-panel. The function sets sensible defaults but this provides you with
@@ -121,9 +124,8 @@ vertically ("v") aligned. Options are "none" (default), "hv" (align in both dire
 margins. Options are "none" (default), or a string of any combination of l, r, t, and b in any order (e.g. "tblr" or "rlbt" for aligning all margins).
 Must be specified if any of the graphs are complex (e.g. faceted) and alignment is specified and desired. See \code{\link[cowplot:align_plots]{align_plots()}} for details.}
 
-\item{rel_heights}{(multi-panel specific) A numeric vector giving the
-relative proportions of each graph component (title, plots, footer
-(optional)).}
+\item{rel_heights}{(multi-panel specific) A numeric vector giving
+the relative proportions of each graph component (title, plots, footer).}
 
 \item{width, height}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} width and height are
 no longer supported; use \code{dim} instead.}

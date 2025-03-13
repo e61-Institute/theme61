@@ -2,19 +2,21 @@
 #'
 #' Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
 #' appearance. If you are looking to change the appearance of titles or labels,
-#' check the arguments in [labs_e61], which are probably what you are
-#' looking for.
+#' check the arguments in [labs_e61], which are probably what you are looking
+#' for.
 #'
-#' @param y_top Defaults to TRUE. Puts the y-axis title at the top. If you
-#'   change this argument you also need to change the argument with the same
+#' @param y_top Logical. Puts the y-axis title at the top. Defaults to TRUE. If
+#'   you change this argument you also need to change the argument with the same
 #'   name in [scale_y_continuous_e61].
 #' @param adj Either a single numeric to adjust left and right axis titles
 #'   simultaneously or a vector of 2 numerics to adjust each axis title
 #'   separately. More negative values move the text closer to the graph panel.
-#' @param fix_left Sometimes if the value of the `adj` argument is too
+#' @param fix_left Numeric. Sometimes if the value of the `adj` argument is too
 #'   negative, the margins on the left side of the graph start to cut off some
 #'   of the text. Provide a small positive value (5?) to correct this.
 #' @param legend Character. Legend position, "none" (default) hides the legend.
+#' @param legend_position A numeric vector of length two setting the placement
+#'   of legends that have the "inside" position. Takes values between 0 and 1.
 #' @param legend_title Logical. Include legend title? Defaults to FALSE.
 #' @param aspect_ratio Numeric. Sets the aspect ratio of the graph panel.
 #' @param background Character. Default is "white". For all graphs that you
@@ -40,7 +42,8 @@
 theme_e61 <- function(y_top = TRUE,
                       adj = 0,
                       fix_left = 0,
-                      legend = c("none", "bottom", "top", "left", "right"),
+                      legend = c("none", "bottom", "top", "left", "right", "inside"),
+                      legend_position = NULL,
                       legend_title = FALSE,
                       aspect_ratio = 0.75,
                       panel_borders = TRUE,
@@ -52,6 +55,14 @@ theme_e61 <- function(y_top = TRUE,
                       ) {
 
   legend <- match.arg(legend)
+
+  if (legend == "inside") {
+    if (!is.numeric(legend_position) || length(legend_position) != 2)
+      stop("legend_position needs to be a length two numeric vector.")
+
+    if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
+      stop("Both legend_position values must be between 0 and 1.")
+  }
 
   half_line <- base_size / 2
 
@@ -223,6 +234,14 @@ theme_e61 <- function(y_top = TRUE,
       legend.title = element_blank()
     )
 
+  # add legend position if inside
+  if (legend == "inside") {
+    ret <- ret +
+      theme(
+        legend.position.inside = legend_position
+      )
+  }
+
   # add panel borders if the user requests them
   if (legend_title) {
     ret <- ret %+replace%
@@ -273,10 +292,12 @@ theme_e61 <- function(y_top = TRUE,
 #'
 #' Applies the e61 theme to ggplot spatial maps to adjust graph appearance. If
 #' you are looking to change the appearance of titles or labels, check the
-#' arguments in [theme61::labs_e61()], which are probably what you are
-#' looking for.
+#' arguments in [theme61::labs_e61()], which are probably what you are looking
+#' for.
 #'
 #' @param legend Character. Legend position, "none" (default) hides the legend.
+#' @param legend_position A numeric vector of length two setting the placement
+#'   of legends that have the "inside" position. Takes values between 0 and 1.
 #' @param legend_title Logical. Include Legend title? Defaults to FALSE.
 #' @param aspect_ratio Numeric. Sets the aspect ratio of the graph panel.
 #' @param base_size Numeric. Chart font size. Default is 10.
@@ -298,13 +319,23 @@ theme_e61 <- function(y_top = TRUE,
 #' }
 #'
 theme_e61_spatial <- function(
-  legend = c("none", "bottom", "top", "left", "right"),
+  legend = c("none", "bottom", "top", "left", "right", "inside"),
+  legend_position = NULL,
   legend_title = FALSE,
   base_size = 10,
   base_family = "pt-sans"
 ){
 
   legend <- match.arg(legend)
+
+  if (legend == "inside") {
+    if (!is.numeric(legend_position) || length(legend_position) != 2)
+      stop("legend_position needs to be a length two numeric vector.")
+
+    if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
+      stop("Both legend_position values must be between 0 and 1.")
+  }
+
 
   half_line <- base_size / 2
 
@@ -356,7 +387,16 @@ theme_e61_spatial <- function(
       panel.border = element_blank()
     )
 
-  if(legend_title) ret <- ret + theme(legend.title = element_text())
+  if (legend_title) ret <- ret + theme(legend.title = element_text())
+
+  # add legend position if inside
+  if (legend == "inside") {
+    ret <- ret +
+      theme(
+        legend.position.inside = legend_position
+      )
+  }
+
 
   return(ret)
 }

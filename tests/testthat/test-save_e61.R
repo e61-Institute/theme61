@@ -27,7 +27,6 @@ test_that("Dimensioning functions", {
     suppressWarnings(expect_no_error(save_e61("custom-dim.png", plot, dim = list(width = 10))))
 
   })
-
 })
 
 test_that("Flipped coord formatting", {
@@ -187,10 +186,10 @@ test_that("Different file formats", {
   withr::with_tempdir({
 
     # No support for some file formats
-    expect_error(suppressWarnings(save_e61("text.jpg")))
+    expect_error(suppressWarnings(save_e61("text.tif")))
 
     # Having svg in the file name (but not format) should still trip the file format error
-    expect_error(suppressWarnings(save_e61("svg-text.jpg")))
+    expect_error(suppressWarnings(save_e61("svg-text.tif")))
 
     # Make sure the slightly fiddlier PNG saving method works
     suppressWarnings(save_e61("test-png.png", g), classes = c("warning", "message"))
@@ -239,7 +238,7 @@ test_that("Multiple file saving", {
     suppressWarnings(save_e61("test_file", g))
 
     expect_setequal(list.files(pattern = "test_file.*"),
-                    c("test_file.svg", "test_file.pdf", "test_file.eps", "test_file.png"))
+                    c("test_file.svg", "test_file.pdf", "test_file.eps", "test_file.png", "test_file.jpg"))
   })
 
   # Error if invalid filename used
@@ -293,6 +292,29 @@ test_that("PNG resolution changer works", {
 
     expect_snapshot_file(suppressWarnings(save_e61("png-1.png", plot)))
     expect_snapshot_file(suppressWarnings(save_e61("png-2.png", plot, res = 2)))
+  })
+})
+
+test_that("Preview mode works", {
+  p <- minimal_plot
+
+  withr::with_tempdir({
+
+    # Check that the file is saved if preview is FALSE
+    suppressWarnings(save_e61("plot.svg", p, preview = FALSE))
+    expect_true(file.exists("plot.svg"))
+    unlink("plot.svg")
+
+    # Check that no file is saved in preview mode
+    expect_message(save_e61("plot.svg", p, preview = TRUE),
+                   ".*Preview mode is activated.*")
+    expect_false(file.exists("plot.svg"))
+
+    # It is not possible to check if the graph appears in the Viewer pane
+    # automatically, so run the below code to manually check functionality if
+    # required.
+
+    # save_e61(p, preview = TRUE)
   })
 })
 

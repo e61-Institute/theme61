@@ -102,6 +102,28 @@ scale_y_continuous_e61 <- function(limits = NULL,
   if (isFALSE(y_top))
     class(retval) <- c(class(retval), "no_y_top")
 
+  # Only add our data-range check if numeric limits were supplied
+  if (!is.null(limits) && is.numeric(limits)) {
+    # Save the original train function
+    orig_train <- retval$train
+
+    # Override the train method
+    retval$train <- function(x) {
+      # Call the original train to update x based on data
+      orig_train(x)
+      # x now contains the data values (possibly transformed) used to train the scale
+      data_range <- range(x, na.rm = TRUE)
+
+      # Stop if actual data range fall outside the provided limits
+      if (limits[1] > data_range[1] || limits[2] < data_range[2]) {
+        cli::cli_abort("Supplied limits are outside the data's range. Data range: [{data_range[1]}, {data_range[2]}]; Supplied limits: [{limits[1]}, {limits[2]}]. Change your limits so they contain the full range of the data.",
+                       call = expr(scale_y_continuous_e61()),
+                       class = "error"
+                       )
+      }
+    }
+  }
+
   return(retval)
 }
 

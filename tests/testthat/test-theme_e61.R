@@ -49,3 +49,37 @@ test_that("square_legend_symbols is working", {
   })
 
 })
+
+test_that("Legend position can be adjusted", {
+  p <-
+    ggplot(data.frame(x = 1:3, y = 1:3, colour = 1:3),
+           aes(x, y, colour = colour)) +
+    geom_point()
+
+  p1 <- p +
+    theme_e61(legend = "top")
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("legend-chk-1.svg", p1)))
+  })
+
+  p1 <- p +
+    theme_e61(legend = "bottom")
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("legend-chk-2.svg", p1)))
+  })
+
+  expect_error({p + theme_e61(legend = "inside")})
+  expect_error({p + theme_e61(legend = "inside", legend_position = c(20, 245))})
+  expect_error({p + theme_e61(legend = "inside", legend_position = 20)})
+  expect_error({p + theme_e61(legend = "inside", legend_position = c("a", "b"))})
+
+  p1 <- p +
+    theme_e61(legend = "inside", legend_position = c(0.9, 0.85))
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("legend-chk-3.svg", p1)))
+  })
+
+})
