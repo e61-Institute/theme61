@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,9 +33,28 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/e61-institute/theme61/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/e61-institute/theme61/blob/v0.6.3/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.3" id="theme61-063">theme61 0.6.3<a class="anchor" aria-label="anchor" href="#theme61-063"></a></h2>
+<p>12 Mar 2025</p>
+<div class="section level5">
+<h5 id="improved-functionality-0-6-3">Improved functionality<a class="anchor" aria-label="anchor" href="#improved-functionality-0-6-3"></a></h5>
+<ul><li>Add preview mode to <code>save_e61</code> that does not save the file but allows the graph to be viewed in the Viewer pane.</li>
+<li>The <code>chart_type</code> argument in <code>save_e61</code> has been updated so that it now allows you to adjust the aspect ratio of your chart in an easy and consistent way. There are three valid values <code>normal</code> (aspect ratio of 0.75), <code>wide</code> (aspect ratio of 0.5) and <code>square</code> (aspect ratio of 1). You can also supply a list of values to <code>save_e61</code> if you are saving multiple charts.</li>
+<li>Added the ability to save JPEGs. This functions in a similar way to how PNGs are currently saved - you can use the <code>res</code> argument in <code>save_e61</code> to adjust the resolution.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="bug-fixes-0-6-3">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-6-3"></a></h5>
+<ul><li>Fixed an issue where y-axis labels were not being aligned correctly when saving multiple plots at the same time.</li>
+<li>Fixed an issue where where you could not use a * in footnotes (e.g. for describing the level of statistical significance) without <code>save_e61</code> interpreting this as a new footnote.</li>
+<li>Fixed legend positioning argument that broke due to ggplot2 3.5.0 release.</li>
+<li>Fixed issue with y-axis labels being out-of-position in certain graphs.</li>
+<li>Replaced an uninformative error message when y-axis limits did not include the full range of the data with a more informative error message.</li>
+<li>Fixed image rendering issues on the website (I think).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.2" id="theme61-062">theme61 0.6.2<a class="anchor" aria-label="anchor" href="#theme61-062"></a></h2>
 <p>11 Dec 2023</p>

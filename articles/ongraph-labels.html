@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@
       <h1>Adding on-graph labels</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/e61-institute/theme61/blob/main/vignettes/ongraph-labels.rmd" class="external-link"><code>vignettes/ongraph-labels.rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/e61-institute/theme61/blob/v0.6.3/vignettes/ongraph-labels.rmd" class="external-link"><code>vignettes/ongraph-labels.rmd</code></a></small>
       <div class="d-none name"><code>ongraph-labels.rmd</code></div>
     </div>
 
@@ -126,9 +126,9 @@ ordered factor, and calling the label names using
 <span>    x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"n"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-plot-label.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-plot-label.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="..%2Fman%2Ffigures%2Flabel-plot-label.svg"><!-- --></p>
+<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/label-plot-label.svg"</span>, <span class="va">graph</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="st">"../man/figures/label-plot-label.svg"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/label-plot-label.svg"><!-- --></p>
 </div>
 <div class="section level2">
 <h2 id="facets">Facets<a class="anchor" aria-label="anchor" href="#facets"></a>
@@ -157,9 +157,9 @@ ordered factor, and calling the label names using
 <span>    facet_value <span class="op">=</span> <span class="st">"1"</span></span>
 <span>  <span class="op">)</span> </span>
 <span></span>
-<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-facet-1.svg"</span><span class="op">)</span>, <span class="va">p1</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-facet-1.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="..%2Fman%2Ffigures%2Flabel-facet-1.svg"><!-- --></p>
+<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/label-facet-1.svg"</span>, <span class="va">p1</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="st">"../man/figures/label-facet-1.svg"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/label-facet-1.svg"><!-- --></p>
 <p>If you want to place the labels on different facets, simply supply a
 vector to <code>facet_value</code> with which facet you want each label
 to appear in.</p>
@@ -176,9 +176,9 @@ to appear in.</p>
 <span>    facet_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span>, <span class="st">"2"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-facet-2.svg"</span><span class="op">)</span>, <span class="va">p2</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-facet-2.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="..%2Fman%2Ffigures%2Flabel-facet-2.svg"><!-- --></p>
+<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/label-facet-2.svg"</span>, <span class="va">p2</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="st">"../man/figures/label-facet-2.svg"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/label-facet-2.svg"><!-- --></p>
 </div>
 <div class="section level2">
 <h2 id="graphs-with-many-categories">Graphs with many categories<a class="anchor" aria-label="anchor" href="#graphs-with-many-categories"></a>
@@ -219,9 +219,9 @@ coloured text labels for each colour/fill aesthetic.</p>
 <span>    x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"n"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-cats.svg"</span><span class="op">)</span>, <span class="va">graph</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"man/figures/label-cats.svg"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="..%2Fman%2Ffigures%2Flabel-cats.svg"><!-- --></p>
+<span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/label-cats.svg"</span>, <span class="va">graph</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="st">"../man/figures/label-cats.svg"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../reference/figures/label-cats.svg"><!-- --></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
