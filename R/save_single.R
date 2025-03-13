@@ -40,20 +40,22 @@ save_single <- function(
   max_width <- 18.59
 
   # update the base size without removing the legend
+
+  legendTitle <- plot$theme$legend.title
+  legendPosition <- plot$theme$legend.position
+
   if(is_spatial_chart){
-    plot <- plot + theme_e61_spatial(base_size = base_size)
+    plot <- plot + theme_e61_spatial(base_size = base_size,
+                                     legend = legendPosition,
+                                     legend_title = legendTitle)
 
   } else {
 
-    legend_title <- plot$theme$legend.title
-    legend_position <- plot$theme$legend.position
-
     plot <- plot + theme(text = element_text(size = base_size))
-
-    plot <- plot + update_margins(base_size = base_size, legend_title = legend_title)
+    plot <- plot + update_margins(base_size = base_size, legend_title = legendTitle)
 
     if(!is.null(legend_position)){
-      plot <- plot + theme(legend.position = legend_position)
+      plot <- plot + theme(legend.position = legendPosition)
     }
   }
 
