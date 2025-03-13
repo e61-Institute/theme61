@@ -21,20 +21,22 @@
 #'   Type of chart. This is used to set sensible chart widths based on the type
 #'   of plot you are saving. Options are "normal" (default; for normal charts),
 #    "wide" (for time series graphs) or "square" (for scatter plots).
-#' @param auto_scale Logical. Should the y-axis be scaled automatically. Default
-#'   is TRUE.
+#' @param auto_scale Logical. Scale the y-axis automatically. Default is TRUE.
 #' @param dim An optional named list specifying the plot height and width.
 #'   Defaults to NULL which means the graph dimensions will be set based on the
 #'   chart type and function-calculated value.
-#' @param pad_width Add optional argument which adds padding to the width of a
-#'   chart. The default is 0 cm.
+#' @param pad_width Numeric. Add horizontal whitespace to the sides of the
+#'   graph. Defaults to no additional padding.
+#' @param dim A named list specifying the plot height and width. Defaults to
+#'   NULL which means the graph dimensions will be calculated automatically.
 #' @param max_height Numeric. The maximum height of your plot in cm. This is
 #'   used to constrain the plot resizing algorithm in cases where you want to
-#'   limit the height of your charts.
-#' @param format An optional vector of file formats to save as. For example
-#'   `c("svg", "pdf")` will save 2 files with the same name to the same location
-#'   to SVG and PDF formats. If the file format is specified in `filename`, then
-#'   this argument is ignored.
+#'   limit the height of your charts. Defaults to NULL which does not restrict
+#'   the height.
+#' @param format A string vector of file formats to save as. Accepts "svg",
+#'   "pdf", "eps", "png". For example `c("svg", "pdf")` will save 2 files with
+#'   the same name to the same location to SVG and PDF formats. If the file
+#'   format is specified in `filename`, then this argument is ignored.
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
@@ -43,11 +45,11 @@
 #' @param preview Logical. Set to TRUE to show a preview of the graph in the
 #'   Viewer pane but not save to disk. Defaults to FALSE.
 #' @param base_size Numeric. Chart font size. Default is 10.
-#' @param res Numeric. For saving to PNG only. Increase the size of the saved
+#' @param res Numeric. For saving to PNG only. Rescale the size of the saved
 #'   PNG. E.g. `res = 2` doubles the size of the saved graph.
-#' @param bg_colour Sets the graph background colour. Defaults to "white".
-#'   Accepts a colour name, hex code or theme61 colour object name. For graphs
-#'   used in research note boxes, set the colour to `e61_boxback`.
+#' @param bg_colour Set the graph background colour. Accepts a colour name, hex
+#'   code or theme61 colour object name. Defaults to "white". For graphs used in
+#'   research note boxes, set the colour to `e61_boxback`.
 #' @param ... (multi-panel specific) Plot objects to put on the panel.
 #' @param plotlist (multi-panel specific) List of plots to combine as an
 #'   multi-panel and save. You can also enter the charts individually as
@@ -55,13 +57,12 @@
 #' @param height_adj (multi-panel specific) Rescales the height of the
 #'   multi-panel. The function sets sensible defaults but this provides you with
 #'   manual control if you need it.
-#' @param spacing_adj (multi-panel specific) An optional named list specifying
-#'   the adjustment to the title and subtitle. Rescales the size of the space
-#'   give to the multi-panel title/subtitle. Use if you think the title looks
-#'   too cramped on the chart.
-#' @param rel_heights (multi-panel specific) A numeric vector giving the
-#'   relative proportions of each graph component (title, plots, footer
-#'   (optional)).
+#' @param spacing_adj (multi-panel specific) A named list specifying the
+#'   adjustment to the title and subtitle. Rescales the size of the space given
+#'   to the multi-panel title/subtitle. Use if you think the title looks too
+#'   cramped on the chart.
+#' @param rel_heights (multi-panel specific) A numeric vector giving
+#'   the relative proportions of each graph component (title, plots, footer).
 #' @param width,height `r lifecycle::badge("deprecated")` width and height are
 #'   no longer supported; use `dim` instead.
 #' @inheritParams labs_e61
