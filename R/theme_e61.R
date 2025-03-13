@@ -149,7 +149,7 @@ theme_e61 <- function(y_top = TRUE,
         margin = margin(l = 0,
                         r = base_size / 4, unit = "pt")
       ),
-      legend.text.align = 0,
+      legend.text = element_text(hjust = 0),
       legend.title.align = NULL,
       legend.justification = "center",
       legend.box = "vertical",

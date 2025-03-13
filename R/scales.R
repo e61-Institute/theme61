@@ -39,7 +39,7 @@ scale_colour_e61 <- function(reverse = FALSE,
   palette <- match.arg(palette)
 
   if (discrete) {
-    retval <- discrete_scale(aesthetics, "e61 colours", get_palette, ...)
+    retval <- discrete_scale(aesthetics = aesthetics, palette = get_palette, ...)
 
   } else {
 
@@ -69,7 +69,7 @@ scale_fill_e61 <- function(reverse = FALSE,
   palette <- match.arg(palette)
 
   if (discrete) {
-    retval <- discrete_scale(aesthetics, "e61 colours", get_palette, ...)
+    retval <- discrete_scale(aesthetics = aesthetics, palette = get_palette, ...)
 
   } else {
 
