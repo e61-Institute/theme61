@@ -55,7 +55,7 @@ this argument is ignored.}
 
 \item{chart_type}{String, or vector of strings if saving multiple plots.
 Type of chart. This is used to set sensible chart widths based on the type
-of plot you are saving. Options are "Normal" (default; for normal charts),}
+of plot you are saving. Options are "normal" (default; for normal charts),}
 
 \item{auto_scale}{Logical. Should the y-axis be scaled automatically. Default
 is TRUE.}
