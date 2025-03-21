@@ -17,10 +17,10 @@
 #' @param plot (single-panel specific) Name of the plot object to save. Defaults
 #'   to the last plot displayed so usually you do not need to provide this
 #'   argument explicitly.
-#' @param chart_type String, or vector of strings if saving multiple plots.
-#'   Type of chart. This is used to set sensible chart widths based on the type
-#'   of plot you are saving. Options are "normal" (default; for normal charts),
-#    "wide" (for time series graphs) or "square" (for scatter plots).
+#' @param chart_type String, or vector of strings if saving multiple plots. Type
+#'   of chart. This is used to set sensible chart widths based on the type of
+#'   plot you are saving. Options are "normal" (default; for normal charts),
+#'   "wide" (for time series graphs) or "square" (for scatter plots).
 #' @param auto_scale Logical. Scale the y-axis automatically. Default is TRUE.
 #' @param dim An optional named list specifying the plot height and width.
 #'   Defaults to NULL which means the graph dimensions will be set based on the
@@ -61,8 +61,8 @@
 #'   adjustment to the title and subtitle. Rescales the size of the space given
 #'   to the multi-panel title/subtitle. Use if you think the title looks too
 #'   cramped on the chart.
-#' @param rel_heights (multi-panel specific) A numeric vector giving
-#'   the relative proportions of each graph component (title, plots, footer).
+#' @param rel_heights (multi-panel specific) A numeric vector giving the
+#'   relative proportions of each graph component (title, plots, footer).
 #' @param width,height `r lifecycle::badge("deprecated")` width and height are
 #'   no longer supported; use `dim` instead.
 #' @inheritParams labs_e61
