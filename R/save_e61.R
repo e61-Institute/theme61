@@ -3,8 +3,6 @@
 #' Saves ggplot2 graphs made with using theme61. Using `save_e61()` is required
 #' to ensure graphs are consistent with the e61 style and formatting.
 #'
-#' The supported file formats are SVG, PDF, EPS and PNG.
-#'
 #' Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 #' better as they are modern vector graphics file formats which can be scaled up
 #' and down in size without blurring or becoming pixelated. PNG should only be
@@ -34,9 +32,10 @@
 #'   limit the height of your charts. Defaults to NULL which does not restrict
 #'   the height.
 #' @param format A string vector of file formats to save as. Accepts "svg",
-#'   "pdf", "eps", "png". For example `c("svg", "pdf")` will save 2 files with
-#'   the same name to the same location to SVG and PDF formats. If the file
-#'   format is specified in `filename`, then this argument is ignored.
+#'   "pdf", "eps", "png", "jpg". For example `c("svg", "pdf")` will save 2 files
+#'   with the same name to the same location to SVG and PDF formats. If the file
+#'   format is specified in `filename` or by the `set_format` option, then this
+#'   argument is ignored.
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).

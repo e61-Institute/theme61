@@ -11,9 +11,10 @@ unset_format()
 }
 \arguments{
 \item{format}{A string vector of file formats to save as. Accepts "svg",
-"pdf", "eps", "png". For example \code{c("svg", "pdf")} will save 2 files with
-the same name to the same location to SVG and PDF formats. If the file
-format is specified in \code{filename}, then this argument is ignored.}
+"pdf", "eps", "png", "jpg". For example \code{c("svg", "pdf")} will save 2 files
+with the same name to the same location to SVG and PDF formats. If the file
+format is specified in \code{filename} or by the \code{set_format} option, then this
+argument is ignored.}
 }
 \value{
 This function is used for its side effects.
