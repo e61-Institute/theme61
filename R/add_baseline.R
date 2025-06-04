@@ -1,4 +1,4 @@
-#' Adds a thin black line
+#' Adds a thin black line - Test extra comment
 #'
 #' Adds a thin black line (by default at y = 0). This is useful shorthand for
 #' when you would otherwise have to use `geom_hline`, which by default adds
