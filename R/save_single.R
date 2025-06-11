@@ -14,7 +14,10 @@ save_single <- function(
     bg_colour
     ) {
 
-  # Check if we have a spatial chart, if we do save without editing ---------
+
+  # Check for special graph types -------------------------------------------
+
+  ## Check if we have a spatial chart, if we do save without editing ----
 
   is_spatial_chart <- FALSE
 
@@ -32,6 +35,9 @@ save_single <- function(
   # if it's a spatial plot, turn of autoscaling
   if(is_spatial_chart) auto_scale <- FALSE
 
+  ## Check if discrete y-axis (e.g. ridgeline) ----
+
+  discrete_y <- has_discrete_y_scale(plot)
 
   # Set maximum width based on output type ----------------------------------
 
@@ -87,8 +93,7 @@ save_single <- function(
   # Update y-axis limits ----------------------------------------------------
 
   # update the chart scales if this is an auto_scaled chart
-  if(auto_scale) plot <- update_scales(plot, auto_scale)
-
+  if(auto_scale && !discrete_y) plot <- update_scales(plot, auto_scale)
 
   # Get the number of panel rows and columns ------------------------------
 

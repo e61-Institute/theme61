@@ -63,3 +63,46 @@ check_plots <- function(plots){
 is_testing <- function() {
   identical(Sys.getenv("TESTTHAT"), "true")
 }
+
+#' Function to check if a plot has a discrete y-scale
+#' @noRd
+has_discrete_y_scale <- function(plot) {
+  # Check if the plot is a ggplot object
+  if (!inherits(plot, "ggplot")) {
+    return(FALSE)
+  }
+
+  # Check the y aesthetic mapping
+  y_mapping <- plot$mapping$y
+  if (!is.null(y_mapping)) {
+    # Get the data and check if y variable is discrete
+    plot_data <- plot$data
+    if (!is.null(plot_data) && !is.null(y_mapping)) {
+      y_var <- rlang::eval_tidy(y_mapping, plot_data)
+      if (is.factor(y_var) || is.character(y_var)) {
+        return(TRUE)
+      }
+    }
+  }
+
+  # Alternative check: look for geom_density_ridges
+  layers <- plot$layers
+  for (layer in layers) {
+    if (!is.null(layer$geom)) {
+      geom_class <- class(layer$geom)[1]
+      if (grepl("(ridgeline|density_ridges)", geom_class, ignore.case = TRUE)) {
+        return(TRUE)
+      }
+    }
+  }
+
+  # Check if scale_y_discrete has been explicitly added
+  if (!is.null(plot$scales)) {
+    y_scale <- plot$scales$get_scales("y")
+    if (!is.null(y_scale) && inherits(y_scale, "ScaleDiscrete")) {
+      return(TRUE)
+    }
+  }
+
+  return(FALSE)
+}
