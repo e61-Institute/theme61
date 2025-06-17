@@ -64,6 +64,8 @@ theme_e61 <- function(y_top = TRUE,
       stop("Both legend_position values must be between 0 and 1.")
   }
 
+  base_family <- if (is_testing()) "sans" else "pt-sans"
+
   half_line <- base_size / 2
 
   ret <-
@@ -335,6 +337,7 @@ theme_e61_spatial <- function(
       stop("Both legend_position values must be between 0 and 1.")
   }
 
+  base_family <- if (is_testing()) "sans" else "pt-sans"
 
   half_line <- base_size / 2
 
@@ -417,6 +420,9 @@ theme_e61_alt <- function(
     base_family = "pt-sans",
     base_size = 12
   ){
+
+  base_family <- if (is_testing()) "sans" else "pt-sans"
+
   ggthemes::theme_clean() +
     theme(
       text = element_text(
