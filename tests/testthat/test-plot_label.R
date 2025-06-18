@@ -187,7 +187,7 @@ test_that("Label rotation works", {
                 x = rep(2, 3),
                 y = c(2.1, 2.3, 2.15),
                 angle = c(0, 90, 45)) +
-    scale_y_continuous_e61(limits = c(2, 2.4))
+    scale_y_continuous_e61(c(0, 3))
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("rotate.svg", p1)))

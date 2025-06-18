@@ -45,7 +45,7 @@ check_plots <- function(plots){
   for(i in seq_along(plots)){
     temp_plot <- plots[[i]]
 
-    if(is.ggplot(temp_plot)) {
+    if(is_ggplot(temp_plot)) {
       temp_list[[length(temp_list) + 1]] <- temp_plot
     } else {
 
