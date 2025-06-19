@@ -118,7 +118,7 @@ labs_e61 <- function(title = NULL,
       stop("footnote_wrap must be a positive integer.")
     }
 
-    # Wrap the subtitle text
+    # Wrap the caption text
     caption_text <- caption_wrap(footnotes, sources, max_char = footnote_wrap)
     wrap_caption_trk <- TRUE
 
