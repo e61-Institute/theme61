@@ -91,13 +91,13 @@ theme_e61 <- function(
       plot.caption.position = "plot",
       plot.background = element_blank(),
       plot.title = element_text(
-        size = rel(1.2),
+        size = rel(1.3),
         hjust = 0,
         face = "bold",
         margin = margin(b = 4)
       ),
       plot.subtitle = ggtext::element_markdown(
-        size = rel(1.05),
+        size = rel(1.15),
         hjust = 0,
         margin = margin(b = 10)
       ),
