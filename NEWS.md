@@ -1,3 +1,19 @@
+# theme61 0.6.4
+
+XX Jun 2025
+
+#### New features
+
+* New function `set_format` that sets the default file format that graphs get saved as in the session.
+* New custom geom `geom_pointbar` that combines `geom_point` and `geom_errorbar` in one.
+
+#### Bug fixes
+
+* Fixed an issue where ridgeline plots (and other plots with a discrete y-axis) could not be saved with `save_e61`.
+* Fixed an issue where `save_e61` dropped map legends.
+* Minor documentation fixes.
+* Minor backend adjustments to colour palette functions.
+
 # theme61 0.6.3
 
 12 Mar 2025
