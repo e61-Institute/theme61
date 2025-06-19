@@ -12,10 +12,10 @@
 #' @details The primary purpose of this function is to correctly format footer
 #'   text without requiring the user to guess where to put manual line breaks
 #'   for long footnotes or put in "Sources:" themselves. It does this by
-#'   transforming the `footnotes` and `sources` arguments into nicely
-#'   formatted text that goes into the `caption` argument in ggplot2's
-#'   `labs()` function. Thus, if you are using `footnotes` or
-#'   `sources`, do not supply a `caption` argument as well.
+#'   transforming the `footnotes` and `sources` arguments into nicely formatted
+#'   text that goes into the `caption` argument in ggplot2's `labs()` function.
+#'   Thus, if you are using `footnotes` or `sources`, do not supply a `caption`
+#'   argument as well.
 #'
 #' @param title The text for the title.
 #' @param subtitle The text for the subtitle.
@@ -26,12 +26,16 @@
 #' @param sources String vector providing the names of sources for the graph.
 #' @param x,y String to set the x- and y-axis titles. Note that the x-axis title
 #'   is blank (NULL) by default.
-#' @param title_wrap,subtitle_wrap,footnote_wrap Numeric or
-#'   logical. Set the maximum number of characters per line in the title,
-#'   subtitle and footer text. Set to `FALSE` if you want to turn off text
-#'   wrapping. The default is usually appropriate for the default graph
-#'   dimensions in [save_e61].
-#' @param title_max_char,subtitle_max_char,footnote_max_char `r lifecycle::badge("deprecated")` No longer supported; use `title_wrap`, `subtitle_wrap` or `footnote_wrap` instead.
+#' @param y_top Logical. If `TRUE` (default), the y-axis title is placed
+#'   underneath the subtitle. If `FALSE`, the y-axis label remains on the side
+#'   of the graph.
+#' @param title_wrap,subtitle_wrap,footnote_wrap Numeric or logical. Set the
+#'   maximum number of characters per line in the title, subtitle and footer
+#'   text. Set to `FALSE` if you want to turn off text wrapping. The default is
+#'   usually appropriate for the default graph dimensions in [save_e61].
+#' @param title_max_char,subtitle_max_char,footnote_max_char `r
+#'   lifecycle::badge("deprecated")` No longer supported; use `title_wrap`,
+#'   `subtitle_wrap` or `footnote_wrap` instead.
 #' @param ... Additional optional arguments passed to [labs][ggplot2::labs].
 #'
 #' @export
@@ -54,6 +58,7 @@ labs_e61 <- function(title = NULL,
                      footnote_wrap = NULL,
                      x = NULL,
                      y = ggplot2::waiver(),
+                     y_top = TRUE,
                      ...
                      ) {
 
@@ -129,6 +134,23 @@ labs_e61 <- function(title = NULL,
   if(wrap_title_trk) attr(title_text, "title_wrap") <- TRUE
   if(wrap_subtitle_trk) attr(subtitle_text, "subtitle_wrap") <- TRUE
   if(wrap_caption_trk) attr(caption_text, "caption_wrap") <- TRUE
+
+  # Add the y-axis text once the subtitle has been processed
+  primary_size <- getOption("t61_base_size", default = 10) * 1
+  secondary_size <- getOption("t61_base_size", default = 10) * 0.8
+
+  if (y_top) {
+    subtitle_text <- glue::glue(
+      "<span style='font-size:{primary_size}pt'>{subtitle_text}</span><br>
+   <span style='font-size:{secondary_size}pt'>{y}</span>"
+    )
+
+    y <- NULL
+  } else {
+    subtitle_text <- glue::glue(
+      "<span style='font-size:{primary_size}pt'>{subtitle_text}</span>"
+    )
+  }
 
   # add to a ggplot object and return
   label <-
