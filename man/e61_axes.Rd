@@ -9,7 +9,6 @@ scale_y_continuous_e61(
   limits = NULL,
   sec_axis = ggplot2::dup_axis(),
   rescale_sec = FALSE,
-  y_top = TRUE,
   expand_bottom = 0,
   expand_top = 0,
   ...
@@ -40,11 +39,6 @@ the left and right. Set to FALSE to hide the secondary axis.}
 \item{rescale_sec}{Logical. Set this to TRUE if you are using a rescaled
 secondary axis, otherwise leave it as FALSE (default). To add a rescaled
 secondary axis, see the documentation for \link{sec_rescale}.}
-
-\item{y_top}{Logical. Ensures there is space at the top of the y-axis for the
-axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
-elsewhere. If you change this argument you also need to change the argument
-with the same name in \link{theme_e61}.}
 
 \item{expand_bottom, expand_top}{Numeric. Add extra space between data points
 and the top/bottom of the graph. See \link[ggplot2:expansion]{expansion} for

@@ -14,9 +14,6 @@ labs_e61(
   footnote_wrap = NULL,
   x = NULL,
   y = ggplot2::waiver(),
-  title_max_char = NULL,
-  subtitle_max_char = NULL,
-  footnote_max_char = NULL,
   ...
 )
 }
@@ -41,9 +38,9 @@ dimensions in \link{save_e61}.}
 \item{x, y}{String to set the x- and y-axis titles. Note that the x-axis title
 is blank (NULL) by default.}
 
-\item{title_max_char, subtitle_max_char, footnote_max_char}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} No longer supported; use \code{title_wrap}, \code{subtitle_wrap} or \code{footnote_wrap} instead.}
-
 \item{...}{Additional optional arguments passed to \link[ggplot2:labs]{labs}.}
+
+\item{title_max_char, subtitle_max_char, footnote_max_char}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} No longer supported; use \code{title_wrap}, \code{subtitle_wrap} or \code{footnote_wrap} instead.}
 }
 \description{
 Provides support for well-formatted titles and footer text with minimal user
