@@ -52,6 +52,8 @@ theme_e61 <- function(legend = c("none", "bottom", "top", "left", "right", "insi
 
   base_family <- if (is_testing()) "sans" else "pt-sans"
 
+  base_size <- getOption("t61_base_size", default = 10)
+
   half_line <- base_size / 2
 
   ret <-
@@ -320,6 +322,24 @@ format_flip <- function(x_adj = 0) {
 
   return(retval)
 
+}
+
+#' Sets the base size for the theme
+#'
+#' \code{set_base_size} sets the base size for the theme to be used in
+#' \code{theme_e61()}. This needs to be set outside of the function because it
+#' is called by other functions as part of the graph rendering process.
+#' @param base_size Numeric. Graph font size. Default is 10.
+#' @return \code{set_base_size} is used for its side effects.
+#' @rdname theme_e61
+#' @export
+set_base_size <- function(base_size) {
+  if (!is.numeric(base_size) || length(base_size) != 1 || base_size <= 0) {
+    stop("base_size must be a single positive number.")
+  }
+
+  options(t61_base_size = base_size)
+  invisible()
 }
 
 
