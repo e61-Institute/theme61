@@ -13,14 +13,14 @@
 #' @param background Character. Default is "white". For all graphs that you
 #'   save, you should control the background colour using the `bg_colour`
 #'   argument in `save_e61`, not here.
-#' @param base_size Numeric. Chart font size. Default is 10.
 #' @param base_family Character. Chart font family. Default for notes is PT
 #'   Sans.
 #' @param base_line_size Numeric. Default line width.
 #' @param base_rect_size Numeric. Default rect width.
 #'
-#' @return ggplot2 object
+#' @return \code{theme_e61} returns a ggplot2 object.
 #' @import ggplot2
+#' @rdname theme_e61
 #' @export
 #'
 #' @examples
@@ -29,16 +29,16 @@
 #'   theme_e61()
 #'
 
-theme_e61 <- function(legend = c("none", "bottom", "top", "left", "right", "inside"),
-                      legend_position = NULL,
-                      legend_title = FALSE,
-                      aspect_ratio = 0.75,
-                      background = "white",
-                      base_size = 10,
-                      base_family = "pt-sans",
-                      base_line_size = points_to_mm(0.75),
-                      base_rect_size = points_to_mm(1)
-                      ) {
+theme_e61 <- function(
+    legend = c("none", "bottom", "top", "left", "right", "inside"),
+    legend_position = NULL,
+    legend_title = FALSE,
+    aspect_ratio = 0.75,
+    background = "white",
+    base_family = "pt-sans",
+    base_line_size = points_to_mm(0.75),
+    base_rect_size = points_to_mm(1)
+    ) {
 
   legend <- match.arg(legend)
 
