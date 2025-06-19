@@ -11,10 +11,6 @@
 #' @param rescale_sec Logical. Set this to TRUE if you are using a rescaled
 #'   secondary axis, otherwise leave it as FALSE (default). To add a rescaled
 #'   secondary axis, see the documentation for [sec_rescale].
-#' @param y_top Logical. Ensures there is space at the top of the y-axis for the
-#'   axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
-#'   elsewhere. If you change this argument you also need to change the argument
-#'   with the same name in [theme_e61].
 #' @param expand_left,expand_right Numeric. Add extra space between data points
 #'   and the left/right of the graph. See [expansion][ggplot2::expansion] for
 #'   details.
@@ -36,7 +32,6 @@
 scale_y_continuous_e61 <- function(limits = NULL,
                                    sec_axis = ggplot2::dup_axis(),
                                    rescale_sec = FALSE,
-                                   y_top = TRUE,
                                    expand_bottom = 0,
                                    expand_top = 0,
                                    ...) {
@@ -50,14 +45,9 @@ scale_y_continuous_e61 <- function(limits = NULL,
     if (length(limits) == 3) {
       breaks <- round(seq(limits[[1]], limits[[2]], limits[[3]]), 10)
 
-      # Hides the last break to make space for the unit label
-      if (isTRUE(y_top)) breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
-
     } else {
       breaks <- function(x) {
         x <- scales::breaks_extended()(x)
-        # Hides the last break to make space for the unit label
-        if (isTRUE(y_top)) x[x == max(x, na.rm = TRUE)] <- NA
         return(x)
       }
     }
@@ -97,10 +87,6 @@ scale_y_continuous_e61 <- function(limits = NULL,
 
   # Set an additional class if rescaled dual axis used
   if (isTRUE(rescale_sec)) class(retval) <- c(class(retval), "rescale_y")
-
-  # Set an additional class if no y_top requested
-  if (isFALSE(y_top))
-    class(retval) <- c(class(retval), "no_y_top")
 
   # Only add our data-range check if numeric limits were supplied
   if (!is.null(limits) && is.numeric(limits)) {

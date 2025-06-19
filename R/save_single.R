@@ -120,8 +120,7 @@ save_single <- function(
       max_panel_width <- max_width / 2 # only allow the panel to be at most half the column consistent with other chart types
 
       # Format the flipped coords axes
-      no_y_top <- isTRUE(attr(plot$theme, "no_y_top"))
-      plot <- plot + format_flip(y_top = !no_y_top)
+      plot <- plot + format_flip()
 
       # If it's only one panel, set the chart width to 1/2 of the max-width
     } else if(n_panel_cols == 1){
@@ -170,8 +169,6 @@ save_single <- function(
     # update the plot_labels
     plot <- update_plot_label(plot, chart_type, base_size)
 
-    # update y-axis labels - if it is a y-top label
-    if(isFALSE(attr(plot$theme, "no_y_top"))) plot <- update_y_axis_labels(plot)
   }
 
 

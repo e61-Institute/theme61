@@ -207,57 +207,16 @@ save_e61 <- function(filename = NULL,
         "rescale_y" %in% class(plots[[i]]$scales$scales[[2]])
       ) {
         TRUE
-      } else if (
-        # If y_top is not being used
-        isTRUE(attr(plots[[i]]$theme, "no_y_top")) ||
-        (length(plots[[i]]$scales$scales) > 1 &&
-         "no_y_top" %in% class(plots[[i]]$scales$scales[[2]]))
-      ) {
-        TRUE
       } else {
         FALSE
       }
 
-    # Message if the y-axis label text is missing
-    if (
-      # Checks if y is missing or blank
-      (is.null(plots[[i]]$labels$y) || nchar(plots[[i]]$labels$y) == 0) &&
-      !skip_check
-      ) {
-      y_miss <- c(y_miss, i)
-    }
-
-    # Message if the y-axis label text is too long
-    if (
-      # Check label char length
-      isTRUE(nchar(plots[[i]]$labels$y) > 5) &&
-      !skip_check
-      ) {
-      y_long <- c(y_long, i)
-    }
   }
 
   # Compile the messages
-  if (length(y_miss) > 0) {
-    y_miss <- paste0(
-      "Plot ",
-      paste(y_miss, collapse = ", "),
-      " is missing a y-axis label. Provide the y-axis units for the reader by specifying the 'y' argument in 'labs_e61()'.")
-  } else {
-    y_miss <- NULL
-  }
+  y_miss <- NULL
 
-  if (length(y_long) > 0) {
-    y_long <- paste0(
-      "Plot ",
-      paste(y_long, collapse = ", "),
-      " y-axis labels may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label (for example you could use: %, ppt, $b, '000, n)."
-    )
-  } else {
-    y_long <- NULL
-  }
-
-  adv_msg <- c(y_miss, y_long)
+  adv_msg <- c(y_miss)
 
   # Compile advisory messages
   print_adv <- function() {

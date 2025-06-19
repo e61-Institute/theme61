@@ -20,10 +20,10 @@ ggplot <-
 
       if(max(data[[y_var_name]], na.rm = TRUE) == min(data[[y_var_name]], na.rm = TRUE)){
 
-        p <- p + scale_y_continuous_e61(y_top = TRUE, expand_bottom = 0.15, expand_top = 0.15)
+        p <- p + scale_y_continuous_e61(expand_bottom = 0.15, expand_top = 0.15)
 
       } else {
-        p <- p + scale_y_continuous_e61(y_top = TRUE)
+        p <- p + scale_y_continuous_e61()
       }
     }
   }
