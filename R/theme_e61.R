@@ -69,9 +69,7 @@ theme_e61 <- function(
       axis.ticks.y = element_blank(),
       axis.text = element_text(size = rel(0.9), colour = "black"),
 
-      # Remove default y-axis title (moved to subtitle manually)
-      axis.title.y = element_blank(),
-      axis.title.y.right = element_blank(),
+      # x-axis title
       axis.title.x = element_text(size = rel(1), margin = margin(t = half_line)),
 
       # Legend styling (none, or inline preferred)
@@ -341,7 +339,6 @@ set_base_size <- function(base_size) {
   options(t61_base_size = base_size)
   invisible()
 }
-
 
 # Internal helper functions ----
 
