@@ -264,55 +264,6 @@ theme_e61_spatial <- function(
   return(ret)
 }
 
-#' e61 themed graph options in an alternative style
-#'
-#' @param base_size Numeric. Chart font size. Default is 12.
-#' @param base_family Character. Chart font family. Default is Arial.
-#'
-#' @return ggplot2 object
-#' @export
-#'
-#' @examples
-#' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
-#'   geom_point() +
-#'   theme_e61_alt()
-
-theme_e61_alt <- function(
-    base_family = "pt-sans",
-    base_size = 12
-  ){
-
-  base_family <- if (is_testing()) "sans" else "pt-sans"
-
-  ggthemes::theme_clean() +
-    theme(
-      text = element_text(
-        colour = "black",
-        family = base_family,
-        face = "plain",
-        hjust = 0.5,
-        vjust = 0.5,
-        angle = 0,
-        lineheight = 0.9,
-        debug = FALSE,
-        margin = margin(),
-        size = base_size
-      ),
-      legend.title = element_blank(),
-      legend.background = element_rect(colour = NA),
-      legend.position = "bottom",
-      plot.background = element_rect(colour = NA),
-      panel.grid.major.y = element_line(colour = "grey90", linetype = 1),
-      axis.text = element_text(size = 12),
-      axis.title = element_text(size = 14),
-      plot.title.position = "plot",
-      plot.caption.position = "plot",
-      plot.title = element_text(size = 20, hjust = 0, color = "grey20"),
-      plot.subtitle = element_text(size = 14, hjust = 0, vjust = 0.5, colour = "grey50"),
-      plot.caption =  element_text(size = 10, hjust = 0, vjust = 1, colour = "grey50")
-    )
-}
-
 #' Converts all legend colours to squares
 #'
 #' Legend symbols for line graphs default to coloured lines, which can sometimes
