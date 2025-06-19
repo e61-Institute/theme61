@@ -6,6 +6,7 @@ XX Jun 2025
 
 * New function `set_format` that sets the default file format that graphs get saved as in the session.
 * New custom geom `geom_pointbar` that combines `geom_point` and `geom_errorbar` in one.
+* New colours for states and territories/capital cities, accessible via `scale_colour_e61_aus`/`scale_fill_e61_aus` or directly through the named vector `e61_aus_colours`.
 
 #### Bug fixes
 
