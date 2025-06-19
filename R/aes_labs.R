@@ -41,8 +41,12 @@ update_labs <- function(plot, plot_width){
     subtitle_grob <- p$grobs[[which(p$layout$name == "subtitle")]]
     subtitle_text <- NULL
 
-    if(!is.null(subtitle_grob$children)){
-      subtitle_size <- subtitle_grob$children[[1]]$children[[1]]$gp$fontsize
+    if(!is.null(subtitle_grob$children) && length(subtitle_grob$children) > 0){
+      subtitle_size <- tryCatch(
+        subtitle_grob$children[[1]]$children[[1]]$gp$fontsize,
+        error = function(e) 10
+      )
+
       subtitle_text <-
         rescale_text(
           text = plot$labels$subtitle,
