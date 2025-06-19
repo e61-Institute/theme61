@@ -16,7 +16,7 @@ p <- ggplot(inputs, aes(x = col, y = row, fill = value)) +
   coord_fixed() +
   scale_fill_manual(values = col_pal) +
   scale_x_continuous_e61(n.breaks = 9) +
-  labs_e61(title = "The e61 Institute Colour Palette", y = NULL)
+  labs_e61(title = "The e61 Institute Colour Palette")
 
 save_e61(
   plot = p,
