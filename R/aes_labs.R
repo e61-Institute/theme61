@@ -42,7 +42,7 @@ update_labs <- function(plot, plot_width){
     subtitle_text <- NULL
 
     if(!is.null(subtitle_grob$children)){
-      subtitle_size <- subtitle_grob$children[[1]]$gp$fontsize
+      subtitle_size <- subtitle_grob$children[[1]]$children[[1]]$gp$fontsize
       subtitle_text <-
         rescale_text(
           text = plot$labels$subtitle,
@@ -607,7 +607,7 @@ update_margins <- function(base_size, legend_title) {
       strip.switch.pad.grid = unit(half_line / 2, "pt"),
       strip.switch.pad.wrap = unit(half_line / 2, "pt"),
       plot.title = element_text(margin = margin(b = half_line)),
-      plot.subtitle = element_text(
+      plot.subtitle = ggtext::element_markdown(
         margin = margin(
           t = 0, r = 0, b = base_size * .5, l = 0,
           unit = "pt"
