@@ -5,15 +5,6 @@
 #' check the arguments in [labs_e61], which are probably what you are looking
 #' for.
 #'
-#' @param y_top Logical. Puts the y-axis title at the top. Defaults to TRUE. If
-#'   you change this argument you also need to change the argument with the same
-#'   name in [scale_y_continuous_e61].
-#' @param adj Either a single numeric to adjust left and right axis titles
-#'   simultaneously or a vector of 2 numerics to adjust each axis title
-#'   separately. More negative values move the text closer to the graph panel.
-#' @param fix_left Numeric. Sometimes if the value of the `adj` argument is too
-#'   negative, the margins on the left side of the graph start to cut off some
-#'   of the text. Provide a small positive value (5?) to correct this.
 #' @param legend Character. Legend position, "none" (default) hides the legend.
 #' @param legend_position A numeric vector of length two setting the placement
 #'   of legends that have the "inside" position. Takes values between 0 and 1.
@@ -22,7 +13,6 @@
 #' @param background Character. Default is "white". For all graphs that you
 #'   save, you should control the background colour using the `bg_colour`
 #'   argument in `save_e61`, not here.
-#' @param panel_borders Logical. Show panel borders? Defaults to TRUE.
 #' @param base_size Numeric. Chart font size. Default is 10.
 #' @param base_family Character. Chart font family. Default for notes is PT
 #'   Sans.
@@ -39,14 +29,10 @@
 #'   theme_e61()
 #'
 
-theme_e61 <- function(y_top = TRUE,
-                      adj = 0,
-                      fix_left = 0,
-                      legend = c("none", "bottom", "top", "left", "right", "inside"),
+theme_e61 <- function(legend = c("none", "bottom", "top", "left", "right", "inside"),
                       legend_position = NULL,
                       legend_title = FALSE,
                       aspect_ratio = 0.75,
-                      panel_borders = TRUE,
                       background = "white",
                       base_size = 10,
                       base_family = "pt-sans",
@@ -70,162 +56,61 @@ theme_e61 <- function(y_top = TRUE,
 
   ret <-
     theme(
-      line = element_line(
-        colour = e61_greylight6,
-        linewidth = base_line_size,
-        linetype = 1,
-        lineend = "butt"
-      ),
-      aspect.ratio = aspect_ratio,
-      rect = element_rect(
-        fill = background,
-        colour = e61_greylight6,
-        linewidth = base_rect_size,
-        linetype = 0
-      ),
-      text = element_text(
-        colour = "black",
-        family = base_family,
-        face = "plain",
-        hjust = 0.5,
-        vjust = 0.5,
-        angle = 0,
-        lineheight = 0.9,
-        debug = FALSE,
-        margin = margin(),
-        size = base_size
-      ),
-      axis.line = element_line(linewidth = points_to_mm(1),
-                               colour = "black"),
-      axis.line.x = NULL,
-      axis.line.y = NULL,
-      axis.line.y.right = element_blank(),
-      axis.text = element_text(size = rel(1)),
-      axis.text.x = element_text(
-        margin = margin(t = base_size / 4,
-                        unit = "pt"),
-        vjust = 1
-      ),
-      axis.text.x.top = element_text(margin = margin(b = base_size / 5),
-                                     vjust = 0),
-      axis.text.y = element_text(margin = margin(r = base_size / 5),
-                                 hjust = 1),
-      axis.text.y.right = element_text(margin = margin(l = base_size / 5),
-                                       hjust = 0),
-      axis.ticks = element_line(colour = "black"),
+      line = element_line(colour = "black", linewidth = points_to_mm(0.5)),
+      rect = element_rect(fill = "white", colour = NA),
+      text = element_text(colour = "black", family = base_family, size = base_size),
+      aspect.ratio = NULL,
+
+      # Axes and grid
+      axis.line.x = element_line(colour = "black", linewidth = points_to_mm(0.5)),
+      axis.ticks.x = element_line(colour = "black"),
       axis.ticks.y = element_blank(),
-      axis.ticks.length = unit(half_line / 2, "pt"),
-      axis.ticks.length.x = unit(half_line / 2, "pt"), # Puts ticks inside graph
-      axis.ticks.length.x.top = NULL,
-      axis.ticks.length.x.bottom = NULL,
-      axis.ticks.length.y = NULL,
-      axis.ticks.length.y.left = NULL,
-      axis.ticks.length.y.right = NULL,
-      axis.title = element_text(size = rel(1)),
-      axis.title.x = element_text(margin = margin(t = half_line / 2),
-                                  vjust = 1),
-      axis.title.x.top = element_text(margin = margin(b = half_line / 2),
-                                      vjust = 0),
-      axis.title.y = element_text(
-        angle = 90,
-        margin = margin(r = half_line / 2),
-        vjust = 1
-      ),
-      axis.title.y.right = element_text(
-        angle = -90,
-        margin = margin(l = half_line / 2),
-        vjust = 0
-      ),
-      legend.background = element_rect(colour = NA),
-      legend.spacing = unit(half_line, "pt"),
-      legend.spacing.x = NULL,
-      legend.spacing.y = NULL,
-      legend.margin = margin(),
-      legend.key = element_rect(fill = "white",
-                                colour = "white"),
-      legend.key.size = unit(1, "lines"),
-      legend.key.height = NULL,
-      legend.key.width = NULL,
-      legend.text = element_text(
-        hjust = 0,
-        size = rel(1),
-        margin = margin(l = 0,
-                        r = base_size / 4, unit = "pt")
-      ),
-      legend.justification = "center",
-      legend.box = "vertical",
-      legend.box.margin = margin(0, 0,
-                                 0, 0, "cm"),
-      legend.box.background = element_blank(),
-      legend.box.spacing = unit(half_line, "pt"),
-      panel.background = element_rect(colour = NA),
-      panel.border = element_rect(
-        linetype = 1,
-        linewidth = points_to_mm(2),
-        colour = "black",
-        fill = NA
-      ),
+      axis.text = element_text(size = rel(0.9), colour = "black"),
+
+      # Remove default y-axis title (moved to subtitle manually)
+      axis.title.y = element_blank(),
+      axis.title.y.right = element_blank(),
+      axis.title.x = element_text(size = rel(1), margin = margin(t = half_line)),
+
+      # Legend styling (none, or inline preferred)
+      legend.position = "none",
+      legend.background = element_blank(),
+      legend.key = element_blank(),
+      legend.text = element_text(size = rel(0.9)),
+
+      # Panel styling
+      panel.background = element_blank(),
+      panel.border = element_blank(),
       panel.grid.major.x = element_blank(),
-      panel.grid.major.y = element_line(colour = e61_greylight6,
-                                        linewidth = points_to_mm(0.5)),
+      panel.grid.major.y = element_line(colour = "#D9D9D9",
+                                        linewidth = points_to_mm(0.4)),
       panel.grid.minor = element_blank(),
-      panel.spacing = unit(1, "lines"),
-      panel.spacing.x = NULL,
-      panel.spacing.y = NULL,
-      panel.ontop = FALSE,
-      strip.background = element_blank(),
-      strip.text = element_text(
-        colour = "black",
-        size = rel(1),
-        margin = margin(0.8 * half_line,
-                        0.8 * half_line, 0.8 * half_line, 0.8 * half_line)
-      ),
-      strip.text.x = NULL,
-      strip.text.y = element_text(angle = -90),
-      strip.placement = "inside",
-      strip.placement.x = NULL,
-      strip.placement.y = NULL,
-      strip.switch.pad.grid = unit(half_line / 2,
-                                   "pt"),
-      strip.switch.pad.wrap = unit(half_line / 2,
-                                   "pt"),
-      plot.background = element_rect(),
-      plot.title.position = "panel",
-      plot.caption.position = "panel",
+
+      # Plot layout
+      plot.title.position = "plot",
+      plot.caption.position = "plot",
+      plot.background = element_blank(),
       plot.title = element_text(
-        size = rel(1.15),
-        hjust = 0.5,
-        vjust = 1,
-        colour = "black",
+        size = rel(1.2),
+        hjust = 0,
         face = "bold",
-        margin = margin(b = half_line)
+        margin = margin(b = 4)
       ),
-      plot.subtitle = element_text(
-        size = rel(1),
-        colour = "black",
-        hjust = 0.5,
-        vjust = 1,
-        margin = margin(
-          t = 0, r = 0, b = base_size * .5, l = 0,
-          unit = "pt"
-          )
+      plot.subtitle = ggtext::element_markdown(
+        size = rel(1.05),
+        hjust = 0,
+        margin = margin(b = 10)
       ),
       plot.caption = element_text(
-        family = base_family,
         size = rel(0.8),
         hjust = 0,
-        vjust = 0.5,
-        colour = "black",
-        margin = margin(t = 15)
+        margin = margin(t = 12)
       ),
-      plot.tag = element_text(
-        size = rel(1),
-        hjust = 0.5,
-        vjust = 0.5
-      ),
-      plot.tag.position = "topleft",
-      plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "lines"),
-      complete = TRUE
+      plot.margin = margin(t = 14, r = 8, b = 8, l = 8),
+
+      # Strip (facets)
+      strip.background = element_blank(),
+      strip.text = element_text(size = rel(1), face = "bold")
     )
 
   # add the basics of the legend
@@ -243,23 +128,9 @@ theme_e61 <- function(y_top = TRUE,
       )
   }
 
-  # add panel borders if the user requests them
-  if (legend_title) {
-    ret <- ret %+replace%
-      theme(legend.title = element_text(size = rel(1),
-                                        margin = margin(l = 0,
-                                                        r = base_size / 4, unit = "pt")))
-  }
-
   # adjust legend direction based on legend position
   if (data.table::like(legend, "bottom|top", ignore.case = TRUE)) {
     ret <- ret + theme(legend.direction = "horizontal")
-  }
-
-  # Remove panel borders if requested
-  if (!panel_borders) {
-    ret <- ret %+replace%
-      theme(panel.border = element_blank())
   }
 
   # Adds a grey background option
@@ -271,16 +142,6 @@ theme_e61 <- function(y_top = TRUE,
   if (!inherits(ret$facet, "FacetNull")) {
     ret <- ret %+replace% theme(panel.spacing.x = unit(0, "lines"),
                                 panel.spacing.y = unit(0, "lines"))
-  }
-
-  # Moves y-axis title to the top
-  if (y_top) {
-    ret <- ret + y_title_top(adj = adj, fix_left = fix_left)
-
-    attr(ret, "no_y_top") <- FALSE
-
-  } else {
-    attr(ret, "no_y_top") <- TRUE
   }
 
   # Add attribute to identify it as a theme61 object
@@ -486,12 +347,11 @@ square_legend_symbols <- function(size = 6) {
 #' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
 #' the default works for most graphs. A negative value moves the
 #' title up, a positive value moves the title down.
-#' @param y_top Logical. Defaults to TRUE. Set to FALSE to prevent y-axis label from being positioned in-line with the axis values. Only set this if you also set `y_top = FALSE` in `theme_e61()` and `scale_y_continuous_e61()`.
 #'
 #' @return ggplot object
 #' @export
 
-format_flip <- function(x_adj = 0, y_top = TRUE) {
+format_flip <- function(x_adj = 0) {
 
   retval <-
     theme(
@@ -501,23 +361,11 @@ format_flip <- function(x_adj = 0, y_top = TRUE) {
       axis.ticks.x.top = element_blank(),
       axis.title.x.top = element_blank(),
       plot.title.position = "plot",
-      plot.caption.position = "plot"
-    )
-
-  if (y_top) {
-
-    retval <- retval +
-      theme(axis.title.x.bottom = element_text(
-        margin = margin(t = -11 + x_adj, b = 5),
-        hjust = 1, angle = 0))
-
-  } else {
-
-    retval <- retval +
-      theme(axis.title.x.bottom = element_text(
+      plot.caption.position = "plot",
+      axis.title.x.bottom = element_text(
         margin = margin(t = 0, b = 5),
-        hjust = 0.5, angle = 0))
-  }
+        hjust = 0.5, angle = 0)
+    )
 
   return(retval)
 
