@@ -137,7 +137,7 @@ labs_e61 <- function(title = NULL,
 
   # Add the y-axis text once the subtitle has been processed
   primary_size <- getOption("t61_base_size", default = 10) * 1
-  secondary_size <- getOption("t61_base_size", default = 10) * 0.8
+  secondary_size <- getOption("t61_base_size", default = 10) * 0.9
 
   if (y_top) {
     subtitle_text <- glue::glue(
