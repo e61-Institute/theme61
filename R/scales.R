@@ -10,7 +10,6 @@
 #'   to TRUE.
 #' @param palette Character. The specific e61 palette for continuous scales.
 #'   Must be supplied if a continuous scale is used.
-#' @param n `r lifecycle::badge("deprecated")` n is no longer used.
 #' @inheritDotParams ggplot2::scale_colour_manual
 #'
 #' @return ggplot2 object
@@ -28,13 +27,7 @@ scale_colour_e61 <- function(reverse = FALSE,
                              discrete = TRUE,
                              aesthetics = "colour",
                              palette = c("light", "dark", "diverging", "grey"),
-                             n = NULL,
                              ...) {
-
-  if (!missing("n"))
-    lifecycle::deprecate_stop(when = "0.6.0",
-                              what = "scale_colour_e61(n)",
-                              details = c("!" = "Please remove it from your function call."))
 
   palette <- match.arg(palette)
 
@@ -58,13 +51,7 @@ scale_fill_e61 <- function(reverse = FALSE,
                            discrete = TRUE,
                            aesthetics = "fill",
                            palette = c("light", "dark", "diverging", "grey"),
-                           n = NULL,
                            ...) {
-
-  if (!missing("n"))
-    lifecycle::deprecate_stop(when = "0.6.0",
-                              what = "scale_fill_e61(n)",
-                              details = c("!" = "Please remove it from your function call."))
 
   palette <- match.arg(palette)
 

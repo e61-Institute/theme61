@@ -33,9 +33,6 @@
 #'   maximum number of characters per line in the title, subtitle and footer
 #'   text. Set to `FALSE` if you want to turn off text wrapping. The default is
 #'   usually appropriate for the default graph dimensions in [save_e61].
-#' @param title_max_char,subtitle_max_char,footnote_max_char `r
-#'   lifecycle::badge("deprecated")` No longer supported; use `title_wrap`,
-#'   `subtitle_wrap` or `footnote_wrap` instead.
 #' @param ... Additional optional arguments passed to [labs][ggplot2::labs].
 #'
 #' @export

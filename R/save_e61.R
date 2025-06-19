@@ -63,8 +63,6 @@
 #'   cramped on the chart.
 #' @param rel_heights (multi-panel specific) A numeric vector giving
 #'   the relative proportions of each graph component (title, plots, footer).
-#' @param width,height `r lifecycle::badge("deprecated")` width and height are
-#'   no longer supported; use `dim` instead.
 #' @inheritParams labs_e61
 #' @inheritParams cowplot::plot_grid
 #' @return Invisibly returns the file name.
@@ -97,20 +95,8 @@ save_e61 <- function(filename = NULL,
                      nrow = NULL,
                      align = c("v", "none", "h", "hv"),
                      axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-                     rel_heights = NULL,
-                     width = NULL,
-                     height = NULL) {
-
-  # Deprecation messages
-  if (!missing("width"))
-    lifecycle::deprecate_stop(when = "0.6.0",
-                              what = "save_e61(width)",
-                              details = c("!" = "It has been replaced with the `dim` argument which takes a named list like `list(width = 10, height = 10)`."))
-
-  if (!missing("height"))
-    lifecycle::deprecate_stop(when = "0.6.0",
-                              what = "save_e61(height)",
-                              details = c("!" = "It has been replaced with the `dim` argument which takes a named list like `list(width = 10, height = 10)`."))
+                     rel_heights = NULL
+                     ) {
 
   # Compile plots
   plots <- c(list(...), plotlist)
