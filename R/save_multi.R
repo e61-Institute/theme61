@@ -230,7 +230,7 @@ save_multi <-
     # Prepare titles, subtitles etc. --------------------------------------
 
     # define text sizes
-    title_text_size <- base_size * 1.15
+    title_text_size <- base_size * 1.4
     subtitle_text_size <- base_size
     footer_text_size <- base_size * 0.8
 
@@ -254,8 +254,8 @@ save_multi <-
         cowplot::draw_label(
           title,
           fontface = "bold",
-          x = 0.5,
-          hjust = 0.5,
+          x = 0,
+          hjust = 0,
           vjust = 0.5,
           size = title_text_size
         )
@@ -280,8 +280,8 @@ save_multi <-
         cowplot::draw_label(
           subtitle,
           fontface = "plain",
-          x = 0.5,
-          hjust = 0.5,
+          x = 0,
+          hjust = 0,
           vjust = 0.5,
           size = subtitle_text_size
         )
