@@ -13,7 +13,8 @@ labs_e61(
   subtitle_wrap = NULL,
   footnote_wrap = NULL,
   x = NULL,
-  y = ggplot2::waiver(),
+  y = NULL,
+  y_top = TRUE,
   ...
 )
 }
@@ -29,18 +30,19 @@ separate points you include in the graph.}
 
 \item{sources}{String vector providing the names of sources for the graph.}
 
-\item{title_wrap, subtitle_wrap, footnote_wrap}{Numeric or
-logical. Set the maximum number of characters per line in the title,
-subtitle and footer text. Set to \code{FALSE} if you want to turn off text
-wrapping. The default is usually appropriate for the default graph
-dimensions in \link{save_e61}.}
+\item{title_wrap, subtitle_wrap, footnote_wrap}{Numeric or logical. Set the
+maximum number of characters per line in the title, subtitle and footer
+text. Set to \code{FALSE} if you want to turn off text wrapping. The default is
+usually appropriate for the default graph dimensions in \link{save_e61}.}
 
 \item{x, y}{String to set the x- and y-axis titles. Note that the x-axis title
 is blank (NULL) by default.}
 
-\item{...}{Additional optional arguments passed to \link[ggplot2:labs]{labs}.}
+\item{y_top}{Logical. If \code{TRUE} (default), the y-axis title is placed
+underneath the subtitle. If \code{FALSE}, the y-axis label remains on the side
+of the graph.}
 
-\item{title_max_char, subtitle_max_char, footnote_max_char}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} No longer supported; use \code{title_wrap}, \code{subtitle_wrap} or \code{footnote_wrap} instead.}
+\item{...}{Additional optional arguments passed to \link[ggplot2:labs]{labs}.}
 }
 \description{
 Provides support for well-formatted titles and footer text with minimal user
@@ -56,10 +58,10 @@ formatting if required.
 The primary purpose of this function is to correctly format footer
 text without requiring the user to guess where to put manual line breaks
 for long footnotes or put in "Sources:" themselves. It does this by
-transforming the \code{footnotes} and \code{sources} arguments into nicely
-formatted text that goes into the \code{caption} argument in ggplot2's
-\code{labs()} function. Thus, if you are using \code{footnotes} or
-\code{sources}, do not supply a \code{caption} argument as well.
+transforming the \code{footnotes} and \code{sources} arguments into nicely formatted
+text that goes into the \code{caption} argument in ggplot2's \code{labs()} function.
+Thus, if you are using \code{footnotes} or \code{sources}, do not supply a \code{caption}
+argument as well.
 }
 \examples{
   ggplot() +
