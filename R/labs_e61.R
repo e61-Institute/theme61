@@ -136,6 +136,9 @@ labs_e61 <- function(title = NULL,
   primary_size <- getOption("t61_base_size", default = 10) * 1
   secondary_size <- getOption("t61_base_size", default = 10) * 0.9
 
+  # Set y = "" to NULL because it just breaks code later
+  if (!is.null(y) && y == "") y <- NULL
+
   if (y_top) {
 
     if (is.null(y)) {
