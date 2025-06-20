@@ -134,7 +134,8 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 
       text <- text |>
         stringr::str_remove("\\S+\\\n\\S+$") |>
-        paste("\n", last_two_words)
+        trimws() |>
+        paste0("\n", last_two_words)
     }
 
   # algo for subtitles
@@ -180,7 +181,8 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 
       sub_text <- sub_text |>
         stringr::str_remove("\\S+\\\n\\S+$") |>
-        paste("<br>", last_two_words)
+        trimws() |>
+        paste0("<br>", last_two_words)
     }
 
     ## Parse the y-axis title text
@@ -200,7 +202,8 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 
         y_text <- y_text |>
           stringr::str_remove("\\S+\\\n\\S+$") |>
-          paste("<br>", last_two_words)
+          trimws() |>
+          paste0("<br>", last_two_words)
       }
     }
 
