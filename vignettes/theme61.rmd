@@ -117,7 +117,7 @@ g <- ggplot(data_3, aes(x = year, y = value, colour = category)) +
     subtitle = "1940-1960",
     footnotes = "Data comes from the built-in USPersonalExpenditure dataset.",
     sources = c("e61 Institute", "'datasets' package"),
-    y = "$b"
+    y = "US$ billions"
   )
 save_e61("../man/figures/g-line.svg")
 ```
@@ -139,7 +139,7 @@ g <- ggplot(data_3, aes(x = year, y = value, fill = category)) +
     subtitle = "1940-1960",
     footnotes = "Data comes from the built-in USPersonalExpenditure dataset.",
     sources = c("e61 Institute", "'datasets' package"),
-    y = "$b"
+    y = "US$ billions"
   )
 
 save_e61("../man/figures/g-col.svg")
@@ -175,7 +175,7 @@ g <- ggplot(mtcars2, aes(x = wt, y = mpg, colour = gear)) +
     subtitle = "Data from 1973-74",
     sources = "1974 Motor Trend US magazine",
     x = "Weight (1000 lbs)",
-    y = "mpg"
+    y = "Miles per gallon"
   )
 
 save_e61("../man/figures/g-scatter.svg")
@@ -196,7 +196,7 @@ g <- ggplot(mtcars2, aes(x = wt, y = mpg)) +
     subtitle = "Data from 1973-74",
     sources = "1974 Motor Trend US magazine",
     x = "Weight (1000 lbs)",
-    y = "mpg"
+    y = "Miles per gallon"
   )
 
 save_e61("../man/figures/g-facet.svg")
@@ -215,7 +215,7 @@ g <- ggplot(mpg, aes(x = cty, fill = factor(cyl))) +
     title = "Distribution of Car City Mileage",
     subtitle = "Miles per gallon, by number of cylinders",
     sources = "mpg dataset",
-    y = "dens",
+    y = "Density",
   ) +
   plot_label(label = c("3 cyl", "5 cyl", "6 cyl", "8 cyl"),
               x = c(25, 24, 16, 12),
@@ -240,7 +240,7 @@ g <- ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
               c(15, 50)) +
   labs_e61(
     title = "1940 to 1960 Change", 
-    y = "$b"
+    y = "US$ billions"
   ) +
   format_flip()
 
@@ -279,9 +279,9 @@ g <- ggplot(data_dual, aes(x = year)) +
   # All the action is in the next 5 lines
   geom_line(aes(y = sec_rescale_inv(`Personal Care`, scale = 0.1, shift = 0)), 
             colour = palette_e61(2)[[2]]) +
-  scale_y_continuous_e61(limits = c(0, 100, 25), name = "$b",
+  scale_y_continuous_e61(limits = c(0, 100, 25), 
                          # Usually you don't need to supply scale and shift again but to get the vignette to run you do here
-                         sec_axis = sec_axis(~sec_rescale(., scale = 0.1, shift = 0), name = "$b"), 
+                         sec_axis = sec_axis(~sec_rescale(., scale = 0.1, shift = 0)), 
                          rescale_sec = TRUE) +
   plot_label(c("Food and Tobacco\n(LHS)", "Personal Care\n(RHS)"),
               c(1945, 1948),
@@ -291,7 +291,7 @@ g <- ggplot(data_dual, aes(x = year)) +
     subtitle = "1940-1960",
     footnotes = "Data comes from the built-in USPersonalExpenditure dataset.",
     sources = c("e61 Institute", "'datasets' package"),
-    y = "$b"
+    y = "US$ billions"
   )
 
 ```
@@ -314,7 +314,7 @@ g <- ggplot(pt_rg_data, aes(x, y, ymin = ymin, ymax = ymax)) +
   labs_e61(
     title = "Regression Coefficients",
     sources = c("e61 Institute"),
-    y = "%"
+    y = "Per cent"
   )
 save_e61("../man/figures/g-ptrg.svg")
 ```
@@ -341,7 +341,7 @@ g1 <-
               c(65, 55, 25)) +
   labs_e61(
     title = "Aggregates",
-    y = "$b"
+    y = "US$ billions"
   )
 
 g2 <- ggplot(data_dual, aes(x = year)) +
@@ -355,7 +355,7 @@ g2 <- ggplot(data_dual, aes(x = year)) +
   ) +
   labs_e61(
     title = "Selected Aggregates",
-    y = "$b"
+    y = "US$ billions"
   )
 
 g3 <-
@@ -366,7 +366,7 @@ g3 <-
               c(15, 50)) +
   labs_e61(
     title = "1940 to 1960 Change", 
-    y = "$b"
+    y = "US$ billions"
   )
 
 g4 <- 
@@ -381,7 +381,7 @@ g4 <-
   ) +
   labs_e61(
     title = "Food and Tobacco Spending", 
-    y = "$b"
+    y = "US$ billions"
   )
 ```
 
