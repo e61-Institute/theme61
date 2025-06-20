@@ -155,11 +155,13 @@ rescale_text <- function(text, text_type, font_size, plot_width){
     sub_list <- gsub(regex_in, regex_out, text) |>
       strsplit("___", fixed = T) |> unlist()
 
-    if (has_y_title) {
+    if (length(sub_list) > 1 && has_y_title) {
       sub_text <- sub_list[[2]]
       y_text <- sub_list[[4]]
-    } else {
+    } else if (length(sub_list) > 1 && !has_y_title) {
       sub_text <- sub_list[[2]]
+    } else if (length(sub_list) == 1) {
+      sub_text <- ""
     }
 
     ## Parse the subtitle text
