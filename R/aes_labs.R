@@ -59,7 +59,7 @@ update_labs <- function(plot, plot_width){
     subtitle_text <- plot$labels$subtitle
   }
 
-  # set the title to element blank if it is not required - otherwise it leaves a useless space
+  # set the subtitle to element blank if it is not required - otherwise it leaves a useless space
   if(is.null(subtitle_text) || subtitle_text == ""){
     plot <- plot + theme(plot.subtitle = element_blank())
   }
@@ -116,8 +116,8 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 
   if(length(plot_width) == 0) stop("Plot width is length 0.")
 
-  # one rule for titles and subtitles
-  if(text_type %in% c("title", "subtitle")){
+  # algo for titles
+  if(text_type == "title") {
 
     text <- stringr::str_replace_all(text, "\\\n", " ")
 
@@ -137,7 +137,87 @@ rescale_text <- function(text, text_type, font_size, plot_width){
         paste("\n", last_two_words)
     }
 
-  # another rule for footnotes
+  # algo for subtitles
+  } else if (text_type == "subtitle") {
+
+    # Check if the y-axis title is present
+    has_y_title <- if (stringr::str_detect(text, ".*<br>.*")) TRUE else FALSE
+
+    # Strip the HTML elements and split the subtitle from the y-axis title
+    if (has_y_title) {
+      regex_in <- "(<.*>)(.*)<\\/span><br>(<.*>)(.*)<\\/span>"
+      regex_out <- "\\1___\\2___\\3___\\4"
+    } else {
+      regex_in <- "(<.*>)(.*)<\\/span>"
+      regex_out <- "\\1___\\2"
+      }
+
+    sub_list <- gsub(regex_in, regex_out, text) |>
+      strsplit("___", fixed = T) |> unlist()
+
+    if (has_y_title) {
+      sub_text <- sub_list[[2]]
+      y_text <- sub_list[[4]]
+    } else {
+      sub_text <- sub_list[[2]]
+    }
+
+    ## Parse the subtitle text
+    sub_text <- stringr::str_replace_all(sub_text, "\\\n", " ")
+
+    sub_text <- get_lines(sub_text, font_size, plot_width)
+
+    sub_text <- paste(sub_text$collapsed_text, collapse = "<br>")
+
+    # make sure we don't have only one word hanging on the last line
+    if(stringr::str_detect(sub_text, "\\\n\\S+$")){
+
+      last_two_words <-
+        stringr::str_extract(sub_text, "\\S+\\\n\\S+$") |>
+        stringr::str_replace_all("\\\n", " ")
+
+      sub_text <- sub_text |>
+        stringr::str_remove("\\S+\\\n\\S+$") |>
+        paste("<br>", last_two_words)
+    }
+
+    ## Parse the y-axis title text
+    if (has_y_title) {
+      y_text <- stringr::str_replace_all(y_text, "\\\n", " ")
+
+      y_text <- get_lines(y_text, font_size, plot_width)
+
+      y_text <- paste(y_text$collapsed_text, collapse = "<br>")
+
+      # make sure we don't have only one word hanging on the last line
+      if(stringr::str_detect(y_text, "\\\n\\S+$")){
+
+        last_two_words <-
+          stringr::str_extract(y_text, "\\S+\\\n\\S+$") |>
+          stringr::str_replace_all("\\\n", " ")
+
+        y_text <- y_text |>
+          stringr::str_remove("\\S+\\\n\\S+$") |>
+          paste("<br>", last_two_words)
+      }
+    }
+
+    ## Recombine them and restore the HTML
+    if (sub_text != "" && has_y_title) {
+      text <- paste0(sub_list[[1]], sub_text,
+                     "</span><br>",
+                     sub_list[[3]], y_text,
+                     "</span>")
+
+    } else if (sub_text != "" && !has_y_title) {
+      text <- paste0(sub_list[[1]], sub_text, "</span>")
+
+    } else if (sub_text == "" && has_y_title) {
+      text <- paste0(sub_list[[3]], y_text, "</span>")
+
+    }
+
+  # algo for footnotes
   } else if(text_type == "caption"){
 
     footnote_text <- stringr::str_replace_all(text, "\\\n\\*", " new_footnote\\*")

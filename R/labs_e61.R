@@ -54,7 +54,7 @@ labs_e61 <- function(title = NULL,
                      subtitle_wrap = NULL,
                      footnote_wrap = NULL,
                      x = NULL,
-                     y = ggplot2::waiver(),
+                     y = NULL,
                      y_top = TRUE,
                      ...
                      ) {
@@ -137,16 +137,20 @@ labs_e61 <- function(title = NULL,
   secondary_size <- getOption("t61_base_size", default = 10) * 0.9
 
   if (y_top) {
-    subtitle_text <- glue::glue(
-      "<span style='font-size:{primary_size}pt'>{subtitle_text}</span><br>
-   <span style='font-size:{secondary_size}pt'>{y}</span>"
-    )
 
-    y <- NULL
+    if (is.null(y)) {
+      subtitle_text <- glue::glue(
+        "<span style='font-size:{primary_size}pt'>{subtitle_text}</span>"
+      )
+    } else {
+      subtitle_text <- glue::glue(
+        "<span style='font-size:{primary_size}pt'>{subtitle_text}</span><br><span style='font-size:{secondary_size}pt'>{y}</span>"
+      )
+
+      y <- NULL
+    }
   } else {
-    subtitle_text <- glue::glue(
-      "<span style='font-size:{primary_size}pt'>{subtitle_text}</span>"
-    )
+    subtitle_text <- glue::glue("<span style='font-size:{primary_size}pt'>{subtitle_text}</span>")
   }
 
   # add to a ggplot object and return
