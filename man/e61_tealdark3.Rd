@@ -11,6 +11,6 @@ An object of class \code{character} of length 1.
 e61_tealdark3
 }
 \description{
-#40a0a0
+#49A6A1
 }
 \keyword{datasets}

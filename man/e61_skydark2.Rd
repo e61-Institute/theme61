@@ -11,6 +11,6 @@ An object of class \code{character} of length 1.
 e61_skydark2
 }
 \description{
-#5a9398
+#79D4DB
 }
 \keyword{datasets}
