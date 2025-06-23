@@ -64,7 +64,7 @@ theme_e61 <- function(
       aspect.ratio = NULL,
 
       # Axes and grid
-      axis.line.x = element_line(colour = "black", linewidth = points_to_mm(0.5)),
+      axis.line.x = element_line(colour = "black", linewidth = points_to_mm(0.4)),
       axis.ticks.x = element_line(colour = "black"),
       axis.ticks.y = element_blank(),
       axis.text = element_text(size = rel(0.9), colour = "black"),
@@ -83,7 +83,7 @@ theme_e61 <- function(
       panel.border = element_blank(),
       panel.grid.major.x = element_blank(),
       panel.grid.major.y = element_line(colour = "#D9D9D9",
-                                        linewidth = points_to_mm(0.4)),
+                                        linewidth = points_to_mm(0.5)),
       panel.grid.minor = element_blank(),
 
       # Plot layout
