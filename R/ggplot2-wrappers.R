@@ -113,3 +113,23 @@ labs <- function(...) {
 
   labs_e61(...)
 }
+
+#' Masks ggplot2::facet_wrap to set axes to "all" better distinguish facet
+#' panels
+#'
+#' @noRd
+#' @export
+facet_wrap <- function(..., axes = "all") {
+
+  ggplot2::facet_wrap(..., axes = axes)
+}
+
+#' Masks ggplot2::facet_grid to set axes to "all" better distinguish facet
+#' panels
+#'
+#' @noRd
+#' @export
+facet_grid <- function(..., axes = "all") {
+
+  ggplot2::facet_grid(..., axes = axes)
+}
