@@ -359,6 +359,8 @@ test_that("set_format works", {
 
   })
 
+})
+
 test_that("Spell checker works", {
   # Typo in various places
   plots <- list()
