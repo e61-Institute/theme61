@@ -318,6 +318,47 @@ test_that("Preview mode works", {
   })
 })
 
+test_that("set_format works", {
+  p <- minimal_plot
+
+  withr::with_tempdir({
+
+    set_format(c("pdf", "jpg"))
+
+    # Check filename extension is not overridden by set_format
+    suppressWarnings(save_e61("plot1.svg", p))
+    expect_true(file.exists("plot1.svg"))
+
+    # Check formats are used if file extension is not provided
+    suppressWarnings(save_e61("plot2", p))
+    expect_true(file.exists("plot2.pdf"))
+    expect_true(file.exists("plot2.jpg"))
+
+    # Check formats are used if file formats are provided in save_e61
+    suppressWarnings(save_e61("plot3", p, format = c("svg", "png")))
+    expect_true(file.exists("plot3.svg"))
+    expect_true(file.exists("plot3.png"))
+
+    # Check unset formatting works
+    unset_format()
+
+    suppressWarnings(save_e61("plot4", p))
+    expect_true(file.exists("plot4.svg"))
+    expect_true(file.exists("plot4.pdf"))
+    expect_true(file.exists("plot4.eps"))
+    expect_true(file.exists("plot4.jpg"))
+    expect_true(file.exists("plot4.png"))
+
+    # Check you can change the format again
+    set_format(c("pdf", "jpg"))
+    set_format(c("png", "svg"))
+
+    suppressWarnings(save_e61("plot5", p))
+    expect_true(file.exists("plot5.png"))
+    expect_true(file.exists("plot5.svg"))
+
+  })
+
 test_that("Spell checker works", {
   # Typo in various places
   plots <- list()

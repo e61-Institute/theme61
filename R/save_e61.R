@@ -3,8 +3,6 @@
 #' Saves ggplot2 graphs made with using theme61. Using `save_e61()` is required
 #' to ensure graphs are consistent with the e61 style and formatting.
 #'
-#' The supported file formats are SVG, PDF, EPS and PNG.
-#'
 #' Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 #' better as they are modern vector graphics file formats which can be scaled up
 #' and down in size without blurring or becoming pixelated. PNG should only be
@@ -34,9 +32,10 @@
 #'   limit the height of your charts. Defaults to NULL which does not restrict
 #'   the height.
 #' @param format A string vector of file formats to save as. Accepts "svg",
-#'   "pdf", "eps", "png". For example `c("svg", "pdf")` will save 2 files with
-#'   the same name to the same location to SVG and PDF formats. If the file
-#'   format is specified in `filename`, then this argument is ignored.
+#'   "pdf", "eps", "png", "jpg". For example `c("svg", "pdf")` will save 2 files
+#'   with the same name to the same location to SVG and PDF formats. If the file
+#'   format is specified in `filename` or by the `set_format` option, then this
+#'   argument is ignored.
 #' @param save_data Logical. Set to TRUE if you want to save a .csv with the
 #'   same name as the graph that contains the data needed to recreate the graph
 #'   (defaults to FALSE).
@@ -167,7 +166,7 @@ save_e61 <- function(filename = NULL,
 
   # Enforce file format requirements if a file extension is provided
   if (grepl("\\..{3}$", filename) && !grepl("\\.(svg|pdf|eps|png|jpg)$", filename)) {
-    stop("You must provide a file extension. Only PDF, SVG, EPS, PNG and JPEG file formats are supported.")
+    stop("You must provide a valid file extension. The following file formats are supported: svg, pdf, eps, png, jpg.")
   }
 
   # Determine which file formats to save
@@ -176,6 +175,8 @@ save_e61 <- function(filename = NULL,
 
     # Strip file extension from filename
     filename <- gsub("^(.*)\\..{3}$", "\\1", filename)
+  } else if (is.null(format) && !is.null(getOption("default_save_format"))) {
+    format <- getOption("default_save_format")
   } else {
     format <- match.arg(format, several.ok = TRUE)
   }
@@ -437,8 +438,37 @@ set_open_graph_browser <- function() {
 
 #' @rdname open_graph_browser
 #' @export
-unset_open_graph <- function() {
+unset_open_graph_browser <- function() {
   options(open_e61_graph = FALSE)
+
+  invisible(FALSE)
+}
+
+#' Sets the default file save format if format is not specified
+#'
+#' This function sets the file save format if \code{format} is not specified in
+#' \code{save_e61} and the file extension is not provided in \code{filename}.
+#'
+#' @inheritParams save_e61
+#' @return This function is used for its side effects.
+#' @rdname set_format
+#' @export
+set_format <- function(format) {
+  options(default_save_format = format)
+
+  invisible(TRUE)
+}
+
+#' Clears the default file save format from the session options
+#'
+#' This function clears the default file save format specified in
+#' \code{set_format}.
+#'
+#' @return This function is used for its side effects.
+#' @rdname set_format
+#' @export
+unset_format <- function() {
+  options(default_save_format = NULL)
 
   invisible(FALSE)
 }
