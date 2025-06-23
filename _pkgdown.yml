@@ -30,7 +30,9 @@ reference:
   contents:
   - e61_chart_maker
   - set_open_graph_browser
-  - unset_open_graph
+  - unset_open_graph_browser
+  - set_format
+  - unset_format
 
 - title: Colours
   contents:
