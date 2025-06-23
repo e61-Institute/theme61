@@ -12,6 +12,7 @@ XX Jun 2025
 
 * Fixed an issue where ridgeline plots (and other plots with a discrete y-axis) could not be saved with `save_e61`.
 * Fixed an issue where `save_e61` dropped map legends.
+* Fixed an issue with footnote wrapping when `pad_width` was used.
 * Minor documentation fixes.
 * Minor backend adjustments to colour palette functions.
 
