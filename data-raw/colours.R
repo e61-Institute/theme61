@@ -322,55 +322,68 @@ usethis::use_data(e61_palette_set, overwrite = TRUE)
 
 e61_aus_colours <- c(
   # Australia and aliases
-  `AUS` = "#000000",
-  `Australia` = "#000000",
-  `Aus` = "#000000",
-  # ACT and aliases
-  `ACT` = "#999999",
-  `Australian Capital Territory` = "#999999",
-  `Canberra` = "#999999",
-  `Can` = "#999999",
-  # NSW and aliases
-  `NSW` = "#E69F00",
-  `New South Wales` = "#E69F00",
-  `Sydney` = "#E69F00",
-  `Syd` = "#E69F00",
-  # NT and aliases
-  `NT` = "#56B4E9",
-  `Northern Territory` = "#56B4E9",
-  `Darwin` = "#56B4E9",
-  `Dar` = "#56B4E9",
-  # QLD and aliases
-  `QLD` = "#009E73",
-  `Queensland` = "#009E73",
-  `Qld` = "#009E73",
-  `Qld.` = "#009E73",
-  `Brisbane` = "#009E73",
-  `Bri` = "#009E73",
-  # SA and aliases
-  `SA` = "#F0E442",
-  `South Australia` = "#F0E442",
-  `Adelaide` = "#F0E442",
-  `Ade` = "#F0E442",
-  # TAS and aliases
-  `TAS` = "#0072B2",
-  `Tasmania` = "#0072B2",
-  `Tas` = "#0072B2",
-  `Tas.` = "#0072B2",
-  `Hobart` = "#0072B2",
-  `Hob` = "#0072B2",
-  # VIC and aliases
-  `VIC` = "#D55E00",
-  `Victoria` = "#D55E00",
-  `Vic` = "#D55E00",
-  `Vic.` = "#D55E00",
-  `Melbourne` = "#D55E00",
-  `Mel` = "#D55E00",
-  # WA and aliases
-  `WA` = "#CC79A7",
-  `Western Australia` = "#CC79A7",
-  `Perth` = "#CC79A7",
-  `Per` = "#CC79A7"
+  `AUS` = "#008080",
+  `Australia` = "#008080",
+  `Aus` = "#008080",
+  `Rest of Australia` = "#008080",
+  `Rest of Aus` = "#008080",
+  `RoA` = "#008080",
+  `Other` = "#008080",
+  `Other states` = "#008080",
+
+  # ACT and aliases — Slate Grey
+  `ACT` = "#4C4C4C",
+  `Australian Capital Territory` = "#4C4C4C",
+  `Canberra` = "#4C4C4C",
+  `Can` = "#4C4C4C",
+
+  # NSW and aliases — Lighter Blue
+  `NSW` = "#4A90E2",
+  `New South Wales` = "#4A90E2",
+  `Sydney` = "#4A90E2",
+  `Syd` = "#4A90E2",
+
+  # NT and aliases — Burnt Orange
+  `NT` = "#D55E00",
+  `Northern Territory` = "#D55E00",
+  `Darwin` = "#D55E00",
+  `Dar` = "#D55E00",
+
+  # QLD and aliases — Maroon
+  `QLD` = "#7B003C",
+  `Queensland` = "#7B003C",
+  `Qld` = "#7B003C",
+  `Qld.` = "#7B003C",
+  `Brisbane` = "#7B003C",
+  `Bri` = "#7B003C",
+
+  # SA and aliases — Red Ochre
+  `SA` = "#A72F2F",
+  `South Australia` = "#A72F2F",
+  `Adelaide` = "#A72F2F",
+  `Ade` = "#A72F2F",
+
+  # TAS and aliases — Forest Green
+  `TAS` = "#006644",
+  `Tasmania` = "#006644",
+  `Tas` = "#006644",
+  `Tas.` = "#006644",
+  `Hobart` = "#006644",
+  `Hob` = "#006644",
+
+  # VIC and aliases — Indigo Blue
+  `VIC` = "#002147",
+  `Victoria` = "#002147",
+  `Vic` = "#002147",
+  `Vic.` = "#002147",
+  `Melbourne` = "#002147",
+  `Mel` = "#002147",
+
+  # WA and aliases — Gold
+  `WA` = "#FDB813",
+  `Western Australia` = "#FDB813",
+  `Perth` = "#FDB813",
+  `Per` = "#FDB813"
 )
 
 usethis::use_data(e61_aus_colours, overwrite = TRUE)
