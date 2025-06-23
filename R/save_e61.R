@@ -198,6 +198,7 @@ save_e61 <- function(filename = NULL,
 
   y_miss <- c()
   y_long <- c()
+  spell_chk <- list()
 
   # Loop through the plots
   for(i in seq_along(plots)){
@@ -244,6 +245,26 @@ save_e61 <- function(filename = NULL,
       ) {
       y_long <- c(y_long, i)
     }
+
+    # Spell checks
+    fields <- c("title", "subtitle", "caption")
+
+    spell_chk_i <- lapply(fields, function(field) {
+      val <- plots[[i]]$label[[field]]
+      if (!is.null(val)) {
+        res <- check_spelling(val)
+        if (length(res) > 0) return(res)
+      }
+      return(NULL)
+    })
+
+    # Assign names and remove NULLs (i.e. no typos)
+    names(spell_chk_i) <- fields
+    spell_chk_i <- Filter(Negate(is.null), spell_chk_i)
+
+    spell_chk_i <- unlist(spell_chk_i)
+    spell_chk <- c(spell_chk, spell_chk_i)
+
   }
 
   # Compile the messages
@@ -266,7 +287,16 @@ save_e61 <- function(filename = NULL,
     y_long <- NULL
   }
 
-  adv_msg <- c(y_miss, y_long)
+  if (length(spell_chk) > 0) {
+    spell_chk <- unlist(spell_chk)
+    spell_chk <- paste0("Check possible typos in the ",
+                        paste(names(spell_chk), collapse = ", "),
+                        ": ",
+                        paste(spell_chk, collapse = ", ")
+                        )
+  }
+
+  adv_msg <- c(y_miss, y_long, spell_chk)
 
   # Compile advisory messages
   print_adv <- function() {
