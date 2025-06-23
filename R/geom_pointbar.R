@@ -8,8 +8,8 @@
 #' @param data The data to be displayed in this layer
 #' @param stat The statistical transformation to use on the data
 #' @param position Position adjustment
-#' @param na.rm If FALSE, the default, missing values are removed with a warning.
-#'   If TRUE, missing values are silently removed.
+#' @param na.rm If FALSE, the default, missing values are removed with a
+#'   warning. If TRUE, missing values are silently removed.
 #' @param show.legend logical. Should this layer be included in the legends?
 #' @param inherit.aes If FALSE, overrides the default aesthetics
 #' @param point.size Size for points (overrides size aesthetic for points only)
@@ -17,8 +17,8 @@
 #' @param errorbar.linewidth Line width for error bars
 #' @param ... Other arguments passed on to layer()
 #'
-#' @section Aesthetics:
-#' geom_pointbar() understands the following aesthetics (required aesthetics are in bold):
+#' @section Aesthetics: geom_pointbar() understands the following aesthetics
+#'   (required aesthetics are in bold):
 #' \itemize{
 #'   \item \strong{x}
 #'   \item \strong{y}
@@ -90,7 +90,7 @@ geom_pointbar <- function(mapping = NULL, data = NULL,
   errorbar_params$linewidth <- errorbar.linewidth
   errorbar_params$na.rm <- na.rm
 
-  layers[[1]] <- layer(
+  layers[[1]] <- suppressWarnings(layer(
     data = data,
     mapping = errorbar_mapping,
     stat = stat,
@@ -99,7 +99,7 @@ geom_pointbar <- function(mapping = NULL, data = NULL,
     show.legend = if (is.na(show.legend)) FALSE else show.legend,
     inherit.aes = inherit.aes,
     params = errorbar_params
-  )
+  ))
 
   # Point layer (drawn second, in front of error bars)
   point_params <- params
@@ -108,7 +108,7 @@ geom_pointbar <- function(mapping = NULL, data = NULL,
   }
   point_params$na.rm <- na.rm
 
-  layers[[2]] <- layer(
+  layers[[2]] <- suppressWarnings(layer(
     data = data,
     mapping = point_mapping,
     stat = stat,
@@ -117,8 +117,8 @@ geom_pointbar <- function(mapping = NULL, data = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = point_params
-  )
+  ))
 
   # Return the layers
-  layers
+  return(layers)
 }
