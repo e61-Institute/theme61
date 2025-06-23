@@ -102,6 +102,12 @@ source("colour-palette.R")
 knitr::include_graphics("../man/figures/g-palette-colours.svg")
 ```
 
+There is also a colour palette for the states/territories and capital cities. They are usually used by calling `scale_fill_e61_aus` or `scale_colour_e61_aus`. But, the individual colours can also be accessed in the named vector `e61_aus_colours`.
+
+```{r theme61-state-colours, echo = FALSE}
+knitr::include_graphics("../man/figures/g-palette-state-colours.svg")
+```
+
 ## Graph examples
 
 ### Line graph {#line}

@@ -49,9 +49,10 @@ to the last plot displayed so usually you do not need to provide this
 argument explicitly.}
 
 \item{format}{A string vector of file formats to save as. Accepts "svg",
-"pdf", "eps", "png". For example \code{c("svg", "pdf")} will save 2 files with
-the same name to the same location to SVG and PDF formats. If the file
-format is specified in \code{filename}, then this argument is ignored.}
+"pdf", "eps", "png", "jpg". For example \code{c("svg", "pdf")} will save 2 files
+with the same name to the same location to SVG and PDF formats. If the file
+format is specified in \code{filename} or by the \code{set_format} option, then this
+argument is ignored.}
 
 \item{chart_type}{String, or vector of strings if saving multiple plots.
 Type of chart. This is used to set sensible chart widths based on the type
@@ -138,8 +139,6 @@ Saves ggplot2 graphs made with using theme61. Using \code{save_e61()} is require
 to ensure graphs are consistent with the e61 style and formatting.
 }
 \details{
-The supported file formats are SVG, PDF, EPS and PNG.
-
 Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 better as they are modern vector graphics file formats which can be scaled up
 and down in size without blurring or becoming pixelated. PNG should only be
