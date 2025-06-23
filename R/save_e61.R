@@ -488,6 +488,8 @@ unset_format <- function() {
 #' @export
 svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
 
+  res <- res * 4 # res = 1 produces exceedingly small images now apparently
+
   if (!grepl(".*\\.svg$", file_in))
     stop("file_in must be an svg file.")
 

@@ -54,7 +54,7 @@ save_single <- function(
     plot <- plot + theme(text = element_text(size = base_size))
     plot <- plot + update_margins(base_size = base_size, legend_title = legendTitle)
 
-    if(!is.null(legend_position)){
+    if(!is.null(legendPosition)){
       plot <- plot + theme(legend.position = legendPosition)
     }
   }
