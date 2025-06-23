@@ -318,6 +318,58 @@ test_that("Preview mode works", {
   })
 })
 
+test_that("Spell checker works", {
+  # Typo in various places
+  plots <- list()
+  plots[["title"]] <- minimal_plot + labs_e61(title = "Opertaing expenses")
+  plots[["subtitle"]] <- minimal_plot + labs_e61(subtitle = "Problmatic subtitle text")
+  plots[["footnote"]] <- minimal_plot + labs_e61(footnotes = "Opertaing sektor mistkaes")
+  plots[["sources"]] <- minimal_plot + labs_e61(sources = c("Governmment", "Treasury", "Institute"))
+  plots[["everywhere"]] <- minimal_plot + labs_e61(
+    title = "Opertaing",
+    footnotes = "Opertaing sektor mistkaes",
+    sources = c("Governmment", "Treasury", "Institute"))
+
+  suppressWarnings(suppressMessages(
+      expect_message(
+        save_e61(withr::local_tempfile(fileext = ".svg"), plots[["title"]]),
+        class = "cliMessage"),
+      classes = c("message", "cliMessage")))
+
+  suppressWarnings(suppressMessages(
+    expect_message(
+      save_e61(withr::local_tempfile(fileext = ".svg"), plots[["subtitle"]]),
+      class = "cliMessage"),
+    classes = c("message", "cliMessage")))
+
+  suppressWarnings(suppressMessages(
+    expect_message(
+      save_e61(withr::local_tempfile(fileext = ".svg"), plots[["footnote"]]),
+      class = "cliMessage"),
+    classes = c("message", "cliMessage")))
+
+  suppressWarnings(suppressMessages(
+    expect_message(
+      save_e61(withr::local_tempfile(fileext = ".svg"), plots[["sources"]]),
+      class = "cliMessage"),
+    classes = c("message", "cliMessage")))
+
+  suppressWarnings(suppressMessages(
+    expect_message(
+      save_e61(withr::local_tempfile(fileext = ".svg"), plots[["everywhere"]]),
+      class = "cliMessage"),
+    classes = c("message", "cliMessage")))
+
+
+  # No message if no typo
+  p <- minimal_plot + labs_e61(title = "Operating")
+
+  suppressWarnings(expect_no_message(
+    save_e61(withr::local_tempfile(fileext = ".svg"), p)),
+    classes = c("messages", "warning"))
+
+})
+
 # Check whole-graph generation consistency --------------------------------
 
 test_that("Single-panel graph examples", {

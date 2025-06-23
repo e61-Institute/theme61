@@ -5,7 +5,7 @@
 \alias{e61_aus_colours}
 \title{Australian jurisdictions colour palette}
 \format{
-An object of class \code{character} of length 41.
+An object of class \code{character} of length 46.
 }
 \usage{
 e61_aus_colours

@@ -7,7 +7,7 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
 
     file_i <- paste0(filename, ".", fmt)
 
-    # Create a temp name for png
+    # Create a temp name for png/jpg
     if (fmt == "png" | fmt == "jpg") file_temp <- tempfile(fileext = ".svg")
 
     # add very slight width buffer
@@ -26,7 +26,7 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
     print(graph)
     dev.off()
 
-    # Save a PNG if required
+    # Save a png/jpg if required
     if (fmt == "png") {
       svg_to_bitmap(file_temp, paste0(filename, ".png"), delete = TRUE, res = res)
 
@@ -105,4 +105,21 @@ has_discrete_y_scale <- function(plot) {
   }
 
   return(FALSE)
+
+#' Helper function that spell checks any string vector that is supplied
+#' @noRd
+check_spelling <- function(vector) {
+  if (!is.null(vector) && !is.character(vector)) {
+    stop("The vector supplied to check_spelling must be a character vector.")
+  }
+
+  # Check spelling of each element in the vector
+  retval <- hunspell::hunspell(vector, dict = hunspell::dictionary("en_AU"))
+  retval <- unlist(retval)
+
+  # Boolean to test whether there were any errors picked up
+  length_chk <- length(retval)
+
+  if (length_chk > 0) return(retval) else return(invisible(NULL))
+
 }
