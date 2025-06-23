@@ -2,12 +2,12 @@
 % Please edit documentation in R/save_e61.R
 \name{set_open_graph_browser}
 \alias{set_open_graph_browser}
-\alias{unset_open_graph}
+\alias{unset_open_graph_browser}
 \title{Set option to open graphs in the browser instead of the Viewer pane}
 \usage{
 set_open_graph_browser()
 
-unset_open_graph()
+unset_open_graph_browser()
 }
 \value{
 This function is used for its side effects.
