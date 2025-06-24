@@ -24,3 +24,28 @@ save_e61(
   dim = list(height = 6),
   auto_scale = FALSE
 )
+
+# Builds the state colour diagram
+data <- data.frame(
+  call = c("NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT", "AUS"),
+  label = c("NSW/Sydney", "VIC/Melbourne", "QLD/Brisbane", "SA/Adelaide", "WA/Perth", "TAS/Hobart", "NT/Darwin", "ACT/Canberra", "Australia"),
+  y = rep(1, 9)
+)
+
+p <- ggplot(data, aes(x = call, y = y, fill = call)) +
+  geom_col() +
+  geom_text(aes(label = label), y = 0.05, hjust = 0, colour = "white") +
+  coord_flip() +
+  scale_y_continuous_e61(c(0, 1, 1), expand_bottom = 0, expand_top = 0) +
+  scale_fill_e61_aus() +
+  labs_e61(title = "The e61 Institute States and Territories Colour Palette", y = NULL) +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+
+save_e61(
+  plot = p,
+  filename = here::here("man/figures/g-palette-state-colours.svg"),
+  auto_scale = FALSE
+)

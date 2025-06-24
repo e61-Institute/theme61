@@ -23,13 +23,11 @@
 #'
 'e61_bluedark1'
 
-
 #' Hex code for the colour: e61 Blue Dark 2
 #'
 #' #2B5C6F
 #'
 'e61_bluedark2'
-
 
 #' Hex code for the colour: e61 Blue Dark 3
 #'
@@ -37,13 +35,11 @@
 #'
 'e61_bluedark3'
 
-
 #' Hex code for the colour: e61 Blue Dark 4
 #'
 #' #618492
 #'
 'e61_bluedark4'
-
 
 #' Hex code for the colour: e61 Blue Dark 5
 #'
@@ -51,13 +47,11 @@
 #'
 'e61_bluedark5'
 
-
 #' Hex code for the colour: e61 Blue Dark 6
 #'
 #' #98ADB5
 #'
 'e61_bluedark6'
-
 
 #' Hex code for the colour: e61 Blue Dark 7
 #'
@@ -65,13 +59,11 @@
 #'
 'e61_bluedark7'
 
-
 #' Hex code for the colour: e61 Blue Dark 8
 #'
 #' #CED5D8
 #'
 'e61_bluedark8'
-
 
 #' Hex code for the colour: e61 Blue Light
 #'
@@ -79,13 +71,11 @@
 #'
 'e61_bluelight'
 
-
 #' Hex code for the colour: e61 Blue Light 1
 #'
 #' #196F91
 #'
 'e61_bluelight1'
-
 
 #' Hex code for the colour: e61 Blue Light 2
 #'
@@ -93,13 +83,11 @@
 #'
 'e61_bluelight2'
 
-
 #' Hex code for the colour: e61 Blue Light 3
 #'
 #' #4D8DA7
 #'
 'e61_bluelight3'
-
 
 #' Hex code for the colour: e61 Blue Light 4
 #'
@@ -107,13 +95,11 @@
 #'
 'e61_bluelight4'
 
-
 #' Hex code for the colour: e61 Blue Light 5
 #'
 #' #81ACBD
 #'
 'e61_bluelight5'
-
 
 #' Hex code for the colour: e61 Blue Light 6
 #'
@@ -121,13 +107,11 @@
 #'
 'e61_bluelight6'
 
-
 #' Hex code for the colour: e61 Blue Light 7
 #'
 #' #B5CBD3
 #'
 'e61_bluelight7'
-
 
 #' Hex code for the colour: e61 Blue Light 8
 #'
@@ -135,195 +119,113 @@
 #'
 'e61_bluelight8'
 
-
 #' Hex code for the colour: e61 Teal Dark
 #'
-#' #008080
+#' #0d8982
 #'
 'e61_tealdark'
 
-
 #' Hex code for the colour: e61 Teal Dark 1
 #'
-#' #008080
+#' #0d8982
 #'
 'e61_tealdark1'
 
-
 #' Hex code for the colour: e61 Teal Dark 2
 #'
-#' #209090
+#' #2B9791
 #'
 'e61_tealdark2'
 
-
 #' Hex code for the colour: e61 Teal Dark 3
 #'
-#' #40a0a0
+#' #49A6A1
 #'
 'e61_tealdark3'
 
-
 #' Hex code for the colour: e61 Teal Dark 4
 #'
-#' #60b0b0
+#' #67B5B0
 #'
 'e61_tealdark4'
 
-
 #' Hex code for the colour: e61 Teal Dark 5
 #'
-#' #80c0c0
+#' #86C3C0
 #'
 'e61_tealdark5'
 
-
 #' Hex code for the colour: e61 Teal Dark 6
 #'
-#' #9fcfcf
+#' #A4D2D0
 #'
 'e61_tealdark6'
 
-
 #' Hex code for the colour: e61 Teal Dark 7
 #'
-#' #bfdfdf
+#' #C2E1DF
 #'
 'e61_tealdark7'
 
-
 #' Hex code for the colour: e61 Teal Dark 8
 #'
-#' #dfefef
+#' #E0F0EF
 #'
 'e61_tealdark8'
 
-
 #' Hex code for the colour: e61 Teal Light
 #'
-#' #33a7ab
+#' #1DB2B9
 #'
 'e61_teallight'
 
-
 #' Hex code for the colour: e61 Teal Light 1
 #'
-#' #33a7ab
+#' #1DB2B9
 #'
 'e61_teallight1'
 
-
 #' Hex code for the colour: e61 Teal Light 2
 #'
-#' #4db2b5
+#' #39BBC1
 #'
 'e61_teallight2'
 
-
 #' Hex code for the colour: e61 Teal Light 3
 #'
-#' #66bdc0
+#' #55C5CA
 #'
 'e61_teallight3'
 
-
 #' Hex code for the colour: e61 Teal Light 4
 #'
-#' #80c8ca
+#' #71CED3
 #'
 'e61_teallight4'
 
-
 #' Hex code for the colour: e61 Teal Light 5
 #'
-#' #99d3d5
+#' #8ED8DC
 #'
 'e61_teallight5'
 
-
 #' Hex code for the colour: e61 Teal Light 6
 #'
-#' #b3dedf
+#' #AAE2E4
 #'
 'e61_teallight6'
 
-
 #' Hex code for the colour: e61 Teal Light 7
 #'
-#' #cce9ea
+#' #C6EBED
 #'
 'e61_teallight7'
 
-
 #' Hex code for the colour: e61 Teal Light 8
 #'
-#' #e5f4f4
+#' #E2F5F6
 #'
 'e61_teallight8'
-
-
-#' Hex code for the colour: e61 Sky Light
-#'
-#' #66ced6
-#'
-'e61_skylight'
-
-
-#' Hex code for the colour: e61 Sky Light 1
-#'
-#' #66ced6
-#'
-'e61_skylight1'
-
-
-#' Hex code for the colour: e61 Sky Light 2
-#'
-#' #79d4db
-#'
-'e61_skylight2'
-
-
-#' Hex code for the colour: e61 Sky Light 3
-#'
-#' #8cdae0
-#'
-'e61_skylight3'
-
-
-#' Hex code for the colour: e61 Sky Light 4
-#'
-#' #9fe0e5
-#'
-'e61_skylight4'
-
-
-#' Hex code for the colour: e61 Sky Light 5
-#'
-#' #b3e7eb
-#'
-'e61_skylight5'
-
-
-#' Hex code for the colour: e61 Sky Light 6
-#'
-#' #c6edf0
-#'
-'e61_skylight6'
-
-
-#' Hex code for the colour: e61 Sky Light 7
-#'
-#' #d9f3f5
-#'
-'e61_skylight7'
-
-
-#' Hex code for the colour: e61 Sky Light 8
-#'
-#' #ecf9fa
-#'
-'e61_skylight8'
-
 
 #' Hex code for the colour: e61 Sky Dark
 #'
@@ -331,62 +233,107 @@
 #'
 'e61_skydark'
 
-
 #' Hex code for the colour: e61 Sky Dark 1
 #'
 #' #428489
 #'
 'e61_skydark1'
 
-
 #' Hex code for the colour: e61 Sky Dark 2
 #'
-#' #5a9398
+#' #599397
 #'
 'e61_skydark2'
 
-
 #' Hex code for the colour: e61 Sky Dark 3
 #'
-#' #71a3a7
+#' #71A2A6
 #'
 'e61_skydark3'
 
-
 #' Hex code for the colour: e61 Sky Dark 4
 #'
-#' #89b2b5
+#' #88B2B5
 #'
 'e61_skydark4'
 
-
 #' Hex code for the colour: e61 Sky Dark 5
 #'
-#' #a1c2c4
+#' #A0C1C3
 #'
 'e61_skydark5'
 
-
 #' Hex code for the colour: e61 Sky Dark 6
 #'
-#' #b8d1d3
+#' #B8D0D2
 #'
 'e61_skydark6'
 
-
 #' Hex code for the colour: e61 Sky Dark 7
 #'
-#' #d0e0e2
+#' #CFE0E1
 #'
 'e61_skydark7'
 
-
 #' Hex code for the colour: e61 Sky Dark 8
 #'
-#' #e7f0f0
+#' #E7EFF0
 #'
 'e61_skydark8'
 
+#' Hex code for the colour: e61 Sky Light
+#'
+#' #66CED6
+#'
+'e61_skylight'
+
+#' Hex code for the colour: e61 Sky Light 1
+#'
+#' #66CED6
+#'
+'e61_skylight1'
+
+#' Hex code for the colour: e61 Sky Light 2
+#'
+#' #79D4DB
+#'
+'e61_skylight2'
+
+#' Hex code for the colour: e61 Sky Light 3
+#'
+#' #8CDAE0
+#'
+'e61_skylight3'
+
+#' Hex code for the colour: e61 Sky Light 4
+#'
+#' #9FE0E5
+#'
+'e61_skylight4'
+
+#' Hex code for the colour: e61 Sky Light 5
+#'
+#' #B2E6EA
+#'
+'e61_skylight5'
+
+#' Hex code for the colour: e61 Sky Light 6
+#'
+#' #C5ECEF
+#'
+'e61_skylight6'
+
+#' Hex code for the colour: e61 Sky Light 7
+#'
+#' #D8F2F4
+#'
+'e61_skylight7'
+
+#' Hex code for the colour: e61 Sky Light 8
+#'
+#' #EBF8F9
+#'
+'e61_skylight8'
 
 #' Hex code for the colour: e61 Orange Light
 #'
