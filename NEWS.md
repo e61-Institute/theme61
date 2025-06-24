@@ -4,6 +4,24 @@ XX Jun 2025
 
 * New graph design. No longer will we make graphs that people think were made by the RBA. The goal of the new design is to strengthen our brand by having a more distinct visual identity that is recognisable as the e61 Institute.
 
+# theme61 0.6.4
+
+24 Jun 2025
+
+#### New features
+
+* New function `set_format` that sets the default file format that graphs get saved as in the session.
+* New custom geom `geom_pointbar` that combines `geom_point` and `geom_errorbar` in one.
+* New colours for states and territories/capital cities, accessible via `scale_colour_e61_aus`/`scale_fill_e61_aus` or directly through the named vector `e61_aus_colours`.
+
+#### Bug fixes
+
+* Fixed an issue where ridgeline plots (and other plots with a discrete y-axis) could not be saved with `save_e61`.
+* Fixed an issue where `save_e61` dropped map legends.
+* Fixed an issue with footnote wrapping when `pad_width` was used.
+* Minor documentation fixes.
+* Minor backend adjustments to colour palette functions.
+
 # theme61 0.6.3
 
 12 Mar 2025

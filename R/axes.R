@@ -113,7 +113,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
   return(retval)
 }
 
-#' @param hide_first_last Logical. Defaults to TRUE. Hides the first and
+#' @param hide_first_last Logical. Defaults to FALSE. Hides the first and
 #'   last x-axis labels to avoid overlapping with the bottom of the y-axis.
 #' @inheritParams scale_y_continuous_e61
 #' @rdname e61_axes
@@ -122,7 +122,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
 scale_x_continuous_e61 <- function(limits = NULL,
                                    expand_left = 0.05,
                                    expand_right = 0.05,
-                                   hide_first_last = TRUE,
+                                   hide_first_last = FALSE,
                                    ...) {
 
   # Prepares limits and breaks

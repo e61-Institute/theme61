@@ -18,7 +18,7 @@ scale_x_continuous_e61(
   limits = NULL,
   expand_left = 0.05,
   expand_right = 0.05,
-  hide_first_last = TRUE,
+  hide_first_last = FALSE,
   ...
 )
 }
@@ -72,7 +72,7 @@ bounds values with \code{NA}.
 and the left/right of the graph. See \link[ggplot2:expansion]{expansion} for
 details.}
 
-\item{hide_first_last}{Logical. Defaults to TRUE. Hides the first and
+\item{hide_first_last}{Logical. Defaults to FALSE. Hides the first and
 last x-axis labels to avoid overlapping with the bottom of the y-axis.}
 }
 \description{
