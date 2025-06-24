@@ -359,6 +359,7 @@ test_that("set_format works", {
 
   })
 
+
 })
 
 test_that("Spell checker works", {
@@ -705,5 +706,15 @@ test_that("Multi-panel graph examples", {
                footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
                sources = c("Sources", "Sauces"))))
   })
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
+      save_e61("plot-multi-1x2-1-long-panel-title-padwidth.svg", p1_t, p2_t, pad_width = 3,
+               title = "Multi-panel graph title text",
+               subtitle = "Multi-panel graph subtitle text",
+               footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+               sources = c("Sources", "Sauces"))))
+  })
+
 
 })

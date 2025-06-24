@@ -310,7 +310,7 @@ save_multi <-
             text_type = "caption",
             font_size = footer_text_size,
             # plot width including the left axis
-            plot_width = width - (max_right_axis_width + points_to_mm(10) / 10)
+            plot_width = width + pad_width - (max_right_axis_width + points_to_mm(10) / 10)
           )
       }
 

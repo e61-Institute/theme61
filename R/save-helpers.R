@@ -105,6 +105,7 @@ has_discrete_y_scale <- function(plot) {
   }
 
   return(FALSE)
+}
 
 #' Helper function that spell checks any string vector that is supplied
 #' @noRd
