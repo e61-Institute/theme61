@@ -100,14 +100,14 @@ save_multi <-
 
         # update the text and margin sizes
         legend_title <- temp_plot$theme$legend.title
-        legend_position <- temp_plot$theme$legend.position
+        legendPosition <- temp_plot$theme$legend.position
 
         temp_plot <- temp_plot + theme(text = element_text(size = base_size))
 
         temp_plot <- temp_plot + update_margins(base_size = base_size, legend_title = legend_title)
 
-        if(!is.null(legend_position)){
-          temp_plot <- temp_plot + theme(legend.position = legend_position)
+        if(!is.null(legendPosition)){
+          temp_plot <- temp_plot + theme(legend.position = legendPosition)
         }
       }
 

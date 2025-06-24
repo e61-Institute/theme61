@@ -15,10 +15,10 @@
 #' @param plot (single-panel specific) Name of the plot object to save. Defaults
 #'   to the last plot displayed so usually you do not need to provide this
 #'   argument explicitly.
-#' @param chart_type String, or vector of strings if saving multiple plots.
-#'   Type of chart. This is used to set sensible chart widths based on the type
-#'   of plot you are saving. Options are "normal" (default; for normal charts),
-#    "wide" (for time series graphs) or "square" (for scatter plots).
+#' @param chart_type String, or vector of strings if saving multiple plots. Type
+#'   of chart. This is used to set sensible chart widths based on the type of
+#'   plot you are saving. Options are "normal" (default; for normal charts),
+#'   "wide" (for time series graphs) or "square" (for scatter plots).
 #' @param auto_scale Logical. Scale the y-axis automatically. Default is TRUE.
 #' @param dim An optional named list specifying the plot height and width.
 #'   Defaults to NULL which means the graph dimensions will be set based on the
@@ -60,8 +60,8 @@
 #'   adjustment to the title and subtitle. Rescales the size of the space given
 #'   to the multi-panel title/subtitle. Use if you think the title looks too
 #'   cramped on the chart.
-#' @param rel_heights (multi-panel specific) A numeric vector giving
-#'   the relative proportions of each graph component (title, plots, footer).
+#' @param rel_heights (multi-panel specific) A numeric vector giving the
+#'   relative proportions of each graph component (title, plots, footer).
 #' @param width,height `r lifecycle::badge("deprecated")` width and height are
 #'   no longer supported; use `dim` instead.
 #' @inheritParams labs_e61
@@ -137,6 +137,15 @@ save_e61 <- function(filename = NULL,
       if(!chart_type[i] %in% c("normal", "wide", "square"))
         stop("Invalid chart type. All chart types must be one of 'normal', 'wide' or 'square'.")
     }
+  }
+
+  # Check if filename has been provided when preview mode is FALSE
+  if (!preview && is.null(filename)) stop("You must provide a file path to save the graph.")
+
+  # Override save directory with temp file if preview mode is TRUE
+  if (preview) {
+    cli::cli_alert_info("Preview mode is activated, file will not be saved to disk.")
+    filename <- tempfile(fileext = ".svg")
   }
 
   # Check if filename has been provided when preview mode is FALSE
@@ -478,6 +487,8 @@ unset_format <- function() {
 #' @keywords internal
 #' @export
 svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
+
+  res <- res * 4 # res = 1 produces exceedingly small images now apparently
 
   if (!grepl(".*\\.svg$", file_in))
     stop("file_in must be an svg file.")

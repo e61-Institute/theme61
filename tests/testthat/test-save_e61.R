@@ -358,7 +358,10 @@ test_that("set_format works", {
     expect_true(file.exists("plot5.svg"))
 
   })
+
+
 })
+
 test_that("Spell checker works", {
   # Typo in various places
   plots <- list()

@@ -14,7 +14,10 @@ save_single <- function(
     bg_colour
     ) {
 
-  # Check if we have a spatial chart, if we do save without editing ---------
+
+  # Check for special graph types -------------------------------------------
+
+  ## Check if we have a spatial chart, if we do save without editing ----
 
   is_spatial_chart <- FALSE
 
@@ -32,6 +35,9 @@ save_single <- function(
   # if it's a spatial plot, turn of autoscaling
   if(is_spatial_chart) auto_scale <- FALSE
 
+  ## Check if discrete y-axis (e.g. ridgeline) ----
+
+  discrete_y <- has_discrete_y_scale(plot)
 
   # Set maximum width based on output type ----------------------------------
 
@@ -40,20 +46,22 @@ save_single <- function(
   max_width <- 18.59
 
   # update the base size without removing the legend
+
+  legendTitle <- plot$theme$legend.title
+  legendPosition <- plot$theme$legend.position
+
   if(is_spatial_chart){
-    plot <- plot + theme_e61_spatial(base_size = base_size)
+    plot <- plot + theme_e61_spatial(base_size = base_size,
+                                     legend = legendPosition,
+                                     legend_title = legendTitle)
 
   } else {
 
-    legend_title <- plot$theme$legend.title
-    legend_position <- plot$theme$legend.position
-
     plot <- plot + theme(text = element_text(size = base_size))
+    plot <- plot + update_margins(base_size = base_size, legend_title = legendTitle)
 
-    plot <- plot + update_margins(base_size = base_size, legend_title = legend_title)
-
-    if(!is.null(legend_position)){
-      plot <- plot + theme(legend.position = legend_position)
+    if(!is.null(legendPosition)){
+      plot <- plot + theme(legend.position = legendPosition)
     }
   }
 
@@ -87,8 +95,7 @@ save_single <- function(
   # Update y-axis limits ----------------------------------------------------
 
   # update the chart scales if this is an auto_scaled chart
-  if(auto_scale) plot <- update_scales(plot, auto_scale)
-
+  if(auto_scale && !discrete_y) plot <- update_scales(plot, auto_scale)
 
   # Get the number of panel rows and columns ------------------------------
 

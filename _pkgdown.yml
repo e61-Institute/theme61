@@ -9,6 +9,7 @@ reference:
   - add_baseline
   - labs_e61
   - plot_label
+  - geom_pointbar
 
 - title: Formatting
   contents:
