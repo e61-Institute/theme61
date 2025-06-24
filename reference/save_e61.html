@@ -9,7 +9,7 @@ to ensure graphs are consistent with the e61 style and formatting."></head><body
 
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,7 @@ to ensure graphs are consistent with the e61 style and formatting."></head><body
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Save graphs with theme61 styles and defaults</h1>
-      <small class="dont-index">Source: <a href="https://github.com/e61-institute/theme61/blob/v0.6.3/R/save_e61.R" class="external-link"><code>R/save_e61.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/e61-institute/theme61/blob/main/R/save_e61.R" class="external-link"><code>R/save_e61.R</code></a></small>
       <div class="d-none name"><code>save_e61.Rd</code></div>
     </div>
 
@@ -102,15 +102,17 @@ argument explicitly.</p></dd>
 
 <dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>
 <dd><p>A string vector of file formats to save as. Accepts "svg",
-"pdf", "eps", "png". For example <code>c("svg", "pdf")</code> will save 2 files with
-the same name to the same location to SVG and PDF formats. If the file
-format is specified in <code>filename</code>, then this argument is ignored.</p></dd>
+"pdf", "eps", "png", "jpg". For example <code>c("svg", "pdf")</code> will save 2 files
+with the same name to the same location to SVG and PDF formats. If the file
+format is specified in <code>filename</code> or by the <code>set_format</code> option, then this
+argument is ignored.</p></dd>
 
 
 <dt id="arg-chart-type">chart_type<a class="anchor" aria-label="anchor" href="#arg-chart-type"></a></dt>
-<dd><p>String, or vector of strings if saving multiple plots.
-Type of chart. This is used to set sensible chart widths based on the type
-of plot you are saving. Options are "normal" (default; for normal charts),</p></dd>
+<dd><p>String, or vector of strings if saving multiple plots. Type
+of chart. This is used to set sensible chart widths based on the type of
+plot you are saving. Options are "normal" (default; for normal charts),
+"wide" (for time series graphs) or "square" (for scatter plots).</p></dd>
 
 
 <dt id="arg-auto-scale">auto_scale<a class="anchor" aria-label="anchor" href="#arg-auto-scale"></a></dt>
@@ -223,8 +225,8 @@ Must be specified if any of the graphs are complex (e.g. faceted) and alignment 
 
 
 <dt id="arg-rel-heights">rel_heights<a class="anchor" aria-label="anchor" href="#arg-rel-heights"></a></dt>
-<dd><p>(multi-panel specific) A numeric vector giving
-the relative proportions of each graph component (title, plots, footer).</p></dd>
+<dd><p>(multi-panel specific) A numeric vector giving the
+relative proportions of each graph component (title, plots, footer).</p></dd>
 
 
 <dt id="arg-width-height">width, height<a class="anchor" aria-label="anchor" href="#arg-width-height"></a></dt>
@@ -238,8 +240,7 @@ no longer supported; use <code>dim</code> instead.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The supported file formats are SVG, PDF, EPS and PNG.</p>
-<p>Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
+    <p>Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 better as they are modern vector graphics file formats which can be scaled up
 and down in size without blurring or becoming pixelated. PNG should only be
 used for Twitter posts for compatibility reasons.</p>
@@ -254,7 +255,7 @@ used for Twitter posts for compatibility reasons.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
