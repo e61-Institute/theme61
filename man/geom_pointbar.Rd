@@ -36,8 +36,8 @@ aesthetics from both geom_point and geom_errorbar.}
 
 \item{errorbar.linewidth}{Line width for error bars}
 
-\item{na.rm}{If FALSE, the default, missing values are removed with a warning.
-If TRUE, missing values are silently removed.}
+\item{na.rm}{If FALSE, the default, missing values are removed with a
+warning. If TRUE, missing values are silently removed.}
 
 \item{show.legend}{logical. Should this layer be included in the legends?}
 
@@ -48,8 +48,8 @@ This geom combines the functionality of geom_point() and geom_errorbar(),
 drawing error bars behind points with separate control over their parameters.
 }
 \section{Aesthetics}{
-
-geom_pointbar() understands the following aesthetics (required aesthetics are in bold):
+ geom_pointbar() understands the following aesthetics
+(required aesthetics are in bold):
 \itemize{
 \item \strong{x}
 \item \strong{y}

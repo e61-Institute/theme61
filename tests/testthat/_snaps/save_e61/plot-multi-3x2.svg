@@ -179,7 +179,7 @@
 <polyline points='299.64,142.56 495.05,142.56 ' style='stroke-width: 0.38; stroke: #D0D0D0; stroke-linecap: butt;' />
 <polyline points='299.64,105.92 495.05,105.92 ' style='stroke-width: 0.38; stroke: #D0D0D0; stroke-linecap: butt;' />
 <polyline points='299.64,69.28 495.05,69.28 ' style='stroke-width: 0.38; stroke: #D0D0D0; stroke-linecap: butt;' />
-<polyline points='308.52,112.11 328.25,73.81 348.03,42.21 367.76,141.76 387.48,111.45 407.21,41.43 426.99,35.83 446.72,161.98 466.44,109.58 486.17,97.08 ' style='stroke-width: 1.07; stroke: #AFEFDF; stroke-linecap: butt;' />
+<polyline points='308.52,112.11 328.25,73.81 348.03,42.21 367.76,141.76 387.48,111.45 407.21,41.43 426.99,35.83 446.72,161.98 466.44,109.58 486.17,97.08 ' style='stroke-width: 1.07; stroke: #66CED6; stroke-linecap: butt;' />
 <polyline points='308.52,46.70 328.25,158.87 348.03,34.27 367.76,40.46 387.48,167.12 407.21,103.84 426.99,122.01 446.72,46.45 466.44,113.69 486.17,56.67 ' style='stroke-width: 1.07; stroke: #0D8982; stroke-linecap: butt;' />
 <rect x='299.64' y='32.64' width='195.41' height='146.56' style='stroke-width: 1.50;' />
 </g>
@@ -692,7 +692,7 @@
 <polyline points='299.64,535.77 495.05,535.77 ' style='stroke-width: 0.38; stroke: #D0D0D0; stroke-linecap: butt;' />
 <polyline points='299.64,499.13 495.05,499.13 ' style='stroke-width: 0.38; stroke: #D0D0D0; stroke-linecap: butt;' />
 <polyline points='299.64,462.49 495.05,462.49 ' style='stroke-width: 0.38; stroke: #D0D0D0; stroke-linecap: butt;' />
-<polyline points='308.52,505.32 328.25,467.02 348.03,435.42 367.76,534.97 387.48,504.66 407.21,434.64 426.99,429.04 446.72,555.19 466.44,502.79 486.17,490.29 ' style='stroke-width: 1.07; stroke: #AFEFDF; stroke-linecap: butt;' />
+<polyline points='308.52,505.32 328.25,467.02 348.03,435.42 367.76,534.97 387.48,504.66 407.21,434.64 426.99,429.04 446.72,555.19 466.44,502.79 486.17,490.29 ' style='stroke-width: 1.07; stroke: #66CED6; stroke-linecap: butt;' />
 <polyline points='308.52,439.92 328.25,552.08 348.03,427.48 367.76,433.67 387.48,560.33 407.21,497.05 426.99,515.22 446.72,439.66 466.44,506.90 486.17,449.89 ' style='stroke-width: 1.07; stroke: #0D8982; stroke-linecap: butt;' />
 <rect x='299.64' y='425.85' width='195.41' height='146.56' style='stroke-width: 1.50;' />
 </g>
