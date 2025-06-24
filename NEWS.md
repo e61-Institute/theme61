@@ -1,6 +1,6 @@
 # theme61 0.6.4
 
-XX Jun 2025
+24 Jun 2025
 
 #### New features
 
