@@ -39,14 +39,14 @@
 </defs>
 <g clip-path='url(#cpMTguODh8MjQ3LjQ0fDE2LjcyfDE4OC4xNA==)'>
 <rect x='18.88' y='16.72' width='228.56' height='171.42' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF;' />
-<polyline points='18.88,188.14 247.44,188.14 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
-<polyline points='18.88,145.28 247.44,145.28 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
-<polyline points='18.88,102.43 247.44,102.43 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
-<polyline points='18.88,59.57 247.44,59.57 ' style='stroke-width: 0.38; stroke: #CDCDCD; stroke-linecap: butt;' />
-<polyline points='29.27,42.43 237.05,42.43 ' style='stroke-width: 1.07; stroke: #008080; stroke-linecap: butt;' />
-<polyline points='133.16,42.43 133.16,162.42 ' style='stroke-width: 1.07; stroke: #008080; stroke-linecap: butt;' />
-<polyline points='29.27,162.42 237.05,162.42 ' style='stroke-width: 1.07; stroke: #008080; stroke-linecap: butt;' />
-<circle cx='133.16' cy='102.43' r='1.95' style='stroke-width: 0.71; stroke: #008080; fill: #008080;' />
+<polyline points='18.88,188.14 247.44,188.14 ' style='stroke-width: 0.38; stroke: #D0D0D0; stroke-linecap: butt;' />
+<polyline points='18.88,145.28 247.44,145.28 ' style='stroke-width: 0.38; stroke: #D0D0D0; stroke-linecap: butt;' />
+<polyline points='18.88,102.43 247.44,102.43 ' style='stroke-width: 0.38; stroke: #D0D0D0; stroke-linecap: butt;' />
+<polyline points='18.88,59.57 247.44,59.57 ' style='stroke-width: 0.38; stroke: #D0D0D0; stroke-linecap: butt;' />
+<polyline points='29.27,42.43 237.05,42.43 ' style='stroke-width: 1.07; stroke: #0D8982; stroke-linecap: butt;' />
+<polyline points='133.16,42.43 133.16,162.42 ' style='stroke-width: 1.07; stroke: #0D8982; stroke-linecap: butt;' />
+<polyline points='29.27,162.42 237.05,162.42 ' style='stroke-width: 1.07; stroke: #0D8982; stroke-linecap: butt;' />
+<circle cx='133.16' cy='102.43' r='1.95' style='stroke-width: 0.71; stroke: #0D8982; fill: #0D8982;' />
 <rect x='18.88' y='16.72' width='228.56' height='171.42' style='stroke-width: 1.50;' />
 </g>
 <g clip-path='url(#cpMC4wMHwyNjYuMzF8MC4wMHwyMDMuNTE=)'>
