@@ -49,13 +49,15 @@ to the last plot displayed so usually you do not need to provide this
 argument explicitly.}
 
 \item{format}{A string vector of file formats to save as. Accepts "svg",
-"pdf", "eps", "png". For example \code{c("svg", "pdf")} will save 2 files with
-the same name to the same location to SVG and PDF formats. If the file
-format is specified in \code{filename}, then this argument is ignored.}
+"pdf", "eps", "png", "jpg". For example \code{c("svg", "pdf")} will save 2 files
+with the same name to the same location to SVG and PDF formats. If the file
+format is specified in \code{filename} or by the \code{set_format} option, then this
+argument is ignored.}
 
-\item{chart_type}{String, or vector of strings if saving multiple plots.
-Type of chart. This is used to set sensible chart widths based on the type
-of plot you are saving. Options are "normal" (default; for normal charts),}
+\item{chart_type}{String, or vector of strings if saving multiple plots. Type
+of chart. This is used to set sensible chart widths based on the type of
+plot you are saving. Options are "normal" (default; for normal charts),
+"wide" (for time series graphs) or "square" (for scatter plots).}
 
 \item{auto_scale}{Logical. Scale the y-axis automatically. Default is TRUE.}
 
@@ -124,8 +126,8 @@ vertically ("v") aligned. Options are "none" (default), "hv" (align in both dire
 margins. Options are "none" (default), or a string of any combination of l, r, t, and b in any order (e.g. "tblr" or "rlbt" for aligning all margins).
 Must be specified if any of the graphs are complex (e.g. faceted) and alignment is specified and desired. See \code{\link[cowplot:align_plots]{align_plots()}} for details.}
 
-\item{rel_heights}{(multi-panel specific) A numeric vector giving
-the relative proportions of each graph component (title, plots, footer).}
+\item{rel_heights}{(multi-panel specific) A numeric vector giving the
+relative proportions of each graph component (title, plots, footer).}
 
 \item{width, height}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} width and height are
 no longer supported; use \code{dim} instead.}
@@ -138,8 +140,6 @@ Saves ggplot2 graphs made with using theme61. Using \code{save_e61()} is require
 to ensure graphs are consistent with the e61 style and formatting.
 }
 \details{
-The supported file formats are SVG, PDF, EPS and PNG.
-
 Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 better as they are modern vector graphics file formats which can be scaled up
 and down in size without blurring or becoming pixelated. PNG should only be

@@ -318,6 +318,101 @@ test_that("Preview mode works", {
   })
 })
 
+test_that("set_format works", {
+  p <- minimal_plot
+
+  withr::with_tempdir({
+
+    set_format(c("pdf", "jpg"))
+
+    # Check filename extension is not overridden by set_format
+    suppressWarnings(save_e61("plot1.svg", p))
+    expect_true(file.exists("plot1.svg"))
+
+    # Check formats are used if file extension is not provided
+    suppressWarnings(save_e61("plot2", p))
+    expect_true(file.exists("plot2.pdf"))
+    expect_true(file.exists("plot2.jpg"))
+
+    # Check formats are used if file formats are provided in save_e61
+    suppressWarnings(save_e61("plot3", p, format = c("svg", "png")))
+    expect_true(file.exists("plot3.svg"))
+    expect_true(file.exists("plot3.png"))
+
+    # Check unset formatting works
+    unset_format()
+
+    suppressWarnings(save_e61("plot4", p))
+    expect_true(file.exists("plot4.svg"))
+    expect_true(file.exists("plot4.pdf"))
+    expect_true(file.exists("plot4.eps"))
+    expect_true(file.exists("plot4.jpg"))
+    expect_true(file.exists("plot4.png"))
+
+    # Check you can change the format again
+    set_format(c("pdf", "jpg"))
+    set_format(c("png", "svg"))
+
+    suppressWarnings(save_e61("plot5", p))
+    expect_true(file.exists("plot5.png"))
+    expect_true(file.exists("plot5.svg"))
+
+  })
+
+})
+
+test_that("Spell checker works", {
+  # Typo in various places
+  plots <- list()
+  plots[["title"]] <- minimal_plot + labs_e61(title = "Opertaing expenses")
+  plots[["subtitle"]] <- minimal_plot + labs_e61(subtitle = "Problmatic subtitle text")
+  plots[["footnote"]] <- minimal_plot + labs_e61(footnotes = "Opertaing sektor mistkaes")
+  plots[["sources"]] <- minimal_plot + labs_e61(sources = c("Governmment", "Treasury", "Institute"))
+  plots[["everywhere"]] <- minimal_plot + labs_e61(
+    title = "Opertaing",
+    footnotes = "Opertaing sektor mistkaes",
+    sources = c("Governmment", "Treasury", "Institute"))
+
+  suppressWarnings(suppressMessages(
+      expect_message(
+        save_e61(withr::local_tempfile(fileext = ".svg"), plots[["title"]]),
+        class = "cliMessage"),
+      classes = c("message", "cliMessage")))
+
+  suppressWarnings(suppressMessages(
+    expect_message(
+      save_e61(withr::local_tempfile(fileext = ".svg"), plots[["subtitle"]]),
+      class = "cliMessage"),
+    classes = c("message", "cliMessage")))
+
+  suppressWarnings(suppressMessages(
+    expect_message(
+      save_e61(withr::local_tempfile(fileext = ".svg"), plots[["footnote"]]),
+      class = "cliMessage"),
+    classes = c("message", "cliMessage")))
+
+  suppressWarnings(suppressMessages(
+    expect_message(
+      save_e61(withr::local_tempfile(fileext = ".svg"), plots[["sources"]]),
+      class = "cliMessage"),
+    classes = c("message", "cliMessage")))
+
+  suppressWarnings(suppressMessages(
+    expect_message(
+      save_e61(withr::local_tempfile(fileext = ".svg"), plots[["everywhere"]]),
+      class = "cliMessage"),
+    classes = c("message", "cliMessage")))
+
+
+  # No message if no typo
+  p <- minimal_plot + labs_e61(title = "Operating")
+
+  suppressWarnings(expect_no_message(
+    save_e61(withr::local_tempfile(fileext = ".svg"), p)),
+    classes = c("messages", "warning"))
+
+})
+
 # Check whole-graph generation consistency --------------------------------
 
 test_that("Single-panel graph examples", {
