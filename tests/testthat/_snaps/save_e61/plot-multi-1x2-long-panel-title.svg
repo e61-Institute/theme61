@@ -309,7 +309,7 @@
 <polyline points='290.56,179.77 504.13,179.77 ' style='stroke-width: 0.38; stroke: #D0D0D0; stroke-linecap: butt;' />
 <polyline points='290.56,139.72 504.13,139.72 ' style='stroke-width: 0.38; stroke: #D0D0D0; stroke-linecap: butt;' />
 <polyline points='290.56,99.68 504.13,99.68 ' style='stroke-width: 0.38; stroke: #D0D0D0; stroke-linecap: butt;' />
-<polyline points='300.27,146.49 321.83,104.63 343.45,70.10 365.01,178.90 386.57,145.76 408.13,69.24 429.75,63.12 451.30,200.99 472.86,143.73 494.42,130.06 ' style='stroke-width: 1.07; stroke: #AFEFDF; stroke-linecap: butt;' />
+<polyline points='300.27,146.49 321.83,104.63 343.45,70.10 365.01,178.90 386.57,145.76 408.13,69.24 429.75,63.12 451.30,200.99 472.86,143.73 494.42,130.06 ' style='stroke-width: 1.07; stroke: #66CED6; stroke-linecap: butt;' />
 <polyline points='300.27,75.01 321.83,197.60 343.45,61.41 365.01,68.18 386.57,206.61 408.13,137.45 429.75,157.31 451.30,74.73 472.86,148.22 494.42,85.90 ' style='stroke-width: 1.07; stroke: #0D8982; stroke-linecap: butt;' />
 <rect x='290.56' y='59.64' width='213.57' height='160.18' style='stroke-width: 1.50;' />
 </g>
