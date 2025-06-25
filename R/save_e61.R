@@ -187,6 +187,9 @@ save_e61 <- function(filename = NULL,
     spell_chk_i <- lapply(fields, function(field) {
       val <- plots[[i]]$label[[field]]
       if (!is.null(val)) {
+        # remove html elements before spell-checking
+        val <- gsub("<[^>]+>", "", val)
+
         res <- check_spelling(val)
         if (length(res) > 0) return(res)
       }
