@@ -41,6 +41,8 @@
 #'   (defaults to FALSE).
 #' @param print_info Logical. Set to TRUE if you want graph dimensions and other
 #'   information printed to the console. Defaults to FALSE.
+#' @param spell_check Logical. Check spelling of words in the title and caption.
+#'   Defaults to TRUE. Set to FALSE to turn off.
 #' @param preview Logical. Set to TRUE to show a preview of the graph in the
 #'   Viewer pane but not save to disk. Defaults to FALSE.
 #' @param base_size Numeric. Chart font size. Default is 10.
@@ -60,8 +62,8 @@
 #'   adjustment to the title and subtitle. Rescales the size of the space given
 #'   to the multi-panel title/subtitle. Use if you think the title looks too
 #'   cramped on the chart.
-#' @param rel_heights (multi-panel specific) A numeric vector giving
-#'   the relative proportions of each graph component (title, plots, footer).
+#' @param rel_heights (multi-panel specific) A numeric vector giving the
+#'   relative proportions of each graph component (title, plots, footer).
 #' @inheritParams labs_e61
 #' @inheritParams cowplot::plot_grid
 #' @return Invisibly returns the file name.
@@ -79,6 +81,7 @@ save_e61 <- function(filename = NULL,
                      preview = FALSE,
                      save_data = FALSE,
                      print_info = FALSE,
+                     spell_check = TRUE,
                      base_size = 10,
                      res = 1,
                      bg_colour = "white",
@@ -216,6 +219,9 @@ save_e61 <- function(filename = NULL,
     spell_chk <- c(spell_chk, spell_chk_i)
 
   }
+
+  # Turn off spell check
+  if (!spell_check) spell_chk <- NULL
 
   # Compile the messages
   bad_msg <- NULL
