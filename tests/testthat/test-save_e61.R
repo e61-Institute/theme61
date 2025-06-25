@@ -580,32 +580,32 @@ test_that("Multi-panel graph examples", {
     labs_e61(title = "Panel graph title text",
              subtitle = "Panel graph subtitle text")
 
-  # 1x2 graph
+  ## 1x2 graph ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-multi-1x2.svg", p1, p2)))
   })
 
-  # 2x1 graph
+  ## 2x1 graph ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x1.svg", p1, p2, ncol = 1)))
   })
 
-  # 2x2 graph
+  ## 2x2 graph ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x2.svg", p1_t, p2_t, p3_t, p4_t)))
   })
 
-  # 2x3 graph
+  ## 2x3 graph ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x3.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, ncol = 3)))
   })
 
-  # 3x2 graph
+  ## 3x2 graph ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-multi-3x2.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, ncol = 2)))
   })
 
-  # 1x2 graph with long common footnotes + sources
+  ## 1x2 graph with long common footnotes + sources ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61("plot-multi-1x2-long-footer.svg", p1, p2,
@@ -615,7 +615,7 @@ test_that("Multi-panel graph examples", {
                sources = c("Sources", "Sauces"))))
   })
 
-  # 1x2 graph with long title
+  ## 1x2 graph with long title ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61("plot-multi-1x2-long-title.svg", p1, p2,
@@ -625,7 +625,7 @@ test_that("Multi-panel graph examples", {
                sources = c("Sources", "Sauces"))))
   })
 
-  # 1x2 graph with long panel titles and subtitles
+  ## 1x2 graph with long panel titles and subtitles ----
   p1_lt <- p1 +
     labs_e61(title = "Really long panel title title title title title title title title",
              subtitle = "Really long panel title title title title title")
@@ -643,7 +643,7 @@ test_that("Multi-panel graph examples", {
                sources = c("Sources", "Sauces"))))
   })
 
-  # 1x2 graph with 1 long panel title and subtitles
+  ## 1x2 graph with 1 long panel title and subtitles ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61("plot-multi-1x2-1-long-panel-title.svg", p1_lt, p2_t,
@@ -653,6 +653,7 @@ test_that("Multi-panel graph examples", {
                sources = c("Sources", "Sauces"))))
   })
 
+  ## Test pad_width > 0 values ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61("plot-multi-1x2-1-long-panel-title-padwidth.svg", p1_t, p2_t, pad_width = 3,
@@ -662,5 +663,21 @@ test_that("Multi-panel graph examples", {
                sources = c("Sources", "Sauces"))))
   })
 
+  ## Check spacing with multi-panel title, no subtitle, and panel subtitles ----
+
+  p1_t <- p1 +
+    labs_e61(subtitle = "Panel graph subtitle",
+             y = "ppt")
+
+  p2_t <- p2 +
+    labs_e61(subtitle = "Panel graph subtitle",
+             y = "ppt")
+
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
+      save_e61("plot-multi-1x2-1-title-no subtitle.svg", p1_t, p2_t,
+               title = "Multi-panel graph title text")))
+  })
 
 })
