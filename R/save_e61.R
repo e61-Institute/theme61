@@ -137,15 +137,6 @@ save_e61 <- function(filename = NULL,
     filename <- tempfile(fileext = ".svg")
   }
 
-  # Check if filename has been provided when preview mode is FALSE
-  if (!preview && is.null(filename)) stop("You must provide a file path to save the graph.")
-
-  # Override save directory with temp file if preview mode is TRUE
-  if (preview) {
-    cli::cli_alert_info("Preview mode is activated, file will not be saved to disk.")
-    filename <- tempfile(fileext = ".svg")
-  }
-
   # Check if the save directory exists
   dir_provided <- grepl("^(.*)\\/.*\\..{3}$", filename)
   dir_name <- gsub("^(.*)\\/.*\\..{3}$", "\\1", filename)
