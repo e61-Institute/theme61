@@ -6,7 +6,7 @@
 #' Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 #' better as they are modern vector graphics file formats which can be scaled up
 #' and down in size without blurring or becoming pixelated. PNG should only be
-#' used for Twitter posts for compatibility reasons.
+#' used when required for compatibility reasons.
 #'
 #' @param filename File name to create on disk. Providing the file format
 #'   extension (e.g. .svg) is suggested when saving to a single file format. The
@@ -21,12 +21,10 @@
 #'   "wide" (for time series graphs) or "square" (for scatter plots).
 #' @param auto_scale Logical. Scale the y-axis automatically. Default is TRUE.
 #' @param dim An optional named list specifying the plot height and width.
-#'   Defaults to NULL which means the graph dimensions will be set based on the
-#'   chart type and function-calculated value.
+#'   Defaults to NULL which means the graph dimensions will be calculated
+#'   automatically.
 #' @param pad_width Numeric. Add horizontal whitespace to the sides of the
 #'   graph. Defaults to no additional padding.
-#' @param dim A named list specifying the plot height and width. Defaults to
-#'   NULL which means the graph dimensions will be calculated automatically.
 #' @param max_height Numeric. The maximum height of your plot in cm. This is
 #'   used to constrain the plot resizing algorithm in cases where you want to
 #'   limit the height of your charts. Defaults to NULL which does not restrict
@@ -393,16 +391,16 @@ unset_format <- function() {
   invisible(FALSE)
 }
 
-#' Converts SVG to PNG
+#' Converts SVG to a bitmap file
 #'
-#' Converts an SVG file to a PNG file
+#' Converts an SVG file to a bitmap file, currently supports JPEG and PNG.
 #'
 #' @param file_in File path to the SVG image to convert.
-#' @param file_out File path to the PNG or JPEG. image to save. Default saves a file with
-#'   the same name and location (except for the file extension).
-#' @param delete Logical. Delete the original SVG file? (defaults to FALSE)
-#' @param res Numeric. Increase the dimensions of the saved PNG or JPEG. E.g. `res
-#'   = 2` doubles the dimensions of the saved graph.
+#' @param file_out File path to the PNG or JPEG. image to save. Default saves a
+#'   file with the same name and location (except for the file extension).
+#' @param delete Logical. Delete the original SVG file? (defaults to FALSE).
+#' @param res Numeric. Increase the dimensions of the saved PNG or JPEG. E.g.
+#'   `res = 2` doubles the dimensions of the saved graph.
 #' @return Invisibly returns the file path to the PNG image
 #' @keywords internal
 #' @export

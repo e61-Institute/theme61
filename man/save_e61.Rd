@@ -17,6 +17,7 @@ save_e61(
   preview = FALSE,
   save_data = FALSE,
   print_info = FALSE,
+  spell_check = TRUE,
   base_size = 10,
   res = 1,
   bg_colour = "white",
@@ -59,8 +60,9 @@ plot you are saving. Options are "normal" (default; for normal charts),
 
 \item{auto_scale}{Logical. Scale the y-axis automatically. Default is TRUE.}
 
-\item{dim}{A named list specifying the plot height and width. Defaults to
-NULL which means the graph dimensions will be calculated automatically.}
+\item{dim}{An optional named list specifying the plot height and width.
+Defaults to NULL which means the graph dimensions will be calculated
+automatically.}
 
 \item{pad_width}{Numeric. Add horizontal whitespace to the sides of the
 graph. Defaults to no additional padding.}
@@ -79,6 +81,9 @@ same name as the graph that contains the data needed to recreate the graph
 
 \item{print_info}{Logical. Set to TRUE if you want graph dimensions and other
 information printed to the console. Defaults to FALSE.}
+
+\item{spell_check}{Logical. Check spelling of words in the title and caption.
+Defaults to TRUE. Set to FALSE to turn off.}
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
 
@@ -124,8 +129,8 @@ vertically ("v") aligned. Options are "none" (default), "hv" (align in both dire
 margins. Options are "none" (default), or a string of any combination of l, r, t, and b in any order (e.g. "tblr" or "rlbt" for aligning all margins).
 Must be specified if any of the graphs are complex (e.g. faceted) and alignment is specified and desired. See \code{\link[cowplot:align_plots]{align_plots()}} for details.}
 
-\item{rel_heights}{(multi-panel specific) A numeric vector giving
-the relative proportions of each graph component (title, plots, footer).}
+\item{rel_heights}{(multi-panel specific) A numeric vector giving the
+relative proportions of each graph component (title, plots, footer).}
 }
 \value{
 Invisibly returns the file name.
@@ -138,5 +143,5 @@ to ensure graphs are consistent with the e61 style and formatting.
 Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 better as they are modern vector graphics file formats which can be scaled up
 and down in size without blurring or becoming pixelated. PNG should only be
-used for Twitter posts for compatibility reasons.
+used when required for compatibility reasons.
 }

@@ -2,24 +2,25 @@
 % Please edit documentation in R/save_e61.R
 \name{svg_to_bitmap}
 \alias{svg_to_bitmap}
-\title{Converts SVG to PNG}
+\title{Converts SVG to a bitmap file}
 \usage{
 svg_to_bitmap(file_in, file_out = NULL, res = 1, delete = FALSE)
 }
 \arguments{
 \item{file_in}{File path to the SVG image to convert.}
 
-\item{file_out}{File path to the PNG or JPEG. image to save. Default saves a file with
-the same name and location (except for the file extension).}
+\item{file_out}{File path to the PNG or JPEG. image to save. Default saves a
+file with the same name and location (except for the file extension).}
 
-\item{res}{Numeric. Increase the dimensions of the saved PNG or JPEG. E.g. \code{res = 2} doubles the dimensions of the saved graph.}
+\item{res}{Numeric. Increase the dimensions of the saved PNG or JPEG. E.g.
+\code{res = 2} doubles the dimensions of the saved graph.}
 
-\item{delete}{Logical. Delete the original SVG file? (defaults to FALSE)}
+\item{delete}{Logical. Delete the original SVG file? (defaults to FALSE).}
 }
 \value{
 Invisibly returns the file path to the PNG image
 }
 \description{
-Converts an SVG file to a PNG file
+Converts an SVG file to a bitmap file, currently supports JPEG and PNG.
 }
 \keyword{internal}
