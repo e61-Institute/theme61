@@ -180,25 +180,14 @@ save_e61 <- function(filename = NULL,
 
   # Advisory messages -------------------------------------------------------
 
-  ## Check if y-axis label text is good
+  # Currently spell check is the only function provided in the advisory msgs
+  bad_msg <- c()
   adv_msg <- c()
 
   spell_chk <- list()
 
   # Loop through the plots
   for(i in seq_along(plots)){
-
-    # Skip checks if any of the following criteria are met
-    skip_check <-
-      if (
-        # If a theme61 function is not being used
-        length(plots[[i]]$scales$scales) > 1 &&
-        !"scale_e61" %in% class(plots[[i]]$scales$scales[[2]])
-      ) {
-        TRUE
-      } else {
-        FALSE
-      }
 
     # Spell checks
     fields <- c("title", "subtitle", "caption")
@@ -216,12 +205,20 @@ save_e61 <- function(filename = NULL,
     names(spell_chk_i) <- fields
     spell_chk_i <- Filter(Negate(is.null), spell_chk_i)
 
+    # Format nicely
+    spell_chk_i <- lapply(names(spell_chk_i), function(x) {
+
+      paste0("There may be a typo in the ", x, ": ",
+             paste(spell_chk_i[[x]], collapse = ", "))
+    })
+
     spell_chk_i <- unlist(spell_chk_i)
     spell_chk <- c(spell_chk, spell_chk_i)
 
   }
 
   # Compile the messages
+  bad_msg <- NULL
   adv_msg <- c(spell_chk)
 
   # Compile advisory messages
@@ -233,12 +230,13 @@ save_e61 <- function(filename = NULL,
     )
     cli::cli_h1("--- Your graph may have some issues to address ----------------------------------------", class = "adv")
     cli::cli_ul()
-    sapply(adv_msg, cli::cli_alert, class = "bad")
+    sapply(bad_msg, cli::cli_alert, class = "bad")
+    sapply(adv_msg, cli::cli_alert, class = "adv")
     cli::cli_end()
   }
 
   # Print advisory messages
-  if (length(adv_msg) > 0 && is.null(getOption("no_advisory"))) print_adv()
+  if (length(adv_msg) + length(bad_msg) > 0 && is.null(getOption("no_advisory"))) print_adv()
 
   # Make graph to save --------------------------------
 

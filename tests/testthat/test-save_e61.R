@@ -60,14 +60,6 @@ test_that("Y-axis label messages", {
   suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg)),
                    classes = c("messages", "warning"))
 
-  # No message if non-theme61 scale functions are used.
-  p <- minimal_plot +
-    labs_e61(y = "Long y-axis label that goes on the side") +
-    ggplot2::scale_y_continuous()
-
-  suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p)),
-                   classes = c("messages", "warning"))
-
   # No message if session option is set
   withr::with_options(list(no_advisory = TRUE), {
     p <- minimal_plot +
@@ -324,6 +316,7 @@ test_that("Spell checker works", {
   plots[["sources"]] <- minimal_plot + labs_e61(sources = c("Governmment", "Treasury", "Institute"))
   plots[["everywhere"]] <- minimal_plot + labs_e61(
     title = "Opertaing",
+    subtitle = "Wrnog speeling",
     footnotes = "Opertaing sektor mistkaes",
     sources = c("Governmment", "Treasury", "Institute"))
 
