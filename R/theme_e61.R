@@ -24,9 +24,11 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
 #'   geom_point() +
 #'   theme_e61()
+#' }
 #'
 
 theme_e61 <- function(
@@ -157,14 +159,9 @@ theme_e61 <- function(
 #' arguments in [theme61::labs_e61()], which are probably what you are looking
 #' for.
 #'
-#' @param legend Character. Legend position, "none" (default) hides the legend.
-#' @param legend_position A numeric vector of length two setting the placement
-#'   of legends that have the "inside" position. Takes values between 0 and 1.
-#' @param legend_title Logical. Include Legend title? Defaults to FALSE.
-#' @param aspect_ratio Numeric. Sets the aspect ratio of the graph panel.
-#' @param base_size Numeric. Chart font size. Default is 10.
-#' @param base_family Character. Chart font family. Default is PT Sans.
-#' @return ggplot2 object
+#' @inheritParams theme_e61
+#' @return \code{theme_e61_spatial} returns a ggplot2 object.
+#' @import ggplot2
 #' @export
 #' @family map functions
 #'
@@ -186,7 +183,6 @@ theme_e61_spatial <- function(
     legend = c("none", "bottom", "top", "left", "right", "inside"),
     legend_position = NULL,
     legend_title = FALSE,
-    base_size = 10,
     base_family = "pt-sans"
 ) {
   legend <- match.arg(legend)
@@ -201,6 +197,7 @@ theme_e61_spatial <- function(
   }
 
   base_family <- if (is_testing()) "sans" else base_family
+  base_size <- getOption("t61_base_size", default = 10)
   half_line <- base_size / 2
 
   if (length(legend_title) == 0) legend_title <- FALSE

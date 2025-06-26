@@ -57,8 +57,10 @@ for.
 is called by other functions as part of the graph rendering process.
 }
 \examples{
+\dontrun{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
   geom_point() +
   theme_e61()
+}
 
 }
