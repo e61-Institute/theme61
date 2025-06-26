@@ -147,6 +147,7 @@ theme_e61 <- function(
   }
 
   # Add attribute to identify it as a theme61 object
+  class(ret) <- c("theme_e61", class(ret))
   attr(ret, "t61_obj") <- TRUE
 
   return(ret)
@@ -199,8 +200,6 @@ theme_e61_spatial <- function(
   base_family <- if (is_testing()) "sans" else base_family
   base_size <- getOption("t61_base_size", default = 10)
   half_line <- base_size / 2
-
-  if (length(legend_title) == 0) legend_title <- FALSE
 
   ret <-
     theme(
@@ -268,7 +267,10 @@ theme_e61_spatial <- function(
     )
   }
 
+  # Add attribute to identify it as a theme61 object
+  class(ret) <- c("theme_e61", class(ret))
   attr(ret, "t61_obj") <- TRUE
+
   return(ret)
 }
 
@@ -400,4 +402,15 @@ y_title_top <- function(adj, fix_left) {
     )
 
   return(ret)
+}
+
+#' Tell ggplot2 what to do when someone does + theme_e61()
+#' @method ggplot_add theme_e61
+#' @export
+ggplot_add.theme_e61 <- function(object, plot, object_name) {
+  # 1) merge in all the theme bits the way ggplot2 normally would
+  plot <- ggplot2:::ggplot_add.theme(object, plot, object_name)
+  # 2) now copy your flag from the theme onto the plot
+  attr(plot, "t61_obj") <- attr(object, "t61_obj")
+  plot
 }

@@ -49,11 +49,11 @@ save_single <- function(
   legendTitle <- plot$theme$legend.title
   legendPosition <- plot$theme$legend.position
 
-  if(is_spatial_chart){
-    plot <- plot + theme_e61_spatial(base_size = base_size,
-                                     legend = legendPosition,
-                                     legend_title = legendTitle)
+  if (is_spatial_chart && !attr(plot, "t61_obj")){
+    plot <- plot + theme_e61_spatial()
 
+  } else if (is_spatial_chart && attr(plot, "t61_obj")) {
+    plot
   } else {
 
     plot <- plot + theme(text = element_text(size = base_size))
