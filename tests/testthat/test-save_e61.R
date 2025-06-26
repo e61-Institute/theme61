@@ -681,3 +681,35 @@ test_that("Multi-panel graph examples", {
   })
 
 })
+
+test_that("Map examples", {
+
+  skip_if_not_installed("sf")
+  skip_if_not_installed("strayr")
+  library(sf)
+
+  sa3_shp <- strayr::read_absmap("sa32016")
+
+  sydney_map <- dplyr::filter(sa3_shp, gcc_code_2016 == "1GSYD")
+
+  ## Simple map with title and subtitle ----
+  p <- ggplot(data = sydney_map) +
+    geom_sf(aes(fill = sa3_code_2016), colour = "black") +
+    labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA3s") +
+    theme_e61_spatial()
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-simple-map.svg", p)))
+  })
+
+  ## Map with legends ----
+  p <- ggplot(data = sydney_map) +
+    geom_sf(aes(fill = as.numeric(sa3_code_2016)), colour = "black") +
+    labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA3s",
+             fill = "SA3 code") +
+    theme_e61_spatial(legend = "right", legend_title = T)
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-legend-map.svg", p)))
+  })
+})
