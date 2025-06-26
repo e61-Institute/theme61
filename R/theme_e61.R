@@ -171,96 +171,107 @@ theme_e61 <- function(
 #' @examples
 #'
 #' \dontrun{
+#' library(sf)
+#'
 #' sa3_shp <- strayr::read_absmap("sa32016")
 #'
 #' sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
 #'
 #' ggplot(data = sydney_map) +
-#'   geom_sf(aes(fill = gcc_name_2016)) +
+#'   geom_sf(aes(fill = sa3_code_2016), colour = "black") +
 #'   theme_e61_spatial()
 #' }
 #'
 theme_e61_spatial <- function(
-  legend = c("none", "bottom", "top", "left", "right", "inside"),
-  legend_position = NULL,
-  legend_title = FALSE,
-  base_size = 10,
-  base_family = "pt-sans"
-){
-
+    legend = c("none", "bottom", "top", "left", "right", "inside"),
+    legend_position = NULL,
+    legend_title = FALSE,
+    base_size = 10,
+    base_family = "pt-sans"
+) {
   legend <- match.arg(legend)
 
   if (legend == "inside") {
-    if (!is.numeric(legend_position) || length(legend_position) != 2)
+    if (!is.numeric(legend_position) || length(legend_position) != 2) {
       stop("legend_position needs to be a length two numeric vector.")
 
     if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
       stop("Both legend_position values must be between 0 and 1.")
+    }
   }
 
-  base_family <- if (is_testing()) "sans" else "pt-sans"
-
+  base_family <- if (is_testing()) "sans" else base_family
   half_line <- base_size / 2
 
+  if (length(legend_title) == 0) legend_title <- FALSE
+
   ret <-
-    theme_void() +
     theme(
+      # base text
       text = element_text(
         colour = "black",
         family = base_family,
-        face = "plain",
-        hjust = 0.5,
-        vjust = 0.5,
-        angle = 0,
-        lineheight = 0.9,
-        debug = FALSE,
-        margin = margin(),
         size = base_size
       ),
+      # titles
+      plot.title.position   = "plot",
+      plot.caption.position = "plot",
       plot.title = element_text(
-        size = rel(1.15),
-        hjust = 0.5,
-        vjust = 1,
-        colour = "black",
+        size = rel(1.3),
+        hjust = 0,
         face = "bold",
         margin = margin(b = half_line)
       ),
-      plot.subtitle = element_text(
-        size = rel(1),
-        colour = "black",
-        hjust = 0.5,
-        vjust = 1,
-        margin = margin(
-          t = 0, r = 0, b = base_size * .5, l = 0,
-          unit = "pt"
-        )
+      plot.subtitle = ggtext::element_markdown(
+        size = rel(1.15),
+        hjust = 0,
+        margin = margin(b = base_size)
       ),
       plot.caption = element_text(
-        family = base_family,
         size = rel(0.8),
         hjust = 0,
-        vjust = 1,
-        colour = "black",
-        margin = margin(t = 15)
+        margin = margin(t = half_line)
       ),
-      legend.position = legend,
+      plot.margin = margin(t = half_line * 2, r = half_line, b = half_line, l = half_line),
+
+      # panel and axes
+      panel.background = element_blank(),
+      panel.border = element_blank(),
       axis.text = element_blank(),
-      axis.ticks = element_blank(),
-      axis.line = element_blank(),
-      panel.border = element_blank()
+      axis.ticks.x = element_blank(),
+      axis.line.x = element_blank(),
+
+      # grid
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+
+      # legend
+      legend.position = legend,
+      legend.direction = if (grepl("bottom|top", legend)) "horizontal" else "vertical",
+      legend.background = element_blank(),
+      legend.key = element_blank(),
+      legend.text = element_text(size = rel(0.9))
     )
 
-  if (legend_title) ret <- ret + theme(legend.title = element_text())
-
-  # add legend position if inside
-  if (legend == "inside") {
-    ret <- ret +
-      theme(
-        legend.position.inside = legend_position
-      )
+  if (legend_title) {
+    ret <- ret + theme(legend.title = element_text(size = rel(0.9)))
+  } else {
+    ret <- ret + theme(legend.title = element_blank())
   }
 
+  if (legend == "inside") {
+    ret <- ret + theme(legend.position.inside = legend_position)
+  }
 
+  # facet spacing if used
+  if (!inherits(ret$facet, "FacetNull")) {
+    ret <- ret %+replace% theme(
+      panel.spacing.x = unit(2, "lines"),
+      panel.spacing.y = unit(2, "lines")
+    )
+  }
+
+  attr(ret, "t61_obj") <- TRUE
   return(ret)
 }
 

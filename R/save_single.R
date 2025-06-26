@@ -46,7 +46,6 @@ save_single <- function(
   max_width <- 18.59
 
   # update the base size without removing the legend
-
   legendTitle <- plot$theme$legend.title
   legendPosition <- plot$theme$legend.position
 
@@ -58,7 +57,8 @@ save_single <- function(
   } else {
 
     plot <- plot + theme(text = element_text(size = base_size))
-    plot <- plot + update_margins(base_size = base_size, legend_title = legendTitle)
+    plot <- plot + update_margins(base_size = base_size,
+                                  legend_title = legendTitle)
 
     if(!is.null(legendPosition)){
       plot <- plot + theme(legend.position = legendPosition)
