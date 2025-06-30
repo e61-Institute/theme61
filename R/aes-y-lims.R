@@ -144,12 +144,12 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   # rescale the axis and apply requested customisations
   lims <- if (exists("aes_lims")) aes_lims else y_scale_lims
 
-  if(auto_scale && length(y_scale_lims) < 3){
+  if(auto_scale){
     suppressWarnings({
       if (sec_axis) {
-        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis())
+        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), save_call = TRUE)
       } else if (!sec_axis) {
-        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE)
+        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE, save_call = TRUE)
       }
     })
   }

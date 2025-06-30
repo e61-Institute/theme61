@@ -268,6 +268,8 @@ save_e61 <- function(filename = NULL,
     )
   } else {
 
+    temp <- plots[[1]]
+
     save_input <- save_single(
       filename = filename,
       plot = plots[[1]],
@@ -339,7 +341,6 @@ save_e61 <- function(filename = NULL,
   retval <- paste(filename, format, sep = ".")
 
   invisible(retval)
-
 }
 
 #' Set option to open graphs in the browser instead of the Viewer pane

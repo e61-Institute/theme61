@@ -212,25 +212,19 @@ save_multi <-
       nrow <- ceiling(length(plots) / ncol)
     }
 
-    # Put together the panels
-    panels <- cowplot::plot_grid(
-      plotlist = plots,
-      align = align,
-      axis = axis,
+    # Create the main chart
+    multi_plot <- patchwork::wrap_plots(
+      plots,
       ncol = ncol,
       nrow = nrow
     )
 
-    # These all need to be lists
-    panels <- list(panels)
-    lab_head <- list()
-    lab_foot <- list()
 
     # Prepare titles, subtitles etc. --------------------------------------
 
     # define text sizes
-    title_text_size <- base_size * 1.4
-    subtitle_text_size <- base_size
+    title_text_size <- base_size * 1.6
+    subtitle_text_size <- base_size  * 1.1
     footer_text_size <- base_size * 0.8
 
     # title
@@ -248,15 +242,10 @@ save_multi <-
           )
       }
 
-      lab_head$title <-
-        cowplot::ggdraw() +
-        cowplot::draw_label(
-          title,
-          fontface = "bold",
-          x = 0,
-          hjust = 0,
-          vjust = 0.5,
-          size = title_text_size
+      multi_plot <- multi_plot +
+        patchwork::plot_annotation(
+          title = title,
+          theme = theme(plot.title = element_text(size = title_text_size, face = "bold", hjust = 0, vjust = 0.5))
         )
     }
 
@@ -274,15 +263,10 @@ save_multi <-
           )
       }
 
-      lab_head$subtitle <-
-        cowplot::ggdraw() +
-        cowplot::draw_label(
-          subtitle,
-          fontface = "plain",
-          x = 0,
-          hjust = 0,
-          vjust = 0.5,
-          size = subtitle_text_size
+      multi_plot <- multi_plot +
+        patchwork::plot_annotation(
+          subtitle = subtitle,
+          theme = theme(plot.subtitle = element_text(size = subtitle_text_size, face = "plain", hjust = 0, vjust = 0.5))
         )
     }
 
@@ -307,16 +291,14 @@ save_multi <-
           )
       }
 
-      lab_foot$footer <-
-        cowplot::ggdraw() +
-        cowplot::draw_label(
-          caption,
-          x = 0,
-          hjust = 0,
-          vjust = 0.5,
-          size = footer_text_size
-        ) +
-        theme(plot.margin = margin(t = 5, r = 0, b = 3, l = 5))
+      multi_plot <- multi_plot +
+        patchwork::plot_annotation(
+          caption = caption,
+          theme = theme(
+            plot.caption = element_text(size = footer_text_size, face = "plain", hjust = 0, vjust = 0.5),
+            plot.margin = margin(t = 5, r = 0, b = 3, l = 5)
+          )
+        )
     }
 
 
@@ -363,20 +345,11 @@ save_multi <-
     if (s_h == 0) s_h <- NULL
     if (f_h == 0) f_h <- NULL
 
-    # Use automatically generated relative heights if the user does not specify their own
-    if (is.null(rel_heights)) rel_heights <- c(t_h, s_h, p_h, f_h)
-
-    gg <- cowplot::plot_grid(
-      plotlist = c(lab_head, panels, lab_foot),
-      ncol = 1,
-      rel_heights = rel_heights
-    )
-
     # Add width padding
     width <- width + pad_width
 
     # Return objects needed to save the graph ----
-    retval <- list(graph = gg,
+    retval <- list(graph = multi_plot,
                    width = width,
                    height = tot_height)
 
