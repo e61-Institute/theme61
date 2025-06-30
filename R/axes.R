@@ -69,7 +69,8 @@ scale_y_continuous_e61 <- function(limits = NULL,
     retval <- ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
       sec.axis = sec_axis,
-      limits = limits,
+      # Add 5% to the supplied limits to create a bit of white space at the top of the chart
+      limits = c(limits[1], limits[2] + (limits[2] - limits[1])* 0.03),
       breaks = breaks,
       ...
     )

@@ -68,7 +68,6 @@ save_multi <-
 
       temp_plot <- plots[[i]]
 
-
       # Update the aspect ratio
       if(length(chart_type) > 1) {
         chart_type_temp <- chart_type[i]
