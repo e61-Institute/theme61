@@ -7,11 +7,6 @@ update_scales <- function(plot, auto_scale){
   # check if we have a numeric y-variable
   check_y_var <- check_for_y_var(plot)
 
-  # check if no y-axis label was set in theme_e61
-  no_y_top <- isTRUE(attr(plot$theme, "no_y_top"))
-
-  if (no_y_top) cli::cli_alert_info("Moving y-axis label back to the side of the graph.")
-
   # if we don't have a numeric y-variable then check whether the plot contains geom_density or geom_histogram (GeomBar without a y-variable)
   if (!check_y_var) {
     layers <- plot$layers
@@ -41,7 +36,7 @@ update_scales <- function(plot, auto_scale){
   # if the y-variable class is numeric, or the plot is a density or histogram, then update the chart scales
   if (check_y_var){
 
-    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis, no_y_top = no_y_top)})
+    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
 
     # if the y-var class is NULL, send a warning message about the auto updating of chart scales
   } else if (!check_y_var & is.null(getOption("warn_y_var"))){
@@ -101,7 +96,7 @@ check_for_y_var <- function(plot){
 
 #' Aesthetically update the y-axis scales and labels
 #' @noRd
-update_chart_scales <- function(plot, auto_scale, sec_axis, no_y_top){
+update_chart_scales <- function(plot, auto_scale, sec_axis){
 
   # Returns the order of the first scale function used - how do we determine this
   y_scale_lims <- layer_scales(plot)$y$limits
@@ -151,13 +146,9 @@ update_chart_scales <- function(plot, auto_scale, sec_axis, no_y_top){
 
   if(auto_scale && length(y_scale_lims) < 3){
     suppressWarnings({
-      if (no_y_top && sec_axis) {
-        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), y_top = FALSE)
-      } else if (!no_y_top && sec_axis) {
+      if (sec_axis) {
         plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis())
-      } else if (no_y_top && !sec_axis) {
-        plot <- plot + scale_y_continuous_e61(limits = lims, y_top = FALSE, sec_axis = FALSE)
-      } else if (!no_y_top && !sec_axis) {
+      } else if (!sec_axis) {
         plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE)
       }
     })

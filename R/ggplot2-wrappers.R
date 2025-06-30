@@ -20,10 +20,10 @@ ggplot <-
 
       if(max(data[[y_var_name]], na.rm = TRUE) == min(data[[y_var_name]], na.rm = TRUE)){
 
-        p <- p + scale_y_continuous_e61(y_top = TRUE, expand_bottom = 0.15, expand_top = 0.15)
+        p <- p + scale_y_continuous_e61(expand_bottom = 0.15, expand_top = 0.15)
 
       } else {
-        p <- p + scale_y_continuous_e61(y_top = TRUE)
+        p <- p + scale_y_continuous_e61()
       }
     }
   }
@@ -112,4 +112,24 @@ labs <- function(...) {
     cli::cli_bullets(c("x" = "Your function arguments have been passed to labs_e61() automatically. Please use labs_e61() instead of labs() to ensure your graphs conform to the e61 style correctly. If you still want to use ggplot2's labs(), provide the namespace explicitly."))
 
   labs_e61(...)
+}
+
+#' Masks ggplot2::facet_wrap to set axes to "all" better distinguish facet
+#' panels
+#'
+#' @noRd
+#' @export
+facet_wrap <- function(..., axes = "all") {
+
+  ggplot2::facet_wrap(..., axes = axes)
+}
+
+#' Masks ggplot2::facet_grid to set axes to "all" better distinguish facet
+#' panels
+#'
+#' @noRd
+#' @export
+facet_grid <- function(..., axes = "all") {
+
+  ggplot2::facet_grid(..., axes = axes)
 }

@@ -6,7 +6,7 @@
 #' Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 #' better as they are modern vector graphics file formats which can be scaled up
 #' and down in size without blurring or becoming pixelated. PNG should only be
-#' used for Twitter posts for compatibility reasons.
+#' used when required for compatibility reasons.
 #'
 #' @param filename File name to create on disk. Providing the file format
 #'   extension (e.g. .svg) is suggested when saving to a single file format. The
@@ -21,12 +21,10 @@
 #'   "wide" (for time series graphs) or "square" (for scatter plots).
 #' @param auto_scale Logical. Scale the y-axis automatically. Default is TRUE.
 #' @param dim An optional named list specifying the plot height and width.
-#'   Defaults to NULL which means the graph dimensions will be set based on the
-#'   chart type and function-calculated value.
+#'   Defaults to NULL which means the graph dimensions will be calculated
+#'   automatically.
 #' @param pad_width Numeric. Add horizontal whitespace to the sides of the
 #'   graph. Defaults to no additional padding.
-#' @param dim A named list specifying the plot height and width. Defaults to
-#'   NULL which means the graph dimensions will be calculated automatically.
 #' @param max_height Numeric. The maximum height of your plot in cm. This is
 #'   used to constrain the plot resizing algorithm in cases where you want to
 #'   limit the height of your charts. Defaults to NULL which does not restrict
@@ -41,6 +39,8 @@
 #'   (defaults to FALSE).
 #' @param print_info Logical. Set to TRUE if you want graph dimensions and other
 #'   information printed to the console. Defaults to FALSE.
+#' @param spell_check Logical. Check spelling of words in the title and caption.
+#'   Defaults to TRUE. Set to FALSE to turn off.
 #' @param preview Logical. Set to TRUE to show a preview of the graph in the
 #'   Viewer pane but not save to disk. Defaults to FALSE.
 #' @param base_size Numeric. Chart font size. Default is 10.
@@ -62,8 +62,6 @@
 #'   cramped on the chart.
 #' @param rel_heights (multi-panel specific) A numeric vector giving the
 #'   relative proportions of each graph component (title, plots, footer).
-#' @param width,height `r lifecycle::badge("deprecated")` width and height are
-#'   no longer supported; use `dim` instead.
 #' @inheritParams labs_e61
 #' @inheritParams cowplot::plot_grid
 #' @return Invisibly returns the file name.
@@ -81,6 +79,7 @@ save_e61 <- function(filename = NULL,
                      preview = FALSE,
                      save_data = FALSE,
                      print_info = FALSE,
+                     spell_check = TRUE,
                      base_size = 10,
                      res = 1,
                      bg_colour = "white",
@@ -96,20 +95,8 @@ save_e61 <- function(filename = NULL,
                      nrow = NULL,
                      align = c("v", "none", "h", "hv"),
                      axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-                     rel_heights = NULL,
-                     width = NULL,
-                     height = NULL) {
-
-  # Deprecation messages
-  if (!missing("width"))
-    lifecycle::deprecate_stop(when = "0.6.0",
-                              what = "save_e61(width)",
-                              details = c("!" = "It has been replaced with the `dim` argument which takes a named list like `list(width = 10, height = 10)`."))
-
-  if (!missing("height"))
-    lifecycle::deprecate_stop(when = "0.6.0",
-                              what = "save_e61(height)",
-                              details = c("!" = "It has been replaced with the `dim` argument which takes a named list like `list(width = 10, height = 10)`."))
+                     rel_heights = NULL
+                     ) {
 
   # Compile plots
   plots <- c(list(...), plotlist)
@@ -137,15 +124,6 @@ save_e61 <- function(filename = NULL,
       if(!chart_type[i] %in% c("normal", "wide", "square"))
         stop("Invalid chart type. All chart types must be one of 'normal', 'wide' or 'square'.")
     }
-  }
-
-  # Check if filename has been provided when preview mode is FALSE
-  if (!preview && is.null(filename)) stop("You must provide a file path to save the graph.")
-
-  # Override save directory with temp file if preview mode is TRUE
-  if (preview) {
-    cli::cli_alert_info("Preview mode is activated, file will not be saved to disk.")
-    filename <- tempfile(fileext = ".svg")
   }
 
   # Check if filename has been provided when preview mode is FALSE
@@ -194,58 +172,14 @@ save_e61 <- function(filename = NULL,
 
   # Advisory messages -------------------------------------------------------
 
-  ## Check if y-axis label text is good
+  # Currently spell check is the only function provided in the advisory msgs
+  bad_msg <- c()
   adv_msg <- c()
 
-  y_miss <- c()
-  y_long <- c()
   spell_chk <- list()
 
   # Loop through the plots
   for(i in seq_along(plots)){
-
-    # Skip checks if any of the following criteria are met
-    skip_check <-
-      if (
-        # If a theme61 function is not being used
-        length(plots[[i]]$scales$scales) > 1 &&
-        !"scale_e61" %in% class(plots[[i]]$scales$scales[[2]])
-      ) {
-        TRUE
-      } else if (
-        # If rescaled dual axis scales are used
-        length(plots[[i]]$scales$scales) > 1 &&
-        "rescale_y" %in% class(plots[[i]]$scales$scales[[2]])
-      ) {
-        TRUE
-      } else if (
-        # If y_top is not being used
-        isTRUE(attr(plots[[i]]$theme, "no_y_top")) ||
-        (length(plots[[i]]$scales$scales) > 1 &&
-         "no_y_top" %in% class(plots[[i]]$scales$scales[[2]]))
-      ) {
-        TRUE
-      } else {
-        FALSE
-      }
-
-    # Message if the y-axis label text is missing
-    if (
-      # Checks if y is missing or blank
-      (is.null(plots[[i]]$labels$y) || nchar(plots[[i]]$labels$y) == 0) &&
-      !skip_check
-      ) {
-      y_miss <- c(y_miss, i)
-    }
-
-    # Message if the y-axis label text is too long
-    if (
-      # Check label char length
-      isTRUE(nchar(plots[[i]]$labels$y) > 5) &&
-      !skip_check
-      ) {
-      y_long <- c(y_long, i)
-    }
 
     # Spell checks
     fields <- c("title", "subtitle", "caption")
@@ -253,6 +187,9 @@ save_e61 <- function(filename = NULL,
     spell_chk_i <- lapply(fields, function(field) {
       val <- plots[[i]]$label[[field]]
       if (!is.null(val)) {
+        # remove html elements before spell-checking
+        val <- gsub("<[^>]+>", "", val)
+
         res <- check_spelling(val)
         if (length(res) > 0) return(res)
       }
@@ -263,41 +200,24 @@ save_e61 <- function(filename = NULL,
     names(spell_chk_i) <- fields
     spell_chk_i <- Filter(Negate(is.null), spell_chk_i)
 
+    # Format nicely
+    spell_chk_i <- lapply(names(spell_chk_i), function(x) {
+
+      paste0("There may be a typo in the ", x, ": ",
+             paste(spell_chk_i[[x]], collapse = ", "))
+    })
+
     spell_chk_i <- unlist(spell_chk_i)
     spell_chk <- c(spell_chk, spell_chk_i)
 
   }
 
+  # Turn off spell check
+  if (!spell_check) spell_chk <- NULL
+
   # Compile the messages
-  if (length(y_miss) > 0) {
-    y_miss <- paste0(
-      "Plot ",
-      paste(y_miss, collapse = ", "),
-      " is missing a y-axis label. Provide the y-axis units for the reader by specifying the 'y' argument in 'labs_e61()'.")
-  } else {
-    y_miss <- NULL
-  }
-
-  if (length(y_long) > 0) {
-    y_long <- paste0(
-      "Plot ",
-      paste(y_long, collapse = ", "),
-      " y-axis labels may be too long. Consider if the information needed to interpret the graph is already in the title and only specify the required units in the y-axis label (for example you could use: %, ppt, $b, '000, n)."
-    )
-  } else {
-    y_long <- NULL
-  }
-
-  if (length(spell_chk) > 0) {
-    spell_chk <- unlist(spell_chk)
-    spell_chk <- paste0("Check possible typos in the ",
-                        paste(names(spell_chk), collapse = ", "),
-                        ": ",
-                        paste(spell_chk, collapse = ", ")
-                        )
-  }
-
-  adv_msg <- c(y_miss, y_long, spell_chk)
+  bad_msg <- NULL
+  adv_msg <- c(spell_chk)
 
   # Compile advisory messages
   print_adv <- function() {
@@ -308,12 +228,13 @@ save_e61 <- function(filename = NULL,
     )
     cli::cli_h1("--- Your graph may have some issues to address ----------------------------------------", class = "adv")
     cli::cli_ul()
-    sapply(adv_msg, cli::cli_alert, class = "bad")
+    sapply(bad_msg, cli::cli_alert, class = "bad")
+    sapply(adv_msg, cli::cli_alert, class = "adv")
     cli::cli_end()
   }
 
   # Print advisory messages
-  if (length(adv_msg) > 0 && is.null(getOption("no_advisory"))) print_adv()
+  if (length(adv_msg) + length(bad_msg) > 0 && is.null(getOption("no_advisory"))) print_adv()
 
   # Make graph to save --------------------------------
 
@@ -473,16 +394,16 @@ unset_format <- function() {
   invisible(FALSE)
 }
 
-#' Converts SVG to PNG
+#' Converts SVG to a bitmap file
 #'
-#' Converts an SVG file to a PNG file
+#' Converts an SVG file to a bitmap file, currently supports JPEG and PNG.
 #'
 #' @param file_in File path to the SVG image to convert.
-#' @param file_out File path to the PNG or JPEG. image to save. Default saves a file with
-#'   the same name and location (except for the file extension).
-#' @param delete Logical. Delete the original SVG file? (defaults to FALSE)
-#' @param res Numeric. Increase the dimensions of the saved PNG or JPEG. E.g. `res
-#'   = 2` doubles the dimensions of the saved graph.
+#' @param file_out File path to the PNG or JPEG. image to save. Default saves a
+#'   file with the same name and location (except for the file extension).
+#' @param delete Logical. Delete the original SVG file? (defaults to FALSE).
+#' @param res Numeric. Increase the dimensions of the saved PNG or JPEG. E.g.
+#'   `res = 2` doubles the dimensions of the saved graph.
 #' @return Invisibly returns the file path to the PNG image
 #' @keywords internal
 #' @export

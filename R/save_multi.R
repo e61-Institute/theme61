@@ -68,7 +68,6 @@ save_multi <-
 
       temp_plot <- plots[[i]]
 
-
       # Update the aspect ratio
       if(length(chart_type) > 1) {
         chart_type_temp <- chart_type[i]
@@ -193,12 +192,6 @@ save_multi <-
 
         temp_plot <- clean_plotlist[[i]]
 
-        # update y-axis labels - if the y-axis labels are set to the top
-        suppressMessages({
-          if(isFALSE(attr(temp_plot$theme, "no_y_top")))
-            temp_plot <- update_y_axis_labels(temp_plot, max_break_width, y_lab_max_size, any_neg_break, any_dec_break)
-        })
-
         # update labels - for each set the limit as width - knowwidth (axis labels etc.) divided by the number of columns we have
         temp_plot <- update_labs(temp_plot, panel_width)
 
@@ -236,7 +229,7 @@ save_multi <-
     # Prepare titles, subtitles etc. --------------------------------------
 
     # define text sizes
-    title_text_size <- base_size * 1.15
+    title_text_size <- base_size * 1.4
     subtitle_text_size <- base_size
     footer_text_size <- base_size * 0.8
 
@@ -260,8 +253,8 @@ save_multi <-
         cowplot::draw_label(
           title,
           fontface = "bold",
-          x = 0.5,
-          hjust = 0.5,
+          x = 0,
+          hjust = 0,
           vjust = 0.5,
           size = title_text_size
         )
@@ -286,8 +279,8 @@ save_multi <-
         cowplot::draw_label(
           subtitle,
           fontface = "plain",
-          x = 0.5,
-          hjust = 0.5,
+          x = 0,
+          hjust = 0,
           vjust = 0.5,
           size = subtitle_text_size
         )

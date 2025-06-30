@@ -54,38 +54,10 @@ test_that("Flipped coord formatting", {
 
 test_that("Y-axis label messages", {
 
-  # y-axis text missing or too long
-  p1 <- minimal_plot + labs_e61(y = "")
-  p2 <- minimal_plot + labs_e61(y = "too long label")
-
-  suppressWarnings(suppressMessages(
-    expect_message(
-      save_e61(withr::local_tempfile(fileext = ".svg"), p1, p2),
-      class = "cliMessage"),
-    classes = c("message", "cliMessage")))
-
   # No message if you do it right
   gg <- minimal_plot
 
   suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg)),
-                   classes = c("messages", "warning"))
-
-  # No message if y_top is FALSE
-  p <- minimal_plot +
-    labs_e61(y = NULL) +
-    theme_e61(y_top = FALSE)
-
-  suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p),
-                                     message = ".*missing a y-axis label.*",
-                                     class = "cliMessage"),
-                   classes = c("messages", "warning"))
-
-  # No message if non-theme61 scale functions are used.
-  p <- minimal_plot +
-    labs_e61(y = "Long y-axis label that goes on the side") +
-    ggplot2::scale_y_continuous()
-
-  suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p)),
                    classes = c("messages", "warning"))
 
   # No message if session option is set
@@ -101,52 +73,29 @@ test_that("Y-axis label messages", {
 test_that("Y-axis customisation options", {
   p <- minimal_plot
 
-  # Limits, sec_axis, y_top
+  # Limits, sec_axis
   p1 <- p +
     scale_y_continuous_e61(limits = c(0, 1.5, 0.5)) +
     labs_e61(title = "Y-scale testing")
 
-  # Limits, sec_axis, no y_top
+  # Limits, no sec_axis
   p2 <- p +
-    theme_e61(y_top = FALSE) +
-    scale_y_continuous_e61(limits = c(0, 1.5, 0.5), y_top = FALSE) +
-    labs_e61(title = "Y-scale testing", y = NULL)
-
-  # Limits, no sec_axis, no y_top
-  p3 <- p +
-    theme_e61(y_top = FALSE) +
-    scale_y_continuous_e61(limits = c(0, 1.5, 0.5), sec_axis = FALSE, y_top = FALSE) +
-    labs_e61(title = "Y-scale testing", y = NULL)
-
-  # Limits, no sec_axis, y_top
-  p4 <- p +
     scale_y_continuous_e61(limits = c(0, 1.5, 0.5), sec_axis = FALSE) +
     labs_e61(title = "Y-scale testing")
 
-  # No limits, sec_axis, y_top
-  p5 <- p + labs_e61(title = "Y-scale testing")
+  # No limits, sec_axis
+  p3 <- p + labs_e61(title = "Y-scale testing")
 
-  # No limits, sec_axis, no y_top
-  p6 <- p +
-    theme_e61(y_top = FALSE) +
-    labs_e61(title = "Y-scale testing", y = NULL)
-
-  # No limits, no sec_axis, y_top
-  p7 <- p +
+  # No limits, no sec_axis
+  p4 <- p +
     scale_y_continuous_e61(sec_axis = FALSE) +
     labs_e61(title = "Y-scale testing")
 
-  # No limits, no sec_axis, no y_top
-  p8 <- p +
-    theme_e61(y_top = FALSE) +
-    scale_y_continuous_e61(sec_axis = FALSE) +
-    labs_e61(title = "Y-scale testing", y = NULL)
-
-  # Flipped graph, no y_top
-  p9 <- p +
-    theme_e61(y_top = FALSE) +
+  # Flipped graph
+  p5 <- p +
+    theme_e61() +
     coord_flip() +
-    labs_e61(title = "Flipped graph with no y_top",
+    labs_e61(title = "Flipped graph",
              y = "Long y-axis text")
 
   withr::with_tempdir({
@@ -155,10 +104,6 @@ test_that("Y-axis customisation options", {
     expect_snapshot_file(suppressWarnings(save_e61("y-scale-test3.svg", p3)))
     expect_snapshot_file(suppressWarnings(save_e61("y-scale-test4.svg", p4)))
     expect_snapshot_file(suppressWarnings(save_e61("y-scale-test5.svg", p5)))
-    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test6.svg", p6)))
-    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test7.svg", p7)))
-    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test8.svg", p8)))
-    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test9.svg", p9)))
   })
 
 })
@@ -371,6 +316,7 @@ test_that("Spell checker works", {
   plots[["sources"]] <- minimal_plot + labs_e61(sources = c("Governmment", "Treasury", "Institute"))
   plots[["everywhere"]] <- minimal_plot + labs_e61(
     title = "Opertaing",
+    subtitle = "Wrnog speeling",
     footnotes = "Opertaing sektor mistkaes",
     sources = c("Governmment", "Treasury", "Institute"))
 
@@ -634,32 +580,32 @@ test_that("Multi-panel graph examples", {
     labs_e61(title = "Panel graph title text",
              subtitle = "Panel graph subtitle text")
 
-  # 1x2 graph
+  ## 1x2 graph ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-multi-1x2.svg", p1, p2)))
   })
 
-  # 2x1 graph
+  ## 2x1 graph ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x1.svg", p1, p2, ncol = 1)))
   })
 
-  # 2x2 graph
+  ## 2x2 graph ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x2.svg", p1_t, p2_t, p3_t, p4_t)))
   })
 
-  # 2x3 graph
+  ## 2x3 graph ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x3.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, ncol = 3)))
   })
 
-  # 3x2 graph
+  ## 3x2 graph ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-multi-3x2.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, ncol = 2)))
   })
 
-  # 1x2 graph with long common footnotes + sources
+  ## 1x2 graph with long common footnotes + sources ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61("plot-multi-1x2-long-footer.svg", p1, p2,
@@ -669,7 +615,7 @@ test_that("Multi-panel graph examples", {
                sources = c("Sources", "Sauces"))))
   })
 
-  # 1x2 graph with long title
+  ## 1x2 graph with long title ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61("plot-multi-1x2-long-title.svg", p1, p2,
@@ -679,7 +625,7 @@ test_that("Multi-panel graph examples", {
                sources = c("Sources", "Sauces"))))
   })
 
-  # 1x2 graph with long panel titles and subtitles
+  ## 1x2 graph with long panel titles and subtitles ----
   p1_lt <- p1 +
     labs_e61(title = "Really long panel title title title title title title title title",
              subtitle = "Really long panel title title title title title")
@@ -697,7 +643,7 @@ test_that("Multi-panel graph examples", {
                sources = c("Sources", "Sauces"))))
   })
 
-  # 1x2 graph with 1 long panel title and subtitles
+  ## 1x2 graph with 1 long panel title and subtitles ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61("plot-multi-1x2-1-long-panel-title.svg", p1_lt, p2_t,
@@ -707,6 +653,7 @@ test_that("Multi-panel graph examples", {
                sources = c("Sources", "Sauces"))))
   })
 
+  ## Test pad_width > 0 values ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61("plot-multi-1x2-1-long-panel-title-padwidth.svg", p1_t, p2_t, pad_width = 3,
@@ -716,5 +663,53 @@ test_that("Multi-panel graph examples", {
                sources = c("Sources", "Sauces"))))
   })
 
+  ## Check spacing with multi-panel title, no subtitle, and panel subtitles ----
 
+  p1_t <- p1 +
+    labs_e61(subtitle = "Panel graph subtitle",
+             y = "ppt")
+
+  p2_t <- p2 +
+    labs_e61(subtitle = "Panel graph subtitle",
+             y = "ppt")
+
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
+      save_e61("plot-multi-1x2-1-title-no subtitle.svg", p1_t, p2_t,
+               title = "Multi-panel graph title text")))
+  })
+
+})
+
+test_that("Map examples", {
+
+  skip_if_not_installed("sf")
+  skip_if_not_installed("strayr")
+  library(sf)
+
+  sa3_shp <- strayr::read_absmap("sa32016")
+
+  sydney_map <- dplyr::filter(sa3_shp, gcc_code_2016 == "1GSYD")
+
+  ## Simple map with title and subtitle ----
+  p <- ggplot(data = sydney_map) +
+    geom_sf(aes(fill = sa3_code_2016), colour = "black") +
+    labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA3s") +
+    theme_e61_spatial()
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-simple-map.svg", p)))
+  })
+
+  ## Map with legends ----
+  p <- ggplot(data = sydney_map) +
+    geom_sf(aes(fill = as.numeric(sa3_code_2016)), colour = "black") +
+    labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA3s",
+             fill = "SA3 code") +
+    theme_e61_spatial(legend = "right", legend_title = T)
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("plot-legend-map.svg", p)))
+  })
 })
