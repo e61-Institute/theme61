@@ -9,7 +9,7 @@ to ensure graphs are consistent with the e61 style and formatting."></head><body
 
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,6 +59,7 @@ to ensure graphs are consistent with the e61 style and formatting.</p>
 <span>  preview <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  save_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  print_info <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  spell_check <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  base_size <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  res <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  bg_colour <span class="op">=</span> <span class="st">"white"</span>,</span>
@@ -73,9 +74,7 @@ to ensure graphs are consistent with the e61 style and formatting.</p>
 <span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  align <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"v"</span>, <span class="st">"none"</span>, <span class="st">"h"</span>, <span class="st">"hv"</span><span class="op">)</span>,</span>
 <span>  axis <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"l"</span>, <span class="st">"r"</span>, <span class="st">"t"</span>, <span class="st">"b"</span>, <span class="st">"lr"</span>, <span class="st">"tb"</span>, <span class="st">"tblr"</span><span class="op">)</span>,</span>
-<span>  rel_heights <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  height <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  rel_heights <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -120,8 +119,9 @@ plot you are saving. Options are "normal" (default; for normal charts),
 
 
 <dt id="arg-dim">dim<a class="anchor" aria-label="anchor" href="#arg-dim"></a></dt>
-<dd><p>A named list specifying the plot height and width. Defaults to
-NULL which means the graph dimensions will be calculated automatically.</p></dd>
+<dd><p>An optional named list specifying the plot height and width.
+Defaults to NULL which means the graph dimensions will be calculated
+automatically.</p></dd>
 
 
 <dt id="arg-pad-width">pad_width<a class="anchor" aria-label="anchor" href="#arg-pad-width"></a></dt>
@@ -150,6 +150,11 @@ same name as the graph that contains the data needed to recreate the graph
 <dt id="arg-print-info">print_info<a class="anchor" aria-label="anchor" href="#arg-print-info"></a></dt>
 <dd><p>Logical. Set to TRUE if you want graph dimensions and other
 information printed to the console. Defaults to FALSE.</p></dd>
+
+
+<dt id="arg-spell-check">spell_check<a class="anchor" aria-label="anchor" href="#arg-spell-check"></a></dt>
+<dd><p>Logical. Check spelling of words in the title and caption.
+Defaults to TRUE. Set to FALSE to turn off.</p></dd>
 
 
 <dt id="arg-base-size">base_size<a class="anchor" aria-label="anchor" href="#arg-base-size"></a></dt>
@@ -228,11 +233,6 @@ Must be specified if any of the graphs are complex (e.g. faceted) and alignment 
 <dd><p>(multi-panel specific) A numeric vector giving the
 relative proportions of each graph component (title, plots, footer).</p></dd>
 
-
-<dt id="arg-width-height">width, height<a class="anchor" aria-label="anchor" href="#arg-width-height"></a></dt>
-<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> width and height are
-no longer supported; use <code>dim</code> instead.</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -243,7 +243,7 @@ no longer supported; use <code>dim</code> instead.</p></dd>
     <p>Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 better as they are modern vector graphics file formats which can be scaled up
 and down in size without blurring or becoming pixelated. PNG should only be
-used for Twitter posts for compatibility reasons.</p>
+used when required for compatibility reasons.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

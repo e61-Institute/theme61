@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,12 +98,12 @@ package.</p>
 <li>(optional) Use <code><a href="../reference/theme_e61.html">theme_e61()</a></code> if you want to add a legend,
 or change its position. Other aspects of <code><a href="../reference/theme_e61.html">theme_e61()</a></code> are
 now added by default.</li>
-<li>(optional) Format the x and y axes scales:
+<li>Format the x and y axes scales:
 <code><a href="../reference/e61_axes.html">scale_y_continuous_e61()</a></code>,
-<code><a href="../reference/e61_axes.html">scale_x_continuous_e61()</a></code>. Your y-axis will be automatically
-scaled when you save your chart using <code><a href="../reference/save_e61.html">save_e61()</a></code> but if you
-do not like the automatic scaling then you can always scale your axes
-manually.</li>
+<code><a href="../reference/e61_axes.html">scale_x_continuous_e61()</a></code>. Your y-axis should get
+automatically scaled when you save your chart using
+<code><a href="../reference/save_e61.html">save_e61()</a></code> but if you do not like the automatic scaling
+then you can always scale your axes manually.</li>
 <li>Save the graph: <code><a href="../reference/save_e61.html">save_e61()</a></code>.</li>
 </ul>
 </div>
@@ -138,7 +138,7 @@ also be accessed in the named vector <code>e61_aus_colours</code>.</p>
 <span>    subtitle <span class="op">=</span> <span class="st">"1940-1960"</span>,</span>
 <span>    footnotes <span class="op">=</span> <span class="st">"Data comes from the built-in USPersonalExpenditure dataset."</span>,</span>
 <span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span>, <span class="st">"'datasets' package"</span><span class="op">)</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"$b"</span></span>
+<span>    y <span class="op">=</span> <span class="st">"US$ billions"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/g-line.svg"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../reference/figures/g-line.svg" width="60%" style="display: block; margin: auto;"></p>
@@ -157,7 +157,7 @@ also be accessed in the named vector <code>e61_aus_colours</code>.</p>
 <span>    subtitle <span class="op">=</span> <span class="st">"1940-1960"</span>,</span>
 <span>    footnotes <span class="op">=</span> <span class="st">"Data comes from the built-in USPersonalExpenditure dataset."</span>,</span>
 <span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span>, <span class="st">"'datasets' package"</span><span class="op">)</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"$b"</span></span>
+<span>    y <span class="op">=</span> <span class="st">"US$ billions"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/g-col.svg"</span><span class="op">)</span></span></code></pre></div>
@@ -189,7 +189,7 @@ also be accessed in the named vector <code>e61_aus_colours</code>.</p>
 <span>    subtitle <span class="op">=</span> <span class="st">"Data from 1973-74"</span>,</span>
 <span>    sources <span class="op">=</span> <span class="st">"1974 Motor Trend US magazine"</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"Weight (1000 lbs)"</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"mpg"</span></span>
+<span>    y <span class="op">=</span> <span class="st">"Miles per gallon"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/g-scatter.svg"</span><span class="op">)</span></span></code></pre></div>
@@ -207,7 +207,7 @@ also be accessed in the named vector <code>e61_aus_colours</code>.</p>
 <span>    subtitle <span class="op">=</span> <span class="st">"Data from 1973-74"</span>,</span>
 <span>    sources <span class="op">=</span> <span class="st">"1974 Motor Trend US magazine"</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"Weight (1000 lbs)"</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"mpg"</span></span>
+<span>    y <span class="op">=</span> <span class="st">"Miles per gallon"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/g-facet.svg"</span><span class="op">)</span></span></code></pre></div>
@@ -223,7 +223,7 @@ also be accessed in the named vector <code>e61_aus_colours</code>.</p>
 <span>    title <span class="op">=</span> <span class="st">"Distribution of Car City Mileage"</span>,</span>
 <span>    subtitle <span class="op">=</span> <span class="st">"Miles per gallon, by number of cylinders"</span>,</span>
 <span>    sources <span class="op">=</span> <span class="st">"mpg dataset"</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"dens"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"Density"</span>,</span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/plot_label.html">plot_label</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"3 cyl"</span>, <span class="st">"5 cyl"</span>, <span class="st">"6 cyl"</span>, <span class="st">"8 cyl"</span><span class="op">)</span>,</span>
 <span>              x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">24</span>, <span class="fl">16</span>, <span class="fl">12</span><span class="op">)</span>,</span>
@@ -245,7 +245,7 @@ also be accessed in the named vector <code>e61_aus_colours</code>.</p>
 <span>              <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">15</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"1940 to 1960 Change"</span>, </span>
-<span>    y <span class="op">=</span> <span class="st">"$b"</span></span>
+<span>    y <span class="op">=</span> <span class="st">"US$ billions"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/format_flip.html">format_flip</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -259,8 +259,8 @@ also be accessed in the named vector <code>e61_aus_colours</code>.</p>
 <p>Despite <a href="https://stackoverflow.com/questions/3099219/ggplot-with-2-y-axes-on-each-side-and-different-scales/3101876#3101876" class="external-link">Hadley’s
 best efforts</a> to make it difficult to add a differently-scaled second
 y-axis, this feature now exists in <code>theme61.</code></p>
-<p>Implementing dual y-axis requires a fair amount of additional faff
-that I will try and step through.</p>
+<p>Implementing dual y-axis requires some additional faff that I will
+try and step through.</p>
 <p>First, the structure of your data needs to be different to the usual
 best practice. Normally, you want your data in long format, and add
 separate groups using <code>colour</code> or <code>fill</code>. However,
@@ -277,13 +277,11 @@ required arguments).</p>
 using <code><a href="../reference/palette_e61.html">palette_e61()</a></code>.</p>
 <p>You must then specify the <code>sec_axis</code> argument in
 <code><a href="../reference/e61_axes.html">scale_y_continuous_e61()</a></code> with
-<code>sec_axis(~sec_rescale(.), name = "name")</code>. Replace “name”
-with the y-axis label. This must be specified otherwise it will show up
-blank.</p>
+<code>sec_axis(~sec_rescale(.))</code>.</p>
 <p>You also need to set <code>rescale_sec = TRUE</code> to ensure the
 formatting is appropriately adjusted for the secondary axis.</p>
-<p>Finally, you will need to run your code twice, as the first time,
-there will be an error caused by how R internally assigns objects
+<p>Finally, you will need to run the graph code twice, as the first
+time, there will be an error caused by how R internally assigns objects
 generated by simultaneous function calls (this may get fixed in the
 future).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -292,9 +290,9 @@ future).</p>
 <span>  <span class="co"># All the action is in the next 5 lines</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="../reference/dual_y_axis.html">sec_rescale_inv</a></span><span class="op">(</span><span class="va">`Personal Care`</span>, scale <span class="op">=</span> <span class="fl">0.1</span>, shift <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>            colour <span class="op">=</span> <span class="fu"><a href="../reference/palette_e61.html">palette_e61</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span>, <span class="fl">25</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"$b"</span>,</span>
+<span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span>, <span class="fl">25</span><span class="op">)</span>, </span>
 <span>                         <span class="co"># Usually you don't need to supply scale and shift again but to get the vignette to run you do here</span></span>
-<span>                         sec_axis <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html" class="external-link">sec_axis</a></span><span class="op">(</span><span class="op">~</span><span class="fu"><a href="../reference/dual_y_axis.html">sec_rescale</a></span><span class="op">(</span><span class="va">.</span>, scale <span class="op">=</span> <span class="fl">0.1</span>, shift <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"$b"</span><span class="op">)</span>, </span>
+<span>                         sec_axis <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html" class="external-link">sec_axis</a></span><span class="op">(</span><span class="op">~</span><span class="fu"><a href="../reference/dual_y_axis.html">sec_rescale</a></span><span class="op">(</span><span class="va">.</span>, scale <span class="op">=</span> <span class="fl">0.1</span>, shift <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>                         rescale_sec <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/plot_label.html">plot_label</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Food and Tobacco\n(LHS)"</span>, <span class="st">"Personal Care\n(RHS)"</span><span class="op">)</span>,</span>
 <span>              <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1945</span>, <span class="fl">1948</span><span class="op">)</span>,</span>
@@ -304,7 +302,7 @@ future).</p>
 <span>    subtitle <span class="op">=</span> <span class="st">"1940-1960"</span>,</span>
 <span>    footnotes <span class="op">=</span> <span class="st">"Data comes from the built-in USPersonalExpenditure dataset."</span>,</span>
 <span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span>, <span class="st">"'datasets' package"</span><span class="op">)</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"$b"</span></span>
+<span>    y <span class="op">=</span> <span class="st">"US$ billions"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="../reference/figures/g-dual.svg" width="60%" style="display: block; margin: auto;"></p>
 </div>
@@ -324,7 +322,7 @@ passage of time.</p>
 <span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Regression Coefficients"</span>,</span>
 <span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span><span class="op">)</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"%"</span></span>
+<span>    y <span class="op">=</span> <span class="st">"Per cent"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/g-ptrg.svg"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../reference/figures/g-ptrg.svg" width="60%" style="display: block; margin: auto;"></p>
@@ -347,7 +345,7 @@ in the footer of the full multi-panel instead.</p>
 <span>              <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">65</span>, <span class="fl">55</span>, <span class="fl">25</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Aggregates"</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"$b"</span></span>
+<span>    y <span class="op">=</span> <span class="st">"US$ billions"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="va">g2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">data_dual</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -361,7 +359,7 @@ in the footer of the full multi-panel instead.</p>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Selected Aggregates"</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"$b"</span></span>
+<span>    y <span class="op">=</span> <span class="st">"US$ billions"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="va">g3</span> <span class="op">&lt;-</span></span>
@@ -372,7 +370,7 @@ in the footer of the full multi-panel instead.</p>
 <span>              <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">15</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"1940 to 1960 Change"</span>, </span>
-<span>    y <span class="op">=</span> <span class="st">"$b"</span></span>
+<span>    y <span class="op">=</span> <span class="st">"US$ billions"</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="va">g4</span> <span class="op">&lt;-</span> </span>
@@ -387,7 +385,7 @@ in the footer of the full multi-panel instead.</p>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/labs_e61.html">labs_e61</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Food and Tobacco Spending"</span>, </span>
-<span>    y <span class="op">=</span> <span class="st">"$b"</span></span>
+<span>    y <span class="op">=</span> <span class="st">"US$ billions"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p>Then we use <code><a href="../reference/save_e61.html">save_e61()</a></code> to put the graphs together.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">

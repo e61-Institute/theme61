@@ -9,7 +9,7 @@ adjustment needed."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,10 +55,8 @@ adjustment needed.</p>
 <span>  subtitle_wrap <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  footnote_wrap <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  y <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/waiver.html" class="external-link">waiver</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  title_max_char <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  subtitle_max_char <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  footnote_max_char <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y_top <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -87,11 +85,10 @@ separate points you include in the graph.</p></dd>
 
 
 <dt id="arg-title-wrap-subtitle-wrap-footnote-wrap">title_wrap, subtitle_wrap, footnote_wrap<a class="anchor" aria-label="anchor" href="#arg-title-wrap-subtitle-wrap-footnote-wrap"></a></dt>
-<dd><p>Numeric or
-logical. Set the maximum number of characters per line in the title,
-subtitle and footer text. Set to <code>FALSE</code> if you want to turn off text
-wrapping. The default is usually appropriate for the default graph
-dimensions in <a href="save_e61.html">save_e61</a>.</p></dd>
+<dd><p>Numeric or logical. Set the
+maximum number of characters per line in the title, subtitle and footer
+text. Set to <code>FALSE</code> if you want to turn off text wrapping. The default is
+usually appropriate for the default graph dimensions in <a href="save_e61.html">save_e61</a>.</p></dd>
 
 
 <dt id="arg-x-y">x, y<a class="anchor" aria-label="anchor" href="#arg-x-y"></a></dt>
@@ -99,8 +96,10 @@ dimensions in <a href="save_e61.html">save_e61</a>.</p></dd>
 is blank (NULL) by default.</p></dd>
 
 
-<dt id="arg-title-max-char-subtitle-max-char-footnote-max-char">title_max_char, subtitle_max_char, footnote_max_char<a class="anchor" aria-label="anchor" href="#arg-title-max-char-subtitle-max-char-footnote-max-char"></a></dt>
-<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> No longer supported; use <code>title_wrap</code>, <code>subtitle_wrap</code> or <code>footnote_wrap</code> instead.</p></dd>
+<dt id="arg-y-top">y_top<a class="anchor" aria-label="anchor" href="#arg-y-top"></a></dt>
+<dd><p>Logical. If <code>TRUE</code> (default), the y-axis title is placed
+underneath the subtitle. If <code>FALSE</code>, the y-axis label remains on the side
+of the graph.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -116,10 +115,10 @@ formatting if required.</p>
 <p>The primary purpose of this function is to correctly format footer
 text without requiring the user to guess where to put manual line breaks
 for long footnotes or put in "Sources:" themselves. It does this by
-transforming the <code>footnotes</code> and <code>sources</code> arguments into nicely
-formatted text that goes into the <code>caption</code> argument in ggplot2's
-<code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs()</a></code> function. Thus, if you are using <code>footnotes</code> or
-<code>sources</code>, do not supply a <code>caption</code> argument as well.</p>
+transforming the <code>footnotes</code> and <code>sources</code> arguments into nicely formatted
+text that goes into the <code>caption</code> argument in ggplot2's <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs()</a></code> function.
+Thus, if you are using <code>footnotes</code> or <code>sources</code>, do not supply a <code>caption</code>
+argument as well.</p>
     </div>
 
     <div class="section level2">

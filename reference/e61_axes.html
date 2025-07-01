@@ -9,7 +9,7 @@ This includes removing white space at the beginning and end of each axis."></hea
 
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,9 +50,9 @@ This includes removing white space at the beginning and end of each axis.</p>
 <span>  limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sec_axis <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html" class="external-link">dup_axis</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  rescale_sec <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  y_top <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  expand_bottom <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  expand_top <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  add_space <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -90,17 +90,17 @@ secondary axis, otherwise leave it as FALSE (default). To add a rescaled
 secondary axis, see the documentation for <a href="dual_y_axis.html">sec_rescale</a>.</p></dd>
 
 
-<dt id="arg-y-top">y_top<a class="anchor" aria-label="anchor" href="#arg-y-top"></a></dt>
-<dd><p>Logical. Ensures there is space at the top of the y-axis for the
-axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
-elsewhere. If you change this argument you also need to change the argument
-with the same name in <a href="theme_e61.html">theme_e61</a>.</p></dd>
-
-
 <dt id="arg-expand-bottom-expand-top">expand_bottom, expand_top<a class="anchor" aria-label="anchor" href="#arg-expand-bottom-expand-top"></a></dt>
 <dd><p>Numeric. Add extra space between data points
 and the top/bottom of the graph. See <a href="https://ggplot2.tidyverse.org/reference/expansion.html" class="external-link">expansion</a> for
 details.</p></dd>
+
+
+<dt id="arg-add-space">add_space<a class="anchor" aria-label="anchor" href="#arg-add-space"></a></dt>
+<dd><p>Logical. This argument is for internal theme61 purposes
+only. It is recommended that as a user you do not include it in your
+function call. Defaults to FALSE to ensure that we only add the extra white
+space above the chart when we are saving it.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
