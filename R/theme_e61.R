@@ -406,6 +406,7 @@ y_title_top <- function(adj, fix_left) {
 
 #' Tell ggplot2 what to do when someone does + theme_e61()
 #' @method ggplot_add theme_e61
+#' @keywords internal
 #' @export
 ggplot_add.theme_e61 <- function(object, plot, object_name) {
   # 1) merge in all the theme bits the way ggplot2 normally would

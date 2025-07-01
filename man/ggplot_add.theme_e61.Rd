@@ -9,3 +9,4 @@
 \description{
 Tell ggplot2 what to do when someone does + theme_e61()
 }
+\keyword{internal}
