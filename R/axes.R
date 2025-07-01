@@ -23,8 +23,10 @@
 #'     limits of the scale. The break increments will be automatically chosen.}
 #'     \item{`NULL` to use the default scale range.}
 #'     }
-#' @param save_call Logical. Defaults to FALSE to ensure that we only add the extra
-#' white space above the chart when we are saving it.
+#' @param add_space Logical. This argument is for internal theme61 purposes only.
+#' It is recommended that as a user you do not include it in your function call.
+#' Defaults to FALSE to ensure that we only add the extra white space above the
+#' chart when we are saving it.
 #' @inheritDotParams ggplot2::scale_y_continuous name oob na.value trans guide
 #'   position
 #'
@@ -36,7 +38,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
                                    rescale_sec = FALSE,
                                    expand_bottom = 0,
                                    expand_top = 0,
-                                   save_call = FALSE,
+                                   add_space = FALSE,
                                    ...) {
 
   # Set sec_axis to default behaviour if we don't want it
@@ -67,7 +69,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
     sec_axis$labels <- sec_labels
   }
 
-  if(!is.null(limits) & save_call == TRUE){
+  if(!is.null(limits) & add_space == TRUE){
     # Put it all together
     retval <- ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
