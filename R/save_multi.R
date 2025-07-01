@@ -349,6 +349,13 @@ save_multi <-
     width <- width + pad_width
 
     # Return objects needed to save the graph ----
+    multi_plot <- multi_plot &
+      theme(plot.background = element_rect(fill = "transparent",
+                                           colour = "transparent"),
+            legend.background = element_rect(fill = "transparent",
+                                             colour = "transparent")
+            )
+
     retval <- list(graph = multi_plot,
                    width = width,
                    height = tot_height)
