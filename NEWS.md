@@ -1,3 +1,9 @@
+# theme61 0.7.0
+
+01 Jul 2025
+
+* New graph design. No longer will we make graphs that people think were made by the RBA!
+
 # theme61 0.6.4
 
 24 Jun 2025

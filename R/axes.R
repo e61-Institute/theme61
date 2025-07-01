@@ -11,10 +11,6 @@
 #' @param rescale_sec Logical. Set this to TRUE if you are using a rescaled
 #'   secondary axis, otherwise leave it as FALSE (default). To add a rescaled
 #'   secondary axis, see the documentation for [sec_rescale].
-#' @param y_top Logical. Ensures there is space at the top of the y-axis for the
-#'   axis label. Defaults to TRUE. Set to FALSE if the axis label is placed
-#'   elsewhere. If you change this argument you also need to change the argument
-#'   with the same name in [theme_e61].
 #' @param expand_left,expand_right Numeric. Add extra space between data points
 #'   and the left/right of the graph. See [expansion][ggplot2::expansion] for
 #'   details.
@@ -27,6 +23,10 @@
 #'     limits of the scale. The break increments will be automatically chosen.}
 #'     \item{`NULL` to use the default scale range.}
 #'     }
+#' @param add_space Logical. This argument is for internal theme61 purposes
+#'   only. It is recommended that as a user you do not include it in your
+#'   function call. Defaults to FALSE to ensure that we only add the extra white
+#'   space above the chart when we are saving it.
 #' @inheritDotParams ggplot2::scale_y_continuous name oob na.value trans guide
 #'   position
 #'
@@ -36,9 +36,9 @@
 scale_y_continuous_e61 <- function(limits = NULL,
                                    sec_axis = ggplot2::dup_axis(),
                                    rescale_sec = FALSE,
-                                   y_top = TRUE,
                                    expand_bottom = 0,
                                    expand_top = 0,
+                                   add_space = FALSE,
                                    ...) {
 
   # Set sec_axis to default behaviour if we don't want it
@@ -50,14 +50,9 @@ scale_y_continuous_e61 <- function(limits = NULL,
     if (length(limits) == 3) {
       breaks <- round(seq(limits[[1]], limits[[2]], limits[[3]]), 10)
 
-      # Hides the last break to make space for the unit label
-      if (isTRUE(y_top)) breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
-
     } else {
       breaks <- function(x) {
         x <- scales::breaks_extended()(x)
-        # Hides the last break to make space for the unit label
-        if (isTRUE(y_top)) x[x == max(x, na.rm = TRUE)] <- NA
         return(x)
       }
     }
@@ -74,7 +69,18 @@ scale_y_continuous_e61 <- function(limits = NULL,
     sec_axis$labels <- sec_labels
   }
 
-  if(!is.null(limits)){
+  if(!is.null(limits) && add_space){
+    # Put it all together
+    retval <- ggplot2::scale_y_continuous(
+      expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
+      sec.axis = sec_axis,
+      # Add 3% to the supplied limits to create a bit of white space at the top of the chart
+      limits = c(limits[1], limits[2] + (limits[2] - limits[1]) * 0.03),
+      breaks = breaks,
+      ...
+    )
+
+  } else if(!is.null(limits)){
     # Put it all together
     retval <- ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
@@ -97,10 +103,6 @@ scale_y_continuous_e61 <- function(limits = NULL,
 
   # Set an additional class if rescaled dual axis used
   if (isTRUE(rescale_sec)) class(retval) <- c(class(retval), "rescale_y")
-
-  # Set an additional class if no y_top requested
-  if (isFALSE(y_top))
-    class(retval) <- c(class(retval), "no_y_top")
 
   # Only add our data-range check if numeric limits were supplied
   if (!is.null(limits) && is.numeric(limits)) {

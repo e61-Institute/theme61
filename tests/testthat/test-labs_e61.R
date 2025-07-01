@@ -22,10 +22,10 @@ test_that("Functionality in labs_e61 works", {
   expect_equal(lab$caption, "* Footnote 1\nSource: Source A")
 
   # Test that you can pass through other labels e.g. x axis titles
-  lab <- labs_e61(title = "Test", x = "X", y = "Y", fill = "Fill")
+  lab <- labs_e61(title = "Test", x = "X", y = "Y", fill = "Fill", y_top = F)
   expect_equal(
     lab,
-    list(x = "X", y = "Y", fill = "Fill", title = "Test", subtitle = "", caption = NULL),
+    list(x = "X", y = "Y", fill = "Fill", title = "Test", subtitle = "<span style='font-size:10pt'></span>", caption = NULL),
     ignore_attr = TRUE
   )
 
@@ -70,7 +70,8 @@ test_that("Functionality in labs_e61 works", {
   )
   expect_equal(
     lab$subtitle,
-    "A really really really really really really really really really really\nreally really long title",
+    "<span style='font-size:10pt'>A really really really really really really really really really really
+really really long title</span>",
     ignore_attr = TRUE
   )
 

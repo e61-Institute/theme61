@@ -7,11 +7,6 @@ update_scales <- function(plot, auto_scale){
   # check if we have a numeric y-variable
   check_y_var <- check_for_y_var(plot)
 
-  # check if no y-axis label was set in theme_e61
-  no_y_top <- isTRUE(attr(plot$theme, "no_y_top"))
-
-  if (no_y_top) cli::cli_alert_info("Moving y-axis label back to the side of the graph.")
-
   # if we don't have a numeric y-variable then check whether the plot contains geom_density or geom_histogram (GeomBar without a y-variable)
   if (!check_y_var) {
     layers <- plot$layers
@@ -41,7 +36,7 @@ update_scales <- function(plot, auto_scale){
   # if the y-variable class is numeric, or the plot is a density or histogram, then update the chart scales
   if (check_y_var){
 
-    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis, no_y_top = no_y_top)})
+    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
 
     # if the y-var class is NULL, send a warning message about the auto updating of chart scales
   } else if (!check_y_var & is.null(getOption("warn_y_var"))){
@@ -101,7 +96,7 @@ check_for_y_var <- function(plot){
 
 #' Aesthetically update the y-axis scales and labels
 #' @noRd
-update_chart_scales <- function(plot, auto_scale, sec_axis, no_y_top){
+update_chart_scales <- function(plot, auto_scale, sec_axis){
 
   # Returns the order of the first scale function used - how do we determine this
   y_scale_lims <- layer_scales(plot)$y$limits
@@ -132,6 +127,26 @@ update_chart_scales <- function(plot, auto_scale, sec_axis, no_y_top){
     min_y <- y_scale_lims[1]
     max_y <- y_scale_lims[2]
 
+    # Update the limits if we have previously added the white space adjustment
+    # and need to overwrite it. This happens when the plot is saved several times
+    # in a row because the limits are not recalculated so they keep adding 3% to
+    # the max of the y-axis.
+
+    # Step 1 - calculate what the upper limit would have been without the 3% added to it
+    lim_upper <- (max_y + 0.03 * min_y) / (1 + 0.03)
+    lim_lower <- min_y
+
+    # Step 2 - find the maximum y-value in the data - we want to make sure we don't
+    # adjust down and chop off some data
+    max_y_data <- get_y_minmax(plot)[[2]]
+
+    # Step 3 - Check that with the new upper limit we have asethetic ticks (this suggests it
+    # was overwritten), and check that the new upper limit is greater than the maximum value
+    # in the data.
+    if(!is.null(get_aes_ticks(lim_upper, lim_lower)) && lim_upper > max_y_data) {
+      max_y <- lim_upper
+    }
+
     # check whether the chart is a bar chart or not
     is_bar <- is_barchart(plot)
 
@@ -142,6 +157,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis, no_y_top){
       aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
 
     } else {
+
       aes_lims <- c(min_y, max_y, tick)
     }
   }
@@ -149,16 +165,12 @@ update_chart_scales <- function(plot, auto_scale, sec_axis, no_y_top){
   # rescale the axis and apply requested customisations
   lims <- if (exists("aes_lims")) aes_lims else y_scale_lims
 
-  if(auto_scale && length(y_scale_lims) < 3){
+  if(auto_scale){
     suppressWarnings({
-      if (no_y_top && sec_axis) {
-        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), y_top = FALSE)
-      } else if (!no_y_top && sec_axis) {
-        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis())
-      } else if (no_y_top && !sec_axis) {
-        plot <- plot + scale_y_continuous_e61(limits = lims, y_top = FALSE, sec_axis = FALSE)
-      } else if (!no_y_top && !sec_axis) {
-        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE)
+      if (sec_axis) {
+        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), add_space = TRUE)
+      } else if (!sec_axis) {
+        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE, add_space = TRUE)
       }
     })
   }

@@ -4,14 +4,12 @@
 \alias{format_flip}
 \title{Applies changes to the theme for horizontal bar graphs}
 \usage{
-format_flip(x_adj = 0, y_top = TRUE)
+format_flip(x_adj = 0)
 }
 \arguments{
 \item{x_adj}{Numeric. Adjusts the vertical position of the x-axis title,
 the default works for most graphs. A negative value moves the
 title up, a positive value moves the title down.}
-
-\item{y_top}{Logical. Defaults to TRUE. Set to FALSE to prevent y-axis label from being positioned in-line with the axis values. Only set this if you also set \code{y_top = FALSE} in \code{theme_e61()} and \code{scale_y_continuous_e61()}.}
 }
 \value{
 ggplot object
