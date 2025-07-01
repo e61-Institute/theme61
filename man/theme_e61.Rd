@@ -2,37 +2,23 @@
 % Please edit documentation in R/theme_e61.R
 \name{theme_e61}
 \alias{theme_e61}
+\alias{set_base_size}
 \title{e61 themed graph options}
 \usage{
 theme_e61(
-  y_top = TRUE,
-  adj = 0,
-  fix_left = 0,
   legend = c("none", "bottom", "top", "left", "right", "inside"),
   legend_position = NULL,
   legend_title = FALSE,
   aspect_ratio = 0.75,
-  panel_borders = TRUE,
   background = "white",
-  base_size = 10,
   base_family = "pt-sans",
   base_line_size = points_to_mm(0.75),
   base_rect_size = points_to_mm(1)
 )
+
+set_base_size(base_size)
 }
 \arguments{
-\item{y_top}{Logical. Puts the y-axis title at the top. Defaults to TRUE. If
-you change this argument you also need to change the argument with the same
-name in \link{scale_y_continuous_e61}.}
-
-\item{adj}{Either a single numeric to adjust left and right axis titles
-simultaneously or a vector of 2 numerics to adjust each axis title
-separately. More negative values move the text closer to the graph panel.}
-
-\item{fix_left}{Numeric. Sometimes if the value of the \code{adj} argument is too
-negative, the margins on the left side of the graph start to cut off some
-of the text. Provide a small positive value (5?) to correct this.}
-
 \item{legend}{Character. Legend position, "none" (default) hides the legend.}
 
 \item{legend_position}{A numeric vector of length two setting the placement
@@ -42,13 +28,9 @@ of legends that have the "inside" position. Takes values between 0 and 1.}
 
 \item{aspect_ratio}{Numeric. Sets the aspect ratio of the graph panel.}
 
-\item{panel_borders}{Logical. Show panel borders? Defaults to TRUE.}
-
 \item{background}{Character. Default is "white". For all graphs that you
 save, you should control the background colour using the \code{bg_colour}
 argument in \code{save_e61}, not here.}
-
-\item{base_size}{Numeric. Chart font size. Default is 10.}
 
 \item{base_family}{Character. Chart font family. Default for notes is PT
 Sans.}
@@ -56,19 +38,29 @@ Sans.}
 \item{base_line_size}{Numeric. Default line width.}
 
 \item{base_rect_size}{Numeric. Default rect width.}
+
+\item{base_size}{Numeric. Graph font size. Default is 10.}
 }
 \value{
-ggplot2 object
+\code{theme_e61} returns a ggplot2 object.
+
+\code{set_base_size} is used for its side effects.
 }
 \description{
 Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
 appearance. If you are looking to change the appearance of titles or labels,
 check the arguments in \link{labs_e61}, which are probably what you are looking
 for.
+
+\code{set_base_size} sets the base size for the theme to be used in
+\code{theme_e61()}. This needs to be set outside of the function because it
+is called by other functions as part of the graph rendering process.
 }
 \examples{
+\dontrun{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
   geom_point() +
   theme_e61()
+}
 
 }

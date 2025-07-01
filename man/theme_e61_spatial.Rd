@@ -8,7 +8,6 @@ theme_e61_spatial(
   legend = c("none", "bottom", "top", "left", "right", "inside"),
   legend_position = NULL,
   legend_title = FALSE,
-  base_size = 10,
   base_family = "pt-sans"
 )
 }
@@ -18,16 +17,13 @@ theme_e61_spatial(
 \item{legend_position}{A numeric vector of length two setting the placement
 of legends that have the "inside" position. Takes values between 0 and 1.}
 
-\item{legend_title}{Logical. Include Legend title? Defaults to FALSE.}
+\item{legend_title}{Logical. Include legend title? Defaults to FALSE.}
 
-\item{base_size}{Numeric. Chart font size. Default is 10.}
-
-\item{base_family}{Character. Chart font family. Default is PT Sans.}
-
-\item{aspect_ratio}{Numeric. Sets the aspect ratio of the graph panel.}
+\item{base_family}{Character. Chart font family. Default for notes is PT
+Sans.}
 }
 \value{
-ggplot2 object
+\code{theme_e61_spatial} returns a ggplot2 object.
 }
 \description{
 Applies the e61 theme to ggplot spatial maps to adjust graph appearance. If
@@ -38,12 +34,14 @@ for.
 \examples{
 
 \dontrun{
+library(sf)
+
 sa3_shp <- strayr::read_absmap("sa32016")
 
 sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
 
 ggplot(data = sydney_map) +
-  geom_sf(aes(fill = gcc_name_2016)) +
+  geom_sf(aes(fill = sa3_code_2016), colour = "black") +
   theme_e61_spatial()
 }
 

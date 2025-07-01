@@ -10,7 +10,6 @@ scale_colour_e61(
   discrete = TRUE,
   aesthetics = "colour",
   palette = c("light", "dark", "diverging", "grey"),
-  n = NULL,
   ...
 )
 
@@ -19,7 +18,6 @@ scale_fill_e61(
   discrete = TRUE,
   aesthetics = "fill",
   palette = c("light", "dark", "diverging", "grey"),
-  n = NULL,
   ...
 )
 }
@@ -31,8 +29,6 @@ to TRUE.}
 
 \item{palette}{Character. The specific e61 palette for continuous scales.
 Must be supplied if a continuous scale is used.}
-
-\item{n}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} n is no longer used.}
 
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:scale_manual]{ggplot2::scale_colour_manual}}
