@@ -11,6 +11,7 @@ scale_y_continuous_e61(
   rescale_sec = FALSE,
   expand_bottom = 0,
   expand_top = 0,
+  add_space = FALSE,
   ...
 )
 
@@ -43,6 +44,11 @@ secondary axis, see the documentation for \link{sec_rescale}.}
 \item{expand_bottom, expand_top}{Numeric. Add extra space between data points
 and the top/bottom of the graph. See \link[ggplot2:expansion]{expansion} for
 details.}
+
+\item{add_space}{Logical. This argument is for internal theme61 purposes
+only. It is recommended that as a user you do not include it in your
+function call. Defaults to FALSE to ensure that we only add the extra white
+space above the chart when we are saving it.}
 
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous}}
