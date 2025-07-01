@@ -127,6 +127,26 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
     min_y <- y_scale_lims[1]
     max_y <- y_scale_lims[2]
 
+    # Update the limits if we have previously added the white space adjustment
+    # and need to overwrite it. This happens when the plot is saved several times
+    # in a row because the limits are not recalculated so they keep adding 3% to
+    # the max of the y-axis.
+
+    # Step 1 - calculate what the upper limit would have been without the 3% added to it
+    lim_upper <- (max_y + 0.03 * min_y) / (1 + 0.03)
+    lim_lower <- min_y
+
+    # Step 2 - find the maximum y-value in the data - we want to make sure we don't
+    # adjust down and chop off some data
+    max_y_data <- get_y_minmax(plot)[[2]]
+
+    # Step 3 - Check that with the new upper limit we have asethetic ticks (this suggests it
+    # was overwritten), and check that the new upper limit is greater than the maximum value
+    # in the data.
+    if(!is.null(get_aes_ticks(lim_upper, lim_lower)) && lim_upper > max_y_data) {
+      max_y <- lim_upper
+    }
+
     # check whether the chart is a bar chart or not
     is_bar <- is_barchart(plot)
 
@@ -137,6 +157,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
       aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
 
     } else {
+
       aes_lims <- c(min_y, max_y, tick)
     }
   }
