@@ -1,8 +1,8 @@
 # theme61 0.7.0
 
-XX Jun 2025
+01 Jul 2025
 
-* New graph design. No longer will we make graphs that people think were made by the RBA. The goal of the new design is to strengthen our brand by having a more distinct visual identity that is recognisable as the e61 Institute.
+* New graph design. No longer will we make graphs that people think were made by the RBA!
 
 # theme61 0.6.4
 
