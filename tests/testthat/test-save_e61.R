@@ -513,7 +513,7 @@ test_that("Single-panel graph examples", {
   ## Plot with geom_rect ----
   p <- ggplot(data.frame(x = 1:3, y = c(90, 100, 110)), aes(x, y)) +
     geom_line() +
-    geom_rect(xmin = 1.25, xmax = 1.75, ymin = -Inf, ymax = Inf,
+    geom_rect(xmin = 1.25, xmax = 1.75, ymin = 90, ymax = 110,
               fill = e61_greydark, alpha = 0.1)
 
   withr::with_tempdir({
