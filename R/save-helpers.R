@@ -73,10 +73,10 @@ has_discrete_y_scale <- function(plot) {
   }
 
   # Check the y aesthetic mapping
-  y_mapping <- plot$mapping$y
+  y_mapping <- plot@mapping$y
   if (!is.null(y_mapping)) {
     # Get the data and check if y variable is discrete
-    plot_data <- plot$data
+    plot_data <- plot@data
     if (!is.null(plot_data) && !is.null(y_mapping)) {
       y_var <- rlang::eval_tidy(y_mapping, plot_data)
       if (is.factor(y_var) || is.character(y_var)) {
@@ -86,7 +86,7 @@ has_discrete_y_scale <- function(plot) {
   }
 
   # Alternative check: look for geom_density_ridges
-  layers <- plot$layers
+  layers <- plot@layers
   for (layer in layers) {
     if (!is.null(layer$geom)) {
       geom_class <- class(layer$geom)[1]
@@ -97,8 +97,8 @@ has_discrete_y_scale <- function(plot) {
   }
 
   # Check if scale_y_discrete has been explicitly added
-  if (!is.null(plot$scales)) {
-    y_scale <- plot$scales$get_scales("y")
+  if (!is.null(plot@scales)) {
+    y_scale <- plot@scales$get_scales("y")
     if (!is.null(y_scale) && inherits(y_scale, "ScaleDiscrete")) {
       return(TRUE)
     }

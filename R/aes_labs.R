@@ -10,7 +10,7 @@ update_labs <- function(plot, plot_width){
   # Title ----
 
   # First check whether the title has already been manually wrapped
-  if(is.null(attr(plot$labels$title, "title_wrap"))){
+  if(is.null(attr(plot@labels$title, "title_wrap"))){
 
     # check if the title exists
     title_grob <- p$grobs[[which(p$layout$name == "title")]]
@@ -21,14 +21,14 @@ update_labs <- function(plot, plot_width){
 
       title_text <-
         rescale_text(
-          text = plot$labels$title,
+          text = plot@labels$title,
           text_type = "title",
           font_size = title_size,
           plot_width = plot_width
         )
     }
   } else {
-    title_text <- plot$labels$title
+    title_text <- plot@labels$title
   }
 
   # set the title to element blank if it is not required - otherwise it leaves a useless space
@@ -37,7 +37,7 @@ update_labs <- function(plot, plot_width){
   }
 
   # Subtitle ----
-  if(is.null(attr(plot$labels$subtitle, "subtitle_wrap"))){
+  if(is.null(attr(plot@labels$subtitle, "subtitle_wrap"))){
     subtitle_grob <- p$grobs[[which(p$layout$name == "subtitle")]]
     subtitle_text <- NULL
 
@@ -49,14 +49,14 @@ update_labs <- function(plot, plot_width){
 
       subtitle_text <-
         rescale_text(
-          text = plot$labels$subtitle,
+          text = plot@labels$subtitle,
           text_type = "subtitle",
           font_size = subtitle_size,
           plot_width = plot_width
         )
     }
   } else {
-    subtitle_text <- plot$labels$subtitle
+    subtitle_text <- plot@labels$subtitle
   }
 
   # set the subtitle to element blank if it is not required - otherwise it leaves a useless space
@@ -66,7 +66,7 @@ update_labs <- function(plot, plot_width){
 
   # Footnotes ----
 
-  if(is.null(attr(plot$labels$caption, "caption_wrap"))){
+  if(is.null(attr(plot@labels$caption, "caption_wrap"))){
     footnote_grob <- p$grobs[[which(p$layout$name == "caption")]]
     caption_text <- NULL
 
@@ -75,19 +75,19 @@ update_labs <- function(plot, plot_width){
       footnote_size <- footnote_grob$children[[1]]$gp$fontsize
       caption_text <-
         rescale_text(
-          text = plot$labels$caption,
+          text = plot@labels$caption,
           text_type = "caption",
           font_size = footnote_size,
           plot_width = plot_width
         )
     }
   } else {
-    caption_text <- plot$labels$caption
+    caption_text <- plot@labels$caption
   }
 
   # Update the x-axis label spacing if there is no x-axis label ----
 
-  if(is.null(plot$labels$x) || plot$labels$x == ""){
+  if(is.null(plot@labels$x) || plot@labels$x == ""){
     plot <- plot + theme(axis.title.x = element_blank())
   }
 
@@ -97,10 +97,10 @@ update_labs <- function(plot, plot_width){
       title = title_text,
       subtitle = subtitle_text,
       caption = caption_text,
-      x = plot$labels$x,
-      y = plot$labels$y,
-      colour = plot$labels$colour,
-      fill = plot$labels$fill
+      x = plot@labels$x,
+      y = plot@labels$y,
+      colour = plot@labels$colour,
+      fill = plot@labels$fill
     )
 
   return(plot_new)
@@ -535,8 +535,8 @@ get_y_breaks <- function(plot){
     }
 
     # check whether the y-title is at the top - then we want the max break to be smaller
-    y_angle <- plot$theme$axis.title.y.left$angle
-    y_vjust <- plot$theme$axis.title.y.left$vjust
+    y_angle <- plot@theme$axis.title.y.left$angle
+    y_vjust <- plot@theme$axis.title.y.left$vjust
 
     if(length(y_angle) != 0 && length(y_vjust) != 0 && y_angle == 0 && y_vjust == 1) {
 
@@ -604,9 +604,9 @@ check_y_break_type <- function(plot){
 get_font_size <- function(plot, elem = "text", parent = "text"){
 
   # get the text sizes of the elements we're interested in and the main text size of the plot
-  main_text_size <- plot$theme$text$size
-  elem_text_size <- plot$theme[[elem]]$size
-  parent_text_size <- plot$theme[[parent]]$size
+  main_text_size <- plot@theme$text$size
+  elem_text_size <- plot@theme[[elem]]$size
+  parent_text_size <- plot@theme[[parent]]$size
 
   # if the element does not have a text size, look at the parent
   if(is.null(elem_text_size)){
@@ -643,23 +643,23 @@ get_font_size <- function(plot, elem = "text", parent = "text"){
 #' @noRd
 update_plot_label <- function(plot, chart_type, base_size){
 
-  for (i in seq_along(plot$layers)){
+  for (i in seq_along(plot@layers)){
 
     # 1 - check whether it has geom_text or geom_label arguments (this is what plot labels are)
-    layer_class <- class(plot$layers[[i]]$geom)
+    layer_class <- class(plot@layers[[i]]$geom)
 
     if("GeomText" %in% layer_class || "GeomLabel" %in% layer_class){
 
       # 2 - check whether it is an plot_label that can be adjusted
-      label <- plot$layers[[i]]$aes_params$label
+      label <- plot@layers[[i]]$aes_params$label
 
-      label_size <- plot$layers[[i]]$aes_params$size
+      label_size <- plot@layers[[i]]$aes_params$size
 
       # 3 - check that it has the adjustment attribute
       if(!is.null(attr(label, "adj_plot_label"))){
 
         # 4 - update the size - this will depend on the chart width and base text size
-        plot$layers[[i]]$aes_params$size <- 3.5 * base_size / 10
+        plot@layers[[i]]$aes_params$size <- 3.5 * base_size / 10
       }
     }
   }

@@ -21,9 +21,9 @@ save_single <- function(
 
   is_spatial_chart <- FALSE
 
-  for(i in seq_along(plot$layers)){
+  for(i in seq_along(plot@layers)){
 
-    layer_class <- class(plot$layers[[i]]$geom)
+    layer_class <- class(plot@layers[[i]]$geom)
 
     if("GeomSf" %in% layer_class) {
       is_spatial_chart <- TRUE
@@ -46,8 +46,8 @@ save_single <- function(
   max_width <- 18.59
 
   # update the base size without removing the legend
-  legendTitle <- plot$theme$legend.title
-  legendPosition <- plot$theme$legend.position
+  legendTitle <- plot@theme$legend.title
+  legendPosition <- plot@theme$legend.position
 
   if (is_spatial_chart && !attr(plot, "t61_obj")){
     plot <- plot + theme_e61_spatial()
@@ -100,7 +100,7 @@ save_single <- function(
   # Get the number of panel rows and columns ------------------------------
 
   # Get facet dimensions if applicable
-  if (length(plot$facet$params) != 0) {
+  if (length(plot@facet$params) != 0) {
 
     n_panel_cols <- max(plot_build$layout$layout$COL)
     n_panel_rows <- max(plot_build$layout$layout$ROW)

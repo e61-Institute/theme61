@@ -98,8 +98,8 @@ save_multi <-
         temp_plot <- update_scales(temp_plot, auto_scale)
 
         # update the text and margin sizes
-        legend_title <- temp_plot$theme$legend.title
-        legendPosition <- temp_plot$theme$legend.position
+        legend_title <- temp_plot@theme$legend.title
+        legendPosition <- temp_plot@theme$legend.position
 
         temp_plot <- temp_plot + theme(text = element_text(size = base_size))
 
@@ -130,7 +130,7 @@ save_multi <-
       # keep track of the maximum y-axis title size in cm
       y_font_size <- get_font_size(temp_plot, elem = "axis.text.y", parent = "axis.text")
 
-      y_lab_size <- get_text_width(temp_plot$labels$y, font_size = y_font_size)
+      y_lab_size <- get_text_width(temp_plot@labels$y, font_size = y_font_size)
       y_lab_max_size <- pmax(y_lab_size, y_lab_max_size, na.rm = T)
 
       # keep track of the maximum break size
