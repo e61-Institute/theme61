@@ -85,7 +85,7 @@ add_map_e61 <-
 #' up your session accordingly.
 #'
 #' To get an API key, you must sign up at
-#' [https://client.stadiamaps.com/signup/].
+#' \url{https://client.stadiamaps.com/signup/}.
 #'
 #' @export
 #' @family map functions
