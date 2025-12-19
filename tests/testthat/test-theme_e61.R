@@ -83,3 +83,33 @@ test_that("Legend position can be adjusted", {
   })
 
 })
+
+test_that("Aspect ratio can be changed", {
+  p <-
+    ggplot(data.frame(x = 1:10, y = (1:10)^2),
+           aes(x, y)) +
+    geom_point() +
+    theme_e61()
+
+  p1 <- p +
+    theme_e61(aspect_ratio = 1)
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("aspect-ratio-1.svg", p1, chart_type = "custom")))
+  })
+
+  p2 <- p +
+    theme_e61(aspect_ratio = 0.5)
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("aspect-ratio-0.5.svg", p2, chart_type = "custom")))
+  })
+
+  p3 <- p +
+    theme_e61(aspect_ratio = 3)
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("aspect-ratio-3.svg", p3, chart_type = "custom")))
+  })
+
+})
