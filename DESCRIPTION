@@ -1,7 +1,7 @@
 Package: theme61
 Type: Package
 Title: Create Graphs in the e61 Institute Style
-Version: 0.7.0
+Version: 0.7.1.9000
 Authors@R: c(
     person("Aaron", "Wong", email = "aaron.wong@e61.in", role = c("aut", "cre")),
     person("Elyse", "Dwyer", email = "elyse.dwyer@e61.in", role = c("aut")),
@@ -43,7 +43,7 @@ Config/testthat/edition: 3
 URL: https://github.com/e61-institute/theme61,
      https://e61-institute.github.io/theme61/
 BugReports: https://github.com/e61-institute/theme61/issues
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Depends: 
     R (>= 4.5.0)
 Roxygen: list(markdown = TRUE)
