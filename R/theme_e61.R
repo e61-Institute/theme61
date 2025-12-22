@@ -63,7 +63,7 @@ theme_e61 <- function(
       line = element_line(colour = "black", linewidth = points_to_mm(0.5)),
       rect = element_rect(fill = background, colour = NA),
       text = element_text(colour = "black", family = base_family, size = base_size),
-      aspect.ratio = NULL,
+      aspect.ratio = aspect_ratio,
 
       # Axes and grid
       axis.line.x = element_line(colour = "black", linewidth = points_to_mm(0.4)),

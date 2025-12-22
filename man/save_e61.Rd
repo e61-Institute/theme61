@@ -55,8 +55,14 @@ argument is ignored.}
 
 \item{chart_type}{String, or vector of strings if saving multiple plots. Type
 of chart. This is used to set sensible chart widths based on the type of
-plot you are saving. Options are "normal" (default; for normal charts),
-"wide" (for time series graphs) or "square" (for scatter plots).}
+plot you are saving. Options are:
+\itemize{
+\item "normal": default, for normal charts;
+\item "wide": for time series graphs;
+\item "square": for scatter plots;
+\item "custom": for saving a custom aspect ratio specified in the
+\code{aspect_ratio} argument in \code{\link[=theme_e61]{theme_e61()}}.
+}}
 
 \item{auto_scale}{Logical. Scale the y-axis automatically. Default is TRUE.}
 
