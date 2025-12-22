@@ -164,7 +164,7 @@ save_e61 <- function(filename = NULL,
   }
 
   # Check if the data frame can be written
-  if (save_data && !is.data.frame(plots[[1]]$data))
+  if (save_data && !is.data.frame(plots[[1]]@data))
     stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
   # Check list args are valid
@@ -189,7 +189,7 @@ save_e61 <- function(filename = NULL,
     fields <- c("title", "subtitle", "caption")
 
     spell_chk_i <- lapply(fields, function(field) {
-      val <- plots[[i]]$label[[field]]
+      val <- plots[[i]]@labels[[field]]
       if (!is.null(val)) {
         # remove html elements before spell-checking
         val <- gsub("<[^>]+>", "", val)
@@ -314,7 +314,7 @@ save_e61 <- function(filename = NULL,
 
     for (i in seq_along(plots)) {
       data_name <- gsub("\\.(\\w{3})$", paste0(i, ".csv"), filename)
-      data.table::fwrite(plots[[i]]$data, data_name)
+      data.table::fwrite(plots[[i]]@data, data_name)
     }
   }
 

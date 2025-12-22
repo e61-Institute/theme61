@@ -9,7 +9,7 @@ update_scales <- function(plot, auto_scale){
 
   # if we don't have a numeric y-variable then check whether the plot contains geom_density or geom_histogram (GeomBar without a y-variable)
   if (!check_y_var) {
-    layers <- plot$layers
+    layers <- plot@layers
 
     for (j in seq_along(layers)){
 
@@ -55,10 +55,10 @@ check_for_y_var <- function(plot){
   check <- FALSE
 
   # First check if the y-variable is a factor or a character - we can't scale those
-  y_var <- deparse(plot$mapping$y)
+  y_var <- deparse(plot@mapping$y)
   y_var <- gsub("~", "", y_var)
 
-  y_class <- class(plot$data[[y_var]])
+  y_class <- class(plot@data[[y_var]])
 
   # if the y-var is either missing, or it is not a factor/character, then
   # continue looking for whether there is a y-variable that can be used for scaling
@@ -265,7 +265,7 @@ get_y_minmax <- function(plot){
 is_barchart <- function(plot){
 
   # Check whether the chart is a column chart
-  geoms <- plot$layers
+  geoms <- plot@layers
 
   check_geoms <- c("GeomCol", "GeomBar")
 

@@ -4,7 +4,7 @@
 \alias{ggplot_add.theme_e61}
 \title{Tell ggplot2 what to do when someone does + theme_e61()}
 \usage{
-\method{ggplot_add}{theme_e61}(object, plot, object_name)
+\method{ggplot_add}{theme_e61}(object, plot, object_name, ...)
 }
 \description{
 Tell ggplot2 what to do when someone does + theme_e61()

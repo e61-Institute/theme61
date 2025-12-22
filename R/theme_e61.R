@@ -408,10 +408,13 @@ y_title_top <- function(adj, fix_left) {
 #' @method ggplot_add theme_e61
 #' @keywords internal
 #' @export
-ggplot_add.theme_e61 <- function(object, plot, object_name) {
-  # 1) merge in all the theme bits the way ggplot2 normally would
-  plot <- ggplot2:::ggplot_add.theme(object, plot, object_name)
-  # 2) now copy your flag from the theme onto the plot
+ggplot_add.theme_e61 <- function(object, plot, object_name, ...) {
+  # 1) Run the normal ggplot2 theme logic for this object
+  plot <- NextMethod()  # dispatches to ggplot_add.theme()
+
+  # 2) Copy your custom attribute from the theme onto the plot
   attr(plot, "t61_obj") <- attr(object, "t61_obj")
+
   plot
 }
+

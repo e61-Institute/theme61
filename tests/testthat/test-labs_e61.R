@@ -23,9 +23,13 @@ test_that("Functionality in labs_e61 works", {
 
   # Test that you can pass through other labels e.g. x axis titles
   lab <- labs_e61(title = "Test", x = "X", y = "Y", fill = "Fill", y_top = F)
+  compare_lab <- list(x = "X", y = "Y", fill = "Fill", title = "Test", subtitle = "<span style='font-size:10pt'></span>", caption = NULL)
+
+  class(compare_lab) <- c("ggplot2::labels", "gg", "S7_object")
+
   expect_equal(
     lab,
-    list(x = "X", y = "Y", fill = "Fill", title = "Test", subtitle = "<span style='font-size:10pt'></span>", caption = NULL),
+    compare_lab,
     ignore_attr = TRUE
   )
 
