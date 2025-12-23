@@ -1,3 +1,14 @@
+# theme61 0.7.1
+
+XX Jan 2026
+
+This release mostly contains bug fixes:
+
+* Fix issue where `save_e61` ignored custom aspect ratios.
+* Fix issue where maps would use the (bad) default aspect ratios designed for normal graphs.
+* Fix issue where package would not load if there is no internet connection.
+* Updated back-end code that was broken by the release of ggplot2 v4.0.0
+
 # theme61 0.7.0
 
 01 Jul 2025
