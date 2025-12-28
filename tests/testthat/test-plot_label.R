@@ -59,7 +59,8 @@ test_that("Multi-plot labels work", {
     plot_label(c("1", "2", "3"),
                rep(0.5, 3),
                c(1.3, 2.3, 3.3),
-               facet_name = "facet", facet_value = "A")
+               facet = "A"
+               )
 
   withr::with_tempdir({
     suppressWarnings(expect_snapshot_file(save_e61("multi-label-facet-plot.svg", p)))
@@ -205,53 +206,57 @@ test_that("Labels work on facets", {
     group = factor(c(1, 2, 1, 2))
   )
 
-  # Place labels on 1 facet only
-  p1 <- ggplot(data, aes(x, y, colour = group)) +
+  p <- ggplot(data, aes(x, y, colour = group)) +
     facet_wrap(~f_var) +
     geom_point() +
-    scale_y_continuous_e61(c(0, 3, 1)) +
-    plot_label(
-      label = c("Lab 1", "Lab 2"),
-      x = c(1.25, 1.75),
-      y = c(1, 2),
-      facet_name = "f_var",
-      facet_value = "1"
-    )
+    scale_y_continuous_e61(c(0, 3, 1))
+
+  # Place labels on 1 facet only
+  p1 <- p + plot_label(
+    label = c("Lab 1", "Lab 2"),
+    x = c(1.25, 1.75),
+    y = c(1, 2),
+    f_var = "1"
+  )
 
   # Place 1 labels on 1 facet and the other label on the other
-  p2 <- ggplot(data, aes(x, y, colour = group)) +
-    facet_wrap(~f_var) +
-    geom_point() +
-    scale_y_continuous_e61(c(0, 3, 1)) +
-    plot_label(
-      label = c("Lab 1", "Lab 2"),
-      x = c(1.25, 1.75),
-      y = c(1, 2),
-      facet_name = "f_var",
-      facet_value = c("1", "2")
-    )
+  p2 <- p + plot_label(
+    label = c("Lab 1", "Lab 2"),
+    x = c(1.25, 1.75),
+    y = c(1, 2),
+    f_var = c("1", "2")
+  )
+
+  # Defaults to putting the labels on all facets if no facet specified
+  p3 <- p + plot_label(
+    label = c("Lab 1", "Lab 2"),
+    x = c(1.25, 1.75),
+    y = c(1, 2)
+  )
+
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("facets.svg", p1)))
     expect_snapshot_file(suppressWarnings(save_e61("alternating-facets.svg", p2)))
+    expect_snapshot_file(suppressWarnings(save_e61("no-specified-facets.svg", p3)))
   })
 
 })
 
-test_that("Order of facets is preserved", {
+test_that("Facet order preserved", {
   df <- data.frame(grp = 1:3, val = rep(1, 3))
   df$grp <- ordered(df$grp, levels = 3:1)
 
-  p0 <- ggplot2::ggplot(df, ggplot2::aes(val, val)) +
-    ggplot2::geom_point() +
-    ggplot2::facet_wrap(~grp)
+  p0 <- ggplot(df, ggplot2::aes(val, val)) +
+    geom_point() +
+    facet_wrap(~grp)
 
   p1 <- p0 +
-    theme61::plot_label("a point", 1.25, 1, facet_name = "grp", facet_value = "1") +
-    theme61::scale_x_continuous_e61(c(1, 2))
+    plot_label("a point", 1.25, 1, facet_name = "grp", facet_value = "1") +
+    scale_x_continuous_e61(c(1, 2))
 
-  lay0 <- ggplot2::ggplot_build(p0)$layout$layout[["grp"]]
-  lay1 <- ggplot2::ggplot_build(p1)$layout$layout[["grp"]]
+  lay0 <- ggplot_build(p0)$layout$layout[["grp"]]
+  lay1 <- ggplot_build(p1)$layout$layout[["grp"]]
 
   expect_identical(lay1, lay0)
 })

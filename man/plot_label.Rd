@@ -14,8 +14,7 @@ plot_label(
   hjust = 0,
   geom = c("text", "label"),
   angle = 0,
-  facet_name = NULL,
-  facet_value = NULL
+  ...
 )
 
 plab(
@@ -27,8 +26,7 @@ plab(
   hjust = 0,
   geom = c("text", "label"),
   angle = 0,
-  facet_name = NULL,
-  facet_value = NULL
+  ...
 )
 }
 \arguments{
@@ -53,10 +51,9 @@ adds a white box around the text which could be useful sometimes.}
 \item{angle}{(optional) Numeric. Rotate the labels. Defaults to 0 which is
 normal left-to-right text.}
 
-\item{facet_name, facet_value}{(optional) String. Specify the name of the
-facetting variable in \code{facet_name} and the panel to show the labels in
-using \code{facet_value}. Defaults to NULL which shows the labels on all facets.
-You must specify both \code{facet_name} and \code{facet_value} or leave both as NULL.}
+\item{...}{Optional named vectors. If the plot is facetted, you can restrict
+the label(s) to a specific panel by supplying the facetting variable(s) as
+named arguments (e.g. \code{grp = "1"}). For facet grids, supply all facet vars.}
 }
 \value{
 Object to add to a ggplot (via \code{+}).
