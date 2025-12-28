@@ -59,7 +59,7 @@ using \code{facet_value}. Defaults to NULL which shows the labels on all facets.
 You must specify both \code{facet_name} and \code{facet_value} or leave both as NULL.}
 }
 \value{
-ggplot2 object
+Object to add to a ggplot (via \code{+}).
 }
 \description{
 Add text labels for lines, columns or other elements directly
