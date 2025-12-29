@@ -14,6 +14,8 @@ plot_label(
   hjust = 0,
   geom = c("text", "label"),
   angle = 0,
+  facet_name = NULL,
+  facet_variable = NULL,
   ...
 )
 
@@ -26,6 +28,8 @@ plab(
   hjust = 0,
   geom = c("text", "label"),
   angle = 0,
+  facet_name = NULL,
+  facet_variable = NULL,
   ...
 )
 }
