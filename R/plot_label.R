@@ -102,13 +102,13 @@ plot_label <-
 
 # --- internal helpers ---------------------------------------------------------
 
-.theme61_plab_len_chk <- function(vec, len) {
+.plab_len_chk <- function(vec, len) {
   if (length(vec) == len) return(vec)
   if (length(vec) != 1) stop(deparse(substitute(vec)), " must be length ", len, " or 1.")
   rep(vec, len)
 }
 
-.theme61_find_facet_proto <- function(plot, facet_name) {
+.find_facet_proto <- function(plot, facet_name) {
   if (is.null(facet_name) || !nzchar(facet_name)) return(NULL)
 
   if (!is.null(plot$data) && facet_name %in% names(plot$data)) {
@@ -125,7 +125,7 @@ plot_label <-
   NULL
 }
 
-.theme61_coerce_to_proto <- function(values, proto) {
+.coerce_to_proto <- function(values, proto) {
   if (is.null(proto)) return(values)
 
   v <- as.character(values)
@@ -141,7 +141,7 @@ plot_label <-
 }
 
 # Best-effort extractor of facet variable names from a ggplot
-.theme61_get_facet_vars <- function(plot) {
+.get_facet_vars <- function(plot) {
   f <- plot$facet
   if (is.null(f) || is.null(f$params)) return(character())
 
@@ -173,7 +173,7 @@ plot_label <-
   vars
 }
 
-.theme61_build_plot_label_layer <- function(object, plot) {
+.build_plot_label_layer <- function(object, plot) {
   n <- length(object$label)
 
   plot_lab_data <- data.table::data.table(
@@ -181,9 +181,9 @@ plot_label <-
     x = object$x,
     y = object$y,
     colour = object$colour,
-    size = .theme61_plab_len_chk(object$size, n),
-    hjust = .theme61_plab_len_chk(object$hjust, n),
-    angle = .theme61_plab_len_chk(object$angle, n)
+    size = .plab_len_chk(object$size, n),
+    hjust = .plab_len_chk(object$hjust, n),
+    angle = .plab_len_chk(object$angle, n)
   )
 
   # Add any extra columns (facet vars, etc.)
@@ -198,7 +198,7 @@ plot_label <-
     }
   }
 
-  facet_vars <- .theme61_get_facet_vars(plot)
+  facet_vars <- .get_facet_vars(plot)
 
   if (length(facet_vars)) {
     have <- intersect(facet_vars, names(plot_lab_data))
@@ -219,14 +219,14 @@ plot_label <-
     if (length(have) == length(facet_vars)) {
       # User supplied all facet vars: coerce to plot prototypes (preserve ordered levels)
       for (fv in facet_vars) {
-        proto <- .theme61_find_facet_proto(plot, fv)
+        proto <- .find_facet_proto(plot, fv)
         if (is.null(proto)) {
           stop(
             "Facet variable `", fv, "` was not found in the plot data.\n",
             "Check that you used the correct facetting variable name."
           )
         }
-        plot_lab_data[[fv]] <- .theme61_coerce_to_proto(plot_lab_data[[fv]], proto)
+        plot_lab_data[[fv]] <- .coerce_to_proto(plot_lab_data[[fv]], proto)
       }
     } else {
       # User supplied no facet vars: expand labels across existing panels so per-row
@@ -281,14 +281,14 @@ plot_label <-
 
 # ggplot2 v4+ hook
 #' @export
-update_ggplot.theme61_plot_label <- function(object, plot, ...) {
-  plot + .theme61_build_plot_label_layer(object, plot)
+update_ggplot.plot_label <- function(object, plot, ...) {
+  plot + .build_plot_label_layer(object, plot)
 }
 
 # Back-compat hook (still used by ggplot2 add_ggplot path)
 #' @export
-ggplot_add.theme61_plot_label <- function(object, plot, object_name, ...) {
-  update_ggplot.theme61_plot_label(object, plot, ...)
+ggplot_add.plot_label <- function(object, plot, object_name, ...) {
+  update_ggplot.plot_label(object, plot, ...)
 }
 
 #' @rdname plot_label
