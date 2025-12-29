@@ -10,6 +10,7 @@ This release mostly contains bug fixes:
 * Labels on facet graphs now respect ordered factor ordering rather than resetting them.
 * New, simpler approach to specifying which facets for labels to appear on.
 * A better default of labels showing on all facet panels if no facet is specified, rather than erroring out with an uninformative error message.
+* Added `ytitle_wrap` argument to `labs_e61` so you can custom wrap the y-axis titles just like other graph titles.
 * Updated back-end code that was broken by the release of ggplot2 v4.0.0.
 
 # theme61 0.7.0
