@@ -22,8 +22,13 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
       png = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
       jpg = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
     )
+    on.exit(dev.off(), add = TRUE)
 
-    print(graph)
+    # avoid recursion into print.e61_ggplot()
+    graph_i <- graph
+    class(graph_i) <- setdiff(class(graph_i), "e61_ggplot")
+
+    print(graph_i)
     dev.off()
 
     # Save a png/jpg if required
