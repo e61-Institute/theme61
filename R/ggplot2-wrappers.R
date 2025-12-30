@@ -1,20 +1,91 @@
-#' Masks ggplot2::ggplot to use theme_e61() by default
-#'
-#' This wrapper tags the plot so theme61 can inject default scales at build time.
+#' Masks ggplot2::ggplot to use the e61 colour palette and scales by default
 #'
 #' @noRd
 #' @export
-ggplot <- function(data = NULL,
-                   mapping = ggplot2::aes(),
-                   ...,
-                   environment = parent.frame()) {
+ggplot <-
+  function(data = NULL,
+           mapping = aes(),
+           ...,
+           environment = parent.frame()) {
 
-  p <- ggplot2::ggplot(data = data, mapping = mapping, environment = environment) +
-    theme_e61()
+  p <- ggplot2::ggplot(data = data, mapping = mapping, environment = environment) + theme_e61()
 
-  class(p) <- c("e61_ggplot", class(p))
+  # add e61 y-axis scale if the y-variable is numeric
+  if(!is.null(mapping$y)) {
 
-  p
+    y_var_name <- ggplot2::quo_name(mapping$y)
+    y_var_class <- class(data[[y_var_name]])
+
+    if (any(y_var_class %in% c("numeric", "integer"))) {
+
+      if(max(data[[y_var_name]], na.rm = TRUE) == min(data[[y_var_name]], na.rm = TRUE)){
+
+        p <- p + scale_y_continuous_e61(expand_bottom = 0.15, expand_top = 0.15)
+
+      } else {
+        p <- p + scale_y_continuous_e61()
+      }
+    }
+  }
+
+  # add e61 x-axis scale if the x-variable is numeric
+  if (!is.null(mapping$x)) {
+
+    x_var_name <- ggplot2::quo_name(mapping$x)
+    x_var_class <- class(data[[x_var_name]])
+
+    if (any(x_var_class %in% c("numeric", "integer"))) {
+      p <- p + scale_x_continuous_e61()
+    }
+  }
+
+  # scale fill variables
+  if (!is.null(mapping$fill)) {
+
+    fill_var_name <- ggplot2::quo_name(mapping$fill)
+
+    if (is.null(data[[fill_var_name]]) && stringr::str_detect(fill_var_name, "^(as\\.)?factor\\(")){
+
+      fill_var_class <- "factor"
+
+    } else {
+
+      fill_var_class <- class(data[[fill_var_name]])
+    }
+
+    if (any(fill_var_class %in% "numeric")) {
+
+      p <- p + scale_fill_e61(discrete = FALSE)
+
+    } else if (any(fill_var_class %in% c("factor", "character", "logical"))) {
+
+      p <- p + scale_fill_e61()
+    }
+  }
+
+  # scale colours
+  if (!is.null(mapping$colour)) {
+
+    colour_var_name <- ggplot2::quo_name(mapping$colour)
+
+    if (is.null(data[[colour_var_name]]) & stringr::str_detect(colour_var_name, "^factor\\(")) {
+
+      colour_var_class <- "factor"
+
+    } else {
+      colour_var_class <- class(data[[colour_var_name]])
+    }
+
+    if (any(colour_var_class %in% "numeric")) {
+      p <- p + scale_colour_e61(discrete = FALSE)
+
+    } else if (any(colour_var_class %in% c("factor", "character", "logical"))) {
+
+      p <- p + scale_colour_e61()
+    }
+  }
+
+  return(p)
 }
 
 #' Masks ggplot2::ggsave to encourage users to use save_e61
