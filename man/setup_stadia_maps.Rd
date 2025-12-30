@@ -13,7 +13,7 @@ up your session accordingly.
 }
 \details{
 To get an API key, you must sign up at
-\url{https://client.stadiamaps.com/signup/}.
+\url{https://client.stadiamaps.com/signup/}{Stadia Maps sign up}.
 }
 \seealso{
 Other map functions: 
