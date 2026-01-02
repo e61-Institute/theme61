@@ -105,6 +105,9 @@ save_e61 <- function(filename = NULL,
   # Compile plots
   plots <- c(list(...), plotlist)
 
+  # Ensure plots are e61 plots
+  plots <- as_e61_plot(plots)
+
   # For single-panel graphs
   if (length(plots) == 0) plots <- list(plot)
 

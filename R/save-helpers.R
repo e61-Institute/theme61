@@ -24,9 +24,9 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
     )
     on.exit(dev.off(), add = TRUE)
 
-    # avoid recursion into print.e61_ggplot()
+    # avoid recursion into print.e61_plot()
     graph_i <- graph
-    class(graph_i) <- setdiff(class(graph_i), "e61_ggplot")
+    class(graph_i) <- setdiff(class(graph_i), "e61_plot")
 
     print(graph_i)
     dev.off()

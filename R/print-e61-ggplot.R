@@ -1,6 +1,6 @@
 #' Print method for theme61 plots to automatically render plots in Viewer pane
 #' @export
-print.e61_ggplot <- function(x, ...) {
+print.e61_plot <- function(x, ...) {
 
   if (isFALSE(getOption("theme61.preview_on_print", TRUE))) {
     return(NextMethod())
@@ -12,24 +12,14 @@ print.e61_ggplot <- function(x, ...) {
 
   # Preview first
   if (in_rstudio) {
-    suppressWarnings(
-      suppressMessages(
-        theme61::save_e61(
-          filename     = NULL,
-          plot         = x,
-          preview      = TRUE,
-          format       = "svg",
-          spell_check  = FALSE,
-          save_data    = FALSE,
-          print_info   = FALSE
-        )
-      )
-    )
-  }
+    suppressWarnings(suppressMessages(
+      save_e61(filename = NULL, plot = x, preview = TRUE, format = "svg")
+    ))
+      }
 
   # Plot last so Plots pane keeps it
   x_plot <- x
-  class(x_plot) <- setdiff(class(x_plot), "e61_ggplot")
+  class(x_plot) <- setdiff(class(x_plot), "e61_plot")
   print(x_plot)
 
   # Now force focus to Viewer (after RStudio finishes plot focus changes)
