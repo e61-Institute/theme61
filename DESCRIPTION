@@ -1,7 +1,7 @@
 Package: theme61
 Type: Package
 Title: Create Graphs in the e61 Institute Style
-Version: 0.7.1.9000
+Version: 0.8.0.9000
 Authors@R: c(
     person("Aaron", "Wong", email = "aaron.wong@e61.in", role = c("aut", "cre")),
     person("Elyse", "Dwyer", email = "elyse.dwyer@e61.in", role = c("aut")),
@@ -26,6 +26,7 @@ Imports:
     gridExtra (>= 2.3),
     here (>= 1.0.1),
     hunspell (>= 3.0.6),
+    later (>= 1.4.4),
     lifecycle (>= 1.0.3),
     magick (>= 2.7.3),
     remotes (>= 2.4.2),
