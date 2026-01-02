@@ -108,6 +108,9 @@ save_e61 <- function(filename = NULL,
   # Ensure plots are e61 plots
   plots <- as_e61_plot(plots)
 
+  # Check if plot is a map
+  if (length(plots) == 1) plots <- classify_e61_map(plots)
+
   # For single-panel graphs
   if (length(plots) == 0) plots <- list(plot)
 
