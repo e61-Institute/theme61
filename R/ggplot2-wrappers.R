@@ -1,6 +1,4 @@
-#' Masks ggplot2::ggplot to use theme_e61() by default
-#'
-#' This wrapper tags the plot so theme61 can inject default scales at build time.
+#' Masks ggplot2::ggplot to add e61_plot class and apply theme_e61
 #'
 #' @noRd
 #' @export
@@ -11,10 +9,17 @@ ggplot <- function(data = NULL,
 
   p <- ggplot2::ggplot(data = data,
                        mapping = mapping,
-                       environment = environment) +
-    theme_e61()
+                       ...,
+                       environment = environment)
 
-  as_e61_plot(p)
+  p <- as_e61_plot(p)
+
+  # TODO: think about whether we want to keep this here or attach it on preview?
+  if (isTRUE(getOption("theme61.auto_theme", TRUE))) {
+    p <- p + theme_e61()
+  }
+
+  p
 
 }
 
