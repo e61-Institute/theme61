@@ -32,12 +32,10 @@ plot_label <-
            hjust = 0,
            geom = c("text", "label"),
            angle = 0,
-           facet_name = lifecycle::deprecated(),
-           facet_value = lifecycle::deprecated(),
            ...) {
 
     # Hard deprecate old args if used
-    if (lifecycle::is_present(facet_name) || lifecycle::is_present(facet_value)) {
+    if ("facet_name" %in% names(extra) || "facet_value" %in% names(extra)) {
       lifecycle::deprecate_stop(
         when = "0.7.1",
         what = I("theme61::plot_label(facet_name = '', facet_value = '')"),
