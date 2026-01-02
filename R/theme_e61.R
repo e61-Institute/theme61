@@ -184,7 +184,8 @@ theme_e61_spatial <- function(
     legend = c("none", "bottom", "top", "left", "right", "inside"),
     legend_position = NULL,
     legend_title = FALSE,
-    base_family = "pt-sans"
+    base_family = "pt-sans",
+    aspect_ratio = NULL
 ) {
   legend <- match.arg(legend)
 
@@ -203,6 +204,7 @@ theme_e61_spatial <- function(
 
   ret <-
     theme(
+      aspect.ratio = aspect_ratio,
       # base text
       text = element_text(
         colour = "black",
