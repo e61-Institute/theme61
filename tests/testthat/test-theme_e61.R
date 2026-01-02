@@ -102,7 +102,7 @@ test_that("Aspect ratio can be changed", {
     theme_e61(aspect_ratio = 0.5)
 
   withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("aspect-ratio-0.5.svg", p2, chart_type = "custom")))
+    expect_snapshot_file(suppressWarnings(save_e61("aspect-ratio-5.svg", p2, chart_type = "custom")))
   })
 
   p3 <- p +
@@ -110,6 +110,46 @@ test_that("Aspect ratio can be changed", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("aspect-ratio-3.svg", p3, chart_type = "custom")))
+  })
+
+})
+
+test_that("Spatial plots preserve the original aspect ratios", {
+
+  skip_if_not_installed("strayr")
+  skip_if_not_installed("sf")
+
+  sa4 <- strayr::read_absmap("sa42021")
+
+  bbox <- sf::st_bbox(c(xmin = 145, xmax = 155, ymin = -35, ymax = -30),
+                      crs = sf::st_crs(4326))
+  sa4_syd <- sf::st_crop(sa4, bbox)
+
+  plotdata <- rbind(
+    transform(sa4_syd, property_type = "House"),
+    transform(sa4_syd, property_type = "Unit")
+  )
+
+  p1 <- ggplot(plotdata) +
+      geom_sf(fill = "grey90", colour = "grey40", linewidth = 0.1) +
+      coord_sf(xlim = c(150.95, 151.30), ylim = c(-34.05, -33.70)) +
+      facet_wrap(~ property_type) +
+      theme_e61_spatial() +
+      labs_e61(
+        title = "MWE: faceted ABS SA4 map (strayr::read_absmaps)",
+        footnotes = "Constant fill; geometry from ABS via strayr."
+      )
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("map-aspect-ratio-1.svg", p1)))
+  })
+
+  # See if it preserves weirdly wide graphs
+  p2 <- p1 +
+    coord_sf(xlim = c(150.5, 151.30), ylim = c(-34.05, -33.70))
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(save_e61("map-aspect-ratio-2.svg", p2)))
   })
 
 })
