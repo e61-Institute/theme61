@@ -98,7 +98,7 @@ plot_label <-
         # preserve current behaviour: mark TRUE if default size used
         adj_plot_label = isTRUE(all.equal(size, 3.5))
       ),
-      class = "theme61_plot_label"
+      class = "e61_plot_label"
     )
   }
 
@@ -281,16 +281,18 @@ plot_label <-
   retval
 }
 
+# New methods ----
+
 # ggplot2 v4+ hook
 #' @export
-update_ggplot.plot_label <- function(object, plot, ...) {
+update_ggplot.e61_plot_label <- function(object, plot, ...) {
   plot + .build_plot_label_layer(object, plot)
 }
 
 # Back-compat hook (still used by ggplot2 add_ggplot path)
 #' @export
-ggplot_add.plot_label <- function(object, plot, object_name, ...) {
-  update_ggplot.plot_label(object, plot, ...)
+ggplot_add.e61_plot_label <- function(object, plot, object_name, ...) {
+  update_ggplot.e61_plot_label(object, plot, ...)
 }
 
 #' @rdname plot_label
