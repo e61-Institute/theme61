@@ -52,6 +52,8 @@ theme_e61 <- function(
       stop("Both legend_position values must be between 0 and 1.")
   }
 
+  # This deals with an issue where the test environment can't install pt-sans
+  # and pollutes the test rig with a lot of unhelpful errors
   base_family <- if (is_testing()) "sans" else "pt-sans"
 
   base_size <- getOption("t61_base_size", default = 10)
