@@ -19,6 +19,7 @@
 #' @param ... Optional named vectors. If the plot is facetted, you can restrict
 #'   the label(s) to a specific panel by supplying the facetting variable(s) as
 #'   named arguments (e.g. `grp = "1"`). For facet grids, supply all facet vars.
+#' @param facet_name,facet_value `r lifecycle::badge("deprecated")`
 #'
 #' @return Object to add to a ggplot (via `+`).
 #' @export
@@ -31,12 +32,12 @@ plot_label <-
            hjust = 0,
            geom = c("text", "label"),
            angle = 0,
-           facet_name = NULL,
-           facet_variable = NULL,
+           facet_name = lifecycle::deprecated(),
+           facet_value = lifecycle::deprecated(),
            ...) {
 
     # Hard deprecate old args if used
-    if (!is.null(facet_name) || !is.null(facet_value)) {
+    if (lifecycle::is.present(facet_name) || lifecycle::is.present(facet_value)) {
       lifecycle::deprecate_stop(
         when = "0.7.1",
         what = "theme61::plot_label(facet_name = '', facet_value = '')",
