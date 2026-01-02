@@ -2,7 +2,7 @@
 #' @export
 print.e61_plot <- function(x, ...) {
 
-  if (isFALSE(getOption("theme61.preview_on_print", TRUE))) {
+  if (!isTRUE(getOption("theme61.preview_on_print", TRUE))) {
     return(NextMethod())
   }
 
