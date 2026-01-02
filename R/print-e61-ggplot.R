@@ -13,7 +13,7 @@ print.e61_plot <- function(x, ...) {
   # Preview first
   if (in_rstudio) {
     suppressWarnings(suppressMessages(
-      save_e61(filename = NULL, plot = x, preview = TRUE, format = "svg")
+      save_e61(plot = x, preview = TRUE)
     ))
       }
 
