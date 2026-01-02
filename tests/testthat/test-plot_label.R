@@ -252,7 +252,7 @@ test_that("Facet order preserved", {
     facet_wrap(~grp)
 
   p1 <- p0 +
-    plot_label("a point", 1.25, 1, facet_name = "grp", facet_value = "1") +
+    plot_label("a point", 1.25, 1, grp = "1") +
     scale_x_continuous_e61(c(1, 2))
 
   lay0 <- ggplot_build(p0)$layout$layout[["grp"]]
