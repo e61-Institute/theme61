@@ -18,42 +18,6 @@ ggplot <- function(data = NULL,
 
 }
 
-#' Generic function to coerce plots to e61_plot class
-#' @export
-as_e61_plot <- function(x, ...) {
-  UseMethod("as_e61_plot")
-}
-
-#' Method for plain ggplots
-#' @export
-as_e61_plot.ggplot <- function(x, ...) {
-  if (!inherits(x, "e61_plot")) {
-    class(x) <- c("e61_plot", class(x))
-  }
-  x
-}
-
-#' Method for existing e61_plot class objects
-#' @export
-as_e61_plot.e61_plot <- function(x, ...) {
-  x
-}
-
-#' Method that works for lists of plots
-#' @export
-as_e61_plot.list <- function(x, ...) {
-  lapply(x, as_e61_plot)
-}
-
-#' Method that fails for non-plots
-#' @export
-as_e61_plot.default <- function(x, ...) {
-  stop(
-    "Object of class ", paste(class(x), collapse = "/"),
-    " cannot be converted to an e61 plot"
-  )
-}
-
 #' Masks ggplot2::ggsave to encourage users to use save_e61
 #'
 #' @noRd
