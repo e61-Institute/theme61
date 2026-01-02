@@ -34,6 +34,8 @@ plot_label <-
            angle = 0,
            ...) {
 
+    extra <- list(...)
+
     # Hard deprecate old args if used
     if ("facet_name" %in% names(extra) || "facet_value" %in% names(extra)) {
       lifecycle::deprecate_stop(
@@ -68,8 +70,6 @@ plot_label <-
     if (class(try(as.Date(as.character(x)), silent = TRUE)) != "try-error") {
       x <- as.Date(x)
     }
-
-    extra <- list(...)
 
     # If user supplied extras, they must all be named (facet vars etc.)
     if (length(extra)) {
