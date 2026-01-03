@@ -197,7 +197,7 @@ test_that("Label rotation works", {
 
 })
 
-test_that("Labels work on facets", {
+test_that("Labels work on facet wraps", {
 
   data <- data.frame(
     x = rep(c(1, 2), 2),
@@ -243,11 +243,73 @@ test_that("Labels work on facets", {
 
 })
 
+test_that("Labels work with facet grid", {
+
+  df <- data.frame(
+    x = 1:8,
+    y = 1:8,
+    # rows facetted: ordered with non-default level order
+    r = ordered(rep(c("B", "A"), each = 4), levels = c("B", "A")),
+    # cols facetted: plain factor with non-default order
+    c = factor(rep(c("2", "1"), times = 4), levels = c("2", "1"))
+  )
+
+  p0 <- ggplot(df, aes(x, y)) +
+    geom_point() +
+    facet_grid(r ~ c)
+
+  # 1) Baseline facet layout order
+  lay0 <- ggplot_build(p0)$layout$layout[, c("r", "c"), drop = FALSE]
+
+  # 2) Add labels without specifying facet vars (should replicate cleanly and keep layout)
+  p_all <- p0 + plot_label(
+    label = c("L1", "L2"),
+    x = c(2, 3),
+    y = c(2, 3)
+  )
+
+  lay_all <- ggplot_build(p_all)$layout$layout[, c("r", "c"), drop = FALSE]
+  expect_identical(lay_all, lay0)
+
+  # 3) Target different labels to different panels (must supply BOTH facet vars)
+  p_target <- p0 + plot_label(
+    label = c("RowB-Col2", "RowA-Col1"),
+    x = c(2, 3),
+    y = c(2, 3),
+    r = c("B", "A"),
+    c = c("2", "1")
+  )
+
+  # Ensure the label layer has the facet vars (so ggplot doesn't silently expand)
+  built <- ggplot_build(p_target)
+
+  # label layer is 2nd layer: first geom_point, second geom_text/geom_label
+  # (If your tests add other layers, adjust this index.)
+  lab_data <- built$data[[2]]
+
+  # Expect exactly 2 rows (no expansion because we provided r and c)
+  expect_equal(nrow(lab_data), 2L)
+
+  # Expect each row placed in requested panel
+  # (Facet vars should be present and coerced to the plot prototypes)
+  expect_true(all(c("r", "c") %in% names(lab_data)))
+  expect_identical(as.character(lab_data$r), c("B", "A"))
+  expect_identical(as.character(lab_data$c), c("2", "1"))
+
+  # 4) Helpful error if user supplies only one facet var for a facetted plot
+  expect_error(
+    p0 + plot_label("oops", 2, 2, r = "A"),
+    regexp = "facetted by:.*r.*c|Missing:.*c",
+    fixed = FALSE
+  )
+})
+
+
 test_that("Facet order preserved", {
   df <- data.frame(grp = 1:3, val = rep(1, 3))
   df$grp <- ordered(df$grp, levels = 3:1)
 
-  p0 <- ggplot(df, ggplot2::aes(val, val)) +
+  p0 <- ggplot(df, aes(val, val)) +
     geom_point() +
     facet_wrap(~grp)
 
