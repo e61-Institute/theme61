@@ -18,7 +18,9 @@
 #'   normal left-to-right text.
 #' @param ... Optional named vectors. If the plot is facetted, you can restrict
 #'   the label(s) to a specific panel by supplying the facetting variable(s) as
-#'   named arguments (e.g. `grp = "1"`). For facet grids, supply all facet vars.
+#'   named arguments (e.g. `grp = "1"` if the facetting variable is `grp` and
+#'   you want it to appear on panel `1`). For facet grids, supply all facet
+#'   vars.
 #' @param facet_name,facet_value `r lifecycle::badge("deprecated")`
 #'
 #' @return Object to add to a ggplot (via `+`).

@@ -14,8 +14,6 @@ plot_label(
   hjust = 0,
   geom = c("text", "label"),
   angle = 0,
-  facet_name = lifecycle::deprecated(),
-  facet_value = lifecycle::deprecated(),
   ...
 )
 
@@ -28,8 +26,6 @@ plab(
   hjust = 0,
   geom = c("text", "label"),
   angle = 0,
-  facet_name = lifecycle::deprecated(),
-  facet_value = lifecycle::deprecated(),
   ...
 )
 }
@@ -55,11 +51,11 @@ adds a white box around the text which could be useful sometimes.}
 \item{angle}{(optional) Numeric. Rotate the labels. Defaults to 0 which is
 normal left-to-right text.}
 
-\item{facet_name, facet_value}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
-
 \item{...}{Optional named vectors. If the plot is facetted, you can restrict
 the label(s) to a specific panel by supplying the facetting variable(s) as
 named arguments (e.g. \code{grp = "1"}). For facet grids, supply all facet vars.}
+
+\item{facet_name, facet_value}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }
 \value{
 Object to add to a ggplot (via \code{+}).
