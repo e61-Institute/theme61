@@ -16,12 +16,26 @@
 #'   adds a white box around the text which could be useful sometimes.
 #' @param angle (optional) Numeric. Rotate the labels. Defaults to 0 which is
 #'   normal left-to-right text.
-#' @param ... Optional named vectors. If the plot is facetted, you can restrict
+#' @param panel Optional named list. If the plot is facetted, you can restrict
 #'   the label(s) to a specific panel by supplying the facetting variable(s) as
-#'   named arguments (e.g. `grp = "1"` if the facetting variable is `grp` and
-#'   you want it to appear on panel `1`). For facet grids, supply all facet
-#'   vars.
+#'   a named list, see the Details for the syntax.
 #' @param facet_name,facet_value `r lifecycle::badge("deprecated")`
+#'
+#' @details The syntax for getting labels to appear on certain facet panels is
+#'   as follows.
+#'
+#'   For facet wraps, supply a named list with the facetting variable name(s)
+#'   and the facet value(s) you want the labels to appear on. For example, to
+#'   get labels to appear only on panel `1`, use `panel = list(grp = "1")`. If
+#'   you have 2 labels that you want to appear on panels `1` and `2`, use `panel
+#'   = list(grp = c("1", "2"))`.
+#'
+#'   For facet grids, you need to supply both the x- and y-dimension facet
+#'   variables to get the plot labels to appear correctly. For example, if your
+#'   facet variables are `r` and `c`, use `panel = list(r = "A", c = "1")` to
+#'   get the labels to appear on the panel at row `A` and column `1`. If you
+#'   have 2 labels you want to appear on panel `A1` and `B2`, use
+#'   `panel = list(r = c("A", "B"), c = c("1", "2"))`.
 #'
 #' @return Object to add to a ggplot (via `+`).
 #' @export
@@ -34,21 +48,21 @@ plot_label <-
            hjust = 0,
            geom = c("text", "label"),
            angle = 0,
-           ...) {
-
-    extra <- list(...)
+           panel = NULL,
+           facet_name = lifecycle::deprecated(),
+           facet_value = lifecycle::deprecated()) {
 
     # Hard deprecate old args if used
-    if ("facet_name" %in% names(extra) || "facet_value" %in% names(extra)) {
+    if (lifecycle::is_present(facet_name) || lifecycle::is_present(facet_value)) {
       lifecycle::deprecate_stop(
         when = "0.7.1",
         what = I("theme61::plot_label(facet_name = '', facet_value = '')"),
         with = I("theme61::plot_label(<facet_var> = <facet_value>)"),
         details = paste0(
-          "Facet targeting is now done by passing the facet variable(s) directly. ",
+          "Facet targeting is now done using the panel argument. ",
           "Example: ",
           "If you have a plot where the facetting variable is 'grp' and you want a label to appear on the panel titled 'A', the correct syntax is now: ",
-          "plot_label('a point', 1.25, 1, grp = 'A')"
+          "plot_label('a point', 1.25, 1, panel = list(grp = 'A'))"
         )
       )
     }
@@ -74,12 +88,11 @@ plot_label <-
     }
 
     # If user supplied extras, they must all be named (facet vars etc.)
-    if (length(extra)) {
-      nms <- names(extra)
-      if (is.null(nms) || any(!nzchar(nms))) {
+    if (!is.null(panel)) {
+      if (!is.list(panel) || is.null(names(panel)) || any(!nzchar(names(panel)))) {
         stop(
-          "All additional arguments to plot_label() must be named.\n",
-          "Example: plot_label('a point', 1.25, 1, grp = '1')"
+          "`panel` must be a named list.\n",
+          "Example: panel = list(grp = 'A')"
         )
       }
     }
@@ -94,7 +107,7 @@ plot_label <-
         hjust = hjust,
         geom = geom,
         angle = angle,
-        extra = extra,
+        panel = panel,
         # preserve current behaviour: mark TRUE if default size used
         adj_plot_label = isTRUE(all.equal(size, 3.5))
       ),
@@ -189,13 +202,14 @@ plot_label <-
   )
 
   # Add any extra columns (facet vars, etc.)
-  if (length(object$extra)) {
-    for (nm in names(object$extra)) {
-      v <- object$extra[[nm]]
+  panel <- object$panel
+
+  if (!is.null(panel)) {
+    for (nm in names(panel)) {
+      v <- panel[[nm]]
       if (length(v) == 1) v <- rep(v, n)
-      if (length(v) != n) {
-        stop("`", nm, "` must be length 1 or the number of labels (", n, ").")
-      }
+      if (length(v) != n)
+        stop("`panel$", nm, "` must be length 1 or the number of labels (", n, ").")
       plot_lab_data[[nm]] <- v
     }
   }
