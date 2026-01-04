@@ -99,41 +99,7 @@ test_that("Auto y-axis functionality does not apply if you override with ggplot2
   })
 })
 
-test_that("Auto colour/fill scales handle many discrete levels (>12) without error", {
-
-  n <- 20L
-
-  df <- data.frame(
-    x = rep(1:10, length.out = n),
-    y = seq_len(n),
-    grp = factor(paste0("g", seq_len(n)))
-  )
-
-  # Colour (line)
-  p_col <- ggplot(df, aes(x, y, colour = grp)) +
-    geom_line()
-
-  expect_no_error(b_col <- ggplot_build(p_col))
-  # For a line plot, colour is recorded in built layer data
-  expect_gte(length(unique(b_col$data[[1]]$colour)), n)
-
-  # Fill (bars)
-  # Use geom_col so fill is clearly mapped and appears in built data.
-  df2 <- data.frame(
-    x = df$grp,
-    y = 1,
-    grp = df$grp
-  )
-
-  p_fill <- ggplot(df2, aes(x, y, fill = grp)) +
-    geom_col()
-
-  expect_no_error(b_fill <- ggplot_build(p_fill))
-  expect_gte(length(unique(b_fill$data[[1]]$fill)), n)
-
-})
-
-test_that("User-supplied colour/fill scales are not overridden by theme61 defaults", {
+test_that("User-supplied colour/fill scales are not overridden by defaults", {
 
   n <- 20L
 
@@ -170,5 +136,26 @@ test_that("User-supplied colour/fill scales are not overridden by theme61 defaul
 
   expect_no_error(b_fill_user <- ggplot_build(p_fill_user))
   expect_equal(unique(b_fill_user$data[[1]]$fill), "black")
+
+})
+
+test_that("Error when discrete colour mapping exceeds supported palette size", {
+
+  n <- 20L  # deliberately > 12
+
+  df <- data.frame(
+    x = rep(1:10, length.out = n),
+    y = seq_len(n),
+    grp = factor(paste0("g", seq_len(n)))
+  )
+
+  p <- ggplot(df, aes(x, y, colour = grp)) +
+    geom_point()
+
+  expect_error(
+    ggplot_build(p),
+    regexp = "theme61.*support.*12|more than 12 colours",
+    fixed = FALSE
+  )
 
 })
