@@ -73,14 +73,14 @@ test_that("Auto y-axis functionality does not apply if you override with ggplot2
   # (and should not have theme61 forcibly re-adding scale_y_continuous_e61)
   p_override <- ggplot(data) +
     geom_point(aes(x = v1, y = v2)) +
-    ggplot2::scale_y_continuous(
+    scale_y_continuous(
       breaks = c(0, 50, 100),
       limits = c(0, 110)
     )
 
   # Also test an override added *before* the geom
   p_override2 <- ggplot(data) +
-    ggplot2::scale_y_continuous(
+    scale_y_continuous(
       breaks = c(0, 50, 100),
       limits = c(0, 110)
     ) +
@@ -97,4 +97,78 @@ test_that("Auto y-axis functionality does not apply if you override with ggplot2
       suppressWarnings(save_e61("override-y-scale-3-ggplot2-scale-before.svg", p_override2))
     )
   })
+})
+
+test_that("Auto colour/fill scales handle many discrete levels (>12) without error", {
+
+  n <- 20L
+
+  df <- data.frame(
+    x = rep(1:10, length.out = n),
+    y = seq_len(n),
+    grp = factor(paste0("g", seq_len(n)))
+  )
+
+  # Colour (line)
+  p_col <- ggplot(df, aes(x, y, colour = grp)) +
+    geom_line()
+
+  expect_no_error(b_col <- ggplot_build(p_col))
+  # For a line plot, colour is recorded in built layer data
+  expect_gte(length(unique(b_col$data[[1]]$colour)), n)
+
+  # Fill (bars)
+  # Use geom_col so fill is clearly mapped and appears in built data.
+  df2 <- data.frame(
+    x = df$grp,
+    y = 1,
+    grp = df$grp
+  )
+
+  p_fill <- ggplot(df2, aes(x, y, fill = grp)) +
+    geom_col()
+
+  expect_no_error(b_fill <- ggplot_build(p_fill))
+  expect_gte(length(unique(b_fill$data[[1]]$fill)), n)
+
+})
+
+test_that("User-supplied colour/fill scales are not overridden by theme61 defaults", {
+
+  n <- 20L
+
+  df <- data.frame(
+    x = rep(1:10, length.out = n),
+    y = seq_len(n),
+    grp = factor(paste0("g", seq_len(n)))
+  )
+
+  # ---- Colour override
+  # Make a manual colour scale where every level maps to black.
+  # If theme61 overrides it, colours will not all be black.
+  manual_cols <- stats::setNames(rep("black", n), levels(df$grp))
+
+  p_col_user <- ggplot(df, aes(x, y, colour = grp)) +
+    geom_point() +
+    scale_colour_manual(values = manual_cols)
+
+  expect_no_error(b_col_user <- ggplot_build(p_col_user))
+  expect_equal(unique(b_col_user$data[[1]]$colour), "black")
+
+  # ---- Fill override
+  manual_fills <- stats::setNames(rep("black", n), levels(df$grp))
+
+  df2 <- data.frame(
+    x = df$grp,
+    y = 1,
+    grp = df$grp
+  )
+
+  p_fill_user <- ggplot(df2, aes(x, y, fill = grp)) +
+    geom_col() +
+    scale_fill_manual(values = manual_fills)
+
+  expect_no_error(b_fill_user <- ggplot_build(p_fill_user))
+  expect_equal(unique(b_fill_user$data[[1]]$fill), "black")
+
 })
