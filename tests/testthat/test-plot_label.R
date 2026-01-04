@@ -289,6 +289,60 @@ test_that("Labels works with facet_grid", {
   )
 })
 
+test_that("plot_label works when facet vars use reserved names (colour, size)", {
+
+  df <- data.frame(
+    x = 1:8,
+    y = 1:8,
+    # facet vars intentionally collide with plot_label's internal columns
+    colour = ordered(rep(c("B", "A"), each = 4), levels = c("B", "A")),
+    size   = factor(rep(c("2", "1"), times = 4), levels = c("2", "1"))
+  )
+
+  p0 <- ggplot(df, aes(x, y)) +
+    geom_point() +
+    facet_grid(colour ~ size)
+
+  # 1) Untargeted labels should not error (and should not mis-detect targeting)
+  expect_no_error(
+    p0 + plot_label(
+      label = c("L1", "L2"),
+      x = c(2, 3),
+      y = c(2, 3)
+    )
+  )
+
+  # 2) Targeted labels: provide BOTH facet vars via panel=list(...)
+  p_target <- p0 + plot_label(
+    label = c("RowB-Col2", "RowA-Col1"),
+    x = c(2, 3),
+    y = c(2, 3),
+    panel = list(
+      colour = c("B", "A"),
+      size   = c("2", "1")
+    )
+  )
+
+  built <- ggplot_build(p_target)
+
+  # label layer should be second layer: geom_point then geom_text/geom_label
+  lab_data <- built$data[[2]]
+
+  # Should not have been expanded (because panel specified)
+  expect_equal(nrow(lab_data), 2L)
+
+  # Facet vars should be present and match what we supplied
+  expect_true(all(c("colour", "size") %in% names(lab_data)))
+  expect_identical(as.character(lab_data$colour), c("B", "A"))
+  expect_identical(as.character(lab_data$size), c("2", "1"))
+
+  # 3) Partial panel specification should error with "Missing: size"
+  expect_error(
+    p0 + plot_label("oops", 2, 2, panel = list(colour = "A")),
+    regexp = "Missing:\\s*size"
+  )
+})
+
 
 test_that("Facet order preserved", {
   df <- data.frame(grp = 1:3, val = rep(1, 3))
