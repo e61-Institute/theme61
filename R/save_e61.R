@@ -191,7 +191,9 @@ save_e61 <- function(filename = NULL,
     spell_chk_i <- lapply(fields, function(field) {
       val <- plots[[i]]@labels[[field]]
       if (!is.null(val)) {
-        # remove html elements before spell-checking
+        # replace html line breaks with a space and remove other elements before
+        # spell checking
+        val <- gsub("<br>", " ", val)
         val <- gsub("<[^>]+>", "", val)
 
         res <- check_spelling(val)
