@@ -60,12 +60,12 @@ labs_e61 <- function(title = NULL,
                      ...
 ) {
 
-  # check the title and subtitle are strings
-  sapply(list(title, subtitle), function(x){
-    if (!is.null(x) && !is.character(x)){
-      stop("title and subtitle must be a string.")
-    }
-  })
+  # check various titles are strings
+  str_chk <- list(title, subtitle, footnotes, sources, x, y)
+
+  for (i in str_chk) {
+    if (!is.null(i) && !is.character(i)) stop(i, " must be a string.")
+  }
 
   # Track whether a label has been wrapped
   wrap_title_trk <- FALSE
