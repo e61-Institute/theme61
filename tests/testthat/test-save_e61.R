@@ -688,14 +688,14 @@ test_that("Map examples", {
   skip_if_not_installed("strayr")
   library(sf)
 
-  sa3_shp <- strayr::read_absmap("sa32016")
+  sa4_shp <- strayr::read_absmap("sa42016")
 
-  sydney_map <- dplyr::filter(sa3_shp, gcc_code_2016 == "1GSYD")
+  sydney_map <- dplyr::filter(sa4_shp, gcc_code_2016 == "1GSYD")
 
   ## Simple map with title and subtitle ----
   p <- ggplot(data = sydney_map) +
-    geom_sf(aes(fill = sa3_code_2016), colour = "black") +
-    labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA3s") +
+    geom_sf(colour = "black") +
+    labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA4s") +
     theme_e61_spatial()
 
   withr::with_tempdir({
@@ -704,9 +704,9 @@ test_that("Map examples", {
 
   ## Map with legends ----
   p <- ggplot(data = sydney_map) +
-    geom_sf(aes(fill = as.numeric(sa3_code_2016)), colour = "black") +
-    labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA3s",
-             fill = "SA3 code") +
+    geom_sf(aes(fill = as.numeric(sa4_code_2016)), colour = "black") +
+    labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA4s",
+             fill = "SA4 code") +
     theme_e61_spatial(legend = "right", legend_title = T)
 
   withr::with_tempdir({
