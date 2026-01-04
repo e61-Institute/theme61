@@ -25,7 +25,7 @@ save_single <- function(
 
     layer_class <- class(plot@layers[[i]]$geom)
 
-    if("GeomSf" %in% layer_class) {
+    if(any(data.table::like(layer_class, "*Sf"))) {
       is_spatial_chart <- TRUE
 
       break
@@ -72,7 +72,6 @@ save_single <- function(
 
   plot <- plot + theme(rect = element_rect(fill = bg_colour))
 
-
   # Update the aspect ratio -------------------------------------------------
 
   # Only keep one chart if a list has been supplied
@@ -82,7 +81,10 @@ save_single <- function(
     warning(paste0("Multiple chart types supplied, using first in list, which is: ", chart_type, "."))
   }
 
-  if(chart_type == "normal") {
+  # override chart type if the graph is a map
+  if (is_spatial_chart) chart_type <- "custom"
+
+  if (chart_type == "normal") {
     plot <- plot + theme(aspect.ratio = 0.75)
 
   } else if(chart_type == "square") {
