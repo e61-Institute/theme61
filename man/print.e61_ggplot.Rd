@@ -2,10 +2,14 @@
 % Please edit documentation in R/print-e61-ggplot.R
 \name{print.e61_ggplot}
 \alias{print.e61_ggplot}
-\title{Print method for theme61 plots to automatically render plots in Viewer pane}
+\title{Print method for theme61 plots}
 \usage{
 \method{print}{e61_ggplot}(x, ...)
 }
 \description{
-Print method for theme61 plots to automatically render plots in Viewer pane
+\itemize{
+\item Always draws a plot in the Plots pane
+\item Also renders a preview in the Viewer (opt-out via option)
+\item Prefers Viewer focus by default (best-effort)
+}
 }
