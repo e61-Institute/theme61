@@ -99,8 +99,8 @@ test_that("Manual colour specification by group", {
     x_pos = rep(c(1, 2), 4)
   )
 
-  # Custom color palette using e61 colours
-  method_colors <- c("Method A" = e61_coraldark,
+  # Custom colour palette using e61 colours
+  method_colours <- c("Method A" = e61_coraldark,
                      "Method B" = e61_bluedark,
                      "Method C" = e61_tealdark,
                      "Method D" = e61_orangedark)
@@ -113,11 +113,11 @@ test_that("Manual colour specification by group", {
       point.size = 3,
       errorbar.width = 0.2
     ) +
-    scale_colour_manual(values = method_colors) +
+    scale_colour_manual(values = method_colours) +
     scale_y_continuous_e61() +
     scale_x_continuous_e61() +
     labs_e61(title = "Manual Colour Specification by Group",
-             subtitle = "Four methods with custom e61 color palette",
+             subtitle = "Four methods with custom e61 colour palette",
              x = "Metric Type", y = "score") +
     scale_x_continuous(breaks = 1:2, labels = c("Accuracy", "Precision")) +
     theme_e61(legend = "bottom")
@@ -167,8 +167,8 @@ test_that("Different shapes and styling", {
   p <- ggplot(data, aes(x = x_pos, y = value, ymin = lower, ymax = upper)) +
     geom_pointbar(
       shape = 21,                   # Fillable circles
-      fill = e61_skylight,          # Fill color using e61 palette
-      colour = e61_skydark,         # Border color using e61 palette
+      fill = e61_skylight,          # Fill colour using e61 palette
+      colour = e61_skydark,         # Border colour using e61 palette
       point.size = 5,               # Large points
       errorbar.width = 0.3,         # Error bar width
       errorbar.linewidth = 1.5,     # Thick error bars
@@ -178,7 +178,7 @@ test_that("Different shapes and styling", {
     scale_y_continuous_e61() +
     scale_x_continuous_e61() +
     labs_e61(title = "Different Shapes and Styling",
-             subtitle = "Shape 21, filled circles, dashed error bars with e61 colors",
+             subtitle = "Shape 21, filled circles, dashed error bars with e61 colours",
              y = "n") +
     scale_x_continuous(breaks = 1:4, labels = data$category)
 

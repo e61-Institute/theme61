@@ -1,8 +1,14 @@
-#' Print method for theme61 plots to automatically render plots in Viewer pane
+#' Print method for theme61 plots
+#'
+#' - Always draws a plot in the Plots pane
+#' - Also renders a preview in the Viewer (opt-out via option)
+#' - Prefers Viewer focus by default (best-effort)
+#'
 #' @export
 print.e61_plot <- function(x, ...) {
 
-  if (!isTRUE(getOption("theme61.preview_on_print", TRUE))) {
+  # opt-out (default ON)
+  if (isFALSE(getOption("theme61.preview_on_print", TRUE))) {
     return(NextMethod())
   }
 
@@ -10,7 +16,7 @@ print.e61_plot <- function(x, ...) {
     requireNamespace("rstudioapi", quietly = TRUE) &&
     rstudioapi::isAvailable()
 
-  # Preview first
+  # Viewer preview
   if (in_rstudio) {
     suppressWarnings(suppressMessages(
       save_e61(plot = x, preview = TRUE)
@@ -22,15 +28,21 @@ print.e61_plot <- function(x, ...) {
   class(x_plot) <- setdiff(class(x_plot), "e61_plot")
   print(x_plot)
 
-  # Now force focus to Viewer (after RStudio finishes plot focus changes)
+  # Prefer Viewer focus by default (best-effort)
   if (in_rstudio) {
-    activate_viewer_after_plot()
+    # one-shot “after plotting settles” activator
+    id <- NULL
+    id <- addTaskCallback(function(...) {
+      try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE)
+      removeTaskCallback(id)
+      TRUE
+    })
   }
+
+  activate_viewer_after_plot()
 
   invisible(x)
 }
-
-
 
 #' @noRd
 activate_viewer_after_plot <- function() {
@@ -40,7 +52,10 @@ activate_viewer_after_plot <- function() {
     return(invisible(FALSE))
   }
 
-  # Run on next top-level task, then re-try shortly after.
+  # Immediate attempt
+  try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE)
+
+  # After top-level task returns
   id <- NULL
   id <- addTaskCallback(function(...) {
     try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE)
@@ -48,9 +63,11 @@ activate_viewer_after_plot <- function() {
     TRUE
   })
 
+  # Retry a few times to win focus races
   if (requireNamespace("later", quietly = TRUE)) {
     later::later(function() try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE), 0.05)
     later::later(function() try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE), 0.20)
+    later::later(function() try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE), 0.50)
   }
 
   invisible(TRUE)
