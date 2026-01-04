@@ -1,10 +1,11 @@
+#' Method for theme61 plots to add default scales at build time
 #' @export
-ggplot_build.e61_ggplot <- function(plot, ...) {
+ggplot_build.e61_plot <- function(plot, ...) {
 
   plot2 <- maybe_add_default_scales(plot)
 
   # prevent recursion: drop our class before calling ggplot2 build
-  class(plot2) <- setdiff(class(plot2), "e61_ggplot")
+  class(plot2) <- setdiff(class(plot2), "e61_plot")
 
   ggplot2::ggplot_build(plot2, ...)
 }
@@ -253,14 +254,3 @@ maybe_add_default_scales <- function(plot) {
   plot
 }
 
-#' Method for theme61 plots to add default scales at build time
-#' @export
-ggplot_build.e61_plot <- function(plot, ...) {
-
-  plot2 <- maybe_add_default_scales(plot)
-
-  # prevent recursion: drop our class before calling ggplot2 build
-  class(plot2) <- setdiff(class(plot2), "e61_plot")
-
-  ggplot2::ggplot_build(plot2, ...)
-}
