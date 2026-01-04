@@ -379,33 +379,6 @@ in_to_cm <- function(inches, round = FALSE) {
   }
 }
 
-# Reposition y-axis titles to the top
-y_title_top <- function(adj, fix_left) {
-
-  if (class(adj) != "numeric") stop("adj must be a number.")
-  if (!length(adj) %in% c(1, 2)) stop("adj must be a single value or a vector of 2 values.")
-
-  if (length(adj) == 1) {
-
-    adj_left <- adj
-    adj_right <- adj
-
-  } else {
-
-    adj_left <- adj[[1]]
-    adj_right <- adj[[2]]
-
-  }
-
-  ret <-
-    theme(
-      axis.title.y.left = element_text(margin = margin(l = 5 + fix_left, r = adj_left), vjust = 1, angle = 0),
-      axis.title.y.right = element_text(margin = margin(l = adj_right, r = 5), vjust = 1, angle = 0)
-    )
-
-  return(ret)
-}
-
 #' Tell ggplot2 what to do when someone does + theme_e61()
 #' @method ggplot_add theme_e61
 #' @keywords internal
