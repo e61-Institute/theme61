@@ -80,3 +80,9 @@ really really long title</span>",
   )
 
 })
+
+test_that("Non-string titles fail", {
+  expect_error(labs_e61(title = 123))
+  expect_error(labs_e61(subtitle = TRUE))
+  expect_error(labs_e61(y = list(1,2,3)))
+})
