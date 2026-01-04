@@ -59,7 +59,7 @@ test_that("Multi-plot labels work", {
     plot_label(c("1", "2", "3"),
                rep(0.5, 3),
                c(1.3, 2.3, 3.3),
-               facet = "A"
+               panel = list(facet = "A")
                )
 
   withr::with_tempdir({
@@ -216,7 +216,7 @@ test_that("Labels work on facet wraps", {
     label = c("Lab 1", "Lab 2"),
     x = c(1.25, 1.75),
     y = c(1, 2),
-    f_var = "1"
+    panel = list(f_var = "1")
   )
 
   # Place 1 labels on 1 facet and the other label on the other
@@ -224,7 +224,7 @@ test_that("Labels work on facet wraps", {
     label = c("Lab 1", "Lab 2"),
     x = c(1.25, 1.75),
     y = c(1, 2),
-    f_var = c("1", "2")
+    panel = list(f_var = c("1", "2"))
   )
 
   # Defaults to putting the labels on all facets if no facet specified
@@ -243,14 +243,11 @@ test_that("Labels work on facet wraps", {
 
 })
 
-test_that("Labels work with facet grid", {
-
+test_that("Labels works with facet_grid", {
   df <- data.frame(
     x = 1:8,
     y = 1:8,
-    # rows facetted: ordered with non-default level order
     r = ordered(rep(c("B", "A"), each = 4), levels = c("B", "A")),
-    # cols facetted: plain factor with non-default order
     c = factor(rep(c("2", "1"), times = 4), levels = c("2", "1"))
   )
 
@@ -258,49 +255,37 @@ test_that("Labels work with facet grid", {
     geom_point() +
     facet_grid(r ~ c)
 
-  # 1) Baseline facet layout order
-  lay0 <- ggplot_build(p0)$layout$layout[, c("r", "c"), drop = FALSE]
+  # Baseline facet layout order
+  lay0 <- ggplot_build(p0)@layout$layout[, c("r", "c"), drop = FALSE]
 
-  # 2) Add labels without specifying facet vars (should replicate cleanly and keep layout)
+  # Add labels without specifying facet vars (labels should appear on all panels; layout unchanged)
   p_all <- p0 + plot_label(
     label = c("L1", "L2"),
     x = c(2, 3),
     y = c(2, 3)
   )
 
-  lay_all <- ggplot_build(p_all)$layout$layout[, c("r", "c"), drop = FALSE]
+  lay_all <- ggplot_build(p_all)@layout$layout[, c("r", "c"), drop = FALSE]
   expect_identical(lay_all, lay0)
 
-  # 3) Target different labels to different panels (must supply BOTH facet vars)
+  # Target different labels to different panels (must supply BOTH facet vars)
   p_target <- p0 + plot_label(
     label = c("RowB-Col2", "RowA-Col1"),
     x = c(2, 3),
     y = c(2, 3),
-    r = c("B", "A"),
-    c = c("2", "1")
+    panel = list(r = c("B", "A"),
+                 c = c("2", "1"))
   )
 
-  # Ensure the label layer has the facet vars (so ggplot doesn't silently expand)
-  built <- ggplot_build(p_target)
+  lab_data <- ggplot_build(p_target)@data[[2]]  # assumes: layer1 = points, layer2 = labels
 
-  # label layer is 2nd layer: first geom_point, second geom_text/geom_label
-  # (If your tests add other layers, adjust this index.)
-  lab_data <- built$data[[2]]
-
-  # Expect exactly 2 rows (no expansion because we provided r and c)
   expect_equal(nrow(lab_data), 2L)
+  expect_identical(as.character(lab_data$PANEL), c("1", "4"))
 
-  # Expect each row placed in requested panel
-  # (Facet vars should be present and coerced to the plot prototypes)
-  expect_true(all(c("r", "c") %in% names(lab_data)))
-  expect_identical(as.character(lab_data$r), c("B", "A"))
-  expect_identical(as.character(lab_data$c), c("2", "1"))
-
-  # 4) Helpful error if user supplies only one facet var for a facetted plot
+  # Helpful error if user supplies only one facet var for a facetted plot
   expect_error(
-    p0 + plot_label("oops", 2, 2, r = "A"),
-    regexp = "facetted by:.*r.*c|Missing:.*c",
-    fixed = FALSE
+    p0 + plot_label("oops", 2, 2, panel = list(r = "A")),
+    regexp = "Missing:\\s*c"
   )
 })
 
@@ -314,11 +299,11 @@ test_that("Facet order preserved", {
     facet_wrap(~grp)
 
   p1 <- p0 +
-    plot_label("a point", 1.25, 1, grp = "1") +
+    plot_label("a point", 1.25, 1, panel = list(grp = "1")) +
     scale_x_continuous_e61(c(1, 2))
 
-  lay0 <- ggplot_build(p0)$layout$layout[["grp"]]
-  lay1 <- ggplot_build(p1)$layout$layout[["grp"]]
+  lay0 <- ggplot_build(p0)@layout$layout[["grp"]]
+  lay1 <- ggplot_build(p1)@layout$layout[["grp"]]
 
   expect_identical(lay1, lay0)
 })
