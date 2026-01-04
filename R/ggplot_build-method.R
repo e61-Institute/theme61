@@ -37,6 +37,72 @@ safe_eval_tidy <- function(quo, data) {
   )
 }
 
+#' @noRd
+infer_aes_type <- function(plot, aes_name) {
+  # Returns "continuous", "discrete", or NA (unknown/unsafe)
+
+  # collect mapping quosures for this aesthetic from plot + layers
+  quos <- list()
+  if (!is.null(plot@mapping[[aes_name]])) {
+    quos <- c(quos, list(plot@mapping[[aes_name]]))
+  }
+
+  for (ly in plot@layers) {
+    if (!is.null(ly$mapping[[aes_name]])) {
+      quos <- c(quos, list(ly$mapping[[aes_name]]))
+    }
+  }
+
+  if (length(quos) == 0) return(NA_character_)
+
+  # helper: does a quosure reference after_stat/after_scale etc?
+  is_unsafe_mapping <- function(q) {
+    lab <- rlang::quo_get_expr(q)
+    # don't try to infer types for computed aesthetics
+    txt <- paste(deparse(lab), collapse = "")
+    grepl("after_stat\\(|after_scale\\(|stat\\(", txt, fixed = FALSE)
+  }
+
+  types <- character(0)
+
+  for (i in seq_along(quos)) {
+    q <- quos[[i]]
+    if (is_unsafe_mapping(q)) next
+
+    # Determine data to evaluate against (layer data overrides plot data)
+    # If layer@data is NULL, ggplot2 will use plot@data; that's fine.
+    data_candidates <- list(plot@data)
+    for (ly in plot$layers) {
+      data_candidates <- c(data_candidates, list(ly$data))
+    }
+    data_candidates <- Filter(Negate(is.null), data_candidates)
+    if (length(data_candidates) == 0) next
+
+    # try evaluating in each candidate dataset until one works
+    val <- NULL
+    ok <- FALSE
+    for (d in data_candidates) {
+      val <- tryCatch(rlang::eval_tidy(q, data = d), error = function(e) NULL)
+      if (!is.null(val)) { ok <- TRUE; break }
+    }
+    if (!ok) next
+
+    # infer type
+    if (is.numeric(val) || inherits(val, c("Date", "POSIXct", "POSIXt", "difftime"))) {
+      types <- c(types, "continuous")
+    } else {
+      # factor/character/logical/etc
+      types <- c(types, "discrete")
+    }
+  }
+
+  if (length(types) == 0) return(NA_character_)
+
+  # conservative rule: if any continuous, treat as continuous
+  if (any(types == "continuous")) "continuous" else "discrete"
+}
+
+
 # Function to add default secondary y or x scales
 maybe_add_default_scales <- function(plot) {
 
@@ -77,6 +143,26 @@ maybe_add_default_scales <- function(plot) {
 
         plot <- plot + scale_x_continuous_e61()
       }
+    }
+  }
+
+  # ---- Colour scale ----
+  if (is.null(plot@scales$get_scales("colour")) && !is.null(find_aes(plot, "colour"))) {
+    typ <- infer_aes_type(plot, "colour")
+    if (identical(typ, "continuous")) {
+      plot <- plot + scale_colour_e61(discrete = F)
+    } else if (identical(typ, "discrete")) {
+      plot <- plot + scale_colour_e61()
+    }
+  }
+
+  # ---- Fill scale ----
+  if (is.null(plot@scales$get_scales("fill")) && !is.null(find_aes(plot, "fill"))) {
+    typ <- infer_aes_type(plot, "fill")
+    if (identical(typ, "continuous")) {
+      plot <- plot + scale_fill_e61(discrete = F)
+    } else if (identical(typ, "discrete")) {
+      plot <- plot + scale_fill_e61()
     }
   }
 
