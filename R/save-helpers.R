@@ -134,3 +134,81 @@ check_spelling <- function(vector) {
   if (length_chk > 0) return(retval) else return(invisible(NULL))
 
 }
+
+#' Converts SVG to a bitmap file
+#'
+#' Converts an SVG file to a bitmap file, currently supports JPEG and PNG.
+#'
+#' @param file_in File path to the SVG image to convert.
+#' @param file_out File path to the PNG or JPEG. image to save. Default saves a
+#'   file with the same name and location (except for the file extension).
+#' @param delete Logical. Delete the original SVG file? (defaults to FALSE).
+#' @param res Numeric. Increase the dimensions of the saved PNG or JPEG. E.g.
+#'   `res = 2` doubles the dimensions of the saved graph.
+#' @return Invisibly returns the file path to the PNG image
+#' @keywords internal
+#' @export
+svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
+
+  res <- res * 4 # res = 1 produces exceedingly small images now apparently
+
+  if (!grepl(".*\\.svg$", file_in))
+    stop("file_in must be an svg file.")
+
+  # If file_out is null, then save to a PNG by default
+  if (is.null(file_out)) {
+    file_out <- gsub("(.*)\\.svg$", "\\1.png", file_in)
+  } else if (!grepl(".*\\.png$", file_out) & !grepl(".*\\.jpg$", file_out)) {
+    stop("file_out must be a png or jpg file.")
+  }
+
+  if(grepl(".*\\.png$", file_out)) fmt <- "png" else fmt <- "jpg"
+
+  if (res != 1) {
+    # This approach to rescaling starts by saving a rescaled SVG before
+    # converting it to PNG. Hence the need for temp files.
+    file_temp_svg <- "intermed.svg"
+    file_temp_out <- paste0("intermed.", fmt)
+
+    # For some reason this changed at some point and the scaling is fine now.
+    # Keeping this here in case it reverts back in the future.
+    # res <- res / 1.25 # For some reason any res > 1 scales 1:1.25...
+
+    rsvg::rsvg_png(svg = file_in, file = file_temp_out)
+
+    g_info <- magick::image_info(magick::image_read(file_temp_out))
+
+    rsvg::rsvg_svg(svg = file_in,
+                   file = file_temp_svg,
+                   width = g_info$width * res,
+                   height = g_info$height * res
+    )
+
+    if(fmt == "png"){
+      rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
+
+    } else if(fmt == "jpg"){
+      image_temp <- magick::image_read_svg(file_temp_svg)
+
+      magick::image_write(image = image_temp, path = file_out, format = "jpg")
+    }
+
+    unlink(file_temp_svg)
+    unlink(file_temp_out)
+
+  } else {
+
+    if(fmt == "png"){
+      rsvg::rsvg_png(svg = file_in, file = file_out)
+
+    } else if(fmt == "jpg"){
+      image_temp <- magick::image_read_svg(file_in)
+
+      magick::image_write(image = image_temp, path = file_out, format = "jpg")
+    }
+  }
+
+  if (delete) unlink(file_in)
+
+  invisible(file_out)
+}
