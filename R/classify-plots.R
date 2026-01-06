@@ -41,11 +41,12 @@ as_e61_plot.default <- function(x, ...) {
 #' Helper function to check for spatial attributes
 #' @noRd
 is_spatial <- function(p) {
+
   is_spatial_chart <- FALSE
 
   for(i in seq_along(p@layers)){
 
-    layer_class <- class(plot@layers[[i]]$geom)
+    layer_class <- class(p@layers[[i]]$geom)
 
     if(any(data.table::like(layer_class, "*Sf"))) {
       is_spatial_chart <- TRUE
@@ -64,11 +65,25 @@ classify_e61_map <- function(x, ..., force = NULL) {
   UseMethod("classify_e61_map")
 }
 
+#' Method for e61_plot
+#' @export
+classify_e61_map.e61_plot <- function(x, ..., force = NULL) {
+
+  if (identical(force, TRUE) || (is.null(force) && is_spatial(x))) {
+    class(x) <- c("e61_map", class(x))
+  }
+
+  x
+}
+
 #' Method for ggplot
 #' @export
 classify_e61_map.ggplot <- function(x, ..., force = NULL) {
 
   if (identical(force, TRUE) || (is.null(force) && is_spatial(x))) {
+
+    # Adds e61_plot if not already present, then prepends e61_map
+    x <- as_e61_plot(x)
     class(x) <- c("e61_map", class(x))
   }
 
@@ -78,6 +93,7 @@ classify_e61_map.ggplot <- function(x, ..., force = NULL) {
 #' Method for existing e61_map class objects
 #' @export
 classify_e61_map.e61_map <- function(x, ...) {
+
   x
 }
 
