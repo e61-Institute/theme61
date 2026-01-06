@@ -19,17 +19,10 @@ save_single <- function(
 
   ## Check if we have a spatial chart, if we do save without editing ----
 
-  is_spatial_chart <- FALSE
-
-  for(i in seq_along(plot@layers)){
-
-    layer_class <- class(plot@layers[[i]]$geom)
-
-    if(any(data.table::like(layer_class, "*Sf"))) {
-      is_spatial_chart <- TRUE
-
-      break
-    }
+  if (inherits(plot, "e61_map")) {
+    is_spatial_chart <- TRUE
+  } else {
+    is_spatial_chart <- FALSE
   }
 
   # if it's a spatial plot, turn of autoscaling
