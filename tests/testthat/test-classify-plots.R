@@ -1,7 +1,4 @@
-# tests/testthat/test-as_e61_plot-classify_e61_map.R
-
 test_that("as_e61_plot() coerces ggplot -> e61_plot (and is idempotent)", {
-  # as_e61_plot <- getFromNamespace("as_e61_plot", "theme61")
 
   p0 <- ggplot2::ggplot() + geom_point(aes(1, 1))
 
@@ -18,7 +15,6 @@ test_that("as_e61_plot() coerces ggplot -> e61_plot (and is idempotent)", {
 })
 
 test_that("as_e61_plot() errors on unsupported inputs", {
-  # as_e61_plot <- getFromNamespace("as_e61_plot", "theme61")
 
   expect_error(as_e61_plot(1), "e61", ignore.case = TRUE)
   expect_error(as_e61_plot("x"), "e61", ignore.case = TRUE)
@@ -26,7 +22,6 @@ test_that("as_e61_plot() errors on unsupported inputs", {
 })
 
 test_that("as_e61_plot() works elementwise for lists of ggplots", {
-  # as_e61_plot <- getFromNamespace("as_e61_plot", "theme61")
 
   plots <- list(
     ggplot() + geom_point(aes(1, 1)),
@@ -39,8 +34,6 @@ test_that("as_e61_plot() works elementwise for lists of ggplots", {
 })
 
 test_that("classify_e61_map() adds e61_map iff plot is spatial (GeomSf heuristic)", {
-  # as_e61_plot <- getFromNamespace("as_e61_plot", "theme61")
-  # classify_e61_map <- getFromNamespace("classify_e61_map", "theme61")
 
   # Non-spatial plot should not gain e61_map
   p_plain <- ggplot() + geom_point(aes(1, 1))
@@ -72,8 +65,6 @@ test_that("classify_e61_map() adds e61_map iff plot is spatial (GeomSf heuristic
 })
 
 test_that("classify_e61_map() preserves/ensures e61_plot when tagging e61_map", {
-  # as_e61_plot <- getFromNamespace("as_e61_plot", "theme61")
-  # classify_e61_map <- getFromNamespace("classify_e61_map", "theme61")
 
   # Start as an e61_plot (i.e. already coerced)
   p <- as_e61_plot(ggplot() + geom_point(aes(1, 1)))
@@ -90,8 +81,6 @@ test_that("classify_e61_map() preserves/ensures e61_plot when tagging e61_map", 
 })
 
 test_that("classify_e61_map() works for lists (including mixed ggplot/e61_plot/e61_map)", {
-  # as_e61_plot <- getFromNamespace("as_e61_plot", "theme61")
-  # classify_e61_map <- getFromNamespace("classify_e61_map", "theme61")
 
   # plain ggplot
   p1 <- ggplot() + geom_point(aes(1, 1))
@@ -120,7 +109,6 @@ test_that("classify_e61_map() works for lists (including mixed ggplot/e61_plot/e
 })
 
 test_that("classify_e61_map() errors on unsupported inputs", {
-  # classify_e61_map <- getFromNamespace("classify_e61_map", "theme61")
 
   expect_error(classify_e61_map(1), "e61", ignore.case = TRUE)
   expect_error(classify_e61_map("x"), "e61", ignore.case = TRUE)
