@@ -36,12 +36,6 @@ as_e61_plot.default <- function(x, ...) {
   )
 }
 
-#' Generic to coerce plots to e61_map class
-#' @export
-classify_e61_map <- function(x, ..., force = NULL) {
-  UseMethod("classify_e61_map")
-}
-
 # classify_e61_map ----
 
 #' Helper function to check for spatial attributes
@@ -64,11 +58,17 @@ is_spatial <- function(p) {
 
 }
 
+#' Generic to coerce plots to e61_map class
+#' @export
+classify_e61_map <- function(x, ..., force = NULL) {
+  UseMethod("classify_e61_map")
+}
+
 #' Method for ggplot
 #' @export
 classify_e61_map.ggplot <- function(x, ..., force = NULL) {
 
-  if (identical(force, TRUE) || (is.null(force) && looks_spatial(x))) {
+  if (identical(force, TRUE) || (is.null(force) && is_spatial(x))) {
     class(x) <- c("e61_map", class(x))
   }
 
