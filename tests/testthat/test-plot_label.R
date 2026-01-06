@@ -59,7 +59,7 @@ test_that("Multi-plot labels work", {
     plot_label(c("1", "2", "3"),
                rep(0.5, 3),
                c(1.3, 2.3, 3.3),
-               facet = "A"
+               panel = list(facet = "A")
                )
 
   withr::with_tempdir({
@@ -197,7 +197,7 @@ test_that("Label rotation works", {
 
 })
 
-test_that("Labels work on facets", {
+test_that("Labels work on facet wraps", {
 
   data <- data.frame(
     x = rep(c(1, 2), 2),
@@ -216,7 +216,7 @@ test_that("Labels work on facets", {
     label = c("Lab 1", "Lab 2"),
     x = c(1.25, 1.75),
     y = c(1, 2),
-    f_var = "1"
+    panel = list(f_var = "1")
   )
 
   # Place 1 labels on 1 facet and the other label on the other
@@ -224,7 +224,7 @@ test_that("Labels work on facets", {
     label = c("Lab 1", "Lab 2"),
     x = c(1.25, 1.75),
     y = c(1, 2),
-    f_var = c("1", "2")
+    panel = list(f_var = c("1", "2"))
   )
 
   # Defaults to putting the labels on all facets if no facet specified
@@ -243,20 +243,121 @@ test_that("Labels work on facets", {
 
 })
 
+test_that("Labels works with facet_grid", {
+  df <- data.frame(
+    x = 1:8,
+    y = 1:8,
+    r = ordered(rep(c("B", "A"), each = 4), levels = c("B", "A")),
+    c = factor(rep(c("2", "1"), times = 4), levels = c("2", "1"))
+  )
+
+  p0 <- ggplot(df, aes(x, y)) +
+    geom_point() +
+    facet_grid(r ~ c)
+
+  # Baseline facet layout order
+  lay0 <- ggplot_build(p0)@layout$layout[, c("r", "c"), drop = FALSE]
+
+  # Add labels without specifying facet vars (labels should appear on all panels; layout unchanged)
+  p_all <- p0 + plot_label(
+    label = c("L1", "L2"),
+    x = c(2, 3),
+    y = c(2, 3)
+  )
+
+  lay_all <- ggplot_build(p_all)@layout$layout[, c("r", "c"), drop = FALSE]
+  expect_identical(lay_all, lay0)
+
+  # Target different labels to different panels (must supply BOTH facet vars)
+  p_target <- p0 + plot_label(
+    label = c("RowB-Col2", "RowA-Col1"),
+    x = c(2, 3),
+    y = c(2, 3),
+    panel = list(r = c("B", "A"),
+                 c = c("2", "1"))
+  )
+
+  lab_data <- ggplot_build(p_target)@data[[2]]  # assumes: layer1 = points, layer2 = labels
+
+  expect_equal(nrow(lab_data), 2L)
+  expect_identical(as.character(lab_data$PANEL), c("1", "4"))
+
+  # Helpful error if user supplies only one facet var for a facetted plot
+  expect_error(
+    p0 + plot_label("oops", 2, 2, panel = list(r = "A")),
+    regexp = "Missing:\\s*c"
+  )
+})
+
+test_that("plot_label works when facet vars use reserved names (colour, size)", {
+
+  df <- data.frame(
+    x = 1:8,
+    y = 1:8,
+    # facet vars intentionally collide with plot_label's internal columns
+    colour = ordered(rep(c("B", "A"), each = 4), levels = c("B", "A")),
+    size   = factor(rep(c("2", "1"), times = 4), levels = c("2", "1"))
+  )
+
+  p0 <- ggplot(df, aes(x, y)) +
+    geom_point() +
+    facet_grid(colour ~ size)
+
+  # 1) Untargeted labels should not error (and should not mis-detect targeting)
+  expect_no_error(
+    p0 + plot_label(
+      label = c("L1", "L2"),
+      x = c(2, 3),
+      y = c(2, 3)
+    )
+  )
+
+  # 2) Targeted labels: provide BOTH facet vars via panel=list(...)
+  p_target <- p0 + plot_label(
+    label = c("RowB-Col2", "RowA-Col1"),
+    x = c(2, 3),
+    y = c(2, 3),
+    panel = list(
+      colour = c("B", "A"),
+      size   = c("2", "1")
+    )
+  )
+
+  built <- ggplot_build(p_target)
+
+  # label layer should be second layer: geom_point then geom_text/geom_label
+  lab_data <- built$data[[2]]
+
+  # Should not have been expanded (because panel specified)
+  expect_equal(nrow(lab_data), 2L)
+
+  # Facet vars should be present and match what we supplied
+  expect_true(all(c("colour", "size") %in% names(lab_data)))
+  expect_identical(as.character(lab_data$colour), c("B", "A"))
+  expect_identical(as.character(lab_data$size), c("2", "1"))
+
+  # 3) Partial panel specification should error with "Missing: size"
+  expect_error(
+    p0 + plot_label("oops", 2, 2, panel = list(colour = "A")),
+    regexp = "Missing:\\s*size"
+  )
+})
+
+
 test_that("Facet order preserved", {
   df <- data.frame(grp = 1:3, val = rep(1, 3))
   df$grp <- ordered(df$grp, levels = 3:1)
 
-  p0 <- ggplot(df, ggplot2::aes(val, val)) +
+  p0 <- ggplot(df, aes(val, val)) +
     geom_point() +
     facet_wrap(~grp)
 
   p1 <- p0 +
-    plot_label("a point", 1.25, 1, facet_name = "grp", facet_value = "1") +
+    plot_label("a point", 1.25, 1, panel = list(grp = "1")) +
     scale_x_continuous_e61(c(1, 2))
 
-  lay0 <- ggplot_build(p0)$layout$layout[["grp"]]
-  lay1 <- ggplot_build(p1)$layout$layout[["grp"]]
+  lay0 <- ggplot_build(p0)@layout$layout[["grp"]]
+  lay1 <- ggplot_build(p1)@layout$layout[["grp"]]
 
   expect_identical(lay1, lay0)
 })
