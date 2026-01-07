@@ -2,6 +2,7 @@
 
 S3method(ggplot_add,e61_plot_label)
 S3method(ggplot_add,theme_e61)
+S3method(ggplot_build,e61_ggplot)
 export(add_baseline)
 export(add_e61_logo)
 export(add_map_e61)
