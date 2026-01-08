@@ -221,9 +221,9 @@ maybe_add_default_scales <- function(plot) {
         abort_too_many_discrete_levels("colour", lev_n, max_n)
       }
 
-      plot <- plot + scale_colour_discrete_e61()
+      plot <- plot + scale_colour_e61()
     } else if (identical(typ, "continuous")) {
-      plot <- plot + scale_colour_continuous_e61()
+      plot <- plot + scale_colour_e61(discrete = FALSE)
     }
   }
 
@@ -241,9 +241,9 @@ maybe_add_default_scales <- function(plot) {
         abort_too_many_discrete_levels("fill", lev_n, max_n)
       }
 
-      plot <- plot + scale_fill_discrete_e61()
+      plot <- plot + scale_fill_e61()
     } else if (identical(typ, "continuous")) {
-      plot <- plot + scale_fill_continuous_e61()
+      plot <- plot + scale_fill_e61(discrete = FALSE)
     }
   }
 
