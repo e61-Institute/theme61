@@ -2,6 +2,7 @@
 ggplot_build.e61_ggplot <- function(plot, ...) {
 
   plot2 <- maybe_add_default_scales(plot)
+  plot2 <- maybe_adjust_facet_spacing(plot2)
 
   # prevent recursion: drop our class before calling ggplot2 build
   class(plot2) <- setdiff(class(plot2), "e61_ggplot")
@@ -271,6 +272,38 @@ maybe_add_default_scales <- function(plot) {
     }
   }
 
+
+  plot
+}
+
+# Add facet panel spacing that depends on theme61 facet settings.
+#
+# theme61 masks facet_wrap/facet_grid to default axes = "all". Drawing axes on
+# every panel needs more breathing room, but when axes are only on margins (the
+# ggplot2 default-style), large spacing just wastes space.
+maybe_adjust_facet_spacing <- function(plot) {
+
+  axes <- attr(plot@facet, "t61_axes", exact = TRUE)
+
+  # Only adjust if the facet was created via theme61 wrappers.
+  if (is.null(axes)) return(plot)
+
+  # Respect any user-specified panel spacing.
+  th <- plot@theme
+  if (!is.null(th$panel.spacing) ||
+      !is.null(th$panel.spacing.x) ||
+      !is.null(th$panel.spacing.y)) {
+    return(plot)
+  }
+
+  if (isTRUE(axes == "all")) {
+    plot <- plot + theme(panel.spacing.x = unit(2, "lines"),
+                         panel.spacing.y = unit(2, "lines"))
+  } else {
+    # ggplot2 default is 0.5 lines
+    plot <- plot + theme(panel.spacing.x = unit(0.5, "lines"),
+                         panel.spacing.y = unit(0.5, "lines"))
+  }
 
   plot
 }
