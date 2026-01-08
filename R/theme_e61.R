@@ -140,12 +140,6 @@ theme_e61 <- function(
     ret <- ret + theme(rect = element_rect(fill = e61_greylight6))
   }
 
-  # Adjust spacing between facets if facets used
-  if (!inherits(ret$facet, "FacetNull")) {
-    ret <- ret %+replace% theme(panel.spacing.x = unit(2, "lines"),
-                                panel.spacing.y = unit(2, "lines"))
-  }
-
   # Add attribute to identify it as a theme61 object
   class(ret) <- c("theme_e61", class(ret))
   attr(ret, "t61_obj") <- TRUE

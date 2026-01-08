@@ -50,7 +50,10 @@ labs <- function(...) {
 #' @export
 facet_wrap <- function(..., axes = "all") {
 
-  ggplot2::facet_wrap(..., axes = axes)
+  f <- ggplot2::facet_wrap(..., axes = axes)
+  attr(f, "t61_axes") <- axes
+  return(f)
+
 }
 
 #' Masks ggplot2::facet_grid to set axes to "all" better distinguish facet
@@ -60,5 +63,7 @@ facet_wrap <- function(..., axes = "all") {
 #' @export
 facet_grid <- function(..., axes = "all") {
 
-  ggplot2::facet_grid(..., axes = axes)
+  f <- ggplot2::facet_grid(..., axes = axes)
+  attr(f, "t61_axes") <- axes
+  return(f)
 }

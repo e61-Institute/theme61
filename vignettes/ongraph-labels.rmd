@@ -81,7 +81,7 @@ knitr::include_graphics("../man/figures/label-plot-label.svg")
 
 ## Facets
 
-When you have a facetted graph, you must specify the `facet_name` and `facet_value` arguments in `plot_label()`. 
+When you have a facetted graph, plot labels will appear on all panels by default unless you use the `panel` argument to specify which panels you want the labels to appear on. 
 
 ```{r}
 data <- data.frame(
@@ -100,15 +100,14 @@ p1 <-
     label = c("Label 1", "Label 2"),
     x = c(1, 1.85),
     y = c(1.2, 2.2),
-    facet_name = "f_var",
-    facet_value = "1"
+    panel = list(f_var = "1")
   ) 
 
 save_e61("../man/figures/label-facet-1.svg", p1)
 knitr::include_graphics("../man/figures/label-facet-1.svg")
 ```
 
-If you want to place the labels on different facets, simply supply a vector to `facet_value` with which facet you want each label to appear in.
+If you want to place the labels on different facets, simply supply a vector of panels in `panel` with which facet you want each label to appear in.
 
 ```{r}
 p2 <- ggplot(data, aes(x, y, colour = group)) +
@@ -119,8 +118,7 @@ p2 <- ggplot(data, aes(x, y, colour = group)) +
     label = c("Label 1", "Label 2"),
     x = c(1, 1.85),
     y = c(1.2, 2.2),
-    facet_name = "f_var",
-    facet_value = c("1", "2")
+    panel = list(f_var = c("1", "2"))
   )
 
 save_e61("../man/figures/label-facet-2.svg", p2)

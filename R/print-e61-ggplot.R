@@ -4,6 +4,7 @@
 #' - Also renders a preview in the Viewer (opt-out via option)
 #' - Prefers Viewer focus by default (best-effort)
 #'
+#' @keywords internal
 #' @export
 print.e61_ggplot <- function(x, ...) {
 
