@@ -17,8 +17,6 @@ find_aes <- function(plot, aes_name) {
 
   if (!is.null(plot@data)) {
     plot_data <- plot@data
-  } else if (!is.null(plot@data)) {
-    plot_data <- plot@data
   } else {
     stop("Plot has no data.")
   }
