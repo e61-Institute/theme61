@@ -1,6 +1,6 @@
 # theme61 0.7.1
 
-XX Jan 2026
+09 Jan 2026
 
 #### New features
 
@@ -17,6 +17,7 @@ XX Jan 2026
 * Labels on facet graphs now respect ordered factor ordering rather than resetting them.
 * A better default of labels showing on all facet panels if no facet is specified, rather than erroring out with an uninformative error message.
 * Fix issue with secondary y-axis not appearing by default on certain graphs.
+* Fix issue with facet panel spacing when axes do not appear on all panels.
 
 # theme61 0.7.0
 
