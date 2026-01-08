@@ -13,3 +13,4 @@
 \item Prefers Viewer focus by default (best-effort)
 }
 }
+\keyword{internal}
