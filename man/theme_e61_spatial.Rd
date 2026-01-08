@@ -8,7 +8,8 @@ theme_e61_spatial(
   legend = c("none", "bottom", "top", "left", "right", "inside"),
   legend_position = NULL,
   legend_title = FALSE,
-  base_family = "pt-sans"
+  base_family = "pt-sans",
+  aspect_ratio = NULL
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ of legends that have the "inside" position. Takes values between 0 and 1.}
 
 \item{base_family}{Character. Chart font family. Default for notes is PT
 Sans.}
+
+\item{aspect_ratio}{Numeric. Sets the aspect ratio of the graph panel.}
 }
 \value{
 \code{theme_e61_spatial} returns a ggplot2 object.

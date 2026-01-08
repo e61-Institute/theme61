@@ -53,34 +53,38 @@ labs_e61 <- function(title = NULL,
                      title_wrap = NULL,
                      subtitle_wrap = NULL,
                      footnote_wrap = NULL,
+                     ytitle_wrap = NULL,
                      x = NULL,
                      y = NULL,
                      y_top = TRUE,
                      ...
-                     ) {
+) {
 
-  # check the title and subtitle are strings
-  sapply(list(title, subtitle), function(x){
-    if (!is.null(x) && !is.character(x)){
-      stop("title and subtitle must be a string.")
-    }
-  })
+  # check various titles are strings
+  str_chk <- list(title, subtitle, footnotes, sources, x, y)
+
+  for (i in str_chk) {
+    if (!is.null(i) && !is.character(i)) stop(i, " must be a string.")
+  }
 
   # Track whether a label has been wrapped
   wrap_title_trk <- FALSE
   wrap_subtitle_trk <- FALSE
+  wrap_ytitle_trk <- FALSE
   wrap_caption_trk <- FALSE
 
   # Turn off text wrapping if FALSE is the argument
   if (isFALSE(title_wrap)) title_wrap <- 9999
   if (isFALSE(subtitle_wrap)) subtitle_wrap <- 9999
   if (isFALSE(footnote_wrap)) footnote_wrap <- 9999
+  if (isFALSE(ytitle_wrap)) ytitle_wrap <- 9999
 
+  # Title ----
   # For each label check whether to wrap the title
-  if(!is.null(title_wrap)){
+  if (!is.null(title_wrap)) {
 
     # Check the title and title_wrap have been correctly supplied
-    if (!is.numeric(title_wrap) || title_wrap < 0){
+    if (!is.numeric(title_wrap) || title_wrap < 0) {
       stop("title_wrap must be a positive integer.")
     }
 
@@ -93,7 +97,8 @@ labs_e61 <- function(title = NULL,
     title_text <- paste(strwrap(title, width = 120), collapse = "\n")
   }
 
-  if(!is.null(subtitle_wrap)){
+  # Subtitle ----
+  if (!is.null(subtitle_wrap)) {
 
     # Check the subtitle and subtitle_wrap have been correctly supplied
     if (!is.numeric(subtitle_wrap) || subtitle_wrap < 0){
@@ -113,10 +118,30 @@ labs_e61 <- function(title = NULL,
     subtitle_text <- paste(strwrap(subtitle, width = 120), collapse = "\n")
   }
 
-  if(!is.null(footnote_wrap)){
+  # Y-axis title ----
+  if (y_top && !is.null(ytitle_wrap)) {
 
-    # Check the subtitle and subtitle_wrap have been correctly supplied
-    if (!is.numeric(footnote_wrap) || footnote_wrap < 0){
+    # Check the ytitle and ytitle_wrap have been correctly supplied
+    if (!is.numeric(ytitle_wrap) || ytitle_wrap < 0) {
+      stop("ytitle_wrap must be a positive integer.")
+    }
+
+    if (!is.null(y) && !is.character(y)) {
+      stop("y must be a string.")
+    }
+
+    # Wrap the ytitle text
+    y <- paste(strwrap(y, width = ytitle_wrap), collapse = "<br>")
+
+    wrap_ytitle_trk <- TRUE
+
+  }
+
+  # Footnotes ----
+  if (!is.null(footnote_wrap)) {
+
+    # Check the footnote and footnote_wrap have been correctly supplied
+    if (!is.numeric(footnote_wrap) || footnote_wrap < 0) {
       stop("footnote_wrap must be a positive integer.")
     }
 
@@ -130,6 +155,7 @@ labs_e61 <- function(title = NULL,
 
   if(wrap_title_trk) attr(title_text, "title_wrap") <- TRUE
   if(wrap_subtitle_trk) attr(subtitle_text, "subtitle_wrap") <- TRUE
+  if(wrap_ytitle_trk) attr(y, "ytitle_wrap") <- TRUE
   if(wrap_caption_trk) attr(caption_text, "caption_wrap") <- TRUE
 
   # Add the y-axis text once the subtitle has been processed
@@ -181,7 +207,7 @@ caption_wrap <- function(
     sources = NULL,
     max_char = 120,
     caption_wrap = TRUE
-  ){
+){
 
   # Footnotes
   if (!is.null(footnotes)) {

@@ -12,6 +12,7 @@ labs_e61(
   title_wrap = NULL,
   subtitle_wrap = NULL,
   footnote_wrap = NULL,
+  ytitle_wrap = NULL,
   x = NULL,
   y = NULL,
   y_top = TRUE,
