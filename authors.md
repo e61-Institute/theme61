@@ -11,7 +11,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/e61-institute/theme61/blob/v0.7.1/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/e61-institute/theme61/blob/main/DESCRIPTION)
 
 Wong A, Dwyer E, Buckley J (2026). *theme61: Create Graphs in the e61
 Institute Style*. R package version 0.7.1,

@@ -15,7 +15,7 @@
 - Added `ytitle_wrap` argument to `labs_e61` so you can custom wrap the
   y-axis titles just like other graph titles.
 - New, simpler approach to specifying which facets for labels to appear
-  on using a new `panel` argument in `labs_e61`.
+  on using a new `panel` argument in `plot_label`.
 
 ##### Bug fixes
 
