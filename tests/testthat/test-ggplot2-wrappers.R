@@ -159,3 +159,42 @@ test_that("Error when discrete colour mapping exceeds supported palette size", {
   )
 
 })
+
+test_that("A column named 'source' mapped to colour does not resolve to base::source()", {
+
+  df <- data.frame(
+    x = 1:10,
+    y = 1:10,
+    source = factor(rep(c("Source A", "Source B"), each = 5))
+  )
+
+  p <- ggplot(df, ggplot2::aes(x, y, colour = source)) +
+    geom_line()
+
+  # This is the regression: infer logic accidentally evaluates `source` as base::source (a closure)
+  # and then crashes when it tries to treat it like a vector.
+  expect_no_error(b <- ggplot_build(p))
+
+  # Sanity: should map two discrete groups -> two colours in built data
+  expect_gte(length(unique(b$data[[1]]$colour)), 2L)
+})
+
+
+test_that("Inference works when plot-level data is NULL and mapping comes from layer data", {
+
+  df_layer <- data.frame(
+    x = 1:10,
+    y = 1:10,
+    source = factor(rep(c("Source A", "Source B"), each = 5))
+  )
+
+  # Plot has no data; layer supplies data + mapping
+  p <- ggplot() +
+    geom_line(
+      data = df_layer,
+      mapping = aes(x, y, colour = source)
+    )
+
+  expect_no_error(b <- ggplot_build(p))
+  expect_gte(length(unique(b$data[[1]]$colour)), 2L)
+})
