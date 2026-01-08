@@ -52,71 +52,75 @@ safe_eval_tidy <- function(quo, data) {
 infer_aes_type <- function(plot, aes_name) {
   # Returns "continuous", "discrete", or NA (unknown/unsafe)
 
-  # collect mapping quosures for this aesthetic from plot + layers
+  # Collect mapping quosures for this aesthetic from plot + layers
   quos <- list()
   if (!is.null(plot@mapping[[aes_name]])) {
     quos <- c(quos, list(plot@mapping[[aes_name]]))
   }
-
   for (ly in plot@layers) {
     if (!is.null(ly$mapping[[aes_name]])) {
       quos <- c(quos, list(ly$mapping[[aes_name]]))
     }
   }
-
   if (length(quos) == 0) return(NA_character_)
 
-  # helper: does a quosure reference after_stat/after_scale etc?
+  # Skip computed aesthetics
   is_unsafe_mapping <- function(q) {
-    lab <- rlang::quo_get_expr(q)
-    # don't try to infer types for computed aesthetics
-    txt <- paste(deparse(lab), collapse = "")
-    grepl("after_stat\\(|after_scale\\(|stat\\(", txt, fixed = FALSE)
+    expr <- rlang::quo_get_expr(q)
+    txt <- paste(deparse(expr), collapse = "")
+    grepl("after_stat\\(|after_scale\\(|stat\\(", txt)
   }
+
+  # Candidate datasets (layer overrides plot); ignore waiver
+  data_candidates <- list(plot@data)
+  for (ly in plot@layers) data_candidates <- c(data_candidates, list(ly$data))
+  data_candidates <- Filter(function(d) !is.null(d) && !inherits(d, "waiver"), data_candidates)
+  if (length(data_candidates) == 0) return(NA_character_)
 
   types <- character(0)
 
-  for (i in seq_along(quos)) {
-    q <- quos[[i]]
+  for (q in quos) {
     if (is_unsafe_mapping(q)) next
 
-    # Determine data to evaluate against (layer data overrides plot data)
-    # If layer@data is NULL, ggplot2 will use plot@data; that's fine.
-    data_candidates <- list(plot@data)
-    for (ly in plot@layers) {
-      data_candidates <- c(data_candidates, list(ly$data))
-    }
-    data_candidates <- Filter(Negate(is.null), data_candidates)
-    if (length(data_candidates) == 0) next
+    expr <- rlang::quo_get_expr(q)
 
-    # try evaluating in each candidate dataset until one works
-    val <- NULL
-    ok <- FALSE
-    for (d in data_candidates) {
-      val <- tryCatch(rlang::eval_tidy(q, data = d), error = function(e) NULL)
-      if (!is.null(val)) { ok <- TRUE; break }
-    }
-    if (!ok) next
+    # If mapping is a bare symbol, pull directly from data to avoid name collisions
+    if (rlang::is_symbol(expr)) {
+      nm <- rlang::as_string(expr)
+      val <- NULL
+      for (d in data_candidates) {
+        if (!is.null(names(d)) && nm %in% names(d)) {
+          val <- d[[nm]]
+          break
+        }
+      }
+      if (is.null(val) || is.function(val)) next
 
-    # infer type
+    } else {
+      # Otherwise evaluate safely in a data mask
+      val <- NULL
+      for (d in data_candidates) {
+        val <- safe_eval_tidy(q, data = d)
+        if (!is.null(val)) break
+      }
+      if (is.null(val) || is.function(val)) next
+    }
+
     if (is.numeric(val) || inherits(val, c("Date", "POSIXct", "POSIXt", "difftime"))) {
       types <- c(types, "continuous")
     } else {
-      # factor/character/logical/etc
       types <- c(types, "discrete")
     }
   }
 
   if (length(types) == 0) return(NA_character_)
-
-  # conservative rule: if any continuous, treat as continuous
   if (any(types == "continuous")) "continuous" else "discrete"
 }
 
 #' @noRd
 infer_discrete_nlevels <- function(plot, aes_name) {
 
-  # Find the first mapping for this aes (plot mapping first, then layers)
+  # Find mapping quosure
   q <- plot@mapping[[aes_name]]
   if (is.null(q)) {
     for (ly in plot@layers) {
@@ -126,30 +130,50 @@ infer_discrete_nlevels <- function(plot, aes_name) {
   }
   if (is.null(q)) return(NA_integer_)
 
-  # Don’t attempt for computed aesthetics
-  expr_txt <- paste(deparse(rlang::quo_get_expr(q)), collapse = "")
-  if (grepl("after_stat\\(|after_scale\\(|stat\\(", expr_txt)) return(NA_integer_)
+  expr <- rlang::quo_get_expr(q)
 
-  # Candidate datasets: layer data then plot data
+  # Candidate data: layer data then plot data
   data_candidates <- lapply(plot@layers, `[[`, "data")
   data_candidates <- c(data_candidates, list(plot@data))
   data_candidates <- Filter(Negate(is.null), data_candidates)
   if (length(data_candidates) == 0) return(NA_integer_)
 
+  # If mapping is a bare symbol, pull directly from data to avoid name collisions
+  if (rlang::is_symbol(expr)) {
+    nm <- rlang::as_string(expr)
+    for (d in data_candidates) {
+      if (!is.null(names(d)) && nm %in% names(d)) {
+        val <- d[[nm]]
+        # Discrete-ish only
+        if (is.function(val) || is.numeric(val) ||
+            inherits(val, c("Date", "POSIXct", "POSIXt", "difftime"))) {
+          return(NA_integer_)
+        }
+        return(length(unique(as.character(val))))
+      }
+    }
+    return(NA_integer_)
+  }
+
+  # Skip computed aesthetics (too hard to infer pre-build)
+  expr_txt <- paste(deparse(expr), collapse = "")
+  if (grepl("after_stat\\(|after_scale\\(|stat\\(", expr_txt)) return(NA_integer_)
+
+  # Fallback: evaluate expression safely
   val <- NULL
   for (d in data_candidates) {
     val <- tryCatch(rlang::eval_tidy(q, data = d), error = function(e) NULL)
     if (!is.null(val)) break
   }
-  if (is.null(val)) return(NA_integer_)
+  if (is.null(val) || is.function(val)) return(NA_integer_)
 
-  # If it’s not discrete-ish, don’t report levels
   if (is.numeric(val) || inherits(val, c("Date", "POSIXct", "POSIXt", "difftime"))) {
     return(NA_integer_)
   }
 
   length(unique(as.character(val)))
 }
+
 
 #' @noRd
 abort_too_many_discrete_levels <- function(aes_name, n, max_n) {
