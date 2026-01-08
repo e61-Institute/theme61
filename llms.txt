@@ -1,0 +1,376 @@
+# theme61
+
+This package helps you create graphs that follow the e61 Institute
+graphing style. It provides functions that make it easier to make
+aesthetic graphs and easy access to the Institute’s colour palette.
+
+### Installing theme61
+
+If you haven’t already, install the `remotes` package:
+
+`install.packages("remotes")`
+
+Then install from GitHub:
+
+`remotes::install_github("e61-institute/theme61", dependencies = TRUE, upgrade = "always")`
+
+Then load into R:
+
+[`library(theme61)`](https://github.com/e61-institute/theme61)
+
+### Using theme61
+
+The [package website](https://e61-institute.github.io/theme61/) contains
+a lot of information on how to use theme61.
+
+Start by reading the [Get
+started](https://e61-institute.github.io/theme61/articles/theme61.md)
+article.
+
+There is also a wealth of information contained in the individual
+[function
+documentation](https://e61-institute.github.io/theme61/reference/index.md)
+that answers common usage questions.
+
+# Package index
+
+## Graph components
+
+- [`add_e61_logo()`](https://e61-institute.github.io/theme61/reference/add_e61_logo.md)
+  : Add e61 logo to graph
+- [`add_baseline()`](https://e61-institute.github.io/theme61/reference/add_baseline.md)
+  : Adds a thin black line
+- [`labs_e61()`](https://e61-institute.github.io/theme61/reference/labs_e61.md)
+  : Add graph titles and footers in the e61 style
+- [`plot_label()`](https://e61-institute.github.io/theme61/reference/plot_label.md)
+  [`plab()`](https://e61-institute.github.io/theme61/reference/plot_label.md)
+  : Add on-graph labels to graphs
+- [`geom_pointbar()`](https://e61-institute.github.io/theme61/reference/geom_pointbar.md)
+  : Custom geom combining points and error bars
+
+## Formatting
+
+- [`format_flip()`](https://e61-institute.github.io/theme61/reference/format_flip.md)
+  : Applies changes to the theme for horizontal bar graphs
+- [`save_e61()`](https://e61-institute.github.io/theme61/reference/save_e61.md)
+  : Save graphs with theme61 styles and defaults
+- [`square_legend_symbols()`](https://e61-institute.github.io/theme61/reference/square_legend_symbols.md)
+  : Converts all legend colours to squares
+- [`theme_e61()`](https://e61-institute.github.io/theme61/reference/theme_e61.md)
+  [`set_base_size()`](https://e61-institute.github.io/theme61/reference/theme_e61.md)
+  : e61 themed graph options
+- [`theme_e61_spatial()`](https://e61-institute.github.io/theme61/reference/theme_e61_spatial.md)
+  : e61 themed spatial maps options
+
+## Scales
+
+- [`scale_y_continuous_e61()`](https://e61-institute.github.io/theme61/reference/e61_axes.md)
+  [`scale_x_continuous_e61()`](https://e61-institute.github.io/theme61/reference/e61_axes.md)
+  : Format axes in the e61 style
+- [`scale_colour_e61()`](https://e61-institute.github.io/theme61/reference/scale_e61.md)
+  [`scale_fill_e61()`](https://e61-institute.github.io/theme61/reference/scale_e61.md)
+  : Colour and fill scales using colours from the e61 palette
+- [`scale_colour_e61_aus()`](https://e61-institute.github.io/theme61/reference/scale_e61_aus.md)
+  [`scale_fill_e61_aus()`](https://e61-institute.github.io/theme61/reference/scale_e61_aus.md)
+  : A consistent set of colours for Australian states and territories
+  for graphing
+- [`sec_rescale_inv()`](https://e61-institute.github.io/theme61/reference/dual_y_axis.md)
+  [`sec_rescale()`](https://e61-institute.github.io/theme61/reference/dual_y_axis.md)
+  : Dual y-axis graphing functions
+
+## Maps
+
+- [`add_map_e61()`](https://e61-institute.github.io/theme61/reference/add_map_e61.md)
+  : Add an underlying base map to ggplot maps
+- [`crop_aus_coord()`](https://e61-institute.github.io/theme61/reference/crop_aus_coord.md)
+  : Crops maps of Australia to exclude outlying territories
+- [`setup_stadia_maps()`](https://e61-institute.github.io/theme61/reference/setup_stadia_maps.md)
+  : Setup Stadia Maps API
+- [`theme_e61_spatial()`](https://e61-institute.github.io/theme61/reference/theme_e61_spatial.md)
+  : e61 themed spatial maps options
+
+## Miscellaneous
+
+- [`e61_chart_maker()`](https://e61-institute.github.io/theme61/reference/e61_chart_maker.md)
+  : An add-in to easily create plots with ggplot2
+- [`set_open_graph_browser()`](https://e61-institute.github.io/theme61/reference/open_graph_browser.md)
+  [`unset_open_graph_browser()`](https://e61-institute.github.io/theme61/reference/open_graph_browser.md)
+  : Set option to open graphs in the browser instead of the Viewer pane
+- [`set_format()`](https://e61-institute.github.io/theme61/reference/set_format.md)
+  [`unset_format()`](https://e61-institute.github.io/theme61/reference/set_format.md)
+  : Sets the default file save format if format is not specified
+
+## Colours
+
+- [`palette_e61()`](https://e61-institute.github.io/theme61/reference/palette_e61.md)
+  : Create e61 colour palette
+- [`e61_aus_colours`](https://e61-institute.github.io/theme61/reference/e61_aus_colours.md)
+  : Australian jurisdictions colour palette
+- [`e61_boxback`](https://e61-institute.github.io/theme61/reference/e61_boxback.md)
+  : Hex code for the colour of research and micro note Box backgrounds
+- [`e61_bluedark`](https://e61-institute.github.io/theme61/reference/e61_bluedark.md)
+  : Hex code for the colour: e61 Blue Dark
+- [`e61_bluedark1`](https://e61-institute.github.io/theme61/reference/e61_bluedark1.md)
+  : Hex code for the colour: e61 Blue Dark 1
+- [`e61_bluedark2`](https://e61-institute.github.io/theme61/reference/e61_bluedark2.md)
+  : Hex code for the colour: e61 Blue Dark 2
+- [`e61_bluedark3`](https://e61-institute.github.io/theme61/reference/e61_bluedark3.md)
+  : Hex code for the colour: e61 Blue Dark 3
+- [`e61_bluedark4`](https://e61-institute.github.io/theme61/reference/e61_bluedark4.md)
+  : Hex code for the colour: e61 Blue Dark 4
+- [`e61_bluedark5`](https://e61-institute.github.io/theme61/reference/e61_bluedark5.md)
+  : Hex code for the colour: e61 Blue Dark 5
+- [`e61_bluedark6`](https://e61-institute.github.io/theme61/reference/e61_bluedark6.md)
+  : Hex code for the colour: e61 Blue Dark 6
+- [`e61_bluedark7`](https://e61-institute.github.io/theme61/reference/e61_bluedark7.md)
+  : Hex code for the colour: e61 Blue Dark 7
+- [`e61_bluedark8`](https://e61-institute.github.io/theme61/reference/e61_bluedark8.md)
+  : Hex code for the colour: e61 Blue Dark 8
+- [`e61_bluelight`](https://e61-institute.github.io/theme61/reference/e61_bluelight.md)
+  : Hex code for the colour: e61 Blue Light
+- [`e61_bluelight1`](https://e61-institute.github.io/theme61/reference/e61_bluelight1.md)
+  : Hex code for the colour: e61 Blue Light 1
+- [`e61_bluelight2`](https://e61-institute.github.io/theme61/reference/e61_bluelight2.md)
+  : Hex code for the colour: e61 Blue Light 2
+- [`e61_bluelight3`](https://e61-institute.github.io/theme61/reference/e61_bluelight3.md)
+  : Hex code for the colour: e61 Blue Light 3
+- [`e61_bluelight4`](https://e61-institute.github.io/theme61/reference/e61_bluelight4.md)
+  : Hex code for the colour: e61 Blue Light 4
+- [`e61_bluelight5`](https://e61-institute.github.io/theme61/reference/e61_bluelight5.md)
+  : Hex code for the colour: e61 Blue Light 5
+- [`e61_bluelight6`](https://e61-institute.github.io/theme61/reference/e61_bluelight6.md)
+  : Hex code for the colour: e61 Blue Light 6
+- [`e61_bluelight7`](https://e61-institute.github.io/theme61/reference/e61_bluelight7.md)
+  : Hex code for the colour: e61 Blue Light 7
+- [`e61_bluelight8`](https://e61-institute.github.io/theme61/reference/e61_bluelight8.md)
+  : Hex code for the colour: e61 Blue Light 8
+- [`e61_coraldark`](https://e61-institute.github.io/theme61/reference/e61_coraldark.md)
+  : Hex code for the colour: e61 Coral Dark
+- [`e61_coraldark1`](https://e61-institute.github.io/theme61/reference/e61_coraldark1.md)
+  : Hex code for the colour: e61 Coral Dark 1
+- [`e61_coraldark2`](https://e61-institute.github.io/theme61/reference/e61_coraldark2.md)
+  : Hex code for the colour: e61 Coral Dark 2
+- [`e61_coraldark3`](https://e61-institute.github.io/theme61/reference/e61_coraldark3.md)
+  : Hex code for the colour: e61 Coral Dark 3
+- [`e61_coraldark4`](https://e61-institute.github.io/theme61/reference/e61_coraldark4.md)
+  : Hex code for the colour: e61 Coral Dark 4
+- [`e61_coraldark5`](https://e61-institute.github.io/theme61/reference/e61_coraldark5.md)
+  : Hex code for the colour: e61 Coral Dark 5
+- [`e61_coraldark6`](https://e61-institute.github.io/theme61/reference/e61_coraldark6.md)
+  : Hex code for the colour: e61 Coral Dark 6
+- [`e61_coraldark7`](https://e61-institute.github.io/theme61/reference/e61_coraldark7.md)
+  : Hex code for the colour: e61 Coral Dark 7
+- [`e61_coraldark8`](https://e61-institute.github.io/theme61/reference/e61_coraldark8.md)
+  : Hex code for the colour: e61 Coral Dark 8
+- [`e61_corallight`](https://e61-institute.github.io/theme61/reference/e61_corallight.md)
+  : Hex code for the colour: e61 Coral Light
+- [`e61_corallight1`](https://e61-institute.github.io/theme61/reference/e61_corallight1.md)
+  : Hex code for the colour: e61 Coral Light 1
+- [`e61_corallight2`](https://e61-institute.github.io/theme61/reference/e61_corallight2.md)
+  : Hex code for the colour: e61 Coral Light 2
+- [`e61_corallight3`](https://e61-institute.github.io/theme61/reference/e61_corallight3.md)
+  : Hex code for the colour: e61 Coral Light 3
+- [`e61_corallight4`](https://e61-institute.github.io/theme61/reference/e61_corallight4.md)
+  : Hex code for the colour: e61 Coral Light 4
+- [`e61_corallight5`](https://e61-institute.github.io/theme61/reference/e61_corallight5.md)
+  : Hex code for the colour: e61 Coral Light 5
+- [`e61_corallight6`](https://e61-institute.github.io/theme61/reference/e61_corallight6.md)
+  : Hex code for the colour: e61 Coral Light 6
+- [`e61_corallight7`](https://e61-institute.github.io/theme61/reference/e61_corallight7.md)
+  : Hex code for the colour: e61 Coral Light 7
+- [`e61_corallight8`](https://e61-institute.github.io/theme61/reference/e61_corallight8.md)
+  : Hex code for the colour: e61 Coral Light 8
+- [`e61_greydark`](https://e61-institute.github.io/theme61/reference/e61_greydark.md)
+  : Hex code for the colour: e61 Grey Dark
+- [`e61_greydark1`](https://e61-institute.github.io/theme61/reference/e61_greydark1.md)
+  : Hex code for the colour: e61 Grey Dark 1
+- [`e61_greydark2`](https://e61-institute.github.io/theme61/reference/e61_greydark2.md)
+  : Hex code for the colour: e61 Grey Dark 2
+- [`e61_greydark3`](https://e61-institute.github.io/theme61/reference/e61_greydark3.md)
+  : Hex code for the colour: e61 Grey Dark 3
+- [`e61_greydark4`](https://e61-institute.github.io/theme61/reference/e61_greydark4.md)
+  : Hex code for the colour: e61 Grey Dark 4
+- [`e61_greydark5`](https://e61-institute.github.io/theme61/reference/e61_greydark5.md)
+  : Hex code for the colour: e61 Grey Dark 5
+- [`e61_greydark6`](https://e61-institute.github.io/theme61/reference/e61_greydark6.md)
+  : Hex code for the colour: e61 Grey Dark 6
+- [`e61_greydark7`](https://e61-institute.github.io/theme61/reference/e61_greydark7.md)
+  : Hex code for the colour: e61 Grey Dark 7
+- [`e61_greydark8`](https://e61-institute.github.io/theme61/reference/e61_greydark8.md)
+  : Hex code for the colour: e61 Grey Dark 8
+- [`e61_greylight`](https://e61-institute.github.io/theme61/reference/e61_greylight.md)
+  : Hex code for the colour: e61 Grey Light
+- [`e61_greylight1`](https://e61-institute.github.io/theme61/reference/e61_greylight1.md)
+  : Hex code for the colour: e61 Grey Light 1
+- [`e61_greylight2`](https://e61-institute.github.io/theme61/reference/e61_greylight2.md)
+  : Hex code for the colour: e61 Grey Light 2
+- [`e61_greylight3`](https://e61-institute.github.io/theme61/reference/e61_greylight3.md)
+  : Hex code for the colour: e61 Grey Light 3
+- [`e61_greylight4`](https://e61-institute.github.io/theme61/reference/e61_greylight4.md)
+  : Hex code for the colour: e61 Grey Light 4
+- [`e61_greylight5`](https://e61-institute.github.io/theme61/reference/e61_greylight5.md)
+  : Hex code for the colour: e61 Grey Light 5
+- [`e61_greylight6`](https://e61-institute.github.io/theme61/reference/e61_greylight6.md)
+  : Hex code for the colour: e61 Grey Light 6
+- [`e61_greylight7`](https://e61-institute.github.io/theme61/reference/e61_greylight7.md)
+  : Hex code for the colour: e61 Grey Light 7
+- [`e61_greylight8`](https://e61-institute.github.io/theme61/reference/e61_greylight8.md)
+  : Hex code for the colour: e61 Grey Light 8
+- [`e61_maroondark`](https://e61-institute.github.io/theme61/reference/e61_maroondark.md)
+  : Hex code for the colour: e61 Maroon Dark
+- [`e61_maroondark1`](https://e61-institute.github.io/theme61/reference/e61_maroondark1.md)
+  : Hex code for the colour: e61 Maroon Dark 1
+- [`e61_maroondark2`](https://e61-institute.github.io/theme61/reference/e61_maroondark2.md)
+  : Hex code for the colour: e61 Maroon Dark 2
+- [`e61_maroondark3`](https://e61-institute.github.io/theme61/reference/e61_maroondark3.md)
+  : Hex code for the colour: e61 Maroon Dark 3
+- [`e61_maroondark4`](https://e61-institute.github.io/theme61/reference/e61_maroondark4.md)
+  : Hex code for the colour: e61 Maroon Dark 4
+- [`e61_maroondark5`](https://e61-institute.github.io/theme61/reference/e61_maroondark5.md)
+  : Hex code for the colour: e61 Maroon Dark 5
+- [`e61_maroondark6`](https://e61-institute.github.io/theme61/reference/e61_maroondark6.md)
+  : Hex code for the colour: e61 Maroon Dark 6
+- [`e61_maroondark7`](https://e61-institute.github.io/theme61/reference/e61_maroondark7.md)
+  : Hex code for the colour: e61 Maroon Dark 7
+- [`e61_maroondark8`](https://e61-institute.github.io/theme61/reference/e61_maroondark8.md)
+  : Hex code for the colour: e61 Maroon Dark 8
+- [`e61_maroonlight`](https://e61-institute.github.io/theme61/reference/e61_maroonlight.md)
+  : Hex code for the colour: e61 Maroon Light
+- [`e61_maroonlight1`](https://e61-institute.github.io/theme61/reference/e61_maroonlight1.md)
+  : Hex code for the colour: e61 Maroon Light 1
+- [`e61_maroonlight2`](https://e61-institute.github.io/theme61/reference/e61_maroonlight2.md)
+  : Hex code for the colour: e61 Maroon Light 2
+- [`e61_maroonlight3`](https://e61-institute.github.io/theme61/reference/e61_maroonlight3.md)
+  : Hex code for the colour: e61 Maroon Light 3
+- [`e61_maroonlight4`](https://e61-institute.github.io/theme61/reference/e61_maroonlight4.md)
+  : Hex code for the colour: e61 Maroon Light 4
+- [`e61_maroonlight5`](https://e61-institute.github.io/theme61/reference/e61_maroonlight5.md)
+  : Hex code for the colour: e61 Maroon Light 5
+- [`e61_maroonlight6`](https://e61-institute.github.io/theme61/reference/e61_maroonlight6.md)
+  : Hex code for the colour: e61 Maroon Light 6
+- [`e61_maroonlight7`](https://e61-institute.github.io/theme61/reference/e61_maroonlight7.md)
+  : Hex code for the colour: e61 Maroon Light 7
+- [`e61_maroonlight8`](https://e61-institute.github.io/theme61/reference/e61_maroonlight8.md)
+  : Hex code for the colour: e61 Maroon Light 8
+- [`e61_orangedark`](https://e61-institute.github.io/theme61/reference/e61_orangedark.md)
+  : Hex code for the colour: e61 Orange Dark
+- [`e61_orangedark1`](https://e61-institute.github.io/theme61/reference/e61_orangedark1.md)
+  : Hex code for the colour: e61 Orange Dark 1
+- [`e61_orangedark2`](https://e61-institute.github.io/theme61/reference/e61_orangedark2.md)
+  : Hex code for the colour: e61 Orange Dark 2
+- [`e61_orangedark3`](https://e61-institute.github.io/theme61/reference/e61_orangedark3.md)
+  : Hex code for the colour: e61 Orange Dark 3
+- [`e61_orangedark4`](https://e61-institute.github.io/theme61/reference/e61_orangedark4.md)
+  : Hex code for the colour: e61 Orange Dark 4
+- [`e61_orangedark5`](https://e61-institute.github.io/theme61/reference/e61_orangedark5.md)
+  : Hex code for the colour: e61 Orange Dark 5
+- [`e61_orangedark6`](https://e61-institute.github.io/theme61/reference/e61_orangedark6.md)
+  : Hex code for the colour: e61 Orange Dark 6
+- [`e61_orangedark7`](https://e61-institute.github.io/theme61/reference/e61_orangedark7.md)
+  : Hex code for the colour: e61 Orange Dark 7
+- [`e61_orangedark8`](https://e61-institute.github.io/theme61/reference/e61_orangedark8.md)
+  : Hex code for the colour: e61 Orange Dark 8
+- [`e61_orangelight`](https://e61-institute.github.io/theme61/reference/e61_orangelight.md)
+  : Hex code for the colour: e61 Orange Light
+- [`e61_orangelight1`](https://e61-institute.github.io/theme61/reference/e61_orangelight1.md)
+  : Hex code for the colour: e61 Orange Light 1
+- [`e61_orangelight2`](https://e61-institute.github.io/theme61/reference/e61_orangelight2.md)
+  : Hex code for the colour: e61 Orange Light 2
+- [`e61_orangelight3`](https://e61-institute.github.io/theme61/reference/e61_orangelight3.md)
+  : Hex code for the colour: e61 Orange Light 3
+- [`e61_orangelight4`](https://e61-institute.github.io/theme61/reference/e61_orangelight4.md)
+  : Hex code for the colour: e61 Orange Light 4
+- [`e61_orangelight5`](https://e61-institute.github.io/theme61/reference/e61_orangelight5.md)
+  : Hex code for the colour: e61 Orange Light 5
+- [`e61_orangelight6`](https://e61-institute.github.io/theme61/reference/e61_orangelight6.md)
+  : Hex code for the colour: e61 Orange Light 6
+- [`e61_orangelight7`](https://e61-institute.github.io/theme61/reference/e61_orangelight7.md)
+  : Hex code for the colour: e61 Orange Light 7
+- [`e61_orangelight8`](https://e61-institute.github.io/theme61/reference/e61_orangelight8.md)
+  : Hex code for the colour: e61 Orange Light 8
+- [`e61_skydark`](https://e61-institute.github.io/theme61/reference/e61_skydark.md)
+  : Hex code for the colour: e61 Sky Dark
+- [`e61_skydark1`](https://e61-institute.github.io/theme61/reference/e61_skydark1.md)
+  : Hex code for the colour: e61 Sky Dark 1
+- [`e61_skydark2`](https://e61-institute.github.io/theme61/reference/e61_skydark2.md)
+  : Hex code for the colour: e61 Sky Dark 2
+- [`e61_skydark3`](https://e61-institute.github.io/theme61/reference/e61_skydark3.md)
+  : Hex code for the colour: e61 Sky Dark 3
+- [`e61_skydark4`](https://e61-institute.github.io/theme61/reference/e61_skydark4.md)
+  : Hex code for the colour: e61 Sky Dark 4
+- [`e61_skydark5`](https://e61-institute.github.io/theme61/reference/e61_skydark5.md)
+  : Hex code for the colour: e61 Sky Dark 5
+- [`e61_skydark6`](https://e61-institute.github.io/theme61/reference/e61_skydark6.md)
+  : Hex code for the colour: e61 Sky Dark 6
+- [`e61_skydark7`](https://e61-institute.github.io/theme61/reference/e61_skydark7.md)
+  : Hex code for the colour: e61 Sky Dark 7
+- [`e61_skydark8`](https://e61-institute.github.io/theme61/reference/e61_skydark8.md)
+  : Hex code for the colour: e61 Sky Dark 8
+- [`e61_skylight`](https://e61-institute.github.io/theme61/reference/e61_skylight.md)
+  : Hex code for the colour: e61 Sky Light
+- [`e61_skylight1`](https://e61-institute.github.io/theme61/reference/e61_skylight1.md)
+  : Hex code for the colour: e61 Sky Light 1
+- [`e61_skylight2`](https://e61-institute.github.io/theme61/reference/e61_skylight2.md)
+  : Hex code for the colour: e61 Sky Light 2
+- [`e61_skylight3`](https://e61-institute.github.io/theme61/reference/e61_skylight3.md)
+  : Hex code for the colour: e61 Sky Light 3
+- [`e61_skylight4`](https://e61-institute.github.io/theme61/reference/e61_skylight4.md)
+  : Hex code for the colour: e61 Sky Light 4
+- [`e61_skylight5`](https://e61-institute.github.io/theme61/reference/e61_skylight5.md)
+  : Hex code for the colour: e61 Sky Light 5
+- [`e61_skylight6`](https://e61-institute.github.io/theme61/reference/e61_skylight6.md)
+  : Hex code for the colour: e61 Sky Light 6
+- [`e61_skylight7`](https://e61-institute.github.io/theme61/reference/e61_skylight7.md)
+  : Hex code for the colour: e61 Sky Light 7
+- [`e61_skylight8`](https://e61-institute.github.io/theme61/reference/e61_skylight8.md)
+  : Hex code for the colour: e61 Sky Light 8
+- [`e61_tealdark`](https://e61-institute.github.io/theme61/reference/e61_tealdark.md)
+  : Hex code for the colour: e61 Teal Dark
+- [`e61_tealdark1`](https://e61-institute.github.io/theme61/reference/e61_tealdark1.md)
+  : Hex code for the colour: e61 Teal Dark 1
+- [`e61_tealdark2`](https://e61-institute.github.io/theme61/reference/e61_tealdark2.md)
+  : Hex code for the colour: e61 Teal Dark 2
+- [`e61_tealdark3`](https://e61-institute.github.io/theme61/reference/e61_tealdark3.md)
+  : Hex code for the colour: e61 Teal Dark 3
+- [`e61_tealdark4`](https://e61-institute.github.io/theme61/reference/e61_tealdark4.md)
+  : Hex code for the colour: e61 Teal Dark 4
+- [`e61_tealdark5`](https://e61-institute.github.io/theme61/reference/e61_tealdark5.md)
+  : Hex code for the colour: e61 Teal Dark 5
+- [`e61_tealdark6`](https://e61-institute.github.io/theme61/reference/e61_tealdark6.md)
+  : Hex code for the colour: e61 Teal Dark 6
+- [`e61_tealdark7`](https://e61-institute.github.io/theme61/reference/e61_tealdark7.md)
+  : Hex code for the colour: e61 Teal Dark 7
+- [`e61_tealdark8`](https://e61-institute.github.io/theme61/reference/e61_tealdark8.md)
+  : Hex code for the colour: e61 Teal Dark 8
+- [`e61_teallight`](https://e61-institute.github.io/theme61/reference/e61_teallight.md)
+  : Hex code for the colour: e61 Teal Light
+- [`e61_teallight1`](https://e61-institute.github.io/theme61/reference/e61_teallight1.md)
+  : Hex code for the colour: e61 Teal Light 1
+- [`e61_teallight2`](https://e61-institute.github.io/theme61/reference/e61_teallight2.md)
+  : Hex code for the colour: e61 Teal Light 2
+- [`e61_teallight3`](https://e61-institute.github.io/theme61/reference/e61_teallight3.md)
+  : Hex code for the colour: e61 Teal Light 3
+- [`e61_teallight4`](https://e61-institute.github.io/theme61/reference/e61_teallight4.md)
+  : Hex code for the colour: e61 Teal Light 4
+- [`e61_teallight5`](https://e61-institute.github.io/theme61/reference/e61_teallight5.md)
+  : Hex code for the colour: e61 Teal Light 5
+- [`e61_teallight6`](https://e61-institute.github.io/theme61/reference/e61_teallight6.md)
+  : Hex code for the colour: e61 Teal Light 6
+- [`e61_teallight7`](https://e61-institute.github.io/theme61/reference/e61_teallight7.md)
+  : Hex code for the colour: e61 Teal Light 7
+- [`e61_teallight8`](https://e61-institute.github.io/theme61/reference/e61_teallight8.md)
+  : Hex code for the colour: e61 Teal Light 8
+
+# Articles
+
+### All vignettes
+
+- [Adding on-graph
+  labels](https://e61-institute.github.io/theme61/articles/ongraph-labels.md):
+
+  Some example code showing how to put labels on graphs
+
+- [Introduction to
+  theme61](https://e61-institute.github.io/theme61/articles/theme61.md):
+
+  Some example code showing how to use `theme61` with `ggplot2` graphs.

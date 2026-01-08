@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@
       <h1>Introduction to theme61</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/e61-institute/theme61/blob/v0.7.0/vignettes/theme61.rmd" class="external-link"><code>vignettes/theme61.rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/e61-institute/theme61/blob/main/vignettes/theme61.rmd" class="external-link"><code>vignettes/theme61.rmd</code></a></small>
       <div class="d-none name"><code>theme61.rmd</code></div>
     </div>
 
@@ -114,12 +114,12 @@ then you can always scale your axes manually.</li>
 <p>All the colours are package objects that can be selected by using the
 appropriate name. For example, <code>e61_tealdark3</code> selects the
 colour ‘Teal dark’ with the shade in column ‘3’.</p>
-<p><img src="../reference/figures/g-palette-colours.svg" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="../reference/figures/g-palette-colours.svg" class="r-plt" alt="" width="60%" style="display: block; margin: auto;"></p>
 <p>There is also a colour palette for the states/territories and capital
 cities. They are usually used by calling <code>scale_fill_e61_aus</code>
 or <code>scale_colour_e61_aus</code>. But, the individual colours can
 also be accessed in the named vector <code>e61_aus_colours</code>.</p>
-<p><img src="../reference/figures/g-palette-state-colours.svg" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="../reference/figures/g-palette-state-colours.svg" class="r-plt" alt="" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="graph-examples">Graph examples<a class="anchor" aria-label="anchor" href="#graph-examples"></a>
@@ -141,7 +141,7 @@ also be accessed in the named vector <code>e61_aus_colours</code>.</p>
 <span>    y <span class="op">=</span> <span class="st">"US$ billions"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/g-line.svg"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/g-line.svg" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="../reference/figures/g-line.svg" class="r-plt" alt="" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="column">Column graph<a class="anchor" aria-label="anchor" href="#column"></a>
@@ -161,7 +161,7 @@ also be accessed in the named vector <code>e61_aus_colours</code>.</p>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/g-col.svg"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/g-col.svg" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="../reference/figures/g-col.svg" class="r-plt" alt="" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="scatter">Scatter graph<a class="anchor" aria-label="anchor" href="#scatter"></a>
@@ -193,7 +193,7 @@ also be accessed in the named vector <code>e61_aus_colours</code>.</p>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/g-scatter.svg"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/g-scatter.svg" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="../reference/figures/g-scatter.svg" class="r-plt" alt="" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="facet">Faceted scatter graph<a class="anchor" aria-label="anchor" href="#facet"></a>
@@ -211,7 +211,7 @@ also be accessed in the named vector <code>e61_aus_colours</code>.</p>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/g-facet.svg"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/g-facet.svg" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="../reference/figures/g-facet.svg" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="density">Density graph<a class="anchor" aria-label="anchor" href="#density"></a>
@@ -231,7 +231,7 @@ also be accessed in the named vector <code>e61_aus_colours</code>.</p>
 <span>  <span class="fu"><a href="../reference/e61_axes.html">scale_y_continuous_e61</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/g-dens.svg"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/g-dens.svg" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="../reference/figures/g-dens.svg" class="r-plt" alt="" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="flippedbar">Horizontal bar graph<a class="anchor" aria-label="anchor" href="#flippedbar"></a>
@@ -250,7 +250,7 @@ also be accessed in the named vector <code>e61_aus_colours</code>.</p>
 <span>  <span class="fu"><a href="../reference/format_flip.html">format_flip</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/g-flip.svg"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/g-flip.svg" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="../reference/figures/g-flip.svg" class="r-plt" alt="" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="secaxis">Rescaled secondary axis graph<a class="anchor" aria-label="anchor" href="#secaxis"></a>
@@ -304,7 +304,7 @@ future).</p>
 <span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span>, <span class="st">"'datasets' package"</span><span class="op">)</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"US$ billions"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/g-dual.svg" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="../reference/figures/g-dual.svg" class="r-plt" alt="" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="ptrange">Point range graph<a class="anchor" aria-label="anchor" href="#ptrange"></a>
@@ -325,7 +325,7 @@ passage of time.</p>
 <span>    y <span class="op">=</span> <span class="st">"Per cent"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/g-ptrg.svg"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/g-ptrg.svg" width="60%" style="display: block; margin: auto;"></p>
+<p><img src="../reference/figures/g-ptrg.svg" class="r-plt" alt="" width="60%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="mpanel">Multi-panel graph<a class="anchor" aria-label="anchor" href="#mpanel"></a>
@@ -396,7 +396,7 @@ in the footer of the full multi-panel instead.</p>
 <span>    footnotes <span class="op">=</span> <span class="st">"Data comes from the built-in USPersonalExpenditure dataset."</span>,</span>
 <span>    sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e61 Institute"</span>, <span class="st">"'datasets' package"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/g-multi.svg" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="../reference/figures/g-multi.svg" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -410,7 +410,7 @@ in the footer of the full multi-panel instead.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@
       <h1>Adding on-graph labels</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/e61-institute/theme61/blob/v0.7.0/vignettes/ongraph-labels.rmd" class="external-link"><code>vignettes/ongraph-labels.rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/e61-institute/theme61/blob/main/vignettes/ongraph-labels.rmd" class="external-link"><code>vignettes/ongraph-labels.rmd</code></a></small>
       <div class="d-none name"><code>ongraph-labels.rmd</code></div>
     </div>
 
@@ -133,9 +133,9 @@ ordered factor, and calling the label names using
 <div class="section level2">
 <h2 id="facets">Facets<a class="anchor" aria-label="anchor" href="#facets"></a>
 </h2>
-<p>When you have a facetted graph, you must specify the
-<code>facet_name</code> and <code>facet_value</code> arguments in
-<code><a href="../reference/plot_label.html">plot_label()</a></code>.</p>
+<p>When you have a facetted graph, plot labels will appear on all panels
+by default unless you use the <code>panel</code> argument to specify
+which panels you want the labels to appear on.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>,</span>
@@ -153,16 +153,15 @@ ordered factor, and calling the label names using
 <span>    label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Label 1"</span>, <span class="st">"Label 2"</span><span class="op">)</span>,</span>
 <span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1.85</span><span class="op">)</span>,</span>
 <span>    y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.2</span>, <span class="fl">2.2</span><span class="op">)</span>,</span>
-<span>    facet_name <span class="op">=</span> <span class="st">"f_var"</span>,</span>
-<span>    facet_value <span class="op">=</span> <span class="st">"1"</span></span>
+<span>    panel <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>f_var <span class="op">=</span> <span class="st">"1"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> </span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/label-facet-1.svg"</span>, <span class="va">p1</span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="st">"../man/figures/label-facet-1.svg"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../reference/figures/label-facet-1.svg"><!-- --></p>
 <p>If you want to place the labels on different facets, simply supply a
-vector to <code>facet_value</code> with which facet you want each label
-to appear in.</p>
+vector of panels in <code>panel</code> with which facet you want each
+label to appear in.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, colour <span class="op">=</span> <span class="va">group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">f_var</span><span class="op">)</span> <span class="op">+</span></span>
@@ -172,8 +171,7 @@ to appear in.</p>
 <span>    label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Label 1"</span>, <span class="st">"Label 2"</span><span class="op">)</span>,</span>
 <span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1.85</span><span class="op">)</span>,</span>
 <span>    y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.2</span>, <span class="fl">2.2</span><span class="op">)</span>,</span>
-<span>    facet_name <span class="op">=</span> <span class="st">"f_var"</span>,</span>
-<span>    facet_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span>, <span class="st">"2"</span><span class="op">)</span></span>
+<span>    panel <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>f_var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span>, <span class="st">"2"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_e61.html">save_e61</a></span><span class="op">(</span><span class="st">"../man/figures/label-facet-2.svg"</span>, <span class="va">p2</span><span class="op">)</span></span>
@@ -234,7 +232,7 @@ coloured text labels for each colour/fill aesthetic.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

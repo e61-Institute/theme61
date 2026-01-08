@@ -9,7 +9,7 @@ onto the graph plot. This is preferred over using legends."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,7 @@ onto the graph plot. This is preferred over using legends."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Add on-graph labels to graphs</h1>
-      <small class="dont-index">Source: <a href="https://github.com/e61-institute/theme61/blob/v0.7.0/R/plot_label.R" class="external-link"><code>R/plot_label.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/e61-institute/theme61/blob/main/R/plot_label.R" class="external-link"><code>R/plot_label.R</code></a></small>
       <div class="d-none name"><code>plot_label.Rd</code></div>
     </div>
 
@@ -55,8 +55,9 @@ onto the graph plot. This is preferred over using legends.</p>
 <span>  hjust <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  geom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text"</span>, <span class="st">"label"</span><span class="op">)</span>,</span>
 <span>  angle <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  facet_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  facet_value <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  panel <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  facet_name <span class="op">=</span> <span class="fu">lifecycle</span><span class="fu">::</span><span class="fu"><a href="https://lifecycle.r-lib.org/reference/deprecated.html" class="external-link">deprecated</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  facet_value <span class="op">=</span> <span class="fu">lifecycle</span><span class="fu">::</span><span class="fu"><a href="https://lifecycle.r-lib.org/reference/deprecated.html" class="external-link">deprecated</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">plab</span><span class="op">(</span></span>
@@ -68,8 +69,9 @@ onto the graph plot. This is preferred over using legends.</p>
 <span>  hjust <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  geom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text"</span>, <span class="st">"label"</span><span class="op">)</span>,</span>
 <span>  angle <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  facet_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  facet_value <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  panel <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  facet_name <span class="op">=</span> <span class="fu">lifecycle</span><span class="fu">::</span><span class="fu"><a href="https://lifecycle.r-lib.org/reference/deprecated.html" class="external-link">deprecated</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  facet_value <span class="op">=</span> <span class="fu">lifecycle</span><span class="fu">::</span><span class="fu"><a href="https://lifecycle.r-lib.org/reference/deprecated.html" class="external-link">deprecated</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -114,16 +116,34 @@ adds a white box around the text which could be useful sometimes.</p></dd>
 normal left-to-right text.</p></dd>
 
 
+<dt id="arg-panel">panel<a class="anchor" aria-label="anchor" href="#arg-panel"></a></dt>
+<dd><p>Optional named list. If the plot is facetted, you can restrict
+the label(s) to a specific panel by supplying the facetting variable(s) as
+a named list, see the Details for the syntax.</p></dd>
+
+
 <dt id="arg-facet-name-facet-value">facet_name, facet_value<a class="anchor" aria-label="anchor" href="#arg-facet-name-facet-value"></a></dt>
-<dd><p>(optional) String. Specify the name of the
-facetting variable in <code>facet_name</code> and the panel to show the labels in
-using <code>facet_value</code>. Defaults to NULL which shows the labels on all facets.
-You must specify both <code>facet_name</code> and <code>facet_value</code> or leave both as NULL.</p></dd>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a></p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>ggplot2 object</p>
+    <p>Object to add to a ggplot (via <code>+</code>).</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The syntax for getting labels to appear on certain facet panels is
+as follows.</p>
+<p>For facet wraps, supply a named list with the facetting variable name(s)
+and the facet value(s) you want the labels to appear on. For example, to
+get labels to appear only on panel <code>1</code>, use <code>panel = list(grp = "1")</code>. If
+you have 2 labels that you want to appear on panels <code>1</code> and <code>2</code>, use <code>panel = list(grp = c("1", "2"))</code>.</p>
+<p>For facet grids, you need to supply both the x- and y-dimension facet
+variables to get the plot labels to appear correctly. For example, if your
+facet variables are <code>r</code> and <code>c</code>, use <code>panel = list(r = "A", c = "1")</code> to
+get the labels to appear on the panel at row <code>A</code> and column <code>1</code>. If you
+have 2 labels you want to appear on panel <code>A1</code> and <code>B2</code>, use
+<code>panel = list(r = c("A", "B"), c = c("1", "2"))</code>.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -135,7 +155,7 @@ You must specify both <code>facet_name</code> and <code>facet_value</code> or le
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

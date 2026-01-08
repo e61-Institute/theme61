@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">theme61</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,9 +33,31 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/e61-institute/theme61/blob/v0.7.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/e61-institute/theme61/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.1" id="theme61-071">theme61 0.7.1<a class="anchor" aria-label="anchor" href="#theme61-071"></a></h2>
+<p>09 Jan 2026</p>
+<div class="section level5">
+<h5 id="new-features-0-7-1">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-1"></a></h5>
+<ul><li>Plots now render like they would appear when saved in the Viewer pane when they are printed via <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> (this happens automatically when a <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code> object is run).</li>
+<li>Added <code>ytitle_wrap</code> argument to <code>labs_e61</code> so you can custom wrap the y-axis titles just like other graph titles.</li>
+<li>New, simpler approach to specifying which facets for labels to appear on using a new <code>panel</code> argument in <code>labs_e61</code>.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="bug-fixes-0-7-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-1"></a></h5>
+<ul><li>theme61 now works with ggplot2 v4.0.0 and above (this will automatically update when you install the new package).</li>
+<li>
+<code>save_e61</code> no longer ignores custom aspect ratios.</li>
+<li>Maps made using <code>sf</code> functions now retain their aspect ratios rather than using the (bad) default aspect ratios designed for normal graphs.</li>
+<li>Package now loads even if there is no internet connection.</li>
+<li>Labels on facet graphs now respect ordered factor ordering rather than resetting them.</li>
+<li>A better default of labels showing on all facet panels if no facet is specified, rather than erroring out with an uninformative error message.</li>
+<li>Fix issue with secondary y-axis not appearing by default on certain graphs.</li>
+<li>Fix issue with facet panel spacing when axes do not appear on all panels.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.0" id="theme61-070">theme61 0.7.0<a class="anchor" aria-label="anchor" href="#theme61-070"></a></h2>
 <p>01 Jul 2025</p>
@@ -242,7 +264,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

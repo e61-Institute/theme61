@@ -1,0 +1,33 @@
+# theme61
+
+This package helps you create graphs that follow the e61 Institute
+graphing style. It provides functions that make it easier to make
+aesthetic graphs and easy access to the Institute’s colour palette.
+
+### Installing theme61
+
+If you haven’t already, install the `remotes` package:
+
+`install.packages("remotes")`
+
+Then install from GitHub:
+
+`remotes::install_github("e61-institute/theme61", dependencies = TRUE, upgrade = "always")`
+
+Then load into R:
+
+[`library(theme61)`](https://github.com/e61-institute/theme61)
+
+### Using theme61
+
+The [package website](https://e61-institute.github.io/theme61/) contains
+a lot of information on how to use theme61.
+
+Start by reading the [Get
+started](https://e61-institute.github.io/theme61/articles/theme61.md)
+article.
+
+There is also a wealth of information contained in the individual
+[function
+documentation](https://e61-institute.github.io/theme61/reference/index.md)
+that answers common usage questions.

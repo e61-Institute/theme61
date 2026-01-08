@@ -1,0 +1,218 @@
+# Save graphs with theme61 styles and defaults
+
+Saves ggplot2 graphs made with using theme61. Using `save_e61()` is
+required to ensure graphs are consistent with the e61 style and
+formatting.
+
+## Usage
+
+``` r
+save_e61(
+  filename = NULL,
+  ...,
+  plot = last_plot(),
+  format = c("svg", "pdf", "eps", "png", "jpg"),
+  chart_type = NULL,
+  auto_scale = TRUE,
+  dim = list(height = NULL, width = NULL),
+  pad_width = 0,
+  max_height = NULL,
+  preview = FALSE,
+  save_data = FALSE,
+  print_info = FALSE,
+  spell_check = TRUE,
+  base_size = 10,
+  res = 1,
+  bg_colour = "white",
+  plotlist = NULL,
+  title = NULL,
+  subtitle = NULL,
+  footnotes = NULL,
+  sources = NULL,
+  spacing_adj = list(title = 1, subtitle = 1),
+  height_adj = NULL,
+  ncol = 2,
+  nrow = NULL,
+  align = c("v", "none", "h", "hv"),
+  axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
+  rel_heights = NULL
+)
+```
+
+## Arguments
+
+- filename:
+
+  File name to create on disk. Providing the file format extension (e.g.
+  .svg) is suggested when saving to a single file format. The file
+  extension must be lowercase. If you want to save to multiple formats,
+  do not include the extension, see the `format` argument for details.
+
+- ...:
+
+  (multi-panel specific) Plot objects to put on the panel.
+
+- plot:
+
+  (single-panel specific) Name of the plot object to save. Defaults to
+  the last plot displayed so usually you do not need to provide this
+  argument explicitly.
+
+- format:
+
+  A string vector of file formats to save as. Accepts "svg", "pdf",
+  "eps", "png", "jpg". For example `c("svg", "pdf")` will save 2 files
+  with the same name to the same location to SVG and PDF formats. If the
+  file format is specified in `filename` or by the `set_format` option,
+  then this argument is ignored.
+
+- chart_type:
+
+  String, or vector of strings if saving multiple plots. Type of chart.
+  This is used to set sensible chart widths based on the type of plot
+  you are saving. Options are:
+
+  - "normal": default, for normal charts;
+
+  - "wide": for time series graphs;
+
+  - "square": for scatter plots;
+
+  - "custom": for saving a custom aspect ratio specified in the
+    `aspect_ratio` argument in
+    [`theme_e61()`](https://e61-institute.github.io/theme61/reference/theme_e61.md).
+
+- auto_scale:
+
+  Logical. Scale the y-axis automatically. Default is TRUE.
+
+- dim:
+
+  An optional named list specifying the plot height and width. Defaults
+  to NULL which means the graph dimensions will be calculated
+  automatically.
+
+- pad_width:
+
+  Numeric. Add horizontal whitespace to the sides of the graph. Defaults
+  to no additional padding.
+
+- max_height:
+
+  Numeric. The maximum height of your plot in cm. This is used to
+  constrain the plot resizing algorithm in cases where you want to limit
+  the height of your charts. Defaults to NULL which does not restrict
+  the height.
+
+- preview:
+
+  Logical. Set to TRUE to show a preview of the graph in the Viewer pane
+  but not save to disk. Defaults to FALSE.
+
+- save_data:
+
+  Logical. Set to TRUE if you want to save a .csv with the same name as
+  the graph that contains the data needed to recreate the graph
+  (defaults to FALSE).
+
+- print_info:
+
+  Logical. Set to TRUE if you want graph dimensions and other
+  information printed to the console. Defaults to FALSE.
+
+- spell_check:
+
+  Logical. Check spelling of words in the title and caption. Defaults to
+  TRUE. Set to FALSE to turn off.
+
+- base_size:
+
+  Numeric. Chart font size. Default is 10.
+
+- res:
+
+  Numeric. For saving to PNG only. Rescale the size of the saved PNG.
+  E.g. `res = 2` doubles the size of the saved graph.
+
+- bg_colour:
+
+  Set the graph background colour. Accepts a colour name, hex code or
+  theme61 colour object name. Defaults to "white". For graphs used in
+  research note boxes, set the colour to `e61_boxback`.
+
+- plotlist:
+
+  (multi-panel specific) List of plots to combine as an multi-panel and
+  save. You can also enter the charts individually as arguments to the
+  function.
+
+- title:
+
+  The text for the title.
+
+- subtitle:
+
+  The text for the subtitle.
+
+- footnotes:
+
+  A vector of footnote text strings. Each new string will be prepended
+  with \*, \*\*, \*\*\*, etc. Note you'll need to include the asterisks
+  in the title/subtitle yourself. Please be sensible with the number of
+  separate points you include in the graph.
+
+- sources:
+
+  String vector providing the names of sources for the graph.
+
+- spacing_adj:
+
+  (multi-panel specific) A named list specifying the adjustment to the
+  title and subtitle. Rescales the size of the space given to the
+  multi-panel title/subtitle. Use if you think the title looks too
+  cramped on the chart.
+
+- height_adj:
+
+  (multi-panel specific) Rescales the height of the multi-panel. The
+  function sets sensible defaults but this provides you with manual
+  control if you need it.
+
+- ncol:
+
+  (optional) Number of columns in the plot grid.
+
+- nrow:
+
+  (optional) Number of rows in the plot grid.
+
+- align:
+
+  (optional) Specifies whether graphs in the grid should be horizontally
+  ("h") or vertically ("v") aligned. Options are "none" (default), "hv"
+  (align in both directions), "h", and "v".
+
+- axis:
+
+  (optional) Specifies whether graphs should be aligned by the left
+  ("l"), right ("r"), top ("t"), or bottom ("b") margins. Options are
+  "none" (default), or a string of any combination of l, r, t, and b in
+  any order (e.g. "tblr" or "rlbt" for aligning all margins). Must be
+  specified if any of the graphs are complex (e.g. faceted) and
+  alignment is specified and desired. See `align_plots()` for details.
+
+- rel_heights:
+
+  (multi-panel specific) A numeric vector giving the relative
+  proportions of each graph component (title, plots, footer).
+
+## Value
+
+Invisibly returns the file name.
+
+## Details
+
+Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs
+are better as they are modern vector graphics file formats which can be
+scaled up and down in size without blurring or becoming pixelated. PNG
+should only be used when required for compatibility reasons.
