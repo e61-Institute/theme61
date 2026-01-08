@@ -23,8 +23,17 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
       jpg = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
     )
 
-    print(graph)
-    dev.off()
+    closed <- FALSE
+    on.exit({
+      if (!closed) try(grDevices::dev.off(), silent = TRUE)
+    }, add = TRUE)
+
+    graph_i <- maybe_add_default_scales(graph)
+    class(graph_i) <- setdiff(class(graph_i), "e61_ggplot")
+    print(graph_i)
+
+    grDevices::dev.off()
+    closed <- TRUE
 
     # Save a png/jpg if required
     if (fmt == "png") {

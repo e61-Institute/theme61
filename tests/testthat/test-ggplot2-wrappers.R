@@ -73,14 +73,14 @@ test_that("Auto y-axis functionality does not apply if you override with ggplot2
   # (and should not have theme61 forcibly re-adding scale_y_continuous_e61)
   p_override <- ggplot(data) +
     geom_point(aes(x = v1, y = v2)) +
-    ggplot2::scale_y_continuous(
+    scale_y_continuous(
       breaks = c(0, 50, 100),
       limits = c(0, 110)
     )
 
   # Also test an override added *before* the geom
   p_override2 <- ggplot(data) +
-    ggplot2::scale_y_continuous(
+    scale_y_continuous(
       breaks = c(0, 50, 100),
       limits = c(0, 110)
     ) +
@@ -97,4 +97,65 @@ test_that("Auto y-axis functionality does not apply if you override with ggplot2
       suppressWarnings(save_e61("override-y-scale-3-ggplot2-scale-before.svg", p_override2))
     )
   })
+})
+
+test_that("User-supplied colour/fill scales are not overridden by defaults", {
+
+  n <- 20L
+
+  df <- data.frame(
+    x = rep(1:10, length.out = n),
+    y = seq_len(n),
+    grp = factor(paste0("g", seq_len(n)))
+  )
+
+  # ---- Colour override
+  # Make a manual colour scale where every level maps to black.
+  # If theme61 overrides it, colours will not all be black.
+  manual_cols <- stats::setNames(rep("black", n), levels(df$grp))
+
+  p_col_user <- ggplot(df, aes(x, y, colour = grp)) +
+    geom_point() +
+    scale_colour_manual(values = manual_cols)
+
+  expect_no_error(b_col_user <- ggplot_build(p_col_user))
+  expect_equal(unique(b_col_user$data[[1]]$colour), "black")
+
+  # ---- Fill override
+  manual_fills <- stats::setNames(rep("black", n), levels(df$grp))
+
+  df2 <- data.frame(
+    x = df$grp,
+    y = 1,
+    grp = df$grp
+  )
+
+  p_fill_user <- ggplot(df2, aes(x, y, fill = grp)) +
+    geom_col() +
+    scale_fill_manual(values = manual_fills)
+
+  expect_no_error(b_fill_user <- ggplot_build(p_fill_user))
+  expect_equal(unique(b_fill_user$data[[1]]$fill), "black")
+
+})
+
+test_that("Error when discrete colour mapping exceeds supported palette size", {
+
+  n <- 20L  # deliberately > 12
+
+  df <- data.frame(
+    x = rep(1:10, length.out = n),
+    y = seq_len(n),
+    grp = factor(paste0("g", seq_len(n)))
+  )
+
+  p <- ggplot(df, aes(x, y, colour = grp)) +
+    geom_point()
+
+  expect_error(
+    ggplot_build(p),
+    regexp = "theme61.*support.*12|more than 12 colours",
+    fixed = FALSE
+  )
+
 })
