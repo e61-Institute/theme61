@@ -8,11 +8,10 @@ t61_env <- NULL
 .onLoad <- function(libname, pkgname) {
 
   # Check if package is up-to-date
-  check_pkg_ver()
+  tryCatch(check_pkg_ver(), error = function(e) invisible(NULL))
 
   # Add PT Sans font and set up for use
-  sysfonts::font_add_google("PT Sans", "pt-sans")
-  showtext::showtext_auto()
+  tryCatch(.t61_init_fonts(), error = function(e) invisible(NULL))
 
   # Set up package environment for things like dual y-axis
   t61_env <<- new.env()
@@ -28,6 +27,20 @@ t61_env <- NULL
   lapply(geoms_fill, \(x) {update_geom_defaults(x, aes(fill = e61_tealdark))})
 
   # Update defaults for other types
-  update_geom_defaults("ribbon", aes(fill= e61_tealdark, alpha = 0.1))
+  update_geom_defaults("ribbon", aes(fill = e61_tealdark, alpha = 0.1))
 
+}
+
+.onAttach <- function(libname, pkgname) {
+  op <- options()
+  op.theme61 <- list(
+    theme61.preview_on_print = TRUE
+  )
+
+  to_set <- !(names(op.theme61) %in% names(op))
+  if (any(to_set)) {
+    options(op.theme61[to_set])
+  }
+
+  invisible()
 }

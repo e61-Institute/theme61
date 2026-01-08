@@ -63,7 +63,7 @@ theme_e61 <- function(
       line = element_line(colour = "black", linewidth = points_to_mm(0.5)),
       rect = element_rect(fill = background, colour = NA),
       text = element_text(colour = "black", family = base_family, size = base_size),
-      aspect.ratio = NULL,
+      aspect.ratio = aspect_ratio,
 
       # Axes and grid
       axis.line.x = element_line(colour = "black", linewidth = points_to_mm(0.4)),
@@ -140,12 +140,6 @@ theme_e61 <- function(
     ret <- ret + theme(rect = element_rect(fill = e61_greylight6))
   }
 
-  # Adjust spacing between facets if facets used
-  if (!inherits(ret$facet, "FacetNull")) {
-    ret <- ret %+replace% theme(panel.spacing.x = unit(2, "lines"),
-                                panel.spacing.y = unit(2, "lines"))
-  }
-
   # Add attribute to identify it as a theme61 object
   class(ret) <- c("theme_e61", class(ret))
   attr(ret, "t61_obj") <- TRUE
@@ -184,7 +178,8 @@ theme_e61_spatial <- function(
     legend = c("none", "bottom", "top", "left", "right", "inside"),
     legend_position = NULL,
     legend_title = FALSE,
-    base_family = "pt-sans"
+    base_family = "pt-sans",
+    aspect_ratio = NULL
 ) {
   legend <- match.arg(legend)
 
@@ -203,6 +198,7 @@ theme_e61_spatial <- function(
 
   ret <-
     theme(
+      aspect.ratio = aspect_ratio,
       # base text
       text = element_text(
         colour = "black",
@@ -377,41 +373,17 @@ in_to_cm <- function(inches, round = FALSE) {
   }
 }
 
-# Reposition y-axis titles to the top
-y_title_top <- function(adj, fix_left) {
-
-  if (class(adj) != "numeric") stop("adj must be a number.")
-  if (!length(adj) %in% c(1, 2)) stop("adj must be a single value or a vector of 2 values.")
-
-  if (length(adj) == 1) {
-
-    adj_left <- adj
-    adj_right <- adj
-
-  } else {
-
-    adj_left <- adj[[1]]
-    adj_right <- adj[[2]]
-
-  }
-
-  ret <-
-    theme(
-      axis.title.y.left = element_text(margin = margin(l = 5 + fix_left, r = adj_left), vjust = 1, angle = 0),
-      axis.title.y.right = element_text(margin = margin(l = adj_right, r = 5), vjust = 1, angle = 0)
-    )
-
-  return(ret)
-}
-
 #' Tell ggplot2 what to do when someone does + theme_e61()
 #' @method ggplot_add theme_e61
 #' @keywords internal
 #' @export
-ggplot_add.theme_e61 <- function(object, plot, object_name) {
-  # 1) merge in all the theme bits the way ggplot2 normally would
-  plot <- ggplot2:::ggplot_add.theme(object, plot, object_name)
-  # 2) now copy your flag from the theme onto the plot
+ggplot_add.theme_e61 <- function(object, plot, object_name, ...) {
+  # 1) Run the normal ggplot2 theme logic for this object
+  plot <- NextMethod()  # dispatches to ggplot_add.theme()
+
+  # 2) Copy your custom attribute from the theme onto the plot
   attr(plot, "t61_obj") <- attr(object, "t61_obj")
+
   plot
 }
+

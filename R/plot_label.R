@@ -16,12 +16,28 @@
 #'   adds a white box around the text which could be useful sometimes.
 #' @param angle (optional) Numeric. Rotate the labels. Defaults to 0 which is
 #'   normal left-to-right text.
-#' @param facet_name,facet_value (optional) String. Specify the name of the
-#'   facetting variable in `facet_name` and the panel to show the labels in
-#'   using `facet_value`. Defaults to NULL which shows the labels on all facets.
-#'   You must specify both `facet_name` and `facet_value` or leave both as NULL.
+#' @param panel Optional named list. If the plot is facetted, you can restrict
+#'   the label(s) to a specific panel by supplying the facetting variable(s) as
+#'   a named list, see the Details for the syntax.
+#' @param facet_name,facet_value `r lifecycle::badge("deprecated")`
 #'
-#' @return ggplot2 object
+#' @details The syntax for getting labels to appear on certain facet panels is
+#'   as follows.
+#'
+#'   For facet wraps, supply a named list with the facetting variable name(s)
+#'   and the facet value(s) you want the labels to appear on. For example, to
+#'   get labels to appear only on panel `1`, use `panel = list(grp = "1")`. If
+#'   you have 2 labels that you want to appear on panels `1` and `2`, use `panel
+#'   = list(grp = c("1", "2"))`.
+#'
+#'   For facet grids, you need to supply both the x- and y-dimension facet
+#'   variables to get the plot labels to appear correctly. For example, if your
+#'   facet variables are `r` and `c`, use `panel = list(r = "A", c = "1")` to
+#'   get the labels to appear on the panel at row `A` and column `1`. If you
+#'   have 2 labels you want to appear on panel `A1` and `B2`, use
+#'   `panel = list(r = c("A", "B"), c = c("1", "2"))`.
+#'
+#' @return Object to add to a ggplot (via `+`).
 #' @export
 plot_label <-
   function(label,
@@ -32,20 +48,29 @@ plot_label <-
            hjust = 0,
            geom = c("text", "label"),
            angle = 0,
-           facet_name = NULL,
-           facet_value = NULL
-           ) {
+           panel = NULL,
+           facet_name = lifecycle::deprecated(),
+           facet_value = lifecycle::deprecated()) {
+
+    # Hard deprecate old args if used
+    if (lifecycle::is_present(facet_name) || lifecycle::is_present(facet_value)) {
+      lifecycle::deprecate_stop(
+        when = "0.7.1",
+        what = I("theme61::plot_label(facet_name = '', facet_value = '')"),
+        with = I("theme61::plot_label(<facet_var> = <facet_value>)"),
+        details = paste0(
+          "Facet targeting is now done using the panel argument. ",
+          "Example: ",
+          "If you have a plot where the facetting variable is 'grp' and you want a label to appear on the panel titled 'A', the correct syntax is now: ",
+          "plot_label('a point', 1.25, 1, panel = list(grp = 'A'))"
+        )
+      )
+    }
 
     if (!all.equal(length(label), length(x), length(y)))
       stop("The number of x and y positions must equal the number of labels.")
 
     geom <- match.arg(geom)
-
-    if (!is.null(facet_name) && length(facet_name) != 1)
-      stop("facet_name must be a string of length 1.")
-
-    if (xor(is.null(facet_value), is.null(facet_name)))
-      stop("You must provide both `facet_name` and `facet_value` or leave both as NULL.")
 
     # Set up colours
     if (length(colour) == 1 && is.na(colour)) {
@@ -56,68 +81,256 @@ plot_label <-
       stop("The number of colours must equal the number of labels.")
     }
 
-    # Set up facets
-    if (!is.null(facet_name) && length(facet_value) == 1) {
-      facet_value <- rep(facet_value, length(label))
-    } else if (!is.null(facet_value) && length(facet_value) != length(label)) {
-      stop("facet_value must be 1 or equal to the number of labels.")
-    }
-
     # Automatically convert dates to dates if specified, so the user doesn't have
     # to wrap dates in as.Date() which saves some room.
     if (class(try(as.Date(as.character(x)), silent = TRUE)) != "try-error") {
       x <- as.Date(x)
     }
 
-    # Arg length checking helper
-    len_chk <- function(vec, len = length(label)) {
-      if (length(vec) == len) return(vec)
-      if (length(vec) != 1) stop(substitute(vec), " must be length ", length(label), " or 1.")
-      return(rep(vec, len))
+    # If user supplied extras, they must all be named (facet vars etc.)
+    if (!is.null(panel)) {
+      if (!is.list(panel) || is.null(names(panel)) || any(!nzchar(names(panel)))) {
+        stop(
+          "`panel` must be a named list.\n",
+          "Example: panel = list(grp = 'A')"
+        )
+      }
     }
 
-    plot_lab_data <- data.table::data.table(
-      label = label,
-      x = x,
-      y = y,
-      colour = colour,
-      size = len_chk(size),
-      hjust = len_chk(hjust),
-      angle = len_chk(angle),
-      facet = facet_value
+    structure(
+      list(
+        label = label,
+        x = x,
+        y = y,
+        colour = colour,
+        size = size,
+        hjust = hjust,
+        geom = geom,
+        angle = angle,
+        panel = panel,
+        # preserve current behaviour: mark TRUE if default size used
+        adj_plot_label = isTRUE(all.equal(size, 3.5))
+      ),
+      class = "e61_plot_label"
     )
-
-    # Facet column needs to have the same name as the facetting variable
-    if (!is.null(facet_name)) {
-      data.table::setnames(plot_lab_data, old = "facet", new = facet_name)
-    }
-
-    # Create the geom
-    if (geom == "text") {
-      retval <- geom_text(
-        data = plot_lab_data,
-        mapping = aes(x, y, label = label),
-        colour = colour, size = size, hjust = hjust, angle = angle,
-        inherit.aes = FALSE
-      )
-    } else if (geom == "label") {
-      retval <- geom_label(
-        data = plot_lab_data,
-        mapping = aes(x, y, label = label),
-        colour = colour, size = size, hjust = hjust, angle = angle,
-        inherit.aes = FALSE
-      )
-    }
-
-    # Only add the functionality to adjust the size of the plot labels if the
-    # user did not manually enter a size
-    if (size == 3.5) {
-      attr(retval, "adj_plot_label") <- TRUE
-    }
-
-    return(retval)
-
   }
+
+# Internal helpers ----
+
+.plab_len_chk <- function(vec, len) {
+  if (length(vec) == len) return(vec)
+  if (length(vec) != 1) stop(deparse(substitute(vec)), " must be length ", len, " or 1.")
+  rep(vec, len)
+}
+
+.find_facet_proto <- function(plot, facet_name) {
+  if (is.null(facet_name) || !nzchar(facet_name)) return(NULL)
+
+  if (!is.null(plot$data) && facet_name %in% names(plot$data)) {
+    return(plot$data[[facet_name]])
+  }
+
+  for (ly in plot$layers) {
+    d <- ly$data
+    if (!is.null(d) && facet_name %in% names(d)) {
+      return(d[[facet_name]])
+    }
+  }
+
+  NULL
+}
+
+.coerce_to_proto <- function(values, proto) {
+  if (is.null(proto)) return(values)
+
+  v <- as.character(values)
+
+  if (is.ordered(proto)) {
+    return(ordered(v, levels = levels(proto)))
+  }
+  if (is.factor(proto)) {
+    return(factor(v, levels = levels(proto)))
+  }
+
+  values
+}
+
+# Best-effort extractor of facet variable names from a ggplot
+.get_facet_vars <- function(plot) {
+  f <- plot$facet
+  if (is.null(f) || is.null(f$params)) return(character())
+
+  # facet_wrap(~a + b)
+  if (!is.null(f$params$facets)) {
+    facets <- f$params$facets
+    nm <- names(facets)
+    if (!is.null(nm) && all(nzchar(nm))) return(nm)
+    return(vapply(facets, function(q) rlang::as_name(q), character(1)))
+  }
+
+  # facet_grid(rows ~ cols)
+  vars <- character()
+
+  if (!is.null(f$params$rows)) {
+    rows <- f$params$rows
+    if (inherits(rows, "quosure")) vars <- c(vars, rlang::as_name(rows))
+    if (is.list(rows)) vars <- c(vars, vapply(rows, rlang::as_name, character(1)))
+  }
+
+  if (!is.null(f$params$cols)) {
+    cols <- f$params$cols
+    if (inherits(cols, "quosure")) vars <- c(vars, rlang::as_name(cols))
+    if (is.list(cols)) vars <- c(vars, vapply(cols, rlang::as_name, character(1)))
+  }
+
+  vars <- unique(vars)
+  vars <- vars[vars != "."]
+  vars
+}
+
+.build_plot_label_layer <- function(object, plot) {
+  n <- length(object$label)
+
+  plot_lab_data <- data.table::data.table(
+    label  = object$label,
+    x      = object$x,
+    y      = object$y,
+    colour = object$colour,
+    size   = .plab_len_chk(object$size, n),
+    hjust  = .plab_len_chk(object$hjust, n),
+    angle  = .plab_len_chk(object$angle, n)
+  )
+
+  facet_vars <- .get_facet_vars(plot)
+
+  # Panel targeting (explicit, avoids name collisions with base columns)
+  panel <- object$panel
+  panel_names <- if (is.null(panel)) character() else names(panel)
+
+  if (!is.null(panel)) {
+    if (!is.list(panel) || is.null(panel_names) || any(!nzchar(panel_names))) {
+      stop(
+        "`panel` must be a named list.\n",
+        "Example: plot_label('a', 1, 1, panel = list(grp = 'A'))"
+      )
+    }
+
+    # If the plot is facetted, require all facet vars to be present in panel
+    if (length(facet_vars)) {
+      have <- intersect(facet_vars, panel_names)
+
+      if (length(have) > 0 && length(have) < length(facet_vars)) {
+        missing <- setdiff(facet_vars, have)
+        stop(
+          "This plot is facetted by: ", paste(facet_vars, collapse = ", "), "\n",
+          "To place labels in a specific panel, supply *all* facet variables in `panel`.\n",
+          "Missing: ", paste(missing, collapse = ", "), "\n",
+          "Example: plot_label('a', 1, 1, panel = list(",
+          paste0(facet_vars, " = '...'", collapse = ", "),
+          "))"
+        )
+      }
+
+      # If none match, user likely supplied wrong names (or plot facet vars are nonstandard)
+      if (length(have) == 0) {
+        stop(
+          "`panel` names (", paste(panel_names, collapse = ", "), ") do not match the plot's facet variables (",
+          paste(facet_vars, collapse = ", "), ")."
+        )
+      }
+    }
+
+    # Add panel columns to label data (length 1 or n)
+    for (nm in panel_names) {
+      v <- panel[[nm]]
+      if (length(v) == 1) v <- rep(v, n)
+      if (length(v) != n) {
+        stop("`panel$", nm, "` must be length 1 or the number of labels (", n, ").")
+      }
+      plot_lab_data[[nm]] <- v
+    }
+  }
+
+  # Facet handling
+  if (length(facet_vars)) {
+    if (!is.null(panel)) {
+      # Targeted labels: coerce supplied facet vars to the plot prototypes
+      for (fv in facet_vars) {
+        proto <- .find_facet_proto(plot, fv)
+        if (is.null(proto)) {
+          stop(
+            "Facet variable `", fv, "` was not found in the plot data.\n",
+            "Check that you used the correct facetting variable name."
+          )
+        }
+        if (fv %in% names(plot_lab_data)) {
+          plot_lab_data[[fv]] <- .coerce_to_proto(plot_lab_data[[fv]], proto)
+        }
+      }
+    } else {
+      # Untargeted labels: expand across panels so per-row aesthetics replicate safely
+      built <- ggplot2::ggplot_build(plot)
+      lay <- built$layout$layout
+
+      facet_vars2 <- facet_vars[facet_vars %in% names(lay)]
+      if (length(facet_vars2)) {
+        panels <- unique(lay[, facet_vars2, drop = FALSE])
+
+        idx <- rep(seq_len(nrow(panels)), each = n)
+
+        plot_lab_data <- plot_lab_data[rep(seq_len(.N), times = nrow(panels))]
+
+        for (fv in facet_vars2) {
+          plot_lab_data[[fv]] <- panels[[fv]][idx]
+        }
+      }
+    }
+  }
+
+  # Create the geom
+  if (object$geom == "text") {
+    retval <- ggplot2::geom_text(
+      data = plot_lab_data,
+      mapping = ggplot2::aes(x, y, label = label),
+      colour = plot_lab_data$colour,
+      size   = plot_lab_data$size,
+      hjust  = plot_lab_data$hjust,
+      angle  = plot_lab_data$angle,
+      inherit.aes = FALSE
+    )
+  } else {
+    retval <- ggplot2::geom_label(
+      data = plot_lab_data,
+      mapping = ggplot2::aes(x, y, label = label),
+      colour = plot_lab_data$colour,
+      size   = plot_lab_data$size,
+      hjust  = plot_lab_data$hjust,
+      angle  = plot_lab_data$angle,
+      inherit.aes = FALSE
+    )
+  }
+
+  if (isTRUE(object$adj_plot_label)) {
+    attr(retval, "adj_plot_label") <- TRUE
+  }
+
+  retval
+}
+
+
+# New methods ----
+
+# ggplot2 v4+ hook
+#' @export
+update_ggplot.e61_plot_label <- function(object, plot, ...) {
+  plot + .build_plot_label_layer(object, plot)
+}
+
+# Back-compat hook (still used by ggplot2 add_ggplot path)
+#' @export
+ggplot_add.e61_plot_label <- function(object, plot, object_name, ...) {
+  update_ggplot.e61_plot_label(object, plot, ...)
+}
 
 #' @rdname plot_label
 #' @export

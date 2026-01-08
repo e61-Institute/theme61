@@ -81,6 +81,10 @@ scale_y_continuous_e61 <- function(limits = NULL,
     )
 
   } else if(!is.null(limits)){
+
+    # Make sure limits are only the min and max values (i.e. strictly length = 2)
+    limits <- limits[1:2]
+
     # Put it all together
     retval <- ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
@@ -168,6 +172,9 @@ scale_x_continuous_e61 <- function(limits = NULL,
   } else {
     breaks <- ggplot2::waiver()
   }
+
+  # Make sure limits are only the min and max values (i.e. strictly length = 2)
+  limits <- limits[1:2]
 
   # Put it all together
   retval <- ggplot2::scale_x_continuous(

@@ -17,8 +17,12 @@
 #'   argument explicitly.
 #' @param chart_type String, or vector of strings if saving multiple plots. Type
 #'   of chart. This is used to set sensible chart widths based on the type of
-#'   plot you are saving. Options are "normal" (default; for normal charts),
-#'   "wide" (for time series graphs) or "square" (for scatter plots).
+#'   plot you are saving. Options are:
+#'   * "normal": default, for normal charts;
+#'   * "wide": for time series graphs;
+#'   * "square": for scatter plots;
+#'   * "custom": for saving a custom aspect ratio specified in the
+#'   `aspect_ratio` argument in [theme_e61()].
 #' @param auto_scale Logical. Scale the y-axis automatically. Default is TRUE.
 #' @param dim An optional named list specifying the plot height and width.
 #'   Defaults to NULL which means the graph dimensions will be calculated
@@ -115,8 +119,8 @@ save_e61 <- function(filename = NULL,
 
   } else if(length(chart_type) == 1){
 
-    if(!chart_type %in% c("normal", "wide", "square"))
-      stop("Invalid chart type. All chart types must be one of 'normal', 'wide' or 'square'.")
+    if(!chart_type %in% c("normal", "wide", "square", "custom"))
+      stop("Invalid chart type. Chart types must be 'normal', 'wide', 'square', or 'custom'.")
 
   } else if(length(chart_type) > 1){
 
@@ -160,7 +164,7 @@ save_e61 <- function(filename = NULL,
   }
 
   # Check if the data frame can be written
-  if (save_data && !is.data.frame(plots[[1]]$data))
+  if (save_data && !is.data.frame(plots[[1]]@data))
     stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
   # Check list args are valid
@@ -185,9 +189,11 @@ save_e61 <- function(filename = NULL,
     fields <- c("title", "subtitle", "caption")
 
     spell_chk_i <- lapply(fields, function(field) {
-      val <- plots[[i]]$label[[field]]
+      val <- plots[[i]]@labels[[field]]
       if (!is.null(val)) {
-        # remove html elements before spell-checking
+        # replace html line breaks with a space and remove other elements before
+        # spell checking
+        val <- gsub("<br>", " ", val)
         val <- gsub("<[^>]+>", "", val)
 
         res <- check_spelling(val)
@@ -310,7 +316,7 @@ save_e61 <- function(filename = NULL,
 
     for (i in seq_along(plots)) {
       data_name <- gsub("\\.(\\w{3})$", paste0(i, ".csv"), filename)
-      data.table::fwrite(plots[[i]]$data, data_name)
+      data.table::fwrite(plots[[i]]@data, data_name)
     }
   }
 

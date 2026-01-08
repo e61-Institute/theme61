@@ -21,11 +21,11 @@ save_single <- function(
 
   is_spatial_chart <- FALSE
 
-  for(i in seq_along(plot$layers)){
+  for(i in seq_along(plot@layers)){
 
-    layer_class <- class(plot$layers[[i]]$geom)
+    layer_class <- class(plot@layers[[i]]$geom)
 
-    if("GeomSf" %in% layer_class) {
+    if(any(data.table::like(layer_class, "*Sf"))) {
       is_spatial_chart <- TRUE
 
       break
@@ -46,8 +46,8 @@ save_single <- function(
   max_width <- 18.59
 
   # update the base size without removing the legend
-  legendTitle <- plot$theme$legend.title
-  legendPosition <- plot$theme$legend.position
+  legendTitle <- plot@theme$legend.title
+  legendPosition <- plot@theme$legend.position
 
   if (is_spatial_chart && !attr(plot, "t61_obj")){
     plot <- plot + theme_e61_spatial()
@@ -72,7 +72,6 @@ save_single <- function(
 
   plot <- plot + theme(rect = element_rect(fill = bg_colour))
 
-
   # Update the aspect ratio -------------------------------------------------
 
   # Only keep one chart if a list has been supplied
@@ -82,7 +81,10 @@ save_single <- function(
     warning(paste0("Multiple chart types supplied, using first in list, which is: ", chart_type, "."))
   }
 
-  if(chart_type == "normal") {
+  # override chart type if the graph is a map
+  if (is_spatial_chart) chart_type <- "custom"
+
+  if (chart_type == "normal") {
     plot <- plot + theme(aspect.ratio = 0.75)
 
   } else if(chart_type == "square") {
@@ -100,7 +102,7 @@ save_single <- function(
   # Get the number of panel rows and columns ------------------------------
 
   # Get facet dimensions if applicable
-  if (length(plot$facet$params) != 0) {
+  if (length(plot@facet$params) != 0) {
 
     n_panel_cols <- max(plot_build$layout$layout$COL)
     n_panel_rows <- max(plot_build$layout$layout$ROW)
