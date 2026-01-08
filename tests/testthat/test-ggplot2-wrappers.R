@@ -198,3 +198,108 @@ test_that("Inference works when plot-level data is NULL and mapping comes from l
   expect_no_error(b <- ggplot_build(p))
   expect_gte(length(unique(b$data[[1]]$colour)), 2L)
 })
+
+test_that("facet spacing depends on theme61 facet axes setting", {
+
+  old <- options(quiet_wrap = TRUE)
+  on.exit(options(old), add = TRUE)
+
+  df <- data.frame(
+    gcc = rep(c("A", "B", "C", "D"), each = 5),
+    x = rep(letters[1:5], times = 4),
+    y = rnorm(20)
+  )
+
+  # axes = "margins" -> tight (0.5 lines)
+  p_margins <-
+    ggplot(df, aes(x = x, y = y)) +
+    geom_point() +
+    facet_wrap(~gcc, axes = "margins")
+
+  b_margins <- ggplot_build(p_margins)
+  th_margins <- b_margins@plot@theme
+
+  expect_equal(th_margins$panel.spacing.x, grid::unit(0.5, "lines"))
+  expect_equal(th_margins$panel.spacing.y, grid::unit(0.5, "lines"))
+
+  # axes = "all" -> roomy (2 lines)
+  p_all <-
+    ggplot(df, aes(x = x, y = y)) +
+    geom_point() +
+    facet_wrap(~gcc, axes = "all")
+
+  b_all <- ggplot_build(p_all)
+  th_all <- b_all@plot@theme
+
+  expect_equal(th_all$panel.spacing.x, grid::unit(2, "lines"))
+  expect_equal(th_all$panel.spacing.y, grid::unit(2, "lines"))
+})
+
+test_that("user-specified panel.spacing is not overridden", {
+
+  old <- options(quiet_wrap = TRUE)
+  on.exit(options(old), add = TRUE)
+
+  df <- data.frame(
+    gcc = rep(c("A", "B"), each = 5),
+    x = rep(letters[1:5], times = 2),
+    y = rnorm(10)
+  )
+
+  user_spacing_x <- grid::unit(9, "mm")
+  user_spacing_y <- grid::unit(7, "mm")
+
+  p <-
+    ggplot(df, ggplot2::aes(x = x, y = y)) +
+    geom_point() +
+    facet_wrap(~gcc, axes = "margins") +
+    theme(
+      panel.spacing.x = user_spacing_x,
+      panel.spacing.y = user_spacing_y
+    )
+
+  b <- ggplot_build(p)
+  th <- b@plot@theme
+
+  expect_equal(th$panel.spacing.x, user_spacing_x)
+  expect_equal(th$panel.spacing.y, user_spacing_y)
+})
+
+testthat::test_that("ggplot2::facet_wrap is not auto-adjusted (facet not tagged)", {
+
+  old <- options(quiet_wrap = TRUE)
+  on.exit(options(old), add = TRUE)
+
+  df <- data.frame(
+    gcc = rep(c("A", "B", "C"), each = 5),
+    x = rep(letters[1:5], times = 3),
+    y = rnorm(15)
+  )
+
+  # Bypass theme61 wrapper: facet is untagged, so spacing should NOT be injected.
+  p <-
+    ggplot(df, ggplot2::aes(x = x, y = y)) +
+    geom_point() +
+    ggplot2::facet_wrap(~gcc)
+
+  b <- ggplot_build(p)
+  th <- b@plot@theme
+
+  # Don't assume ggplot2 defaults; just assert we didn't inject our canonical values.
+  expect_false(identical(th$panel.spacing.x, grid::unit(2, "lines")))
+  expect_false(identical(th$panel.spacing.y, grid::unit(2, "lines")))
+  expect_false(identical(th$panel.spacing.x, grid::unit(0.5, "lines")))
+  expect_false(identical(th$panel.spacing.y, grid::unit(0.5, "lines")))
+})
+
+test_that("theme61::facet_wrap tags facet with t61_axes", {
+
+  df <- data.frame(gcc = rep(c("A", "B"), each = 2), x = 1:4, y = 1:4)
+
+  p <-
+    ggplot(df, ggplot2::aes(x, y)) +
+    geom_point() +
+    facet_wrap(~gcc, axes = "margins")
+
+  expect_equal(attr(p@facet, "t61_axes", exact = TRUE), "margins")
+})
