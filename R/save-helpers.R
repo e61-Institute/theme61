@@ -29,7 +29,7 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
     }, add = TRUE)
 
     graph_i <- maybe_add_default_scales(graph)
-    class(graph_i) <- setdiff(class(graph_i), "e61_ggplot")
+    class(graph_i) <- setdiff(class(graph_i), "e61_plot")
 
     print(graph_i)
 

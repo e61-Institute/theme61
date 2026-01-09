@@ -1,5 +1,7 @@
 #' Masks ggplot2::ggplot to add e61_plot class and apply theme_e61
 #'
+#' This wrapper tags the plot so theme61 can inject default scales at build time.
+#'
 #' @noRd
 #' @export
 ggplot <- function(data = NULL,
@@ -20,7 +22,6 @@ ggplot <- function(data = NULL,
   }
 
   p
-
 }
 
 #' Masks ggplot2::ggsave to encourage users to use save_e61
@@ -56,7 +57,10 @@ labs <- function(...) {
 #' @export
 facet_wrap <- function(..., axes = "all") {
 
-  ggplot2::facet_wrap(..., axes = axes)
+  f <- ggplot2::facet_wrap(..., axes = axes)
+  attr(f, "t61_axes") <- axes
+  return(f)
+
 }
 
 #' Masks ggplot2::facet_grid to set axes to "all" better distinguish facet
@@ -66,5 +70,7 @@ facet_wrap <- function(..., axes = "all") {
 #' @export
 facet_grid <- function(..., axes = "all") {
 
-  ggplot2::facet_grid(..., axes = axes)
+  f <- ggplot2::facet_grid(..., axes = axes)
+  attr(f, "t61_axes") <- axes
+  return(f)
 }

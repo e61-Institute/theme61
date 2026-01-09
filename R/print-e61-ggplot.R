@@ -4,6 +4,7 @@
 #' - Also renders a preview in the Viewer (opt-out via option)
 #' - Prefers Viewer focus by default (best-effort)
 #'
+#' @keywords internal
 #' @export
 print.e61_plot <- function(x, ...) {
 
@@ -18,13 +19,11 @@ print.e61_plot <- function(x, ...) {
 
   # Viewer preview
   if (in_rstudio) {
-    suppressWarnings(suppressMessages(
-      save_e61(plot = x, preview = TRUE)
-    ))
+    suppressWarnings(suppressMessages(save_e61(plot = x, preview = TRUE)))
       }
 
-  # Plot last so Plots pane keeps it
-  x_plot <- x
+  # Plots pane render (must include theme61 defaults)
+  x_plot <- maybe_add_default_scales(x)
   class(x_plot) <- setdiff(class(x_plot), "e61_plot")
   print(x_plot)
 
