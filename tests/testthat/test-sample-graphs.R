@@ -1,8 +1,4 @@
-# Check whole-graph generation consistency --------------------------------
-
 test_that("Single-panel graph examples", {
-
-  skip_if_not(interactive())
 
   withr::local_seed(42)
 
