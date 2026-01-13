@@ -1,3 +1,24 @@
+# theme61 0.7.1
+
+09 Jan 2026
+
+#### New features
+
+* Plots now render like they would appear when saved in the Viewer pane when they are printed via `print()` (this happens automatically when a `ggplot()` object is run).
+* Added `ytitle_wrap` argument to `labs_e61` so you can custom wrap the y-axis titles just like other graph titles.
+* New, simpler approach to specifying which facets for labels to appear on using a new `panel` argument in `plot_label`.
+
+#### Bug fixes
+
+* theme61 now works with ggplot2 v4.0.0 and above (this will automatically update when you install the new package).
+* `save_e61` no longer ignores custom aspect ratios.
+* Maps made using `sf` functions now retain their aspect ratios rather than using the (bad) default aspect ratios designed for normal graphs.
+* Package now loads even if there is no internet connection.
+* Labels on facet graphs now respect ordered factor ordering rather than resetting them.
+* A better default of labels showing on all facet panels if no facet is specified, rather than erroring out with an uninformative error message.
+* Fix issue with secondary y-axis not appearing by default on certain graphs.
+* Fix issue with facet panel spacing when axes do not appear on all panels.
+
 # theme61 0.7.0
 
 01 Jul 2025
