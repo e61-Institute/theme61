@@ -17,18 +17,38 @@ print.e61_ggplot <- function(x, ...) {
     requireNamespace("rstudioapi", quietly = TRUE) &&
     rstudioapi::isAvailable()
 
+  # Alter defaults for facets with free y scales
+
+  free_y <- x@facet$params$free$y
+
+  # Detect whether user supplied a y scale (pre-build)
+  ys <- x@scales$get_scales("y")
+  user_has_y <- !is.null(ys)
+
+  # Detect whether user supplied custom limits
+  user_limits <- FALSE
+  if (user_has_y) {
+    lim <- ys$limits
+    user_limits <- !is.null(lim) && !inherits(lim, "waiver")
+  }
+
+  # Decide whether to autoscale in preview
+  auto_scale_preview <- TRUE
+  if (free_y) {
+    if (!user_has_y) {
+      auto_scale_preview <- FALSE
+    } else if (!inherits(ys, "scale_e61")) {
+      auto_scale_preview <- FALSE
+    } else if (user_limits) {
+      auto_scale_preview <- FALSE
+    }
+  }
+
   # Viewer preview
   if (in_rstudio) {
     suppressWarnings(
       suppressMessages(
-        save_e61(
-          plot        = x,
-          preview     = TRUE,
-          format      = "svg",
-          spell_check = FALSE,
-          save_data   = FALSE,
-          print_info  = FALSE
-        )
+        save_e61(plot = x, preview = TRUE, auto_scale = auto_scale_preview)
       )
     )
   }
