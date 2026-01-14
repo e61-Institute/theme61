@@ -291,7 +291,8 @@ theme_e61_spatial <- function(
 #'   square_legend_symbols()
 #'
 square_legend_symbols <- function(size = 6) {
-  guides(colour = guide_legend(override.aes = list(alpha = 1, size = size, shape = 15)))
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = size, shape = 15)),
+         fill = guide_legend(override.aes = list(alpha = 1, size = size, shape = 15)))
 }
 
 #' Applies changes to the theme for horizontal bar graphs
