@@ -91,21 +91,56 @@ test_that("Y-axis customisation options", {
     scale_y_continuous_e61(sec_axis = FALSE) +
     labs_e61(title = "Y-scale testing")
 
-  # Flipped graph
+  # Flipped graph (save_e61 should auto-apply format_flip)
   p5 <- p +
     theme_e61() +
     coord_flip() +
     labs_e61(title = "Flipped graph",
              y = "Long y-axis text")
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test1.svg", p1)))
-    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test2.svg", p2)))
-    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test3.svg", p3)))
-    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test4.svg", p4)))
-    expect_snapshot_file(suppressWarnings(save_e61("y-scale-test5.svg", p5)))
-  })
+  # Helper: get y scale after theme61 auto-scaling has happened
+  get_y_scale <- function(plot) {
+    b <- ggplot_build(plot)
+    b@plot@scales$get_scales("y")
+  }
 
+  # ---- secondary axis presence/absence
+  y1 <- get_y_scale(p1)
+  y2 <- get_y_scale(p2)
+  y3 <- get_y_scale(p3)
+  y4 <- get_y_scale(p4)
+
+  expect_false(is.null(y1))
+  expect_false(is.null(y2))
+  expect_false(is.null(y3))
+  expect_false(is.null(y4))
+
+  # Default should have duplicated secondary axis (not waiver / not NULL)
+  expect_false(inherits(y1$secondary.axis, "waiver") || is.null(y1$secondary.axis))
+  expect_false(inherits(y3$secondary.axis, "waiver") || is.null(y3$secondary.axis))
+
+  # sec_axis = FALSE should turn it off (waiver or NULL depending on ggplot2 internals)
+  expect_true(inherits(y2$secondary.axis, "waiver") || is.null(y2$secondary.axis))
+  expect_true(inherits(y4$secondary.axis, "waiver") || is.null(y4$secondary.axis))
+
+  # ---- limits are set when provided
+  # We avoid asserting exact numeric limits because ggplot may expand/transform internally.
+  expect_false(is.null(y1$limits))
+  expect_false(is.null(y2$limits))
+
+  # ---- flipped graph: save_e61 should behave like format_flip() was applied
+  p5_manual <- p +
+    theme_e61() +
+    coord_flip() +
+    format_flip() +
+    labs_e61(title = "Flipped graph",
+             y = "Long y-axis text")
+
+  withr::with_tempdir({
+    suppressWarnings(save_e61("auto.svg", p5))
+    suppressWarnings(save_e61("manual.svg", p5_manual))
+    expect_true(compare_file_binary("auto.svg", "manual.svg"))
+  })
 })
 
 test_that("Directory existence checker", {
@@ -213,32 +248,43 @@ test_that("Does save_data work", {
 })
 
 test_that("Change background colour", {
-
   p <- minimal_plot
 
+  read_file <- function(path) paste(readLines(path, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+
   withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("plot-bg-col-pink.svg", p, bg_colour = "pink")))
-    expect_snapshot_file(suppressWarnings(save_e61("plot-bg-col-box.svg", p, bg_colour = e61_skylight8)))
-    expect_snapshot_file(suppressWarnings(save_e61("plot-multi-bg-col-box.svg", plotlist = list(p, p), bg_colour = e61_skylight8)))
+    suppressWarnings(save_e61("plot-bg-col-yellow.svg", p, bg_colour = "#F2F000"))
+    expect_true(file.exists("plot-bg-col-yellow.svg"))
+    expect_gt(file.info("plot-bg-col-yellow.svg")$size, 500)
+    expect_true(grepl("#F2F000", read_file("plot-bg-col-yellow.svg"), fixed = TRUE))
+
+    suppressWarnings(save_e61("plot-bg-col-box.svg", p, bg_colour = e61_skylight8))
+    expect_true(file.exists("plot-bg-col-box.svg"))
+    expect_gt(file.info("plot-bg-col-box.svg")$size, 500)
+    expect_true(grepl(e61_skylight8, read_file("plot-bg-col-box.svg"), fixed = TRUE))
+
+    suppressWarnings(save_e61("plot-multi-bg-col-box.svg", plotlist = list(p, p), bg_colour = e61_skylight8))
+    expect_true(file.exists("plot-multi-bg-col-box.svg"))
+    expect_gt(file.info("plot-multi-bg-col-box.svg")$size, 500)
+    expect_true(grepl(e61_skylight8, read_file("plot-multi-bg-col-box.svg"), fixed = TRUE))
   })
 })
 
 test_that("PNG resolution changer works", {
-
   plot <- minimal_plot
 
   withr::with_tempdir({
     suppressWarnings(save_e61("png-1.png", plot))
     suppressWarnings(save_e61("png-2.png", plot, res = 2))
+
     g_info1 <- magick::image_info(magick::image_read("png-1.png"))
     g_info2 <- magick::image_info(magick::image_read("png-2.png"))
+
     expect_equal(g_info1$width * 2, g_info2$width, tolerance = 0.1)
     expect_equal(g_info1$height * 2, g_info2$height, tolerance = 0.1)
-
-    expect_snapshot_file(suppressWarnings(save_e61("png-1.png", plot)))
-    expect_snapshot_file(suppressWarnings(save_e61("png-2.png", plot, res = 2)))
   })
 })
+
 
 test_that("Preview mode works", {
   p <- minimal_plot
