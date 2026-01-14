@@ -12,10 +12,15 @@ test_that("Interactive prompt works", {
     lockBinding("gh", ns)
   }, add = TRUE)
 
-  testthat::local_mocked_bindings(
-    readline = function(...) "N",
-    .env = baseenv()
-  )
+  orig_readline <- get("readline", envir = baseenv())
+  unlockBinding("readline", baseenv())
+  assign("readline", function(...) "N", baseenv())
+  lockBinding("readline", baseenv())
+  on.exit({
+    unlockBinding("readline", baseenv())
+    assign("readline", orig_readline, baseenv())
+    lockBinding("readline", baseenv())
+  }, add = TRUE)
 
   expect_no_error(check_pkg_ver(test = TRUE))
 })
