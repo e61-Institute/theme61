@@ -1,6 +1,12 @@
 test_that("Interactive prompt works", {
-  skip("This test only works interactively.")
+  testthat::local_mocked_bindings(
+    gh = function(...) list(list(tag_name = "v0.9.0")),
+    .env = asNamespace("gh")
+  )
+  testthat::local_mocked_bindings(
+    readline = function(...) "N",
+    .env = baseenv()
+  )
 
-  check_pkg_ver(test = TRUE)
-
+  expect_no_error(check_pkg_ver(test = TRUE))
 })
