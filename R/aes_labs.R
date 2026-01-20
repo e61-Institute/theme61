@@ -6,7 +6,6 @@ update_labs <- function(plot, plot_width){
 
   p <- ggplotGrob(plot)
 
-
   # Title ----
 
   # First check whether the title has already been manually wrapped
@@ -125,20 +124,7 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 
     text <- paste(text$collapsed_text, collapse = "\n")
 
-    # make sure we don't have only one word hanging on the last line
-    if(stringr::str_detect(text, "\\\n\\S+$")){
-
-      last_two_words <-
-        stringr::str_extract(text, "\\S+\\\n\\S+$") |>
-        stringr::str_replace_all("\\\n", " ")
-
-      text <- text |>
-        stringr::str_remove("\\S+\\\n\\S+$") |>
-        trimws() |>
-        paste0("\n", last_two_words)
-    }
-
-  # algo for subtitles
+    # algo for subtitles
   } else if (text_type == "subtitle") {
 
     # Check if the y-axis title is present
@@ -148,10 +134,11 @@ rescale_text <- function(text, text_type, font_size, plot_width){
     if (has_y_title) {
       regex_in <- "(<.*>)(.*)<\\/span><br>(<.*>)(.*)<\\/span>"
       regex_out <- "\\1___\\2___\\3___\\4"
+
     } else {
       regex_in <- "(<.*>)(.*)<\\/span>"
       regex_out <- "\\1___\\2"
-      }
+    }
 
     sub_list <- gsub(regex_in, regex_out, text) |>
       strsplit("___", fixed = T) |> unlist()
@@ -159,8 +146,10 @@ rescale_text <- function(text, text_type, font_size, plot_width){
     if (length(sub_list) > 1 && has_y_title) {
       sub_text <- sub_list[[2]]
       y_text <- sub_list[[4]]
+
     } else if (length(sub_list) > 1 && !has_y_title) {
       sub_text <- sub_list[[2]]
+
     } else if (length(sub_list) == 1) {
       sub_text <- ""
     }
@@ -172,39 +161,14 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 
     sub_text <- paste(sub_text$collapsed_text, collapse = "<br>")
 
-    # make sure we don't have only one word hanging on the last line
-    if(stringr::str_detect(sub_text, "\\\n\\S+$")){
-
-      last_two_words <-
-        stringr::str_extract(sub_text, "\\S+\\\n\\S+$") |>
-        stringr::str_replace_all("\\\n", " ")
-
-      sub_text <- sub_text |>
-        stringr::str_remove("\\S+\\\n\\S+$") |>
-        trimws() |>
-        paste0("<br>", last_two_words)
-    }
-
     ## Parse the y-axis title text
     if (has_y_title) {
+
       y_text <- stringr::str_replace_all(y_text, "\\\n", " ")
 
-      y_text <- get_lines(y_text, font_size, plot_width)
+      y_text <- get_lines(y_text, font_size * 0.9, plot_width)
 
       y_text <- paste(y_text$collapsed_text, collapse = "<br>")
-
-      # make sure we don't have only one word hanging on the last line
-      if(stringr::str_detect(y_text, "\\\n\\S+$")){
-
-        last_two_words <-
-          stringr::str_extract(y_text, "\\S+\\\n\\S+$") |>
-          stringr::str_replace_all("\\\n", " ")
-
-        y_text <- y_text |>
-          stringr::str_remove("\\S+\\\n\\S+$") |>
-          trimws() |>
-          paste0("<br>", last_two_words)
-      }
     }
 
     ## Recombine them and restore the HTML
@@ -222,7 +186,7 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 
     }
 
-  # algo for footnotes
+    # algo for footnotes
   } else if(text_type == "caption"){
 
     footnote_text <- stringr::str_replace_all(text, "\\\n\\*", " new_footnote\\*")
@@ -266,7 +230,12 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 
       for(i in 1:nrow(footnote_data)){
 
-        text_lines[[i]] <- get_lines(footnote_data$footnote_text[i], font_size, plot_width)
+        # Get lines and make sure to add the *s
+        text_lines[[i]] <- get_lines(
+          paste(strrep("*", i), footnote_data$footnote_text[i]),
+          font_size,
+          plot_width
+        )
 
         text_lines[[i]][, footnote_num := i]
       }
@@ -277,12 +246,11 @@ rescale_text <- function(text, text_type, font_size, plot_width){
       footnote_data <-
         text_lines[, .(footnote = paste(collapsed_text, collapse = "\n")), by = footnote_num]
 
-      footnote_data[, footnote := paste(strrep("*", as.numeric(footnote_num)), footnote)]
       footnote_data <- footnote_data[, .(footnotes = paste(footnote, collapse = "\n"))]
 
       footnote_text <- footnote_data$footnotes[1]
 
-    # Otherwise we didn't have any footnotes to begin with, so set as an empty string
+      # Otherwise we didn't have any footnotes to begin with, so set as an empty string
     } else {
       footnote_text <- NULL
     }
@@ -296,26 +264,34 @@ rescale_text <- function(text, text_type, font_size, plot_width){
         text <- footnote_text
       }
 
-    # we have sources - check how many
+      # we have sources - check how many
     } else {
+
+      # Add the sources label and collapse
       if(length(sources) > 1) {
+        sources <- paste0(sources, collapse = "; ")
 
-        if(is.null(footnote_text)){
-          text <- paste("Sources:", paste(sources, collapse = "; "))
-
-        } else {
-          text <- paste(footnote_text, "\nSources:", paste(sources, collapse = "; "))
-        }
+        sources <- paste0("Sources: ", sources)
 
       } else if(length(sources) == 1){
+        sources <- paste0(sources, collapse = "; ")
 
-        if(is.null(footnote_text)){
-          text <- paste("\nSource:", sources)
-
-        } else {
-          text <- paste(footnote_text, "\nSource:", sources)
-        }
+        sources <- paste0("Source: ", sources)
       }
+
+      # Make sure the sources don't extend over the width of the plot
+      sources <- get_lines(sources, font_size, plot_width)
+
+      sources <- paste0(sources$collapsed_text, collapse = "\n")
+
+      # Add the rest of the footnote text
+      if(is.null(footnote_text)){
+        text <- sources
+
+      } else {
+        text <- paste0(footnote_text, "\n", sources)
+      }
+
     }
   }
 
@@ -442,7 +418,7 @@ update_y_axis_labels <- function(plot,
 
     if(adj_width > 20) spacing <- spacing + 1.2 * y_font_size
 
-  # otherwise we have a multi panel and need to take into account the width of the widest break label
+    # otherwise we have a multi panel and need to take into account the width of the widest break label
   } else {
 
     # This is old code that used to be necessary but it no longer is as the way ggplot calculates margin
