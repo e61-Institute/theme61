@@ -120,7 +120,7 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 
     text <- stringr::str_replace_all(text, "\\\n", " ")
 
-    text <- get_lines(text, font_size, plot_width)
+    text <- get_lines(text, font_size, plot_width, font_face = 2)
 
     text <- paste(text$collapsed_text, collapse = "\n")
 
@@ -166,6 +166,8 @@ rescale_text <- function(text, text_type, font_size, plot_width){
 
       y_text <- stringr::str_replace_all(y_text, "\\\n", " ")
 
+      # Note we need to scale down the font size for y-axis titles as it is part
+      # of the subtitle text which has a larger font size
       y_text <- get_lines(y_text, font_size * 0.9, plot_width)
 
       y_text <- paste(y_text$collapsed_text, collapse = "<br>")
@@ -298,16 +300,158 @@ rescale_text <- function(text, text_type, font_size, plot_width){
   return(text)
 }
 
+#' Format text based on font size, text type and plot width for multi plots
+#' text - The text to be rescaled (adding line breaks in the right places etc.)
+#' text_type - Is the text for a title, subtitle or caption (footnotes and sources)
+#' font_size - Numeric. Size of the font of the text.
+#' plot_width - Numeric. Width of the plot.
+#' @noRd
+rescale_text_multi <- function(text, text_type, font_size, plot_width){
+
+  if(length(plot_width) == 0) stop("Plot width is length 0.")
+
+  # algo for titles
+  if(text_type == "title") {
+
+    text <- stringr::str_replace_all(text, "\\\n", " ")
+
+    text <- get_lines(text, font_size, plot_width, font_face = 2) # set font face to bold
+
+    text <- paste(text$collapsed_text, collapse = "\n")
+
+    # algo for titles
+  } else if(text_type == "subtitle") {
+
+      text <- stringr::str_replace_all(text, "\\\n", " ")
+
+      text <- get_lines(text, font_size, plot_width)
+
+      text <- paste(text$collapsed_text, collapse = "\n")
+
+    # algo for footnotes
+  } else if(text_type == "caption"){
+
+    footnote_text <- stringr::str_replace_all(text, "\\\n\\*", " new_footnote\\*")
+    footnote_text <- stringr::str_replace_all(footnote_text, "\\\n", " ")
+    footnote_text <- stringr::str_remove(footnote_text, pattern = "^\\* ")
+
+    sources <-
+      stringr::str_extract(footnote_text, "(?<=Sources{0,1}\\:).*$") |>
+      stringr::str_split(";") |>
+      unlist() |>
+      stringr::str_squish()
+
+    # remove sources - if we have them
+    if(stringr::str_detect(footnote_text, "Source")){
+      footnote_text <- stringr::str_extract(footnote_text, "^.*(?=Source.*:.+)")
+
+    } else {
+      footnote_text <- footnote_text
+    }
+
+    # split footnotes up if there are multiple and drop those with length 0
+    footnote_text <- stringr::str_split(footnote_text, "new_footnote\\*+\\s*")
+
+    footnote_text <- lapply(footnote_text, stringr::str_remove_all, pattern = "new_footnote")
+
+    text_lengths <- lapply(footnote_text, get_text_width, font_size = font_size)
+
+    footnote_data <- data.table::data.table(footnote_text = unlist(footnote_text), text_width = unlist(text_lengths))
+
+    footnote_data <- footnote_data |>
+      _[text_width != 0] |>
+      _[, footnote_text := stringr::str_replace_all(footnote_text, "[\r\n]" , " ")]
+
+    # number footnotes and then split into words
+    footnote_data[, footnote_num := 1:.N]
+
+    if(nrow(footnote_data) > 0){
+
+      # split into words to calculate line lengths
+      text_lines <- list()
+
+      for(i in 1:nrow(footnote_data)){
+
+        # Get lines and make sure to add the *s
+        text_lines[[i]] <- get_lines(
+          paste(strrep("*", i), footnote_data$footnote_text[i]),
+          font_size,
+          plot_width
+        )
+
+        text_lines[[i]][, footnote_num := i]
+      }
+
+      text_lines <- data.table::rbindlist(text_lines)
+
+      # combine text into a caption along with the sources
+      footnote_data <-
+        text_lines[, .(footnote = paste(collapsed_text, collapse = "\n")), by = footnote_num]
+
+      footnote_data <- footnote_data[, .(footnotes = paste(footnote, collapse = "\n"))]
+
+      footnote_text <- footnote_data$footnotes[1]
+
+      # Otherwise we didn't have any footnotes to begin with, so set as an empty string
+    } else {
+      footnote_text <- NULL
+    }
+
+    # Check whether we have sources to add and how many
+    if(any(is.na(sources)) || is.null(sources)){
+      if(is.null(footnote_text)){
+        text <- NULL
+
+      } else {
+        text <- footnote_text
+      }
+
+      # we have sources - check how many
+    } else {
+
+      # Add the sources label and collapse
+      if(length(sources) > 1) {
+        sources <- paste0(sources, collapse = "; ")
+
+        sources <- paste0("Sources: ", sources)
+
+      } else if(length(sources) == 1){
+        sources <- paste0(sources, collapse = "; ")
+
+        sources <- paste0("Source: ", sources)
+      }
+
+      # Make sure the sources don't extend over the width of the plot
+      sources <- get_lines(sources, font_size, plot_width)
+
+      sources <- paste0(sources$collapsed_text, collapse = "\n")
+
+      # Add the rest of the footnote text
+      if(is.null(footnote_text)){
+        text <- sources
+
+      } else {
+        text <- paste0(footnote_text, "\n", sources)
+      }
+
+    }
+  }
+
+  return(text)
+}
+
+
 #' Calculate break text up into aesthetically sized lines
 #' text - String. Text to be measured.
 #' font_size - Numeric. Size of the font of the text.
 #' plot_width - Numeric. Width of the plot.
+#' font_face - Numeric. Face of the font (1 = normal, 2 = bold)
 #' @noRd
-get_lines <- function(text, font_size, plot_width){
+get_lines <- function(text, font_size, plot_width, font_face = 1){
 
   # split text into words and calculate the length of each word
   words <- split_text_into_words(text)
-  words[, word_width := get_text_width(paste0(word, " "), font_size)]
+  words[, word_width := get_text_width(paste0(word, " "), font_size, font_face)]
 
   # assign words to different lines based on the cumulative length
   words[, cumsum_word_width := cumsum(word_width) / plot_width]
@@ -353,10 +497,10 @@ get_lines <- function(text, font_size, plot_width){
 #' text - String. Text to be measured.
 #' font_size - Numeric. Size of the font of the text.
 #' @noRd
-get_text_width <- function(text, font_size = 10) {
+get_text_width <- function(text, font_size = 10, font_face = 1) {
 
   R.devices::devEval("nulldev", {
-    par(family = "sans", ps = font_size)
+    par(family = "sans", ps = font_size, font = font_face)
     ret <- graphics::strwidth(text, units = "inches") * 2.54
   })
 

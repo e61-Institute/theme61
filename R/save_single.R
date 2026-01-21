@@ -11,6 +11,7 @@ save_single <- function(
     format,
     base_size,
     pad_width,
+    pad_height,
     bg_colour
 ) {
 
@@ -165,7 +166,7 @@ save_single <- function(
   # update the width after this check
   width <- tot_panel_width + known_wd
 
-  plot <- update_labs(plot, 0.95 * width)
+  plot <- update_labs(plot, 0.99 * width)
 
   if(!is_spatial_chart){
 
@@ -220,8 +221,9 @@ save_single <- function(
     }
   }
 
-  # Add width padding
-  width <- width + pad_width
+  # Add width padding - note it comes in mm and we will want to convert to cm
+  width <- width + pad_width / 10
+  height <- height + pad_height / 10
 
   # Return objects needed to save the graph ----
   retval <- list(graph = plot,

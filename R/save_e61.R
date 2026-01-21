@@ -27,8 +27,12 @@
 #' @param dim An optional named list specifying the plot height and width.
 #'   Defaults to NULL which means the graph dimensions will be calculated
 #'   automatically.
-#' @param pad_width Numeric. Add horizontal whitespace to the sides of the
-#'   graph. Defaults to no additional padding.
+#' @param pad_width Numeric (mm). Adds horizontal whitespace to the sides of all
+#'   graphs. If saving multiple charts this will add the same spacing to all
+#'   charts. Defaults to no additional padding.
+#' @param pad_height Numeric (mm). Adds vertical whitespace to the sides of all
+#'   graphs. If saving multiple charts this will add the same spacing to all
+#'   charts. Defaults to no additional padding.
 #' @param max_height Numeric. The maximum height of your plot in cm. This is
 #'   used to constrain the plot resizing algorithm in cases where you want to
 #'   limit the height of your charts. Defaults to NULL which does not restrict
@@ -79,6 +83,7 @@ save_e61 <- function(filename = NULL,
                      auto_scale = TRUE,
                      dim = list(height = NULL, width = NULL),
                      pad_width = 0,
+                     pad_height = 0,
                      max_height = NULL,
                      preview = FALSE,
                      save_data = FALSE,
@@ -258,13 +263,13 @@ save_e61 <- function(filename = NULL,
       sources = sources,
       width = dim$width, # control width of the chart
       height = dim$height, # control height of the chart
-      max_height = max_height, # control maximum height of the chart
       auto_scale = auto_scale,
       title_spacing_adj = spacing_adj$title, # adjust the amount of space given to the title
       subtitle_spacing_adj = spacing_adj$subtitle, # adjust the amount of space given to the subtitle
       height_adj = height_adj, # adjust the vertical spacing of the mpanel charts
       base_size = base_size,
       pad_width = pad_width,
+      pad_height = pad_height,
       ncol = ncol,
       nrow = nrow,
       align = align,
@@ -287,6 +292,7 @@ save_e61 <- function(filename = NULL,
       format = format,
       base_size = base_size,
       pad_width = pad_width,
+      pad_height = pad_height,
       bg_colour = bg_colour
     )
   }
