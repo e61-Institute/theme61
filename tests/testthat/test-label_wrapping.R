@@ -7,7 +7,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p1, filename = "plot-sngle-wrp-test-1.svg", bg_colour = "grey90")
+      save_e61(p1, filename = "plot-sngle-wrp-test-1.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -16,7 +16,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p2, filename = "plot-sngle-wrp-test-2.svg",  bg_colour = "grey90")
+      save_e61(p2, filename = "plot-sngle-wrp-test-2.svg",  bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -25,7 +25,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p3, filename = "plot-sngle-wrp-test-3.svg",  bg_colour = "grey90")
+      save_e61(p3, filename = "plot-sngle-wrp-test-3.svg",  bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -34,7 +34,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p4, filename = "plot-sngle-wrp-test-4.svg", bg_colour = "grey90")
+      save_e61(p4, filename = "plot-sngle-wrp-test-4.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -54,7 +54,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p5, filename = "plot-sngle-wrp-test-5.svg", bg_colour = "grey90")
+      save_e61(p5, filename = "plot-sngle-wrp-test-5.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -75,7 +75,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p6, filename = "plot-sngle-wrp-test-6.svg", bg_colour = "grey90")
+      save_e61(p6, filename = "plot-sngle-wrp-test-6.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -96,7 +96,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p7, filename = "plot-sngle-wrp-test-7.svg", bg_colour = "grey90")
+      save_e61(p7, filename = "plot-sngle-wrp-test-7.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -120,7 +120,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p8, filename = "plot-sngle-wrp-test-8.svg", bg_colour = "grey90")
+      save_e61(p8, filename = "plot-sngle-wrp-test-8.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -144,7 +144,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p9, filename = "plot-sngle-wrp-test-9.svg", bg_colour = "grey90")
+      save_e61(p9, filename = "plot-sngle-wrp-test-9.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -167,7 +167,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p10, filename = "plot-sngle-wrp-test-10.svg", bg_colour = "grey90")
+      save_e61(p10, filename = "plot-sngle-wrp-test-10.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -190,7 +190,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p11, filename = "plot-sngle-wrp-test-11.svg", bg_colour = "grey90")
+      save_e61(p11, filename = "plot-sngle-wrp-test-11.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -213,7 +213,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p12, dim = list(width = 20), filename = "plot-sngle-wrp-test-12.svg", bg_colour = "grey90")
+      save_e61(p12, dim = list(width = 20), filename = "plot-sngle-wrp-test-12.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -242,7 +242,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p13, filename = "plot-sngle-wrp-test-13.svg", bg_colour = "grey90")
+      save_e61(p13, filename = "plot-sngle-wrp-test-13.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -270,7 +270,7 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p14, filename = "plot-sngle-wrp-test-14.svg", bg_colour = "grey90")
+      save_e61(p14, filename = "plot-sngle-wrp-test-14.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 })
@@ -297,7 +297,7 @@ test_that("Multi-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p1a, p1b, filename = "plot-multi-wrp-test-1.svg", bg_colour = "grey90")
+      save_e61(p1a, p1b, filename = "plot-multi-wrp-test-1.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -308,8 +308,8 @@ test_that("Multi-panel graph examples", {
         nrow = 1,
         ncol = 3,
         filename = "plot-multi-wrp-test-2.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -319,8 +319,8 @@ test_that("Multi-panel graph examples", {
       save_e61(
         p1a, p1b, p1a, p1b,
         filename = "plot-multi-wrp-test-3.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -332,7 +332,7 @@ test_that("Multi-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p2a, p2b, filename = "plot-multi-wrp-test-4.svg", bg_colour = "grey90")
+      save_e61(p2a, p2b, filename = "plot-multi-wrp-test-4.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -342,8 +342,8 @@ test_that("Multi-panel graph examples", {
         p2a, p2b, p2a,
         ncol = 3,
         filename = "plot-multi-wrp-test-5.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -353,8 +353,8 @@ test_that("Multi-panel graph examples", {
       save_e61(
         p2a, p2b, p2a, p2b,
         filename = "plot-multi-wrp-test-6.svg",
-        preview = T,
-      bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -366,7 +366,7 @@ test_that("Multi-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p3a, p3b, filename = "plot-multi-wrp-test-7.svg", bg_colour = "grey90")
+      save_e61(p3a, p3b, filename = "plot-multi-wrp-test-7.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -376,8 +376,8 @@ test_that("Multi-panel graph examples", {
         p3a, p3b, p3a,
         ncol = 3,
         filename = "plot-multi-wrp-test-8.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -387,8 +387,8 @@ test_that("Multi-panel graph examples", {
       save_e61(
         p3a, p3b, p3a, p3b,
         filename = "plot-multi-wrp-test-9.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -401,7 +401,7 @@ test_that("Multi-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p4a, p4b, filename = "plot-multi-wrp-test-10.svg", bg_colour = "grey90")
+      save_e61(p4a, p4b, filename = "plot-multi-wrp-test-10.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -411,8 +411,8 @@ test_that("Multi-panel graph examples", {
         p4a, p4b, p4a,
         ncol = 3,
         filename = "plot-multi-wrp-test-11.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -422,8 +422,8 @@ test_that("Multi-panel graph examples", {
       save_e61(
         p4a, p4b, p4a, p4b,
         filename = "plot-multi-wrp-test-12.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -458,7 +458,7 @@ test_that("Multi-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p5a, p5b, filename = "plot-multi-wrp-test-13.svg", bg_colour = "grey90")
+      save_e61(p5a, p5b, filename = "plot-multi-wrp-test-13.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -467,8 +467,8 @@ test_that("Multi-panel graph examples", {
         p5a, p5b, p5a,
         ncol = 3,
         filename = "plot-multi-wrp-test-14.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -477,8 +477,8 @@ test_that("Multi-panel graph examples", {
       save_e61(
         p5a, p5b, p5a, p5b,
         filename = "plot-multi-wrp-test-15.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -518,7 +518,7 @@ test_that("Multi-panel graph examples", {
     )
 
   withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(p6a, p6b, filename = "plot-multi-wrp-test-16.svg", bg_colour = "grey90")
+      save_e61(p6a, p6b, filename = "plot-multi-wrp-test-16.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -527,8 +527,8 @@ test_that("Multi-panel graph examples", {
         p6a, p6b, p6a,
         ncol = 3,
         filename = "plot-multi-wrp-test-17.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -537,8 +537,8 @@ test_that("Multi-panel graph examples", {
       save_e61(
         p6a, p6b, p6a, p6b,
         filename = "plot-multi-wrp-test-18.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -578,7 +578,7 @@ test_that("Multi-panel graph examples", {
     )
 
   withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(p7a, p7b, filename = "plot-multi-wrp-test-19.svg", bg_colour = "grey90")
+      save_e61(p7a, p7b, filename = "plot-multi-wrp-test-19.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -587,8 +587,8 @@ test_that("Multi-panel graph examples", {
         p7a, p7b, p7a,
         ncol = 3,
         filename = "plot-multi-wrp-test-20.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -597,8 +597,8 @@ test_that("Multi-panel graph examples", {
       save_e61(
         p7a, p7b, p7a, p7b,
         filename = "plot-multi-wrp-test-21.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -629,7 +629,7 @@ test_that("Multi-panel graph examples", {
     )
 
   withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(p8a, p8b, filename = "plot-multi-wrp-test-22.svg", bg_colour = "grey90")
+      save_e61(p8a, p8b, filename = "plot-multi-wrp-test-22.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -638,8 +638,8 @@ test_that("Multi-panel graph examples", {
         p8a, p8b, p8a,
         ncol = 3,
         filename = "plot-multi-wrp-test-23.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -648,8 +648,8 @@ test_that("Multi-panel graph examples", {
       save_e61(
         p8a, p8b, p8a, p8b,
         filename = "plot-multi-wrp-test-24.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -680,7 +680,7 @@ test_that("Multi-panel graph examples", {
     )
 
   withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(p9a, p9b, pad_width = 3, filename = "plot-multi-wrp-test-25.svg", bg_colour = "grey90")
+      save_e61(p9a, p9b, pad_width = 3, filename = "plot-multi-wrp-test-25.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -690,8 +690,8 @@ test_that("Multi-panel graph examples", {
         ncol = 3,
         pad_width = 3,
         filename = "plot-multi-wrp-test-26.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -702,8 +702,8 @@ test_that("Multi-panel graph examples", {
         pad_width = 3,
         pad_height = 3,
         filename = "plot-multi-wrp-test-27.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -737,8 +737,7 @@ test_that("Multi-panel graph examples", {
         title = "The is an overal chart title",
         p10a, p10b,
         filename = "plot-multi-wrp-test-28.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90", spell_check = FALSE
       )
     ))
   })
@@ -749,8 +748,8 @@ test_that("Multi-panel graph examples", {
         p10a, p10b, p10a,
         ncol = 3,
         filename = "plot-multi-wrp-test-29.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -760,8 +759,8 @@ test_that("Multi-panel graph examples", {
         title = "The is an overal chart title",
         p10a, p10b, p10a, p10b,
         filename = "plot-multi-wrp-test-30.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -798,8 +797,8 @@ test_that("Multi-panel graph examples", {
         subtitle = "The is a subtitle",
         p11a, p11b,
         filename = "plot-multi-wrp-test-31.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -810,8 +809,8 @@ test_that("Multi-panel graph examples", {
         p11a, p11b, p11a,
         ncol = 3,
         filename = "plot-multi-wrp-test-32.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -821,8 +820,8 @@ test_that("Multi-panel graph examples", {
         subtitle = "The is a subtitle",
         p11a, p11b, p11a, p11b,
         filename = "plot-multi-wrp-test-33.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -857,8 +856,8 @@ test_that("Multi-panel graph examples", {
         sources = c("e61", 'ABS'),
         p12a, p12b,
         filename = "plot-multi-wrp-test-34.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -877,8 +876,8 @@ test_that("Multi-panel graph examples", {
         p12a, p12b, p12a,
         ncol = 3,
         filename = "plot-multi-wrp-test-35.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -896,8 +895,8 @@ test_that("Multi-panel graph examples", {
         sources = c("e61", 'ABS'),
         p12a, p12b, p12a, p12b,
         filename = "plot-multi-wrp-test-36.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -934,8 +933,8 @@ test_that("Multi-panel graph examples", {
         sources = c("e61", 'ABS'),
         p13a, p13b,
         filename = "plot-multi-wrp-test-37.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -959,8 +958,8 @@ test_that("Multi-panel graph examples", {
         p13a,
         ncol = 3,
         filename = "plot-multi-wrp-test-38.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -984,8 +983,8 @@ test_that("Multi-panel graph examples", {
         p13a,
         p13b,
         filename = "plot-multi-wrp-test-39.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -1020,8 +1019,8 @@ test_that("Multi-panel graph examples", {
         p14a,
         p14b,
         filename = "plot-multi-wrp-test-40.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -1045,8 +1044,8 @@ test_that("Multi-panel graph examples", {
         p14a,
         ncol = 3,
         filename = "plot-multi-wrp-test-41.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -1070,8 +1069,8 @@ test_that("Multi-panel graph examples", {
         p14a,
         p14b,
         filename = "plot-multi-wrp-test-42.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -1107,8 +1106,8 @@ test_that("Multi-panel graph examples", {
         p15b,
         pad_width = 10,
         filename = "plot-multi-wrp-test-43.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -1133,8 +1132,8 @@ test_that("Multi-panel graph examples", {
         pad_width = 10,
         ncol = 3,
         filename = "plot-multi-wrp-test-44.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -1160,8 +1159,8 @@ test_that("Multi-panel graph examples", {
         pad_width = 3,
         pad_height = 5,
         filename = "plot-multi-wrp-test-45.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -1186,8 +1185,8 @@ test_that("Multi-panel graph examples", {
         p15b,
         pad_height = 5,
         filename = "plot-multi-wrp-test-46.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -1227,8 +1226,8 @@ test_that("Multi-panel graph examples", {
         nrow = 1,
         ncol = 4,
         filename = "plot-multi-wrp-test-47.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -1256,8 +1255,8 @@ test_that("Multi-panel graph examples", {
         nrow = 2,
         ncol = 3,
         filename = "plot-multi-wrp-test-48.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
@@ -1290,10 +1289,9 @@ test_that("Multi-panel graph examples", {
         pad_height = 3,
         pad_width = 3,
         filename = "plot-multi-wrp-test-49.svg",
-        preview = T,
-        bg_colour = "grey90"
+        bg_colour = "grey90",
+        spell_check = FALSE
       )
     ))
   })
-
 })
