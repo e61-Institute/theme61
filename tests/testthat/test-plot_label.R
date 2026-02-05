@@ -290,6 +290,23 @@ test_that("Labels work on facet_wrap", {
                rep(c("1", "2"), each = 2))
 })
 
+test_that("Facet panel names must match facet variables", {
+  data <- data.frame(
+    x = rep(c(1, 2), 2),
+    y = rep(c(1, 2), 2),
+    f_var = factor(c(1, 1, 2, 2))
+  )
+
+  p <- ggplot(data, aes(x, y)) +
+    facet_wrap(~f_var) +
+    geom_point()
+
+  expect_error(
+    p + plot_label("oops", 1, 1, panel = list(bad = "1")),
+    regexp = "do not match the plot's facet variables"
+  )
+})
+
 test_that("Labels work on facet_grid", {
   df <- data.frame(
     x = 1:8,
