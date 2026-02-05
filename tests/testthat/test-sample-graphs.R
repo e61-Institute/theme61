@@ -159,8 +159,6 @@ test_that("Single-panel graph examples", {
 
 test_that("Multi-panel graph examples", {
 
-  skip_if_not(interactive())
-
   withr::local_seed(42)
 
   # Graphs to use in the panels
@@ -321,8 +319,6 @@ test_that("Multi-panel graph examples", {
 })
 
 test_that("Map examples", {
-
-  skip_if_not(interactive())
 
   skip_if_not_installed("sf")
   skip_if_not_installed("strayr")
