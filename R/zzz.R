@@ -34,7 +34,10 @@ t61_env <- NULL
 .onAttach <- function(libname, pkgname) {
   op <- options()
   op.theme61 <- list(
-    theme61.preview_on_print = TRUE
+    theme61.base_size = 10,
+    theme61.default_save_format = "svg",
+    theme61.open_e61_graph = FALSE,
+    theme61.preview_on_print = TRUE,
   )
 
   to_set <- !(names(op.theme61) %in% names(op))

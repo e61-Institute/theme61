@@ -54,7 +54,7 @@ theme_e61 <- function(
 
   base_family <- if (is_testing()) "sans" else "pt-sans"
 
-  base_size <- getOption("t61_base_size", default = 10)
+  base_size <- getOption("theme61.base_size", default = 10)
 
   half_line <- base_size / 2
 
@@ -187,13 +187,13 @@ theme_e61_spatial <- function(
     if (!is.numeric(legend_position) || length(legend_position) != 2) {
       stop("legend_position needs to be a length two numeric vector.")
 
-    if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
-      stop("Both legend_position values must be between 0 and 1.")
+      if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
+        stop("Both legend_position values must be between 0 and 1.")
     }
   }
 
   base_family <- if (is_testing()) "sans" else base_family
-  base_size <- getOption("t61_base_size", default = 10)
+  base_size <- getOption("theme61.base_size", default = 10)
   half_line <- base_size / 2
 
   ret <-
@@ -342,7 +342,7 @@ set_base_size <- function(base_size) {
     stop("base_size must be a single positive number.")
   }
 
-  options(t61_base_size = base_size)
+  options(theme61.base_size = base_size)
   invisible()
 }
 
