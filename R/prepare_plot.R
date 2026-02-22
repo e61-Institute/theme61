@@ -17,16 +17,17 @@ prepare_plot.e61_plot <- function(plot,
 
   if (is.null(chart_type)) chart_type <- "normal"
 
-  # --- Theme spec: inject default if needed, then realise -----------------
+  # Auto-inject default theme spec only if user didn't add one
   if (isTRUE(getOption("theme61.auto_theme", TRUE))) {
     if (is.null(attr(plot, "e61_theme_spec", exact = TRUE))) {
       attr(plot, "e61_theme_spec") <- theme_e61()
     }
   }
 
+  # Realise spec (after classification)
   plot <- realise_e61_theme(plot)
 
-  # --- Base size + margins (your previous save_single logic) --------------
+  # Existing sizing/margins logic for non-map plots (moved from save_single)
   legendTitle <- plot@theme$legend.title
   legendPosition <- plot@theme$legend.position
 
@@ -37,14 +38,10 @@ prepare_plot.e61_plot <- function(plot,
     plot <- plot + ggplot2::theme(legend.position = legendPosition)
   }
 
-  # --- Background ---------------------------------------------------------
+  # Background fill
   plot <- plot + ggplot2::theme(rect = ggplot2::element_rect(fill = bg_colour))
 
-  list(
-    plot = plot,
-    chart_type = chart_type,
-    auto_scale = auto_scale
-  )
+  list(plot = plot, chart_type = chart_type, auto_scale = auto_scale)
 }
 
 #' @export
@@ -55,13 +52,10 @@ prepare_plot.e61_map <- function(plot,
                                  bg_colour = "white",
                                  ...) {
 
-  # maps: no autoscaling
+  # maps: force settings
   auto_scale <- FALSE
-
-  # maps: chart_type forced custom (aspect handled elsewhere / in theme)
   chart_type <- "custom"
 
-  # theme spec: inject/realise same way as plots
   if (isTRUE(getOption("theme61.auto_theme", TRUE))) {
     if (is.null(attr(plot, "e61_theme_spec", exact = TRUE))) {
       attr(plot, "e61_theme_spec") <- theme_e61()
@@ -70,14 +64,9 @@ prepare_plot.e61_map <- function(plot,
 
   plot <- realise_e61_theme(plot)
 
-  # Background fill
   plot <- plot + ggplot2::theme(rect = ggplot2::element_rect(fill = bg_colour))
 
-  list(
-    plot = plot,
-    chart_type = chart_type,
-    auto_scale = auto_scale
-  )
+  list(plot = plot, chart_type = chart_type, auto_scale = auto_scale)
 }
 
 #' Method that fails for non-plots

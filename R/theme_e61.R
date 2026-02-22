@@ -51,9 +51,13 @@ theme_e61 <- function(
     base_line_size = points_to_mm(0.75),
     base_rect_size = points_to_mm(1)
 ) {
-  legend <- match.arg(legend)
 
-  spec <- list(
+  legend <- match.arg(
+    legend,
+    choices = c("none", "bottom", "top", "left", "right", "inside")
+  )
+
+  args <- list(
     legend = legend,
     legend_position = legend_position,
     legend_title = legend_title,
@@ -64,13 +68,10 @@ theme_e61 <- function(
     base_rect_size = base_rect_size
   )
 
-  structure(
-    list(
-      args = spec,
-      variant = "auto",   # can later support "plot"/"map" forcing if needed
-      version = 1L
-    ),
-    class = "e61_theme_spec"
+  e61_theme_spec_class(
+    args = args,
+    variant = "auto",
+    version = 1L
   )
 }
 
@@ -82,9 +83,9 @@ theme_e61_spatial <- function(
     legend = c("none", "bottom", "top", "left", "right", "inside"),
     legend_position = NULL,
     legend_title = FALSE,
+    base_family = "pt-sans",
     aspect_ratio = NULL,
     background = "white",
-    base_family = "pt-sans",
     base_line_size = points_to_mm(0.75),
     base_rect_size = points_to_mm(1)
 ) {
@@ -92,16 +93,15 @@ theme_e61_spatial <- function(
     legend = legend,
     legend_position = legend_position,
     legend_title = legend_title,
-    aspect_ratio = aspect_ratio %||% 0.75,  # if you want NULL meaning "use default", adjust as desired
+    aspect_ratio = if (is.null(aspect_ratio)) 0.75 else aspect_ratio,
     background = background,
     base_family = base_family,
     base_line_size = base_line_size,
     base_rect_size = base_rect_size
   )
-  spec$variant <- "map"
+  spec@variant <- "map"
   spec
 }
-
 
 #' e61 themed graph options
 #'
@@ -113,9 +113,7 @@ theme_e61_spatial <- function(
 #' @export
 build_theme_e61_plot <- function(args) {
 
-  legend <- match.arg(args$legend)
-
-  if (legend == "inside") {
+  if (args$legend == "inside") {
     if (!is.numeric(args$legend_position) || length(args$legend_position) != 2)
       stop("legend_position needs to be a length two numeric vector.")
 
@@ -190,7 +188,7 @@ build_theme_e61_plot <- function(args) {
     )
 
   # set legend position
-  ret <- ret + theme(legend.position = legend)
+  ret <- ret + theme(legend.position = args$legend)
 
   # set legend title existence
   if (args$legend_title) {
@@ -200,7 +198,7 @@ build_theme_e61_plot <- function(args) {
   }
 
   # add legend position if inside
-  if (legend == "inside") {
+  if (args$legend == "inside") {
     ret <- ret +
       theme(
         legend.position.inside = args$legend_position
@@ -208,7 +206,7 @@ build_theme_e61_plot <- function(args) {
   }
 
   # adjust legend direction based on legend position
-  if (data.table::like(legend, "bottom|top", ignore.case = TRUE)) {
+  if (data.table::like(args$legend, "bottom|top", ignore.case = TRUE)) {
     ret <- ret + theme(legend.direction = "horizontal")
   }
 
@@ -225,9 +223,7 @@ build_theme_e61_plot <- function(args) {
 #' @export
 build_theme_e61_map <- function(args) {
 
-  legend <- match.arg(args$legend)
-
-  if (legend == "inside") {
+  if (args$legend == "inside") {
     if (!is.numeric(args$legend_position) || length(args$legend_position) != 2)
       stop("legend_position needs to be a length two numeric vector.")
 
@@ -282,8 +278,8 @@ build_theme_e61_map <- function(args) {
       panel.grid.minor = element_blank(),
 
       # legend
-      legend.position = legend,
-      legend.direction = if (grepl("bottom|top", legend)) "horizontal" else "vertical",
+      legend.position = args$legend,
+      legend.direction = if (grepl("bottom|top", args$legend)) "horizontal" else "vertical",
       legend.background = element_blank(),
       legend.key = element_blank(),
       legend.text = element_text(size = rel(0.9))
@@ -295,7 +291,7 @@ build_theme_e61_map <- function(args) {
     ret <- ret + theme(legend.title = element_blank())
   }
 
-  if (legend == "inside") {
+  if (args$legend == "inside") {
     ret <- ret + theme(legend.position.inside = args$legend_position)
   }
 
@@ -390,28 +386,26 @@ set_base_size <- function(base_size) {
 # Spec helper functions ----
 realise_e61_theme <- function(plot) {
   spec <- attr(plot, "e61_theme_spec", exact = TRUE)
-
   if (is.null(spec)) return(plot)
 
-  # Decide map vs plot variant AFTER classification
-  is_map <- inherits(plot, "e61_map")
+  variant <- spec@variant
+  if (is.null(variant) || !nzchar(variant)) variant <- "auto"
 
-  th <- if (is_map) {
-    build_theme_e61_map(spec$args)
+  is_map <- inherits(plot, "e61_map")
+  use_map <- if (identical(variant, "auto")) is_map else identical(variant, "map")
+
+  th <- if (use_map) {
+    build_theme_e61_map(spec@args)
   } else {
-    build_theme_e61_plot(spec$args)
+    build_theme_e61_plot(spec@args)
   }
 
-  # Apply the concrete ggplot2 theme now
   plot <- plot + th
 
-  # Prevent double application on repeated prepare calls
+  # Prevent double application if prepare_plot is called multiple times
   attr(plot, "e61_theme_spec") <- NULL
-  attr(plot, "e61_theme_realised") <- TRUE
-
   plot
 }
-
 
 # Internal helper functions ----
 
@@ -439,19 +433,3 @@ in_to_cm <- function(inches, round = FALSE) {
     cm
   }
 }
-
-#' Tell ggplot2 what to do when someone does + theme_e61()
-#' @method ggplot_add theme_e61
-#' @keywords internal
-#' @export
-ggplot_add.theme_e61 <- function(object, plot, object_name) {
-  # Store/replace the theme spec on the plot. Last one wins (ggplot semantics).
-  attr(plot, "e61_theme_spec") <- object
-
-  # Optional marker: plot has an e61 theme spec attached (useful for auto-theme logic)
-  attr(plot, "e61_has_theme_spec") <- TRUE
-
-  plot
-
-}
-

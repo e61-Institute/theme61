@@ -32,6 +32,7 @@ Imports:
     remotes (>= 2.4.2),
     rsvg (>= 2.4.0),
     R.devices (>= 2.17.1),
+    S7 (>= 0.2.1),
     scales (>= 1.4.0),
     showtext (>= 0.9-6),
     stringr (>= 1.5.0),
@@ -49,3 +50,38 @@ RoxygenNote: 7.3.3
 Depends: 
     R (>= 4.5.0)
 Roxygen: list(markdown = TRUE)
+Collate: 
+    'add_baseline.R'
+    'add_e61_logo.R'
+    'aes-y-lims.R'
+    'aes_labs.R'
+    'axes.R'
+    'build-plots.R'
+    'classify-plots.R'
+    'colours.R'
+    'crop_aus_coord.R'
+    'e61_chart_maker.R'
+    'e61_map.R'
+    'geom_pointbar.R'
+    'ggplot2-wrappers.R'
+    'ggplot_build-method.R'
+    'labs_e61.R'
+    'palette_e61.R'
+    'plot_label.R'
+    'prepare_plot.R'
+    'print-e61-ggplot.R'
+    'retired-functions.R'
+    's7_classes.R'
+    'save-helpers.R'
+    'save_e61.R'
+    'save_multi.R'
+    'save_single.R'
+    'scales.R'
+    'sec_axes_rescale.R'
+    'startup-functions.R'
+    'theme61-options.R'
+    'theme61-package.R'
+    'theme_e61.R'
+    'theme_spec_update_ggplot.R'
+    'utils-plot-dims.R'
+    'zzz.R'

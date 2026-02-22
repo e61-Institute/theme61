@@ -32,6 +32,23 @@ t61_env <- NULL
   # Update defaults for other types
   update_geom_defaults("ribbon", aes(fill = e61_tealdark, alpha = 0.1))
 
+  # Ensure namespaces are available
+  if (!requireNamespace("S7", quietly = TRUE)) {
+    stop("S7 must be installed.", call. = FALSE)
+  }
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("ggplot2 must be installed.", call. = FALSE)
+  }
+
+  # Get the ggplot2 S7 generic safely
+  update_ggplot <- getExportedValue("ggplot2", "update_ggplot")
+
+  # Register method: (e61_theme_spec, any) -> attach spec to plot
+  S7::method(update_ggplot, list(e61_theme_spec_class, S7::class_any)) <- .update_ggplot_e61_theme_spec
+
+  # Required for S7 methods defined in packages
+  S7::methods_register()
+
 }
 
 .onAttach <- function(libname, pkgname) {
