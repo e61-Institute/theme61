@@ -15,55 +15,17 @@ save_single <- function(
     ) {
 
 
-  # Check for special graph types -------------------------------------------
+  # Plot is assumed pre-classified + prepared by save_e61() via prepare_plot()
+  is_spatial_chart <- inherits(plot, "e61_map")
 
-  ## Check if we have a spatial chart, if we do save without editing ----
-
-  if (inherits(plot, "e61_map")) {
-    is_spatial_chart <- TRUE
-  } else {
-    is_spatial_chart <- FALSE
-  }
-
-  # if it's a spatial plot, turn of autoscaling
-  if(is_spatial_chart) auto_scale <- FALSE
-
-  ## Check if discrete y-axis (e.g. ridgeline) ----
-
+  # Discrete y-axis (e.g. ridgeline)
   discrete_y <- has_discrete_y_scale(plot)
 
-  # Set maximum width based on output type ----------------------------------
-
-  if(is.null(chart_type)) chart_type <- "normal"
-
+  # Set maximum width based on output type
+  if (is.null(chart_type)) chart_type <- "normal"
   max_width <- 18.59
 
-  # update the base size without removing the legend
-  legendTitle <- plot@theme$legend.title
-  legendPosition <- plot@theme$legend.position
-
-  if (is_spatial_chart && !attr(plot, "t61_obj")){
-    plot <- plot + theme_e61_spatial()
-
-  } else if (is_spatial_chart && attr(plot, "t61_obj")) {
-    plot
-  } else {
-
-    plot <- plot + theme(text = element_text(size = base_size))
-    plot <- plot + update_margins(base_size = base_size,
-                                  legend_title = legendTitle)
-
-    if(!is.null(legendPosition)){
-      plot <- plot + theme(legend.position = legendPosition)
-    }
-  }
-
   plot_build <- ggplot_build(plot)
-
-
-  # Update plot background --------------------------------------------------
-
-  plot <- plot + theme(rect = element_rect(fill = bg_colour))
 
   # Update the aspect ratio -------------------------------------------------
 
@@ -73,9 +35,6 @@ save_single <- function(
     chart_type <- chart_type[1]
     warning(paste0("Multiple chart types supplied, using first in list, which is: ", chart_type, "."))
   }
-
-  # override chart type if the graph is a map
-  if (is_spatial_chart) chart_type <- "custom"
 
   if (chart_type == "normal") {
     plot <- plot + theme(aspect.ratio = 0.75)

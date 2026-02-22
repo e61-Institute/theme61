@@ -107,14 +107,27 @@ save_e61 <- function(filename = NULL,
   # Compile plots
   plots <- c(list(...), plotlist)
 
+  # For single-panel graphs
+  if (length(plots) == 0) plots <- list(plot)
+
   # Ensure plots are e61 plots
   plots <- as_e61_plot(plots)
 
-  # Check if plot is a map (map support only works for single panels)
-  if (length(plots) == 0) plots <- classify_e61_map(plots)
+  if (length(plots) == 1) {
+    plots[[1]] <- classify_e61_map(plots[[1]])
 
-  # For single-panel graphs
-  if (length(plots) == 0) plots <- list(plot)
+    prep <- prepare_plot(
+      plots[[1]],
+      chart_type = chart_type,
+      auto_scale = auto_scale,
+      base_size = base_size,
+      bg_colour = bg_colour
+    )
+
+    plots[[1]] <- prep$plot
+    chart_type <- prep$chart_type
+    auto_scale <- prep$auto_scale
+  }
 
   # Check whether the plots are ggplot2 objects
   plots <- check_plots(plots)
@@ -163,8 +176,8 @@ save_e61 <- function(filename = NULL,
 
     # Strip file extension from filename
     filename <- gsub("^(.*)\\..{3}$", "\\1", filename)
-  } else if (is.null(format) && !is.null(getOption("default_save_format"))) {
-    format <- getOption("default_save_format")
+  } else if (is.null(format) && !is.null(getOption("theme61.default_save_format"))) {
+    format <- getOption("theme61.default_save_format")
   } else {
     format <- match.arg(format, several.ok = TRUE)
   }
@@ -280,8 +293,6 @@ save_e61 <- function(filename = NULL,
     )
   } else {
 
-    temp <- plots[[1]]
-
     save_input <- save_single(
       filename = filename,
       plot = plots[[1]],
@@ -331,7 +342,7 @@ save_e61 <- function(filename = NULL,
   # Put filename back together
   file_to_open <- paste0(filename, ".", format[[1]])
 
-  if (isTRUE(getOption("open_e61_graph", FALSE))) {
+  if (isTRUE(getOption("theme61.open_e61_graph", FALSE))) {
     file_to_open <- shQuote(here::here(file_to_open))
 
     out <- try(system2("open", file_to_open))
