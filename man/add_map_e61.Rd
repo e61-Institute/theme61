@@ -50,7 +50,6 @@ sa3 <- sa3[sa3$gcc_code_2021 == "1GSYD", ] # let's just look at Sydney
 \seealso{
 Other map functions: 
 \code{\link{crop_aus_coord}()},
-\code{\link{setup_stadia_maps}()},
-\code{\link{theme_e61_spatial}()}
+\code{\link{setup_stadia_maps}()}
 }
 \concept{map functions}

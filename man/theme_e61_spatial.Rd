@@ -2,14 +2,17 @@
 % Please edit documentation in R/theme_e61.R
 \name{theme_e61_spatial}
 \alias{theme_e61_spatial}
-\title{e61 themed spatial maps options}
+\title{e61 theme for spatial maps (forced)}
 \usage{
 theme_e61_spatial(
   legend = c("none", "bottom", "top", "left", "right", "inside"),
   legend_position = NULL,
   legend_title = FALSE,
   base_family = "pt-sans",
-  aspect_ratio = NULL
+  aspect_ratio = NULL,
+  background = "white",
+  base_line_size = points_to_mm(0.75),
+  base_rect_size = points_to_mm(1)
 )
 }
 \arguments{
@@ -24,35 +27,15 @@ of legends that have the "inside" position. Takes values between 0 and 1.}
 Sans.}
 
 \item{aspect_ratio}{Numeric. Sets the aspect ratio of the graph panel.}
-}
-\value{
-\code{theme_e61_spatial} returns a ggplot2 object.
+
+\item{background}{Character. Default is "white". For all graphs that you
+save, you should control the background colour using the \code{bg_colour}
+argument in \code{save_e61}, not here.}
+
+\item{base_line_size}{Numeric. Default line width.}
+
+\item{base_rect_size}{Numeric. Default rect width.}
 }
 \description{
-Applies the e61 theme to ggplot spatial maps to adjust graph appearance. If
-you are looking to change the appearance of titles or labels, check the
-arguments in \code{\link[=labs_e61]{labs_e61()}}, which are probably what you are looking
-for.
+e61 theme for spatial maps (forced)
 }
-\examples{
-
-\dontrun{
-library(sf)
-
-sa3_shp <- strayr::read_absmap("sa32016")
-
-sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
-
-ggplot(data = sydney_map) +
-  geom_sf(aes(fill = sa3_code_2016), colour = "black") +
-  theme_e61_spatial()
-}
-
-}
-\seealso{
-Other map functions: 
-\code{\link{add_map_e61}()},
-\code{\link{crop_aus_coord}()},
-\code{\link{setup_stadia_maps}()}
-}
-\concept{map functions}
