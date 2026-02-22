@@ -135,6 +135,46 @@ check_spelling <- function(vector) {
 
 }
 
+#' Helper function that runs the spell checker through each plot
+#'
+#' Returns the mispelled words
+#' @noRd
+check_plot_spelling <- function(plot) {
+
+  # Spell checks
+  fields <- c("title", "subtitle", "caption")
+
+  spell_chk_i <- lapply(fields, function(field) {
+    val <- plot@labels[[field]]
+    if (!is.null(val)) {
+      # replace html line breaks with a space and remove other elements before
+      # spell checking
+      val <- gsub("<br>", " ", val)
+      val <- gsub("<[^>]+>", "", val)
+
+      res <- check_spelling(val)
+      if (length(res) > 0) return(res)
+    }
+    return(NULL)
+  })
+
+  # Assign names and remove NULLs (i.e. no typos)
+  names(spell_chk_i) <- fields
+  spell_chk_i <- Filter(Negate(is.null), spell_chk_i)
+
+  # Format nicely
+  spell_chk_i <- lapply(names(spell_chk_i), function(x) {
+
+    paste0("There may be a typo in the ", x, ": ",
+           paste(spell_chk_i[[x]], collapse = ", "))
+  })
+
+  spell_chk <- unlist(spell_chk_i)
+
+  return(spell_chk)
+
+  }
+
 #' Converts SVG to a bitmap file
 #'
 #' Converts an SVG file to a bitmap file, currently supports JPEG and PNG.
