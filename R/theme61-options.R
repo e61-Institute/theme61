@@ -13,6 +13,13 @@
 #'    \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
 #'  }
 #' @return This function is used for its side effects.
+#'
+#' @examples
+#' \dontrun{
+#' # Set the default save format to "png"
+#' set_t61_options(list(theme61.default_save_format = "png"))
+#' }
+#'
 #' @export
 set_t61_options <- function(opt = NULL) {
   if (is.null(opt)) {
