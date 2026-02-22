@@ -54,7 +54,7 @@ theme_e61 <- function(
 
   base_family <- if (is_testing()) "sans" else "pt-sans"
 
-  base_size <- getOption("theme61.base_size", default = 10)
+  base_size <- getOption("theme61.base_size")
 
   half_line <- base_size / 2
 
@@ -193,7 +193,7 @@ theme_e61_spatial <- function(
   }
 
   base_family <- if (is_testing()) "sans" else base_family
-  base_size <- getOption("theme61.base_size", default = 10)
+  base_size <- getOption("theme61.base_size")
   half_line <- base_size / 2
 
   ret <-
