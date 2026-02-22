@@ -1,9 +1,8 @@
-#' e61 themed graph options
+#' theme61 theme spec object
 #'
-#' Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
-#' appearance. If you are looking to change the appearance of titles or labels,
-#' check the arguments in [labs_e61], which are probably what you are looking
-#' for.
+#' This function returns a lightweight "theme spec" object that records user
+#' preferences. The spec is realised into a concrete ggplot2 theme during plot
+#' preview or saving.
 #'
 #' @param legend Character. Legend position, "none" (default) hides the legend.
 #' @param legend_position A numeric vector of length two setting the placement
@@ -30,7 +29,18 @@
 #'   theme_e61()
 #' }
 #'
-
+#' \dontrun{
+#' library(sf)
+#'
+#' sa3_shp <- strayr::read_absmap("sa32016")
+#'
+#' sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
+#'
+#' ggplot(data = sydney_map) +
+#'   geom_sf(aes(fill = sa3_code_2016), colour = "black") +
+#'   theme_e61_spatial()
+#' }
+#'
 theme_e61 <- function(
     legend = c("none", "bottom", "top", "left", "right", "inside"),
     legend_position = NULL,
@@ -40,32 +50,94 @@ theme_e61 <- function(
     base_family = "pt-sans",
     base_line_size = points_to_mm(0.75),
     base_rect_size = points_to_mm(1)
-    ) {
-
+) {
   legend <- match.arg(legend)
 
+  spec <- list(
+    legend = legend,
+    legend_position = legend_position,
+    legend_title = legend_title,
+    aspect_ratio = aspect_ratio,
+    background = background,
+    base_family = base_family,
+    base_line_size = base_line_size,
+    base_rect_size = base_rect_size
+  )
+
+  structure(
+    list(
+      args = spec,
+      variant = "auto",   # can later support "plot"/"map" forcing if needed
+      version = 1L
+    ),
+    class = "e61_theme_spec"
+  )
+}
+
+#' e61 theme for spatial maps (forced)
+#'
+#' @inheritParams theme_e61
+#' @export
+theme_e61_spatial <- function(
+    legend = c("none", "bottom", "top", "left", "right", "inside"),
+    legend_position = NULL,
+    legend_title = FALSE,
+    aspect_ratio = NULL,
+    background = "white",
+    base_family = "pt-sans",
+    base_line_size = points_to_mm(0.75),
+    base_rect_size = points_to_mm(1)
+) {
+  spec <- theme_e61(
+    legend = legend,
+    legend_position = legend_position,
+    legend_title = legend_title,
+    aspect_ratio = aspect_ratio %||% 0.75,  # if you want NULL meaning "use default", adjust as desired
+    background = background,
+    base_family = base_family,
+    base_line_size = base_line_size,
+    base_rect_size = base_rect_size
+  )
+  spec$variant <- "map"
+  spec
+}
+
+
+#' e61 themed graph options
+#'
+#' Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
+#' appearance. If you are looking to change the appearance of titles or labels,
+#' check the arguments in [labs_e61], which are probably what you are looking
+#' for.
+#'
+#' @export
+build_theme_e61_plot <- function(args) {
+
+  legend <- match.arg(args$legend)
+
   if (legend == "inside") {
-    if (!is.numeric(legend_position) || length(legend_position) != 2)
+    if (!is.numeric(args$legend_position) || length(args$legend_position) != 2)
       stop("legend_position needs to be a length two numeric vector.")
 
-    if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
+    if (!(data.table::between(args$legend_position[[1]], 0, 1) |
+          data.table::between(args$legend_position[[2]], 0, 1)))
       stop("Both legend_position values must be between 0 and 1.")
   }
 
   # This deals with an issue where the test environment can't install pt-sans
   # and pollutes the test rig with a lot of unhelpful errors
-  base_family <- if (is_testing()) "sans" else "pt-sans"
+  base_family <- if (is_testing()) "sans" else args$base_family
 
-  base_size <- getOption("t61_base_size", default = 10)
+  base_size <- getOption("theme61.base_size", default = 10)
 
   half_line <- base_size / 2
 
   ret <-
     theme(
       line = element_line(colour = "black", linewidth = points_to_mm(0.5)),
-      rect = element_rect(fill = background, colour = NA),
+      rect = element_rect(fill = args$background, colour = NA),
       text = element_text(colour = "black", family = base_family, size = base_size),
-      aspect.ratio = aspect_ratio,
+      aspect.ratio = args$aspect_ratio,
 
       # Axes and grid
       axis.line.x = element_line(colour = "black", linewidth = points_to_mm(0.4)),
@@ -117,18 +189,21 @@ theme_e61 <- function(
       strip.text = element_text(size = rel(1), face = "bold")
     )
 
-  # add the basics of the legend
-  ret <- ret +
-    theme(
-      legend.position = legend,
-      legend.title = element_blank()
-    )
+  # set legend position
+  ret <- ret + theme(legend.position = legend)
+
+  # set legend title existence
+  if (args$legend_title) {
+    ret <- ret + theme(legend.title = element_text(size = rel(0.9)))
+  } else {
+    ret <- ret + theme(legend.title = element_blank())
+  }
 
   # add legend position if inside
   if (legend == "inside") {
     ret <- ret +
       theme(
-        legend.position.inside = legend_position
+        legend.position.inside = args$legend_position
       )
   }
 
@@ -138,69 +213,36 @@ theme_e61 <- function(
   }
 
   # Adds a grey background option
-  if (background == "grey" |  background == "box") {
+  if (args$background == "grey" |  args$background == "box") {
     ret <- ret + theme(rect = element_rect(fill = e61_greylight6))
   }
-
-  # Add attribute to identify it as a theme61 object
-  class(ret) <- c("theme_e61", class(ret))
-  attr(ret, "t61_obj") <- TRUE
 
   return(ret)
 }
 
 #' e61 themed spatial maps options
 #'
-#' Applies the e61 theme to ggplot spatial maps to adjust graph appearance. If
-#' you are looking to change the appearance of titles or labels, check the
-#' arguments in [theme61::labs_e61()], which are probably what you are looking
-#' for.
-#'
-#' @inheritParams theme_e61
-#' @return \code{theme_e61_spatial} returns a ggplot2 object.
-#' @import ggplot2
 #' @export
-#' @family map functions
-#'
-#' @examples
-#'
-#' \dontrun{
-#' library(sf)
-#'
-#' sa3_shp <- strayr::read_absmap("sa32016")
-#'
-#' sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
-#'
-#' ggplot(data = sydney_map) +
-#'   geom_sf(aes(fill = sa3_code_2016), colour = "black") +
-#'   theme_e61_spatial()
-#' }
-#'
-theme_e61_spatial <- function(
-    legend = c("none", "bottom", "top", "left", "right", "inside"),
-    legend_position = NULL,
-    legend_title = FALSE,
-    base_family = "pt-sans",
-    aspect_ratio = NULL
-) {
-  legend <- match.arg(legend)
+build_theme_e61_map <- function(args) {
+
+  legend <- match.arg(args$legend)
 
   if (legend == "inside") {
-    if (!is.numeric(legend_position) || length(legend_position) != 2) {
+    if (!is.numeric(args$legend_position) || length(args$legend_position) != 2)
       stop("legend_position needs to be a length two numeric vector.")
 
-    if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
+    if (!(data.table::between(args$legend_position[[1]], 0, 1) |
+          data.table::between(args$legend_position[[2]], 0, 1)))
       stop("Both legend_position values must be between 0 and 1.")
-    }
   }
 
-  base_family <- if (is_testing()) "sans" else base_family
-  base_size <- getOption("t61_base_size", default = 10)
+  base_family <- if (is_testing()) "sans" else args$base_family
+  base_size <- getOption("theme61.base_size", default = 10)
   half_line <- base_size / 2
 
   ret <-
     theme(
-      aspect.ratio = aspect_ratio,
+      aspect.ratio = args$aspect_ratio,
       # base text
       text = element_text(
         colour = "black",
@@ -247,14 +289,14 @@ theme_e61_spatial <- function(
       legend.text = element_text(size = rel(0.9))
     )
 
-  if (legend_title) {
+  if (args$legend_title) {
     ret <- ret + theme(legend.title = element_text(size = rel(0.9)))
   } else {
     ret <- ret + theme(legend.title = element_blank())
   }
 
   if (legend == "inside") {
-    ret <- ret + theme(legend.position.inside = legend_position)
+    ret <- ret + theme(legend.position.inside = args$legend_position)
   }
 
   # facet spacing if used
@@ -265,12 +307,9 @@ theme_e61_spatial <- function(
     )
   }
 
-  # Add attribute to identify it as a theme61 object
-  class(ret) <- c("theme_e61", class(ret))
-  attr(ret, "t61_obj") <- TRUE
-
   return(ret)
 }
+
 
 #' Converts all legend colours to squares
 #'
@@ -344,9 +383,35 @@ set_base_size <- function(base_size) {
     stop("base_size must be a single positive number.")
   }
 
-  options(t61_base_size = base_size)
+  options(theme61.base_size = base_size)
   invisible()
 }
+
+# Spec helper functions ----
+realise_e61_theme <- function(plot) {
+  spec <- attr(plot, "e61_theme_spec", exact = TRUE)
+
+  if (is.null(spec)) return(plot)
+
+  # Decide map vs plot variant AFTER classification
+  is_map <- inherits(plot, "e61_map")
+
+  th <- if (is_map) {
+    build_theme_e61_map(spec$args)
+  } else {
+    build_theme_e61_plot(spec$args)
+  }
+
+  # Apply the concrete ggplot2 theme now
+  plot <- plot + th
+
+  # Prevent double application on repeated prepare calls
+  attr(plot, "e61_theme_spec") <- NULL
+  attr(plot, "e61_theme_realised") <- TRUE
+
+  plot
+}
+
 
 # Internal helper functions ----
 
@@ -379,13 +444,14 @@ in_to_cm <- function(inches, round = FALSE) {
 #' @method ggplot_add theme_e61
 #' @keywords internal
 #' @export
-ggplot_add.theme_e61 <- function(object, plot, object_name, ...) {
-  # 1) Run the normal ggplot2 theme logic for this object
-  plot <- NextMethod()  # dispatches to ggplot_add.theme()
+ggplot_add.theme_e61 <- function(object, plot, object_name) {
+  # Store/replace the theme spec on the plot. Last one wins (ggplot semantics).
+  attr(plot, "e61_theme_spec") <- object
 
-  # 2) Copy your custom attribute from the theme onto the plot
-  attr(plot, "t61_obj") <- attr(object, "t61_obj")
+  # Optional marker: plot has an e61 theme spec attached (useful for auto-theme logic)
+  attr(plot, "e61_has_theme_spec") <- TRUE
 
   plot
+
 }
 

@@ -1,6 +1,9 @@
 # Required for data.table to work
 .datatable.aware = TRUE
 
+# helper
+`%||%` <- function(x, y) if (is.null(x)) y else x
+
 # Required to setup an empty environment with this name
 t61_env <- NULL
 
