@@ -2,7 +2,7 @@
 #'
 #' - Always draws a plot in the Plots pane
 #' - Also renders a preview in the Viewer (opt-out via option)
-#' - Prefers Viewer focus by default (best-effort)
+#' - Prefers Plots focus by default
 #'
 #' @keywords internal
 #' @export
