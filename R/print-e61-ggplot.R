@@ -50,7 +50,7 @@ print.e61_ggplot <- function(x, ...) {
   # Viewer preview (render in background)
   if (in_rstudio) {
     suppressWarnings(
-      suppressMessages(save_e61(plot = x, preview = TRUE, format = "svg"))
+      suppressMessages(save_e61(plot = x, preview = TRUE, format = "svg", auto_scale = auto_scale_preview))
       )
   }
 
