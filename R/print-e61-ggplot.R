@@ -2,7 +2,7 @@
 #'
 #' - Always draws a plot in the Plots pane
 #' - Also renders a preview in the Viewer (opt-out via option)
-#' - Prefers Viewer focus by default (best-effort)
+#' - Prefers Plots focus by default
 #'
 #' @keywords internal
 #' @export
@@ -44,13 +44,14 @@ print.e61_ggplot <- function(x, ...) {
     }
   }
 
-  # Viewer preview
+  # opt-in (default OFF): focus Viewer after printing
+  focus_viewer <- isTRUE(getOption("theme61.focus_viewer_on_print", FALSE))
+
+  # Viewer preview (render in background)
   if (in_rstudio) {
     suppressWarnings(
-      suppressMessages(
-        save_e61(plot = x, preview = TRUE, auto_scale = auto_scale_preview)
+      suppressMessages(save_e61(plot = x, preview = TRUE, format = "svg"))
       )
-    )
   }
 
   # Plots pane render (must include theme61 defaults)
@@ -58,18 +59,10 @@ print.e61_ggplot <- function(x, ...) {
   class(x_plot) <- setdiff(class(x_plot), "e61_ggplot")
   print(x_plot)
 
-  # Prefer Viewer focus by default (best-effort)
-  if (in_rstudio) {
-    # one-shot “after plotting settles” activator
-    id <- NULL
-    id <- addTaskCallback(function(...) {
-      try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE)
-      removeTaskCallback(id)
-      TRUE
-    })
+  # Optional Viewer focus (off by default)
+  if (in_rstudio && focus_viewer) {
+    activate_viewer_after_plot()
   }
-
-  activate_viewer_after_plot()
 
   invisible(x)
 }
