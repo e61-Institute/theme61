@@ -18,8 +18,11 @@ print.e61_ggplot <- function(x, ...) {
     rstudioapi::isAvailable()
 
   # Alter defaults for facets with free y scales
-
-  free_y <- x@facet$params$free$y
+  if (!is.null(x@facet$params$free$y)) {
+    free_y <- x@facet$params$free$y
+  } else {
+    free_y <- FALSE
+  }
 
   # Detect whether user supplied a y scale (pre-build)
   ys <- x@scales$get_scales("y")
