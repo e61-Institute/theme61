@@ -98,8 +98,18 @@ check_for_y_var <- function(plot){
 #' @noRd
 update_chart_scales <- function(plot, auto_scale, sec_axis){
 
+  y_scale <- layer_scales(plot)$y
+
   # Returns the order of the first scale function used - how do we determine this
-  y_scale_lims <- layer_scales(plot)$y$limits
+  y_scale_lims <- y_scale$limits
+
+  # Preserve user-supplied breaks if they have been explicitly provided.
+  custom_breaks <- NULL
+  if (!is.null(y_scale$breaks) &&
+      !inherits(y_scale$breaks, "waiver") &&
+      !is.function(y_scale$breaks)) {
+    custom_breaks <- y_scale$breaks
+  }
 
   # If no y-axis scale is present and y is numeric, then add a default aesthetic scale
   if(is.null(y_scale_lims) && auto_scale){
@@ -168,9 +178,17 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   if(auto_scale){
     suppressWarnings({
       if (sec_axis) {
-        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), add_space = TRUE)
+        if (is.null(custom_breaks)) {
+          plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), add_space = TRUE)
+        } else {
+          plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), add_space = TRUE, breaks = custom_breaks)
+        }
       } else if (!sec_axis) {
-        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE, add_space = TRUE)
+        if (is.null(custom_breaks)) {
+          plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE, add_space = TRUE)
+        } else {
+          plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE, add_space = TRUE, breaks = custom_breaks)
+        }
       }
     })
   }
