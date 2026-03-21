@@ -199,18 +199,10 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   if(auto_scale){
     suppressWarnings({
       if (sec_axis) {
-        if (is.null(custom_breaks)) {
-          plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), add_space = TRUE)
-        } else {
-          plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), add_space = TRUE, breaks = custom_breaks)
+        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), add_space = TRUE)
+        } else if (!sec_axis) {
+        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE, add_space = TRUE)
         }
-      } else if (!sec_axis) {
-        if (is.null(custom_breaks)) {
-          plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE, add_space = TRUE)
-        } else {
-          plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE, add_space = TRUE, breaks = custom_breaks)
-        }
-      }
     })
   }
 
