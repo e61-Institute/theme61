@@ -173,7 +173,28 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   }
 
   # rescale the axis and apply requested customisations
-  lims <- if (exists("aes_lims")) aes_lims else y_scale_lims
+  # If breaks were explicitly provided and are evenly spaced, encode them as
+  # a 3-value limits vector so scale_y_continuous_e61() preserves the interval
+  # without changing its user-facing API.
+  custom_lims <- NULL
+  if (!is.null(custom_breaks) && is.numeric(custom_breaks) && length(custom_breaks) >= 2) {
+    diffs <- unique(round(diff(custom_breaks), 10))
+    diffs <- diffs[is.finite(diffs) & diffs > 0]
+
+    if (length(diffs) == 1) {
+      custom_lims <- c(min(custom_breaks, na.rm = TRUE),
+                       max(custom_breaks, na.rm = TRUE),
+                       diffs[[1]])
+    }
+  }
+
+  lims <- if (!is.null(custom_lims)) {
+    custom_lims
+  } else if (exists("aes_lims")) {
+    aes_lims
+  } else {
+    y_scale_lims
+  }
 
   if(auto_scale){
     suppressWarnings({
