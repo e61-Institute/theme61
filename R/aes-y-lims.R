@@ -98,8 +98,18 @@ check_for_y_var <- function(plot){
 #' @noRd
 update_chart_scales <- function(plot, auto_scale, sec_axis){
 
+  y_scale <- layer_scales(plot)$y
+
   # Returns the order of the first scale function used - how do we determine this
-  y_scale_lims <- layer_scales(plot)$y$limits
+  y_scale_lims <- y_scale$limits
+
+  # Preserve user-supplied breaks if they have been explicitly provided.
+  custom_breaks <- NULL
+  if (!is.null(y_scale$breaks) &&
+      !inherits(y_scale$breaks, "waiver") &&
+      !is.function(y_scale$breaks)) {
+    custom_breaks <- y_scale$breaks
+  }
 
   # If no y-axis scale is present and y is numeric, then add a default aesthetic scale
   if(is.null(y_scale_lims) && auto_scale){
@@ -163,15 +173,36 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   }
 
   # rescale the axis and apply requested customisations
-  lims <- if (exists("aes_lims")) aes_lims else y_scale_lims
+  # If breaks were explicitly provided and are evenly spaced, encode them as
+  # a 3-value limits vector so scale_y_continuous_e61() preserves the interval
+  # without changing its user-facing API.
+  custom_lims <- NULL
+  if (!is.null(custom_breaks) && is.numeric(custom_breaks) && length(custom_breaks) >= 2) {
+    diffs <- unique(round(diff(custom_breaks), 10))
+    diffs <- diffs[is.finite(diffs) & diffs > 0]
+
+    if (length(diffs) == 1) {
+      custom_lims <- c(min(custom_breaks, na.rm = TRUE),
+                       max(custom_breaks, na.rm = TRUE),
+                       diffs[[1]])
+    }
+  }
+
+  lims <- if (!is.null(custom_lims)) {
+    custom_lims
+  } else if (exists("aes_lims")) {
+    aes_lims
+  } else {
+    y_scale_lims
+  }
 
   if(auto_scale){
     suppressWarnings({
       if (sec_axis) {
         plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), add_space = TRUE)
-      } else if (!sec_axis) {
+        } else if (!sec_axis) {
         plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE, add_space = TRUE)
-      }
+        }
     })
   }
 
