@@ -27,7 +27,12 @@ t61_env <- NULL
   lapply(geoms_fill, \(x) {update_geom_defaults(x, aes(fill = e61_tealdark))})
 
   # Update defaults for other types
+  # Keep geom_ribbon() semi-transparent by default.
   update_geom_defaults("ribbon", aes(fill = e61_tealdark, alpha = 0.1))
+
+  # Restore ggplot2 defaults for geoms that inherit from GeomRibbon so they
+  # do not unintentionally inherit ribbon transparency.
+  update_geom_defaults("area", aes(alpha = NA))
 
 }
 
