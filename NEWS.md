@@ -1,3 +1,9 @@
+# theme61 (development version)
+
+#### Bug fixes
+
+* Y-axis text now defaults to left-aligned when the y-axis is categorical (e.g. horizontal bar charts), instead of hugging the axis line, so it lines up with the left-aligned plot title/subtitle/y-axis title. This can still be overridden with `theme(axis.text.y = element_text(hjust = ...))` (#298).
+
 # theme61 0.7.1
 
 09 Jan 2026
