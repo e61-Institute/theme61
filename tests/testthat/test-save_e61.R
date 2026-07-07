@@ -200,6 +200,18 @@ test_that("Does save_data work", {
   withr::with_tempdir({
     expect_no_error(suppressWarnings(save_e61("graph.svg", gg, save_data = TRUE)))
     expect_no_error(suppressWarnings(save_e61("graph", gg, format = "svg", save_data = TRUE)))
+
+    # The data file should include the .csv extension (#313)
+    expect_true(file.exists("graph.csv"))
+  })
+
+  # Multi-panel graphs should get one .csv per panel, each with an index and
+  # the .csv extension
+  withr::with_tempdir({
+    expect_no_error(suppressWarnings(save_e61("multi.svg", plotlist = list(gg, gg), save_data = TRUE)))
+
+    expect_true(file.exists("multi1.csv"))
+    expect_true(file.exists("multi2.csv"))
   })
 
   # This should leave the $data container empty

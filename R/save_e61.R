@@ -315,7 +315,15 @@ save_e61 <- function(filename = NULL,
   if (save_data) {
 
     for (i in seq_along(plots)) {
-      data_name <- gsub("\\.(\\w{3})$", paste0(i, ".csv"), filename)
+      # Give each plot's data file the same name as the graph. When there are
+      # multiple plots (multi-panel), append an index to keep the file names
+      # unique.
+      data_name <- if (length(plots) > 1) {
+        paste0(filename, i, ".csv")
+      } else {
+        paste0(filename, ".csv")
+      }
+
       data.table::fwrite(plots[[i]]@data, data_name)
     }
   }
