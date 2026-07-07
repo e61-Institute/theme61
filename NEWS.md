@@ -1,3 +1,9 @@
+# theme61 (development version)
+
+#### Bug fixes
+
+* `save_e61` now always previews an SVG version of the graph in the Viewer pane, even when saving to other formats such as PDF or PNG. This fixes an error where RStudio's Viewer pane could fail to open non-SVG formats (e.g. a "chrome-extension" popup error when saving PDFs) (#314).
+
 # theme61 0.7.1
 
 09 Jan 2026
