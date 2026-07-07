@@ -50,6 +50,13 @@ save_single <- function(
   legendTitle <- plot@theme$legend.title
   legendPosition <- plot@theme$legend.position
 
+  # Snapshot the theme as the user left it, so any elements they have
+  # explicitly blanked can be restored after update_margins() runs (#312).
+  original_theme <- plot@theme
+  margin_elements <- c("axis.text.x", "axis.text.x.top", "axis.text.y", "axis.text.y.right",
+                       "axis.title.x", "axis.title.x.top", "axis.title.y", "axis.title.y.right",
+                       "legend.text", "legend.title", "strip.text", "plot.title", "plot.subtitle")
+
   if (is_spatial_chart && !attr(plot, "t61_obj")){
     plot <- plot + theme_e61_spatial()
 
@@ -60,6 +67,7 @@ save_single <- function(
     plot <- plot + theme(text = element_text(size = base_size))
     plot <- plot + update_margins(base_size = base_size,
                                   legend_title = legendTitle)
+    plot <- restore_blanked_elements(plot, original_theme, margin_elements)
 
     if(!is.null(legendPosition)){
       plot <- plot + theme(legend.position = legendPosition)
@@ -85,15 +93,7 @@ save_single <- function(
   # override chart type if the graph is a map
   if (is_spatial_chart) chart_type <- "custom"
 
-  if (chart_type == "normal") {
-    plot <- plot + theme(aspect.ratio = 0.75)
-
-  } else if(chart_type == "square") {
-    plot <- plot + theme(aspect.ratio = 1)
-
-  } else if(chart_type == "wide") {
-    plot <- plot + theme(aspect.ratio = 0.5)
-  }
+  plot <- resolve_aspect_ratio(plot, chart_type)
 
   # Update y-axis limits ----------------------------------------------------
 

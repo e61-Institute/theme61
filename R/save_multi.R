@@ -77,17 +77,7 @@ save_multi <-
         chart_type_temp <- chart_type
       }
 
-      if(chart_type_temp == "wide") {
-        temp_plot <- temp_plot + theme(aspect.ratio = 0.5)
-
-      } else if(chart_type_temp == "square") {
-
-        temp_plot <- temp_plot + theme(aspect.ratio = 1)
-
-      } else if(chart_type_temp == "normal") {
-
-        temp_plot <- temp_plot + theme(aspect.ratio = 0.75)
-      }
+      temp_plot <- resolve_aspect_ratio(temp_plot, chart_type_temp)
 
       # set the background colour
       temp_plot <- temp_plot + theme(rect = element_rect(fill = bg_colour))
@@ -102,9 +92,17 @@ save_multi <-
         legend_title <- temp_plot@theme$legend.title
         legendPosition <- temp_plot@theme$legend.position
 
+        # Snapshot the theme as the user left it, so any elements they have
+        # explicitly blanked can be restored after update_margins() runs (#312).
+        original_theme <- temp_plot@theme
+        margin_elements <- c("axis.text.x", "axis.text.x.top", "axis.text.y", "axis.text.y.right",
+                             "axis.title.x", "axis.title.x.top", "axis.title.y", "axis.title.y.right",
+                             "legend.text", "legend.title", "strip.text", "plot.title", "plot.subtitle")
+
         temp_plot <- temp_plot + theme(text = element_text(size = base_size))
 
         temp_plot <- temp_plot + update_margins(base_size = base_size, legend_title = legend_title)
+        temp_plot <- restore_blanked_elements(temp_plot, original_theme, margin_elements)
 
         if(!is.null(legendPosition)){
           temp_plot <- temp_plot + theme(legend.position = legendPosition)

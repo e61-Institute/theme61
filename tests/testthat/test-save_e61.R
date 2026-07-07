@@ -230,6 +230,66 @@ test_that("Does save_data work", {
   })
 })
 
+test_that("resolve_aspect_ratio respects user theme customisations (#312)", {
+
+  p <- minimal_plot # already carries theme_e61()'s default aspect.ratio = 0.75
+
+  # No user customisation - chart_type still controls the aspect ratio
+  expect_equal(resolve_aspect_ratio(p, "normal")@theme$aspect.ratio, 0.75)
+  expect_equal(resolve_aspect_ratio(p, "wide")@theme$aspect.ratio, 0.5)
+  expect_equal(resolve_aspect_ratio(p, "square")@theme$aspect.ratio, 1)
+
+  # User has customised the aspect ratio away from the theme_e61() default -
+  # chart_type should no longer override it
+  p_custom <- p + theme(aspect.ratio = 0.6)
+
+  expect_equal(resolve_aspect_ratio(p_custom, "normal")@theme$aspect.ratio, 0.6)
+  expect_equal(resolve_aspect_ratio(p_custom, "wide")@theme$aspect.ratio, 0.6)
+})
+
+test_that("restore_blanked_elements keeps user-blanked theme elements (#312)", {
+
+  p <- minimal_plot + theme(axis.text.y = element_blank())
+  original_theme <- p@theme
+
+  # Simulate theme61 internals reinstating the axis text with a margin
+  p_updated <- p + theme(axis.text.y = element_text(margin = margin(r = 2)))
+  expect_false(inherits(p_updated@theme$axis.text.y, "element_blank"))
+
+  p_restored <- restore_blanked_elements(p_updated, original_theme, "axis.text.y")
+  expect_true(inherits(p_restored@theme$axis.text.y, "element_blank"))
+
+  # Elements the user never blanked should be untouched
+  p_restored_x <- restore_blanked_elements(p_updated, original_theme, "axis.text.x")
+  expect_false(inherits(p_restored_x@theme$axis.text.x, "element_blank"))
+})
+
+test_that("save_e61 does not overwrite user theme changes (#312)", {
+
+  p <- minimal_plot +
+    theme(
+      axis.text.y = element_blank(),
+      aspect.ratio = 0.5
+    )
+
+  result <- save_single(
+    filename = "issue-312",
+    plot = p,
+    chart_type = NULL,
+    auto_scale = TRUE,
+    width = NULL,
+    height = NULL,
+    max_height = NULL,
+    format = "svg",
+    base_size = 10,
+    pad_width = 0,
+    bg_colour = "white"
+  )
+
+  expect_equal(result$graph@theme$aspect.ratio, 0.5)
+  expect_true(inherits(result$graph@theme$axis.text.y, "element_blank"))
+})
+
 test_that("Change background colour", {
 
   p <- minimal_plot
