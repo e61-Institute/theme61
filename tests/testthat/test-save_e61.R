@@ -205,13 +205,28 @@ test_that("Does save_data work", {
     expect_true(file.exists("graph.csv"))
   })
 
-  # Multi-panel graphs should get one .csv per panel, each with an index and
-  # the .csv extension
+  # Multi-panel graphs should get one .csv per panel, named "<graph name>
+  # <panel number>.csv"
   withr::with_tempdir({
     expect_no_error(suppressWarnings(save_e61("multi.svg", plotlist = list(gg, gg), save_data = TRUE)))
 
-    expect_true(file.exists("multi1.csv"))
-    expect_true(file.exists("multi2.csv"))
+    expect_true(file.exists("multi 1.csv"))
+    expect_true(file.exists("multi 2.csv"))
+  })
+
+  # Each panel's own data frame should be saved, even when the panels are
+  # built from different data frames
+  df1 <- data.frame(x = c(0, 1), y = c(0, 1))
+  df2 <- data.frame(x = c(0, 1), y = c(1, 4))
+
+  p1 <- ggplot(df1, aes(x, y)) + geom_point()
+  p2 <- ggplot(df2, aes(x, y)) + geom_point()
+
+  withr::with_tempdir({
+    expect_no_error(suppressWarnings(save_e61("multi-data.svg", plotlist = list(p1, p2), save_data = TRUE)))
+
+    expect_equal(data.table::fread("multi-data 1.csv")$y, df1$y)
+    expect_equal(data.table::fread("multi-data 2.csv")$y, df2$y)
   })
 
   # This should leave the $data container empty
@@ -221,6 +236,12 @@ test_that("Does save_data work", {
 
   withr::with_tempdir({
     expect_error(suppressWarnings(save_e61("graph.svg", save_data = TRUE)))
+  })
+
+  # The same check should apply to every panel of a multi-panel graph, not
+  # just the first
+  withr::with_tempdir({
+    expect_error(suppressWarnings(save_e61("multi-bad.svg", plotlist = list(p1, gg), save_data = TRUE)))
   })
 })
 
