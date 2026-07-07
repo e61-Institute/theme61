@@ -149,3 +149,23 @@ test_that("Unsuitable custom limits throw error message", {
   #   scale_y_continuous_e61(limits = c(0, 2, 1))
 
 })
+
+test_that("Auto-scaling is skipped for transformed y-scales", {
+
+  # Issue #310 - applying a transformation (e.g. log10) to the y-axis should
+  # not trigger the aesthetic auto-scaling logic, which assumes a linear scale
+  # and would otherwise replace the user's transformed scale with one that
+  # has mismatched (untransformed) limits.
+
+  data <- data.table::data.table(x = letters[1:5], y = 1:5)
+
+  p <- ggplot(data, aes(x = x, y = y)) +
+    geom_col() +
+    scale_y_continuous(trans = "log10")
+
+  withr::with_tempdir({
+    expect_no_error(suppressWarnings(save_e61("log-scale-test.svg", p)))
+  })
+
+  expect_false(identical(get_y_transform_name(p), "identity"))
+})

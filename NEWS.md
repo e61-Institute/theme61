@@ -18,6 +18,7 @@
 * A better default of labels showing on all facet panels if no facet is specified, rather than erroring out with an uninformative error message.
 * Fix issue with secondary y-axis not appearing by default on certain graphs.
 * Fix issue with facet panel spacing when axes do not appear on all panels.
+* Fix error when using a transformed y-axis (e.g. `scale_y_continuous(trans = "log10")`), where the automatic aesthetic scaling would replace the transformed scale and compare its limits against the untransformed data.
 
 # theme61 0.7.0
 
