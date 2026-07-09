@@ -11,8 +11,9 @@ save_single <- function(
     format,
     base_size,
     pad_width,
+    pad_height,
     bg_colour
-    ) {
+) {
 
 
   # Check for special graph types -------------------------------------------
@@ -152,8 +153,8 @@ save_single <- function(
   p <- ggplotGrob(plot)
 
   # allow charts to be the width of the panels
-  right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r"))
-  left_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-l"), get_grob_width(p, grob_name = "axis-l"))
+  right_axis_width <- get_grob_width(p, grob_name = "axis-r")
+  left_axis_width <- get_grob_width(p, grob_name = "axis-l")
 
   known_wd <- right_axis_width + left_axis_width
 
@@ -165,13 +166,7 @@ save_single <- function(
   # update the width after this check
   width <- tot_panel_width + known_wd
 
-  # If the chart has had the coords flipped, then allow the labels (titles, footnotes etc.) to be the width of the panel + left axis
-  if (isTRUE("CoordFlip" %in% class(ggplot_build(plot)$layout$coord))){
-    plot <- update_labs(plot, tot_panel_width + 0.85 * left_axis_width)
-
-  } else {
-    plot <- update_labs(plot, tot_panel_width)
-  }
+  plot <- update_labs(plot, 0.99 * width)
 
   if(!is_spatial_chart){
 
@@ -226,8 +221,9 @@ save_single <- function(
     }
   }
 
-  # Add width padding
-  width <- width + pad_width
+  # Add width padding - note it comes in mm and we will want to convert to cm
+  width <- width + pad_width / 10
+  height <- height + pad_height / 10
 
   # Return objects needed to save the graph ----
   retval <- list(graph = plot,
