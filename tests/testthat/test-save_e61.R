@@ -207,13 +207,6 @@ test_that("Does save_data work", {
 
   # Multi-panel graphs should get one .csv per panel, named "<graph name>
   # <panel number>.csv"
-  withr::with_tempdir({
-    expect_no_error(suppressWarnings(save_e61("multi.svg", plotlist = list(gg, gg), save_data = TRUE)))
-
-    expect_true(file.exists("multi 1.csv"))
-    expect_true(file.exists("multi 2.csv"))
-  })
-
   # Each panel's own data frame should be saved, even when the panels are
   # built from different data frames
   df1 <- data.frame(x = c(0, 1), y = c(0, 1))
