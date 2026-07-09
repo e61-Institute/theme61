@@ -116,10 +116,8 @@ has_discrete_y_scale <- function(plot) {
   return(FALSE)
 }
 
-#' Restore theme elements the user explicitly blanked on the original plot,
-#' undoing any element_blank() that theme61's own formatting (e.g.
-#' update_margins()) would otherwise have replaced with an element_text(). See
-#' issue #312 - save_e61() should not overwrite user changes to the theme.
+#' Restore theme elements the user explicitly blanked, undoing any
+#' element_blank() that update_margins() would otherwise replace.
 #' @noRd
 restore_blanked_elements <- function(plot, original_theme, elements) {
   blanked <- elements[vapply(elements, function(el) {
@@ -136,10 +134,8 @@ restore_blanked_elements <- function(plot, original_theme, elements) {
   plot
 }
 
-#' Work out the aspect ratio to apply for a given chart_type, but respect an
-#' aspect ratio the user has already customised (either via theme_e61() or a
-#' later theme() call) away from theme_e61()'s own default of 0.75. See issue
-#' #312 - save_e61() should not overwrite user changes to the theme.
+#' Work out the aspect ratio for a chart_type, but respect an aspect ratio
+#' the user has already customised away from theme_e61()'s default of 0.75.
 #' @noRd
 resolve_aspect_ratio <- function(plot, chart_type) {
   current <- plot@theme$aspect.ratio

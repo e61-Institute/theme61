@@ -92,8 +92,7 @@ save_multi <-
         legend_title <- temp_plot@theme$legend.title
         legendPosition <- temp_plot@theme$legend.position
 
-        # Snapshot the theme as the user left it, so any elements they have
-        # explicitly blanked can be restored after update_margins() runs (#312).
+        # Snapshot the theme so blanked elements can be restored after update_margins()
         original_theme <- temp_plot@theme
         margin_elements <- c("axis.text.x", "axis.text.x.top", "axis.text.y", "axis.text.y.right",
                              "axis.title.x", "axis.title.x.top", "axis.title.y", "axis.title.y.right",

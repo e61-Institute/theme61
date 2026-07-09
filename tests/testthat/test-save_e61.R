@@ -230,7 +230,7 @@ test_that("Does save_data work", {
   })
 })
 
-test_that("resolve_aspect_ratio respects user theme customisations (#312)", {
+test_that("resolve_aspect_ratio respects user theme customisations", {
 
   p <- minimal_plot # already carries theme_e61()'s default aspect.ratio = 0.75
 
@@ -247,7 +247,7 @@ test_that("resolve_aspect_ratio respects user theme customisations (#312)", {
   expect_equal(resolve_aspect_ratio(p_custom, "wide")@theme$aspect.ratio, 0.6)
 })
 
-test_that("restore_blanked_elements keeps user-blanked theme elements (#312)", {
+test_that("restore_blanked_elements keeps user-blanked theme elements", {
 
   p <- minimal_plot + theme(axis.text.y = element_blank())
   original_theme <- p@theme
@@ -264,7 +264,7 @@ test_that("restore_blanked_elements keeps user-blanked theme elements (#312)", {
   expect_false(inherits(p_restored_x@theme$axis.text.x, "element_blank"))
 })
 
-test_that("save_e61 does not overwrite user theme changes (#312)", {
+test_that("save_e61 does not overwrite user theme changes", {
 
   p <- minimal_plot +
     theme(
@@ -273,7 +273,7 @@ test_that("save_e61 does not overwrite user theme changes (#312)", {
     )
 
   result <- save_single(
-    filename = "issue-312",
+    filename = "theme-overwrite-test",
     plot = p,
     chart_type = NULL,
     auto_scale = TRUE,
