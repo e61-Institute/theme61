@@ -205,10 +205,8 @@ test_that("Does save_data work", {
     expect_true(file.exists("graph.csv"))
   })
 
-  # Multi-panel graphs should get one .csv per panel, named "<graph name>
-  # <panel number>.csv"
-  # Each panel's own data frame should be saved, even when the panels are
-  # built from different data frames
+  # Each panel gets its own "<graph name> <panel number>.csv", even when
+  # panels use different data frames
   df1 <- data.frame(x = c(0, 1), y = c(0, 1))
   df2 <- data.frame(x = c(0, 1), y = c(1, 4))
 
@@ -222,11 +220,8 @@ test_that("Does save_data work", {
     expect_equal(data.table::fread("multi-data 2.csv")$y, df2$y)
   })
 
-  # When data is supplied per-geom instead of to ggplot() itself, plot@data
-  # is a "waiver" placeholder rather than a data frame - there is no single
-  # data frame save_data can extract. This should leave the $data container
-  # empty, so save_e61(save_data = TRUE) should error rather than silently
-  # writing something useless.
+  # Data supplied per-geom rather than to ggplot() itself leaves $data empty,
+  # so save_data should error instead of writing something useless
   gg <- ggplot() +
     geom_point(data = data, aes(x, y)) +
     geom_point(data = data, aes(x, y))
@@ -235,11 +230,7 @@ test_that("Does save_data work", {
     expect_error(suppressWarnings(save_e61("graph.svg", save_data = TRUE)))
   })
 
-  # The pre-save validation used to only check plots[[1]]@data, so a bad
-  # second (or later) panel would slip through undetected. Put the bad plot
-  # (gg, defined above) in the second position of a multi-panel plotlist to
-  # confirm the same check should apply to every panel of a multi-panel
-  # graph, not just the first.
+  # The validation should catch a bad panel anywhere, not just plots[[1]]
   withr::with_tempdir({
     expect_error(suppressWarnings(save_e61("multi-bad.svg", plotlist = list(p1, gg), save_data = TRUE)))
   })
