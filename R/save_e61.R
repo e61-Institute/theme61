@@ -335,9 +335,7 @@ save_e61 <- function(filename = NULL,
     # Only run this in interactive mode
     # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
 
-    # Always preview an SVG version of the graph, even if the saved file
-    # format(s) are not SVG (e.g. PDF/PNG), since RStudio's Viewer pane can
-    # fail to reliably display some formats (see #314).
+    # Always preview an SVG, even if the saved format(s) are not SVG
     preview_svg <- make_preview_svg(
       graph = save_input$graph,
       format = format,

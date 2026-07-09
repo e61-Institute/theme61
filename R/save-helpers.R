@@ -73,13 +73,8 @@ is_testing <- function() {
   identical(Sys.getenv("TESTTHAT"), "true")
 }
 
-#' Create a temp SVG file to preview a graph in the Viewer pane
-#'
-#' The RStudio Viewer pane can fail to reliably open some saved file formats
-#' (e.g. PDFs can trigger a "chrome-extension" error, see #314). To keep the
-#' Viewer preview reliable, we always render/copy a fresh SVG version of the
-#' graph for previewing, regardless of which format(s) were actually saved to
-#' disk.
+#' Create a temp SVG file to preview a graph in the Viewer pane, regardless
+#' of which format(s) were saved to disk
 #' @noRd
 make_preview_svg <- function(graph, format, filename, width, height, bg_colour, res) {
 
