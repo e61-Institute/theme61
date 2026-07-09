@@ -1,5 +1,4 @@
-#' Get the name of the transformation applied to the plot's y-scale.
-#' Returns "identity" if there is no y-scale or no transformation is applied.
+#' Name of the transformation applied to the plot's y-scale, or "identity"
 #' @noRd
 get_y_transform_name <- function(plot){
 
@@ -20,11 +19,8 @@ get_y_transform_name <- function(plot){
 #' @noRd
 update_scales <- function(plot, auto_scale){
 
-  # Skip auto-scaling when the y-axis has a non-linear transformation applied
-  # (e.g. trans = "log10"). The aesthetic limit/break calculations below
-  # assume a linear scale, so running them on transformed data produces
-  # limits that don't match the untransformed data range, and the auto-added
-  # scale would replace (and drop the transformation from) the user's scale.
+  # Skip auto-scaling for transformed y-scales (e.g. trans = "log10") - our
+  # aesthetic limit calculations assume a linear scale.
   if (!identical(get_y_transform_name(plot), "identity")) {
     return(plot)
   }

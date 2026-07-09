@@ -152,10 +152,7 @@ test_that("Unsuitable custom limits throw error message", {
 
 test_that("Auto-scaling is skipped for transformed y-scales", {
 
-  # Issue #310 - applying a transformation (e.g. log10) to the y-axis should
-  # not trigger the aesthetic auto-scaling logic, which assumes a linear scale
-  # and would otherwise replace the user's transformed scale with one that
-  # has mismatched (untransformed) limits.
+  # Issue #310 - log10 y-scale shouldn't be replaced by auto-scaling
 
   data <- data.table::data.table(x = letters[1:5], y = 1:5)
 
