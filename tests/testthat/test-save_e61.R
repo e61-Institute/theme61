@@ -283,6 +283,7 @@ test_that("save_e61 does not overwrite user theme changes", {
     format = "svg",
     base_size = 10,
     pad_width = 0,
+    pad_height = 0,
     bg_colour = "white"
   )
 
