@@ -152,7 +152,7 @@ test_that("Unsuitable custom limits throw error message", {
 
 test_that("Auto-scaling is skipped for transformed y-scales", {
 
-  # Issue #310 - log10 y-scale shouldn't be replaced by auto-scaling
+  # log10 y-scale shouldn't be replaced by auto-scaling
 
   data <- data.table::data.table(x = letters[1:5], y = 1:5)
 
