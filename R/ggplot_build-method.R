@@ -310,13 +310,6 @@ maybe_adjust_facet_spacing <- function(plot) {
 }
 
 # Left-align y-axis text when the y-axis is categorical (issue #298).
-#
-# The theme61 default for y-axis text is to hug the axis line (right-aligned,
-# as with a continuous scale). For categorical y-axes this creates a ragged
-# left edge that looks misaligned against the left-aligned plot
-# title/subtitle/y-axis title, especially once labels are more than a word
-# long. Left-aligning instead lines every label up with the left margin,
-# which also holds up when the categorical axis is drawn on the right.
 maybe_leftalign_discrete_y_text <- function(plot) {
 
   if (!has_discrete_y_scale(plot)) return(plot)
