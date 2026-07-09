@@ -309,7 +309,7 @@ maybe_adjust_facet_spacing <- function(plot) {
   plot
 }
 
-# Left-align y-axis text when the y-axis is categorical (issue #298).
+# Left-align y-axis text when the y-axis is categorical.
 maybe_leftalign_discrete_y_text <- function(plot) {
 
   if (!has_discrete_y_scale(plot)) return(plot)
