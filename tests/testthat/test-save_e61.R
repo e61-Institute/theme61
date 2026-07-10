@@ -247,21 +247,22 @@ test_that("resolve_aspect_ratio respects user theme customisations", {
   expect_equal(resolve_aspect_ratio(p_custom, "wide")@theme$aspect.ratio, 0.6)
 })
 
-test_that("restore_blanked_elements keeps user-blanked theme elements", {
+test_that("update_margins leaves blanked elements alone but still sizes the rest", {
 
-  p <- minimal_plot + theme(axis.text.y = element_blank())
-  original_theme <- p@theme
+  # A blanked element should be skipped entirely, not overridden and reverted
+  blanked_theme <- (minimal_plot + theme(axis.text.y = element_blank()))@theme
+  margins_theme <- update_margins(blanked_theme, base_size = 10, legend_title = element_blank())
 
-  # Simulate theme61 internals reinstating the axis text with a margin
-  p_updated <- p + theme(axis.text.y = element_text(margin = margin(r = 2)))
-  expect_false(inherits(p_updated@theme$axis.text.y, "element_blank"))
+  expect_null(margins_theme$axis.text.y)
 
-  p_restored <- restore_blanked_elements(p_updated, original_theme, "axis.text.y")
-  expect_true(inherits(p_restored@theme$axis.text.y, "element_blank"))
+  # Non-blanked elements should still get a base_size-scaled margin - the
+  # blank-skipping logic must not neuter update_margins()'s actual job
+  default_theme <- minimal_plot@theme
+  margins_10 <- update_margins(default_theme, base_size = 10, legend_title = element_blank())
+  margins_20 <- update_margins(default_theme, base_size = 20, legend_title = element_blank())
 
-  # Elements the user never blanked should be untouched
-  p_restored_x <- restore_blanked_elements(p_updated, original_theme, "axis.text.x")
-  expect_false(inherits(p_restored_x@theme$axis.text.x, "element_blank"))
+  expect_equal(as.numeric(margins_10$axis.text.y$margin)[2], 10 / 5)
+  expect_equal(as.numeric(margins_20$axis.text.y$margin)[2], 20 / 5)
 })
 
 test_that("save_e61 does not overwrite user theme changes", {

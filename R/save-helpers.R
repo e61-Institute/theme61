@@ -116,24 +116,6 @@ has_discrete_y_scale <- function(plot) {
   return(FALSE)
 }
 
-#' Restore theme elements the user explicitly blanked, undoing any
-#' element_blank() that update_margins() would otherwise replace.
-#' @noRd
-restore_blanked_elements <- function(plot, original_theme, elements) {
-  blanked <- elements[vapply(elements, function(el) {
-    inherits(original_theme[[el]], "element_blank")
-  }, logical(1))]
-
-  if (length(blanked) > 0) {
-    blank_args <- rep(list(element_blank()), length(blanked))
-    names(blank_args) <- blanked
-
-    plot <- plot + do.call(theme, blank_args)
-  }
-
-  plot
-}
-
 #' Work out the aspect ratio for a chart_type, but respect an aspect ratio
 #' the user has already customised away from theme_e61()'s default of 0.75.
 #' @noRd

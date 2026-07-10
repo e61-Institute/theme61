@@ -788,41 +788,50 @@ update_plot_label <- function(plot, chart_type, base_size){
 }
 
 #' Update plot margins when new base size is provided
+#'
+#' Elements the current theme has already blanked are left out - a margin
+#' does nothing for an element that won't render, and setting one would
+#' silently undo the user's theme() call.
 #' @noRd
-update_margins <- function(base_size, legend_title) {
+update_margins <- function(current_theme, base_size, legend_title) {
 
   half_line <- base_size / 2
 
-  ret <-
-    theme(
-      axis.text.x = element_text(margin = margin(t = base_size / 4, unit = "pt")),
-      axis.text.x.top = element_text(margin = margin(b = base_size / 5)),
-      axis.text.y = element_text(margin = margin(r = base_size / 5)),
-      axis.text.y.right = element_text(margin = margin(l = base_size / 5)),
-      axis.ticks.length = unit(half_line / 2, "pt"),
-      axis.ticks.length.x = unit(half_line / 2, "pt"), # Puts ticks inside graph
-      axis.title.x = element_text(margin = margin(t = half_line / 2)),
-      axis.title.x.top = element_text(margin = margin(b = half_line / 2)),
-      axis.title.y = element_text(margin = margin(r = half_line / 2)),
-      axis.title.y.right = element_text(margin = margin(l = half_line / 2)),
-      legend.spacing = unit(half_line, "pt"),
-      legend.margin = margin(),
-      legend.text = element_text(margin = margin(l = 0, r = base_size / 4, unit = "pt")),
-      legend.box.margin = margin(0, 0, 0, 0, "cm"),
-      legend.box.spacing = unit(half_line, "pt"),
-      strip.text = element_text(
-        margin = margin(0.8 * half_line, 0.8 * half_line, 0.8 * half_line, 0.8 * half_line)
-      ),
-      strip.switch.pad.grid = unit(half_line / 2, "pt"),
-      strip.switch.pad.wrap = unit(half_line / 2, "pt"),
-      plot.title = element_text(margin = margin(b = half_line)),
-      plot.subtitle = ggtext::element_markdown(
-        margin = margin(
-          t = 0, r = 0, b = base_size * .5, l = 0,
-          unit = "pt"
-        )
+  margin_args <- list(
+    axis.text.x = element_text(margin = margin(t = base_size / 4, unit = "pt")),
+    axis.text.x.top = element_text(margin = margin(b = base_size / 5)),
+    axis.text.y = element_text(margin = margin(r = base_size / 5)),
+    axis.text.y.right = element_text(margin = margin(l = base_size / 5)),
+    axis.ticks.length = unit(half_line / 2, "pt"),
+    axis.ticks.length.x = unit(half_line / 2, "pt"), # Puts ticks inside graph
+    axis.title.x = element_text(margin = margin(t = half_line / 2)),
+    axis.title.x.top = element_text(margin = margin(b = half_line / 2)),
+    axis.title.y = element_text(margin = margin(r = half_line / 2)),
+    axis.title.y.right = element_text(margin = margin(l = half_line / 2)),
+    legend.spacing = unit(half_line, "pt"),
+    legend.margin = margin(),
+    legend.text = element_text(margin = margin(l = 0, r = base_size / 4, unit = "pt")),
+    legend.box.margin = margin(0, 0, 0, 0, "cm"),
+    legend.box.spacing = unit(half_line, "pt"),
+    strip.text = element_text(
+      margin = margin(0.8 * half_line, 0.8 * half_line, 0.8 * half_line, 0.8 * half_line)
+    ),
+    strip.switch.pad.grid = unit(half_line / 2, "pt"),
+    strip.switch.pad.wrap = unit(half_line / 2, "pt"),
+    plot.title = element_text(margin = margin(b = half_line)),
+    plot.subtitle = ggtext::element_markdown(
+      margin = margin(
+        t = 0, r = 0, b = base_size * .5, l = 0,
+        unit = "pt"
       )
     )
+  )
+
+  is_blanked <- vapply(names(margin_args), function(el) {
+    inherits(current_theme[[el]], "element_blank")
+  }, logical(1))
+
+  ret <- do.call(theme, margin_args[!is_blanked])
 
   # adjust borders to the legend title if there is one
   if (!"element_blank" %in% class(legend_title)) {

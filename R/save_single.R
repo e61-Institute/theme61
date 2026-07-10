@@ -50,12 +50,6 @@ save_single <- function(
   legendTitle <- plot@theme$legend.title
   legendPosition <- plot@theme$legend.position
 
-  # Snapshot the theme so blanked elements can be restored after update_margins()
-  original_theme <- plot@theme
-  margin_elements <- c("axis.text.x", "axis.text.x.top", "axis.text.y", "axis.text.y.right",
-                       "axis.title.x", "axis.title.x.top", "axis.title.y", "axis.title.y.right",
-                       "legend.text", "legend.title", "strip.text", "plot.title", "plot.subtitle")
-
   if (is_spatial_chart && !attr(plot, "t61_obj")){
     plot <- plot + theme_e61_spatial()
 
@@ -64,9 +58,9 @@ save_single <- function(
   } else {
 
     plot <- plot + theme(text = element_text(size = base_size))
-    plot <- plot + update_margins(base_size = base_size,
+    plot <- plot + update_margins(current_theme = plot@theme,
+                                  base_size = base_size,
                                   legend_title = legendTitle)
-    plot <- restore_blanked_elements(plot, original_theme, margin_elements)
 
     if(!is.null(legendPosition)){
       plot <- plot + theme(legend.position = legendPosition)

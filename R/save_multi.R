@@ -92,16 +92,11 @@ save_multi <-
         legend_title <- temp_plot@theme$legend.title
         legendPosition <- temp_plot@theme$legend.position
 
-        # Snapshot the theme so blanked elements can be restored after update_margins()
-        original_theme <- temp_plot@theme
-        margin_elements <- c("axis.text.x", "axis.text.x.top", "axis.text.y", "axis.text.y.right",
-                             "axis.title.x", "axis.title.x.top", "axis.title.y", "axis.title.y.right",
-                             "legend.text", "legend.title", "strip.text", "plot.title", "plot.subtitle")
-
         temp_plot <- temp_plot + theme(text = element_text(size = base_size))
 
-        temp_plot <- temp_plot + update_margins(base_size = base_size, legend_title = legend_title)
-        temp_plot <- restore_blanked_elements(temp_plot, original_theme, margin_elements)
+        temp_plot <- temp_plot + update_margins(current_theme = temp_plot@theme,
+                                                base_size = base_size,
+                                                legend_title = legend_title)
 
         if(!is.null(legendPosition)){
           temp_plot <- temp_plot + theme(legend.position = legendPosition)
