@@ -340,10 +340,19 @@ save_e61 <- function(filename = NULL,
   } else if (interactive()) {
     # Only run this in interactive mode
     # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
-    temp_file <- tempfile(fileext = paste0(".", format[[1]]))
-    file.copy(file_to_open, temp_file)
 
-    out <- try(rstudioapi::viewer(temp_file))
+    # Always preview an SVG, even if the saved format(s) are not SVG
+    preview_svg <- make_preview_svg(
+      graph = save_input$graph,
+      format = format,
+      filename = filename,
+      width = save_input$width,
+      height = save_input$height,
+      bg_colour = bg_colour,
+      res = res
+    )
+
+    out <- try(rstudioapi::viewer(preview_svg))
 
     if (!is.null(out)) warning("Graph file could not be opened.")
 
