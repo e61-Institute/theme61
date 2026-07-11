@@ -1,8 +1,29 @@
+#' Name of the transformation applied to the plot's y-scale, or "identity"
+#' @noRd
+get_y_transform_name <- function(plot){
+
+  y_scale <- layer_scales(plot)$y
+
+  if (is.null(y_scale)) return("identity")
+
+  transform <- tryCatch(y_scale$get_transformation(), error = function(e) NULL)
+
+  if (is.null(transform) || is.null(transform$name)) return("identity")
+
+  transform$name
+}
+
 #' Given a ggplot object, update the y-axis scales
 #' plot - ggplot object. This is the plot whose scales we want to update.
 #' auto_scale - should the chart be auto-scaled or should we leave it as is
 #' @noRd
 update_scales <- function(plot, auto_scale){
+
+  # Skip auto-scaling for transformed y-scales (e.g. trans = "log10") - our
+  # aesthetic limit calculations assume a linear scale.
+  if (!identical(get_y_transform_name(plot), "identity")) {
+    return(plot)
+  }
 
   # check if we have a numeric y-variable
   check_y_var <- check_for_y_var(plot)
