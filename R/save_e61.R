@@ -27,8 +27,12 @@
 #' @param dim An optional named list specifying the plot height and width.
 #'   Defaults to NULL which means the graph dimensions will be calculated
 #'   automatically.
-#' @param pad_width Numeric. Add horizontal whitespace to the sides of the
-#'   graph. Defaults to no additional padding.
+#' @param pad_width Numeric (mm). Adds horizontal whitespace to the sides of all
+#'   graphs. If saving multiple charts this will add the same spacing to all
+#'   charts. Defaults to no additional padding.
+#' @param pad_height Numeric (mm). Adds vertical whitespace to the sides of all
+#'   graphs. If saving multiple charts this will add the same spacing to all
+#'   charts. Defaults to no additional padding.
 #' @param max_height Numeric. The maximum height of your plot in cm. This is
 #'   used to constrain the plot resizing algorithm in cases where you want to
 #'   limit the height of your charts. Defaults to NULL which does not restrict
@@ -79,6 +83,7 @@ save_e61 <- function(filename = NULL,
                      auto_scale = TRUE,
                      dim = list(height = NULL, width = NULL),
                      pad_width = 0,
+                     pad_height = 0,
                      max_height = NULL,
                      preview = FALSE,
                      save_data = FALSE,
@@ -157,8 +162,8 @@ save_e61 <- function(filename = NULL,
 
     # Strip file extension from filename
     filename <- gsub("^(.*)\\..{3}$", "\\1", filename)
-  } else if (is.null(format) && !is.null(getOption("default_save_format"))) {
-    format <- getOption("default_save_format")
+  } else if (is.null(format) && !is.null(getOption("theme61.default_save_format"))) {
+    format <- getOption("theme61.default_save_format")
   } else {
     format <- match.arg(format, several.ok = TRUE)
   }
@@ -258,13 +263,13 @@ save_e61 <- function(filename = NULL,
       sources = sources,
       width = dim$width, # control width of the chart
       height = dim$height, # control height of the chart
-      max_height = max_height, # control maximum height of the chart
       auto_scale = auto_scale,
       title_spacing_adj = spacing_adj$title, # adjust the amount of space given to the title
       subtitle_spacing_adj = spacing_adj$subtitle, # adjust the amount of space given to the subtitle
       height_adj = height_adj, # adjust the vertical spacing of the mpanel charts
       base_size = base_size,
       pad_width = pad_width,
+      pad_height = pad_height,
       ncol = ncol,
       nrow = nrow,
       align = align,
@@ -287,6 +292,7 @@ save_e61 <- function(filename = NULL,
       format = format,
       base_size = base_size,
       pad_width = pad_width,
+      pad_height = pad_height,
       bg_colour = bg_colour
     )
   }
@@ -325,7 +331,7 @@ save_e61 <- function(filename = NULL,
   # Put filename back together
   file_to_open <- paste0(filename, ".", format[[1]])
 
-  if (isTRUE(getOption("open_e61_graph", FALSE))) {
+  if (isTRUE(getOption("theme61.open_e61_graph", FALSE))) {
     file_to_open <- shQuote(here::here(file_to_open))
 
     out <- try(system2("open", file_to_open))
@@ -356,58 +362,6 @@ save_e61 <- function(filename = NULL,
   retval <- paste(filename, format, sep = ".")
 
   invisible(retval)
-}
-
-#' Set option to open graphs in the browser instead of the Viewer pane
-#'
-#' Previous versions of theme61 opened graphs in the browser instead of the
-#' Viewer pane. You can bring back this functionality by running this function,
-#' which sets a session-wide option.
-#'
-#' @return This function is used for its side effects.
-#' @rdname open_graph_browser
-#' @export
-set_open_graph_browser <- function() {
-  options(open_e61_graph = TRUE)
-
-  invisible(TRUE)
-}
-
-#' @rdname open_graph_browser
-#' @export
-unset_open_graph_browser <- function() {
-  options(open_e61_graph = FALSE)
-
-  invisible(FALSE)
-}
-
-#' Sets the default file save format if format is not specified
-#'
-#' This function sets the file save format if \code{format} is not specified in
-#' \code{save_e61} and the file extension is not provided in \code{filename}.
-#'
-#' @inheritParams save_e61
-#' @return This function is used for its side effects.
-#' @rdname set_format
-#' @export
-set_format <- function(format) {
-  options(default_save_format = format)
-
-  invisible(TRUE)
-}
-
-#' Clears the default file save format from the session options
-#'
-#' This function clears the default file save format specified in
-#' \code{set_format}.
-#'
-#' @return This function is used for its side effects.
-#' @rdname set_format
-#' @export
-unset_format <- function() {
-  options(default_save_format = NULL)
-
-  invisible(FALSE)
 }
 
 #' Converts SVG to a bitmap file
