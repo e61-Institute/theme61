@@ -161,6 +161,23 @@ resolve_aspect_ratio <- function(plot, chart_type) {
   plot + theme(aspect.ratio = target)
 }
 
+#' Work out the text size to apply, but respect a size the user has already
+#' customised away from theme_e61()'s default (the theme61.base_size option).
+#' Returns the plot plus the effective size to use for any size-dependent
+#' formatting done afterwards (e.g. update_margins()), so spacing stays
+#' proportional to whichever size actually ends up on the plot.
+#' @noRd
+resolve_text_size <- function(plot, base_size) {
+  current <- plot@theme$text$size
+  default_size <- getOption("theme61.base_size", default = 10)
+
+  customised <- !is.null(current) && !isTRUE(all.equal(current, default_size))
+
+  if (customised) return(list(plot = plot, base_size = current))
+
+  list(plot = plot + theme(text = element_text(size = base_size)), base_size = base_size)
+}
+
 #' Helper function that spell checks any string vector that is supplied
 #' @noRd
 check_spelling <- function(vector) {

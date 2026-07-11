@@ -65,6 +65,10 @@ save_multi <-
     any_neg_break <- FALSE
     any_dec_break <- FALSE
 
+    # track the effective text size used per panel, in case a panel has
+    # already customised its own text size away from the theme_e61() default
+    panel_base_sizes <- rep(base_size, length(plots))
+
     for(i in seq_along(plots)){
 
       temp_plot <- plots[[i]]
@@ -92,10 +96,12 @@ save_multi <-
         legend_title <- temp_plot@theme$legend.title
         legendPosition <- temp_plot@theme$legend.position
 
-        temp_plot <- temp_plot + theme(text = element_text(size = base_size))
+        resolved_size <- resolve_text_size(temp_plot, base_size)
+        temp_plot <- resolved_size$plot
+        panel_base_sizes[i] <- resolved_size$base_size
 
         temp_plot <- temp_plot + update_margins(current_theme = temp_plot@theme,
-                                                base_size = base_size,
+                                                base_size = panel_base_sizes[i],
                                                 legend_title = legend_title)
 
         if(!is.null(legendPosition)){
@@ -205,7 +211,7 @@ save_multi <-
         temp_plot <- update_labs(temp_plot, panel_width + known_width / ncol)
 
         # update any plot label sizes
-        temp_plot <- update_plot_label(temp_plot, chart_type, base_size)
+        temp_plot <- update_plot_label(temp_plot, chart_type, panel_base_sizes[i])
 
         # save the plot
         clean_plotlist[[i]] <- temp_plot
