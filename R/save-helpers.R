@@ -73,6 +73,30 @@ is_testing <- function() {
   identical(Sys.getenv("TESTTHAT"), "true")
 }
 
+#' Create a temp SVG file to preview a graph in the Viewer pane, regardless
+#' of which format(s) were saved to disk
+#' @noRd
+make_preview_svg <- function(graph, format, filename, width, height, bg_colour, res) {
+
+  preview_svg <- tempfile(fileext = ".svg")
+
+  if ("svg" %in% format) {
+    file.copy(paste0(filename, ".svg"), preview_svg, overwrite = TRUE)
+  } else {
+    save_graph(
+      graph = graph,
+      format = "svg",
+      filename = tools::file_path_sans_ext(preview_svg),
+      width = width,
+      height = height,
+      bg_colour = bg_colour,
+      res = res
+    )
+  }
+
+  invisible(preview_svg)
+}
+
 #' Function to check if a plot has a discrete y-scale
 #' @noRd
 has_discrete_y_scale <- function(plot) {

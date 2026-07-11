@@ -137,15 +137,105 @@ test_that("Unsuitable custom limits throw error message", {
 
   data <- data.frame(x = seq(1, 10, 1), y = runif(10, 3, 6))
 
-  expect_no_error({
-    ggplot(data, aes(x, y)) +
-      geom_point() +
-      scale_y_continuous_e61(limits = c(0, 10, 2))
+  p <- ggplot(data, aes(x, y)) +
+    geom_point() +
+    scale_y_continuous_e61(limits = c(0, 10, 2))
+
+  expect_no_error(ggplot_build(p))
+
+  p <- ggplot(data, aes(x, y)) +
+    geom_point() +
+    scale_y_continuous_e61(limits = c(-10, -5, 1))
+
+  expect_error(ggplot_build(p))
+
+})
+
+test_that("scale_y_continuous_e61: does not error with geom_rect using +/-Inf", {
+
+  set.seed(1)
+  df <- data.frame(
+    x = 1:10,
+    y = rnorm(10)
+  )
+
+  p <- ggplot(df, aes(x, y)) +
+    geom_rect(
+      aes(
+        xmin = -Inf, xmax = Inf,
+        ymin = -Inf, ymax = Inf
+      ),
+      inherit.aes = FALSE,
+      fill = "grey90"
+    ) +
+    geom_line(linewidth = 1) +
+    scale_y_continuous_e61(limits = c(-3, 3))
+
+  expect_no_error(suppressWarnings(ggplot_build(p)))
+
+  p <- ggplot(df, aes(x, y)) +
+    annotate(
+      "rect",
+      xmin = -Inf, xmax = Inf,
+      ymin = -Inf, ymax = Inf,
+      fill = "grey90"
+    ) +
+    geom_line(linewidth = 1) +
+    scale_y_continuous_e61(limits = c(-3, 3))
+
+  expect_no_error(suppressWarnings(ggplot_build(p)))
+})
+
+test_that("scale_y_continuous_e61: still errors if real data are outside supplied limits", {
+
+  set.seed(3)
+  df <- data.frame(
+    x = 1:10,
+    y = c(rnorm(9), 10) # deliberate outlier beyond limits
+  )
+
+  p <- ggplot(df, ggplot2::aes(x, y)) +
+    geom_point(size = 2) +
+    scale_y_continuous_e61(limits = c(-3, 3))
+
+  expect_error(
+    suppressWarnings(ggplot_build(p)),
+    regexp = "Supplied limits are outside the data's range"
+  )
+})
+
+test_that("scale_y_continuous_e61: does not error when all trained values are filtered out (only Inf layer)", {
+
+  df <- data.frame(x = 1, y = 0)
+
+  p <- ggplot(df, ggplot2::aes(x, y)) +
+    geom_rect(
+      aes(
+        xmin = -Inf, xmax = Inf,
+        ymin = -Inf, ymax = Inf
+      ),
+      inherit.aes = FALSE,
+      fill = "grey90"
+    ) +
+    # make sure there's no geom contributing finite y values; remove points/lines
+    scale_y_continuous_e61(limits = c(-3, 3))
+
+  expect_no_error(suppressWarnings(ggplot_build(p)))
+})
+
+test_that("Auto-scaling is skipped for transformed y-scales", {
+
+  # log10 y-scale shouldn't be replaced by auto-scaling
+
+  data <- data.table::data.table(x = letters[1:5], y = 1:5)
+
+  p <- ggplot(data, aes(x = x, y = y)) +
+    geom_col() +
+    scale_y_continuous(trans = "log10")
+
+  withr::with_tempdir({
+    expect_no_error(suppressWarnings(save_e61("log-scale-test.svg", p)))
   })
 
-  # Test this manually if required
-  # ggplot(data, aes(x, y)) +
-  #   geom_point() +
-  #   scale_y_continuous_e61(limits = c(0, 2, 1))
-
+  expect_false(identical(get_y_transform_name(p), "identity"))
 })

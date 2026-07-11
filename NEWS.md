@@ -1,3 +1,10 @@
+# theme61 (development version)
+
+#### Bug fixes
+
+* `save_e61` now always previews an SVG version of the graph in the Viewer pane, even when saving to other formats such as PDF or PNG. This fixes an error where RStudio's Viewer pane could fail to open non-SVG formats (e.g. a "chrome-extension" popup error when saving PDFs).
+* Y-axis text now defaults to left-aligned when the y-axis is categorical (e.g. horizontal bar charts), instead of hugging the axis line, so it lines up with the left-aligned plot title/subtitle/y-axis title. This can still be overridden with `theme(axis.text.y = element_text(hjust = ...))`.
+
 # theme61 0.7.1
 
 09 Jan 2026
@@ -18,6 +25,7 @@
 * A better default of labels showing on all facet panels if no facet is specified, rather than erroring out with an uninformative error message.
 * Fix issue with secondary y-axis not appearing by default on certain graphs.
 * Fix issue with facet panel spacing when axes do not appear on all panels.
+* Fix error when using a transformed y-axis (e.g. `scale_y_continuous(trans = "log10")`), where the automatic aesthetic scaling would replace the transformed scale and compare its limits against the untransformed data.
 
 # theme61 0.7.0
 

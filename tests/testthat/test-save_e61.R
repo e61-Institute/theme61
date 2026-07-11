@@ -108,6 +108,24 @@ test_that("Y-axis customisation options", {
 
 })
 
+test_that("save_e61 autoscaling preserves custom y breaks", {
+  set.seed(1)
+  df <- data.frame(
+    x = 1:10,
+    y = rnorm(10)
+  )
+
+  p <- ggplot(df, aes(x, y)) +
+    geom_line() +
+    scale_y_continuous_e61(limits = c(-30, 30, 2))
+
+  p_scaled <- update_scales(p, auto_scale = TRUE)
+
+  breaks <- ggplot_build(p_scaled)$layout$panel_scales_y[[1]]$breaks
+
+  expect_equal(breaks, seq(-30, 30, 2))
+})
+
 test_that("Directory existence checker", {
   p <- minimal_plot
 
