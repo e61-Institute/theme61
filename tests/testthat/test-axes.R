@@ -222,3 +222,20 @@ test_that("scale_y_continuous_e61: does not error when all trained values are fi
 
   expect_no_error(suppressWarnings(ggplot_build(p)))
 })
+
+test_that("Auto-scaling is skipped for transformed y-scales", {
+
+  # log10 y-scale shouldn't be replaced by auto-scaling
+
+  data <- data.table::data.table(x = letters[1:5], y = 1:5)
+
+  p <- ggplot(data, aes(x = x, y = y)) +
+    geom_col() +
+    scale_y_continuous(trans = "log10")
+
+  withr::with_tempdir({
+    expect_no_error(suppressWarnings(save_e61("log-scale-test.svg", p)))
+  })
+
+  expect_false(identical(get_y_transform_name(p), "identity"))
+})

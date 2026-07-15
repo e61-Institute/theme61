@@ -61,6 +61,10 @@ save_multi <-
     max_left_axis_width <- 0
     max_right_axis_width <- 0
 
+    # track the effective text size used per panel, in case a panel has
+    # already customised its own text size away from the theme_e61() default
+    panel_base_sizes <- rep(base_size, length(plots))
+
     for(i in seq_along(plots)){
 
       temp_plot <- plots[[i]]
@@ -73,17 +77,7 @@ save_multi <-
         chart_type_temp <- chart_type
       }
 
-      if(chart_type_temp == "wide") {
-        temp_plot <- temp_plot + theme(aspect.ratio = 0.5)
-
-      } else if(chart_type_temp == "square") {
-
-        temp_plot <- temp_plot + theme(aspect.ratio = 1)
-
-      } else if(chart_type_temp == "normal") {
-
-        temp_plot <- temp_plot + theme(aspect.ratio = 0.75)
-      }
+      temp_plot <- resolve_aspect_ratio(temp_plot, chart_type_temp)
 
       # set the background colour
       temp_plot <- temp_plot + theme(rect = element_rect(fill = bg_colour))
@@ -98,9 +92,13 @@ save_multi <-
         legend_title <- temp_plot@theme$legend.title
         legendPosition <- temp_plot@theme$legend.position
 
-        temp_plot <- temp_plot + theme(text = element_text(size = base_size))
+        resolved_size <- resolve_text_size(temp_plot, base_size)
+        temp_plot <- resolved_size$plot
+        panel_base_sizes[i] <- resolved_size$base_size
 
-        temp_plot <- temp_plot + update_margins(base_size = base_size, legend_title = legend_title)
+        temp_plot <- temp_plot + update_margins(current_theme = temp_plot@theme,
+                                                base_size = panel_base_sizes[i],
+                                                legend_title = legend_title)
 
         if(!is.null(legendPosition)){
           temp_plot <- temp_plot + theme(legend.position = legendPosition)
@@ -187,7 +185,7 @@ save_multi <-
         temp_plot <- update_labs(temp_plot, panel_width + known_width / ncol)
 
         # update any plot label sizes
-        temp_plot <- update_plot_label(temp_plot, chart_type, base_size)
+        temp_plot <- update_plot_label(temp_plot, chart_type, panel_base_sizes[i])
 
         # save the plot
         clean_plotlist[[i]] <- temp_plot

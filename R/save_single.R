@@ -57,8 +57,12 @@ save_single <- function(
     plot
   } else {
 
-    plot <- plot + theme(text = element_text(size = base_size))
-    plot <- plot + update_margins(base_size = base_size,
+    resolved_size <- resolve_text_size(plot, base_size)
+    plot <- resolved_size$plot
+    base_size <- resolved_size$base_size
+
+    plot <- plot + update_margins(current_theme = plot@theme,
+                                  base_size = base_size,
                                   legend_title = legendTitle)
 
     if(!is.null(legendPosition)){
@@ -85,15 +89,7 @@ save_single <- function(
   # override chart type if the graph is a map
   if (is_spatial_chart) chart_type <- "custom"
 
-  if (chart_type == "normal") {
-    plot <- plot + theme(aspect.ratio = 0.75)
-
-  } else if(chart_type == "square") {
-    plot <- plot + theme(aspect.ratio = 1)
-
-  } else if(chart_type == "wide") {
-    plot <- plot + theme(aspect.ratio = 0.5)
-  }
+  plot <- resolve_aspect_ratio(plot, chart_type)
 
   # Update y-axis limits ----------------------------------------------------
 
@@ -130,7 +126,7 @@ save_single <- function(
       max_panel_width <- max_width / 2 # only allow the panel to be at most half the column consistent with other chart types
 
       # Format the flipped coords axes
-      plot <- plot + format_flip()
+      plot <- plot + format_flip(current_theme = plot@theme)
 
       # If it's only one panel, set the chart width to 1/2 of the max-width
     } else if(n_panel_cols == 1){
