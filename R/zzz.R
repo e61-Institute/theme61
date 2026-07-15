@@ -27,13 +27,21 @@ t61_env <- NULL
   lapply(geoms_fill, \(x) {update_geom_defaults(x, aes(fill = e61_tealdark))})
 
   # Update defaults for other types
+  # Keep geom_ribbon() semi-transparent by default.
   update_geom_defaults("ribbon", aes(fill = e61_tealdark, alpha = 0.1))
+
+  # Restore ggplot2 defaults for geoms that inherit from GeomRibbon so they
+  # do not unintentionally inherit ribbon transparency.
+  update_geom_defaults("area", aes(alpha = NA))
 
 }
 
 .onAttach <- function(libname, pkgname) {
   op <- options()
   op.theme61 <- list(
+    theme61.base_size = 10,
+    theme61.default_save_format = "svg",
+    theme61.open_e61_graph = FALSE,
     theme61.preview_on_print = TRUE
   )
 

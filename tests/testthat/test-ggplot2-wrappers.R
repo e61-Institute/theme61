@@ -276,6 +276,54 @@ test_that("user-specified panel.spacing is not overridden", {
   expect_equal(th$panel.spacing.y, user_spacing_y)
 })
 
+test_that("categorical y-axis text is left-aligned by default (#298)", {
+
+  df <- data.frame(
+    category = c("Short", "A much longer category label"),
+    value = c(1, 2)
+  )
+
+  p <- ggplot(df, aes(x = value, y = category)) +
+    geom_col()
+
+  b <- ggplot_build(p)
+  th <- b@plot@theme
+
+  expect_equal(th$axis.text.y$hjust, 0)
+  expect_equal(th$axis.text.y.right$hjust, 0)
+})
+
+test_that("continuous y-axis text alignment is untouched (#298)", {
+
+  df <- data.frame(x = 1:5, y = (1:5)^2)
+
+  p <- ggplot(df, aes(x, y)) +
+    geom_point()
+
+  b <- ggplot_build(p)
+  th <- b@plot@theme
+
+  expect_null(th$axis.text.y$hjust)
+  expect_null(th$axis.text.y.right$hjust)
+})
+
+test_that("user-specified y-axis text alignment is not overridden (#298)", {
+
+  df <- data.frame(
+    category = c("Short", "A much longer category label"),
+    value = c(1, 2)
+  )
+
+  p <- ggplot(df, aes(x = value, y = category)) +
+    geom_col() +
+    theme(axis.text.y = element_text(hjust = 1))
+
+  b <- ggplot_build(p)
+  th <- b@plot@theme
+
+  expect_equal(th$axis.text.y$hjust, 1)
+})
+
 testthat::test_that("ggplot2::facet_wrap is not auto-adjusted (facet not tagged)", {
 
   old <- options(quiet_wrap = TRUE)

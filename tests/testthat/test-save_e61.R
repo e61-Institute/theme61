@@ -143,6 +143,24 @@ test_that("Y-axis customisation options", {
   })
 })
 
+test_that("save_e61 autoscaling preserves custom y breaks", {
+  set.seed(1)
+  df <- data.frame(
+    x = 1:10,
+    y = rnorm(10)
+  )
+
+  p <- ggplot(df, aes(x, y)) +
+    geom_line() +
+    scale_y_continuous_e61(limits = c(-30, 30, 2))
+
+  p_scaled <- update_scales(p, auto_scale = TRUE)
+
+  breaks <- ggplot_build(p_scaled)$layout$panel_scales_y[[1]]$breaks
+
+  expect_equal(breaks, seq(-30, 30, 2))
+})
+
 test_that("Directory existence checker", {
   p <- minimal_plot
 
@@ -245,6 +263,131 @@ test_that("Does save_data work", {
   withr::with_tempdir({
     expect_error(suppressWarnings(save_e61("graph.svg", save_data = TRUE)))
   })
+})
+
+test_that("resolve_aspect_ratio respects user theme customisations", {
+
+  p <- minimal_plot # already carries theme_e61()'s default aspect.ratio = 0.75
+
+  # No user customisation - chart_type still controls the aspect ratio
+  expect_equal(resolve_aspect_ratio(p, "normal")@theme$aspect.ratio, 0.75)
+  expect_equal(resolve_aspect_ratio(p, "wide")@theme$aspect.ratio, 0.5)
+  expect_equal(resolve_aspect_ratio(p, "square")@theme$aspect.ratio, 1)
+
+  # User has customised the aspect ratio away from the theme_e61() default -
+  # chart_type should no longer override it
+  p_custom <- p + theme(aspect.ratio = 0.6)
+
+  expect_equal(resolve_aspect_ratio(p_custom, "normal")@theme$aspect.ratio, 0.6)
+  expect_equal(resolve_aspect_ratio(p_custom, "wide")@theme$aspect.ratio, 0.6)
+})
+
+test_that("update_margins leaves blanked elements alone but still sizes the rest", {
+
+  # A blanked element should be skipped entirely, not overridden and reverted
+  blanked_theme <- (minimal_plot + theme(axis.text.y = element_blank()))@theme
+  margins_theme <- update_margins(blanked_theme, base_size = 10, legend_title = element_blank())
+
+  expect_null(margins_theme$axis.text.y)
+
+  # Non-blanked elements should still get a base_size-scaled margin - the
+  # blank-skipping logic must not neuter update_margins()'s actual job
+  default_theme <- minimal_plot@theme
+  margins_10 <- update_margins(default_theme, base_size = 10, legend_title = element_blank())
+  margins_20 <- update_margins(default_theme, base_size = 20, legend_title = element_blank())
+
+  expect_equal(as.numeric(margins_10$axis.text.y$margin)[2], 10 / 5)
+  expect_equal(as.numeric(margins_20$axis.text.y$margin)[2], 20 / 5)
+})
+
+test_that("resolve_text_size respects user theme customisations", {
+
+  p <- minimal_plot # already carries theme_e61()'s default text size (10)
+
+  # No user customisation - the base_size argument still controls the size
+  resolved <- resolve_text_size(p, 14)
+  expect_equal(resolved$plot@theme$text$size, 14)
+  expect_equal(resolved$base_size, 14)
+
+  # User has customised the text size away from the theme_e61() default -
+  # base_size should no longer override it
+  p_custom <- p + theme(text = element_text(size = 18))
+  resolved_custom <- resolve_text_size(p_custom, 14)
+
+  expect_equal(resolved_custom$plot@theme$text$size, 18)
+  expect_equal(resolved_custom$base_size, 18)
+})
+
+test_that("format_flip skips elements the user has customised", {
+
+  p <- minimal_plot +
+    theme(
+      panel.grid.major.x = element_line(colour = "red"),
+      panel.grid.major.y = element_line(colour = "blue")
+    )
+
+  flipped <- p + format_flip(current_theme = p@theme)
+
+  # The user's customisations should survive
+  expect_equal(flipped@theme$panel.grid.major.x$colour, "red")
+  expect_equal(flipped@theme$panel.grid.major.y$colour, "blue")
+
+  # Elements the user never touched should still be applied
+  expect_true(inherits(flipped@theme$axis.text.x.top, "element_blank"))
+  expect_equal(flipped@theme$axis.title.x.bottom$angle, 0)
+})
+
+test_that("save_e61 does not overwrite user theme changes", {
+
+  p <- minimal_plot +
+    theme(
+      axis.text.y = element_blank(),
+      aspect.ratio = 0.5
+    )
+
+  result <- save_single(
+    filename = "theme-overwrite-test",
+    plot = p,
+    chart_type = NULL,
+    auto_scale = TRUE,
+    width = NULL,
+    height = NULL,
+    max_height = NULL,
+    format = "svg",
+    base_size = 10,
+    pad_width = 0,
+    pad_height = 0,
+    bg_colour = "white"
+  )
+
+  expect_equal(result$graph@theme$aspect.ratio, 0.5)
+  expect_true(inherits(result$graph@theme$axis.text.y, "element_blank"))
+})
+
+test_that("save_e61 preserves a custom text size and flipped-coord theme changes", {
+
+  p <- minimal_plot +
+    theme(text = element_text(size = 20)) +
+    coord_flip() +
+    theme(panel.grid.major.x = element_line(colour = "red"))
+
+  result <- save_single(
+    filename = "size-flip-test",
+    plot = p,
+    chart_type = NULL,
+    auto_scale = TRUE,
+    width = NULL,
+    height = NULL,
+    max_height = NULL,
+    format = "svg",
+    base_size = 10,
+    pad_width = 0,
+    pad_height = 0,
+    bg_colour = "white"
+  )
+
+  expect_equal(result$graph@theme$text$size, 20)
+  expect_equal(result$graph@theme$panel.grid.major.x$colour, "red")
 })
 
 test_that("Change background colour", {
