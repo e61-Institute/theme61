@@ -168,9 +168,11 @@ save_e61 <- function(filename = NULL,
     format <- match.arg(format, several.ok = TRUE)
   }
 
-  # Check if the data frame can be written
-  if (save_data && !is.data.frame(plots[[1]]@data))
-    stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
+  # Check if the data frame(s) can be written - every panel needs its own
+  # extractable data frame, not just the first, since multi-panel graphs are
+  # often built from a different data frame per panel.
+  if (save_data && !all(vapply(plots, function(p) is.data.frame(p@data), logical(1))))
+    stop("You have set save_data = TRUE, but the data frame could not be extracted from one or more of the ggplots. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
   # Check list args are valid
   if (!all(names(dim) %in% c("height", "width")))
@@ -321,7 +323,16 @@ save_e61 <- function(filename = NULL,
   if (save_data) {
 
     for (i in seq_along(plots)) {
-      data_name <- gsub("\\.(\\w{3})$", paste0(i, ".csv"), filename)
+      # Give each plot's data file the same name as the graph. When there are
+      # multiple plots (multi-panel), append the panel number to keep the
+      # file names unique, since each panel may be built from a different
+      # data frame.
+      data_name <- if (length(plots) > 1) {
+        paste0(filename, " ", i, ".csv")
+      } else {
+        paste0(filename, ".csv")
+      }
+
       data.table::fwrite(plots[[i]]@data, data_name)
     }
   }
