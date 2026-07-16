@@ -19,6 +19,14 @@
 #' @param panel Optional named list. If the plot is facetted, you can restrict
 #'   the label(s) to a specific panel by supplying the facetting variable(s) as
 #'   a named list, see the Details for the syntax.
+#' @param auto_position Logical. If TRUE (default), `save_e61()` will try to
+#'   automatically reposition the label to a nearby, non-overlapping spot on
+#'   the chart, using `x`/`y` as a fallback if a better position can't be
+#'   found. Automatic positioning only applies to single-panel (unfacetted)
+#'   charts where the label's colour matches a line or point series in the
+#'   plot, and to unrotated text (`angle = 0`); anything else silently keeps
+#'   the position you specify. Set to FALSE to always use the exact `x`/`y`
+#'   you supply.
 #' @param facet_name,facet_value `r lifecycle::badge("deprecated")`
 #'
 #' @details The syntax for getting labels to appear on certain facet panels is
@@ -49,6 +57,7 @@ plot_label <-
            geom = c("text", "label"),
            angle = 0,
            panel = NULL,
+           auto_position = TRUE,
            facet_name = lifecycle::deprecated(),
            facet_value = lifecycle::deprecated()) {
 
@@ -108,6 +117,7 @@ plot_label <-
         geom = geom,
         angle = angle,
         panel = panel,
+        auto_position = auto_position,
         # preserve current behaviour: mark TRUE if default size used
         adj_plot_label = isTRUE(all.equal(size, 3.5))
       ),
@@ -198,7 +208,8 @@ plot_label <-
     colour = object$colour,
     size   = .plab_len_chk(object$size, n),
     hjust  = .plab_len_chk(object$hjust, n),
-    angle  = .plab_len_chk(object$angle, n)
+    angle  = .plab_len_chk(object$angle, n),
+    auto_position = .plab_len_chk(object$auto_position, n)
   )
 
   facet_vars <- .get_facet_vars(plot)

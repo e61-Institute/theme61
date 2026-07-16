@@ -1,5 +1,9 @@
 # theme61 (development version)
 
+#### New features
+
+* `plot_label()` text is now automatically repositioned to a nearby, non-overlapping spot on the chart when you call `save_e61()`, instead of staying exactly where you specified. This applies to single-panel charts where the label's colour matches a `geom_line()`/`geom_point()` series and the label isn't rotated; your `x`/`y` are still used as a fallback if a better spot can't be found, or you can set `plot_label(..., auto_position = FALSE)` to always use the exact position you supply (closes #159).
+
 #### Bug fixes
 
 * `save_e61` now always previews an SVG version of the graph in the Viewer pane, even when saving to other formats such as PDF or PNG. This fixes an error where RStudio's Viewer pane could fail to open non-SVG formats (e.g. a "chrome-extension" popup error when saving PDFs).

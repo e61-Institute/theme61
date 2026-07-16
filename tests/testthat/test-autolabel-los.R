@@ -16,8 +16,8 @@ test_that("t61_bresenham_points traces horizontal, vertical and diagonal paths c
   expect_true(all(d[, "row"] == d[, "col"]))
 
   steep <- t61_bresenham_points(0, 0, 10, 2)
-  expect_equal(unname(steep[1, ]), c(row = 0, col = 0))
-  expect_equal(unname(steep[nrow(steep), ]), c(row = 10, col = 2))
+  expect_equal(unname(steep[1, ]), c(0, 0))
+  expect_equal(unname(steep[nrow(steep), ]), c(10, 2))
 })
 
 test_that("t61_bresenham_points is symmetric under reversal", {

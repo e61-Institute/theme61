@@ -89,9 +89,12 @@ test_that("t61_autolabel_plot keeps the fallback position when placement fails e
 
   # Force every mask this call renders to come back fully saturated, so
   # there is truly nowhere to place the label anywhere in the pipeline.
+  # (Capture the real implementation *before* mocking -- calling
+  # t61_render_mask() from inside its own mock would recurse into itself.)
+  orig_render_mask <- t61_render_mask
   testthat::local_mocked_bindings(
     t61_render_mask = function(...) {
-      m <- t61_render_mask(...)
+      m <- orig_render_mask(...)
       m$occupancy[, ] <- TRUE
       m
     }

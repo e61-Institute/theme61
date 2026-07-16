@@ -15,6 +15,7 @@ plot_label(
   geom = c("text", "label"),
   angle = 0,
   panel = NULL,
+  auto_position = TRUE,
   facet_name = lifecycle::deprecated(),
   facet_value = lifecycle::deprecated()
 )
@@ -29,6 +30,7 @@ plab(
   geom = c("text", "label"),
   angle = 0,
   panel = NULL,
+  auto_position = TRUE,
   facet_name = lifecycle::deprecated(),
   facet_value = lifecycle::deprecated()
 )
@@ -58,6 +60,15 @@ normal left-to-right text.}
 \item{panel}{Optional named list. If the plot is facetted, you can restrict
 the label(s) to a specific panel by supplying the facetting variable(s) as
 a named list, see the Details for the syntax.}
+
+\item{auto_position}{Logical. If TRUE (default), \code{save_e61()} will try to
+automatically reposition the label to a nearby, non-overlapping spot on
+the chart, using \code{x}/\code{y} as a fallback if a better position can't be
+found. Automatic positioning only applies to single-panel (unfacetted)
+charts where the label's colour matches a line or point series in the
+plot, and to unrotated text (\code{angle = 0}); anything else silently keeps
+the position you specify. Set to FALSE to always use the exact \code{x}/\code{y}
+you supply.}
 
 \item{facet_name, facet_value}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }
