@@ -38,16 +38,30 @@ t61_distance_tier <- function(distance_cm, label_height_cm) {
 #'      than the one it's meant to label? (1 = yes, worse; 0 = no)
 #'   2. tier: near/mid/far bucket of distance to its own series
 #'   3. no_los: 1 if the line back to the series is blocked, else 0
-#'   4. distance_cm: final tiebreak, smaller wins
+#'   4. buffer_penalty: final tiebreak, smaller wins -- see below
 #' This plays the same role as arphit's assign_selection_group(), just
 #' expressed as an orderable key instead of ~20 enumerated cases.
+#'
+#' The final tiebreak prefers a candidate close to a small target buffer
+#' (t61_target_buffer_cm()) rather than literally the closest point
+#' available: among a set of otherwise-equal tier-1 candidates (i.e. when
+#' the grid offers a choice), hugging the series as tightly as possible
+#' reads as cramped, so nudge toward a little breathing room instead. The
+#' target sits inside the tier-1 band, so this never pulls a candidate
+#' out of the "near" tier, and it has no effect on tier 2+ (there,
+#' preferring proximity to the target and preferring proximity to the
+#' series are the same ordering, since every candidate is already past
+#' the target).
+#' @noRd
+t61_target_buffer_cm <- function(label_height_cm) 0.4 * label_height_cm
+
 #' @noRd
 t61_selection_score <- function(distance_cm, next_closest_cm, los, label_height_cm) {
   c(
-    ambiguous    = as.numeric(next_closest_cm <= distance_cm),
-    tier         = t61_distance_tier(distance_cm, label_height_cm),
-    no_los       = as.numeric(!los),
-    distance_cm  = distance_cm
+    ambiguous       = as.numeric(next_closest_cm <= distance_cm),
+    tier            = t61_distance_tier(distance_cm, label_height_cm),
+    no_los          = as.numeric(!los),
+    buffer_penalty  = abs(distance_cm - t61_target_buffer_cm(label_height_cm))
   )
 }
 
@@ -66,7 +80,7 @@ t61_select_best_candidate <- function(candidates, label_height_cm) {
     MoreArgs = list(label_height_cm = label_height_cm)
   ))
 
-  ord <- order(scores[, "ambiguous"], scores[, "tier"], scores[, "no_los"], scores[, "distance_cm"])
+  ord <- order(scores[, "ambiguous"], scores[, "tier"], scores[, "no_los"], scores[, "buffer_penalty"])
 
   candidates[ord[1], ]
 }
