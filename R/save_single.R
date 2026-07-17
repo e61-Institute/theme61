@@ -12,7 +12,8 @@ save_single <- function(
     base_size,
     pad_width,
     pad_height,
-    bg_colour
+    bg_colour,
+    print_label_positions = FALSE
 ) {
 
 
@@ -224,7 +225,8 @@ save_single <- function(
   # Auto-position eligible plot_label() text now that the final chart size
   # is known (see autolabel-apply.R / issue #159). No-ops when there are no
   # eligible labels.
-  plot <- t61_apply_autolabel(plot, width_cm = width, height_cm = height)
+  plot <- t61_apply_autolabel(plot, width_cm = width, height_cm = height,
+                              print_positions = print_label_positions)
 
   # Return objects needed to save the graph ----
   retval <- list(graph = plot,

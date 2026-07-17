@@ -70,7 +70,7 @@ t61_selection_group <- function(distance_cm, label_height_cm) {
 #' proximity to the target and preferring proximity to the series are the
 #' same ordering, since every candidate is already past the target).
 #' @noRd
-t61_target_buffer_cm <- function(label_height_cm) 0.6 * label_height_cm
+t61_target_buffer_cm <- function(label_height_cm) 0.85 * label_height_cm
 
 #' @noRd
 t61_selection_score <- function(distance_cm, next_closest_cm, los, label_height_cm) {

@@ -27,6 +27,12 @@
 #'   plot, and to unrotated text (`angle = 0`); anything else silently keeps
 #'   the position you specify. Set to FALSE to always use the exact `x`/`y`
 #'   you supply.
+#' @param print_position Logical. If TRUE, print the plot's final
+#'   (auto-positioned) label `label`/`x`/`y` to the console, as copy-pasteable
+#'   `plot_label()` arguments, whenever the plot is displayed -- no need to
+#'   call `save_e61()` first. Useful for grabbing the chosen positions once
+#'   so you can pin them (or hand-tweak just one or two) instead of
+#'   auto-positioning every time. Defaults to FALSE.
 #' @param facet_name,facet_value `r lifecycle::badge("deprecated")`
 #'
 #' @details The syntax for getting labels to appear on certain facet panels is
@@ -58,6 +64,7 @@ plot_label <-
            angle = 0,
            panel = NULL,
            auto_position = TRUE,
+           print_position = FALSE,
            facet_name = lifecycle::deprecated(),
            facet_value = lifecycle::deprecated()) {
 
@@ -118,6 +125,7 @@ plot_label <-
         angle = angle,
         panel = panel,
         auto_position = auto_position,
+        print_position = print_position,
         # preserve current behaviour: mark TRUE if default size used
         adj_plot_label = isTRUE(all.equal(size, 3.5))
       ),
@@ -209,7 +217,8 @@ plot_label <-
     size   = .plab_len_chk(object$size, n),
     hjust  = .plab_len_chk(object$hjust, n),
     angle  = .plab_len_chk(object$angle, n),
-    auto_position = .plab_len_chk(object$auto_position, n)
+    auto_position = .plab_len_chk(object$auto_position, n),
+    print_position = .plab_len_chk(object$print_position, n)
   )
 
   facet_vars <- .get_facet_vars(plot)

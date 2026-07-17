@@ -18,6 +18,7 @@ save_e61(
   preview = FALSE,
   save_data = FALSE,
   print_info = FALSE,
+  print_label_positions = FALSE,
   spell_check = TRUE,
   base_size = 10,
   res = 1,
@@ -94,6 +95,12 @@ same name as the graph that contains the data needed to recreate the graph
 \item{print_info}{Logical. Set to TRUE if you want graph dimensions and other
 information printed to the console. Defaults to FALSE.}
 
+\item{print_label_positions}{(single-panel specific) Logical. Set to TRUE to
+print the final \code{label}/\code{x}/\code{y} of any auto-positioned \code{plot_label()} text
+to the console as copy-pasteable arguments, so you can pin the chosen
+positions (or hand-tweak just one or two) instead of leaving them to
+auto-position again next time. Defaults to FALSE.}
+
 \item{spell_check}{Logical. Check spelling of words in the title and caption.
 Defaults to TRUE. Set to FALSE to turn off.}
 
@@ -129,6 +136,17 @@ cramped on the chart.}
 \item{height_adj}{(multi-panel specific) Rescales the height of the
 multi-panel. The function sets sensible defaults but this provides you with
 manual control if you need it.}
+
+\item{ncol}{(optional) Number of columns in the plot grid.}
+
+\item{nrow}{(optional) Number of rows in the plot grid.}
+
+\item{align}{(optional) Specifies whether graphs in the grid should be horizontally ("h") or
+vertically ("v") aligned. Options are "none" (default), "hv" (align in both directions), "h", and "v".}
+
+\item{axis}{(optional) Specifies whether graphs should be aligned by the left ("l"), right ("r"), top ("t"), or bottom ("b")
+margins. Options are "none" (default), or a string of any combination of l, r, t, and b in any order (e.g. "tblr" or "rlbt" for aligning all margins).
+Must be specified if any of the graphs are complex (e.g. faceted) and alignment is specified and desired. See \code{\link[cowplot:align_plots]{align_plots()}} for details.}
 
 \item{rel_heights}{(multi-panel specific) A numeric vector giving the
 relative proportions of each graph component (title, plots, footer).}

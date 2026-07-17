@@ -47,6 +47,11 @@
 #'   (defaults to FALSE).
 #' @param print_info Logical. Set to TRUE if you want graph dimensions and other
 #'   information printed to the console. Defaults to FALSE.
+#' @param print_label_positions (single-panel specific) Logical. Set to TRUE to
+#'   print the final `label`/`x`/`y` of any auto-positioned `plot_label()` text
+#'   to the console as copy-pasteable arguments, so you can pin the chosen
+#'   positions (or hand-tweak just one or two) instead of leaving them to
+#'   auto-position again next time. Defaults to FALSE.
 #' @param spell_check Logical. Check spelling of words in the title and caption.
 #'   Defaults to TRUE. Set to FALSE to turn off.
 #' @param preview Logical. Set to TRUE to show a preview of the graph in the
@@ -88,6 +93,7 @@ save_e61 <- function(filename = NULL,
                      preview = FALSE,
                      save_data = FALSE,
                      print_info = FALSE,
+                     print_label_positions = FALSE,
                      spell_check = TRUE,
                      base_size = 10,
                      res = 1,
@@ -293,7 +299,8 @@ save_e61 <- function(filename = NULL,
       base_size = base_size,
       pad_width = pad_width,
       pad_height = pad_height,
-      bg_colour = bg_colour
+      bg_colour = bg_colour,
+      print_label_positions = print_label_positions
     )
   }
 

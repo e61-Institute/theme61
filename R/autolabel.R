@@ -25,10 +25,10 @@
 #'   to measure "ambiguity" against -- see t61_selection_score().
 #' @noRd
 t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
-                            hjust = 0, vjust = 0.5, n_x = 18, n_y = 24, margin = 0.08,
+                            hjust = 0, vjust = 0.5, n_x = 24, n_y = 32, margin = 0.08,
                             min_buffer_cm = NULL) {
 
-  if (is.null(min_buffer_cm)) min_buffer_cm <- 0.5 * label_cm$height_cm
+  if (is.null(min_buffer_cm)) min_buffer_cm <- 0.7 * label_cm$height_cm
 
   units <- t61_mask_units_cm(mask)
   grid <- t61_candidate_grid(mask$x_range, mask$y_range, n_x = n_x, n_y = n_y, margin = margin)

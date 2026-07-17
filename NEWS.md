@@ -3,6 +3,7 @@
 #### New features
 
 * `plot_label()` text is now automatically repositioned to a nearby, non-overlapping spot on the chart when you call `save_e61()`, instead of staying exactly where you specified. This applies to single-panel charts where the label's colour matches a `geom_line()`/`geom_point()` series and the label isn't rotated; your `x`/`y` are still used as a fallback if a better spot can't be found, or you can set `plot_label(..., auto_position = FALSE)` to always use the exact position you supply (closes #159).
+* Set `plot_label(..., print_position = TRUE)` to have the chart's final label positions printed to the console (as copy-pasteable `plot_label()` arguments) whenever the plot is displayed, or pass `save_e61(..., print_label_positions = TRUE)` to do the same when saving. Handy for pinning the auto-positioned spots, or hand-tweaking just one or two.
 
 #### Bug fixes
 

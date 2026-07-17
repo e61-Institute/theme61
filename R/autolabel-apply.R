@@ -78,6 +78,7 @@ t61_collect_autolabel_targets <- function(plot) {
   text <- character(0); geom_type <- character(0)
   hjust <- numeric(0); size_mm <- numeric(0)
   fallback_x <- numeric(0); fallback_y <- numeric(0)
+  is_date_x <- logical(0); is_date_y <- logical(0)
   series <- list()
 
   for (i in label_layers) {
@@ -110,6 +111,8 @@ t61_collect_autolabel_targets <- function(plot) {
       size_mm   <- c(size_mm, sizes[r])
       fallback_x <- c(fallback_x, d$x[r])
       fallback_y <- c(fallback_y, d$y[r])
+      is_date_x <- c(is_date_x, inherits(d$x[r], "Date"))
+      is_date_y <- c(is_date_y, inherits(d$y[r], "Date"))
       series[[length(series) + 1]] <- list(x = match$x, y = match$y)
     }
   }
@@ -123,7 +126,20 @@ t61_collect_autolabel_targets <- function(plot) {
   )
   labels$series <- series
 
-  list(labels = labels, layer_idx = layer_idx, row_idx = row_idx)
+  list(labels = labels, layer_idx = layer_idx, row_idx = row_idx,
+       is_date_x = is_date_x, is_date_y = is_date_y)
+}
+
+#' Cheap check: does this plot have any plot_label() layer with
+#' print_position = TRUE? Used to gate print.e61_ggplot()'s console-print
+#' path so printing a plot doesn't pay for a full save_single() resolve
+#' unless the user actually asked for the positions.
+#' @noRd
+t61_has_print_position_labels <- function(plot) {
+  any(vapply(plot@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$print_position) &&
+      isTRUE(any(ly$data$print_position, na.rm = TRUE))
+  }, logical(1)))
 }
 
 #' Drop plot_label() layers from a plot before rendering the occupancy
@@ -141,6 +157,47 @@ t61_strip_autolabel_layers <- function(plot) {
   plot
 }
 
+#' Format a vector as a copy-pasteable `c(...)` literal for
+#' t61_print_label_positions(). Dates and strings get quoted; plot_label()
+#' already auto-converts a quoted "YYYY-MM-DD" x/y back to Date, so no
+#' as.Date() wrapper is needed. Numbers are rounded to 4 significant
+#' figures -- these are candidate-grid pixel positions, not meaningful
+#' data values, so full float precision would just be noise.
+#' @noRd
+t61_format_label_vec <- function(x) {
+  if (inherits(x, "Date")) {
+    return(paste0("c(", paste0('"', format(x, "%Y-%m-%d"), '"', collapse = ", "), ")"))
+  }
+  if (is.character(x)) {
+    return(paste0("c(", paste0('"', x, '"', collapse = ", "), ")"))
+  }
+  paste0("c(", paste0(signif(x, 4), collapse = ", "), ")")
+}
+
+#' Print the final label/x/y positions as copy-pasteable plot_label()
+#' arguments, so a user who wants to pin the auto-placed positions (or
+#' hand-tweak just one or two) has an exact starting point instead of
+#' reading coordinates off the rendered chart.
+#'
+#' Emitted as a message (not printed/returned), so it's a side effect of
+#' rendering the plot rather than part of any return value -- the caller
+#' (t61_apply_autolabel(), and in turn save_single()/print.e61_ggplot())
+#' still returns the plot itself either way.
+#' @noRd
+t61_print_label_positions <- function(text, x, y, is_date_x, is_date_y) {
+  x_out <- if (any(is_date_x)) as.Date(x, origin = "1970-01-01") else x
+  y_out <- if (any(is_date_y)) as.Date(y, origin = "1970-01-01") else y
+
+  code <- paste0(
+    t61_format_label_vec(text), ", ",
+    t61_format_label_vec(x_out), ", ",
+    t61_format_label_vec(y_out)
+  )
+
+  cli::cli_alert_info("Label positions (paste into {.fn plot_label} to pin them):")
+  message(code)
+}
+
 #' Automatically reposition eligible plot_label() text away from its
 #' fallback position, using the autolabel engine. Called from
 #' save_single() once the chart's final width/height (cm) are known.
@@ -148,8 +205,11 @@ t61_strip_autolabel_layers <- function(plot) {
 #' Fails safe: any error anywhere in matching/placement leaves `plot`
 #' unmodified (labels keep their user-supplied x/y) rather than breaking
 #' save_e61() for existing users.
+#'
+#' @param print_positions Logical. If TRUE, print the final label/x/y as
+#'   copy-pasteable plot_label() arguments (see t61_print_label_positions()).
 #' @noRd
-t61_apply_autolabel <- function(plot, width_cm, height_cm) {
+t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FALSE) {
 
   targets <- tryCatch(t61_collect_autolabel_targets(plot), error = function(e) NULL)
   if (is.null(targets) || nrow(targets$labels) == 0) return(plot)
@@ -169,6 +229,10 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm) {
     r <- targets$row_idx[k]
     plot@layers[[i]]$data$x[r] <- result$x[k]
     plot@layers[[i]]$data$y[r] <- result$y[k]
+  }
+
+  if (isTRUE(print_positions)) {
+    t61_print_label_positions(result$text, result$x, result$y, targets$is_date_x, targets$is_date_y)
   }
 
   plot

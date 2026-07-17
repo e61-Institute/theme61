@@ -1,6 +1,6 @@
 test_that("Single plot label works", {
   p1 <- minimal_plot_label +
-    plot_label(label = "Plot 1", x = 2, y = 2)
+    plot_label(label = "Plot 1", x = 2, y = 2, auto_position = FALSE)
 
   withr::with_tempdir({
     suppressWarnings(expect_snapshot_file(save_e61("compare-plot.svg", p1)))
@@ -21,7 +21,8 @@ test_that("Multi-plot labels work", {
     geom_line() +
     plot_label(c("1", "2", "3"),
                rep(0.5, 3),
-               c(1.3, 2.3, 3.3))
+               c(1.3, 2.3, 3.3),
+               auto_position = FALSE)
 
   withr::with_tempdir({
     suppressWarnings(expect_snapshot_file(save_e61("multi-label-plot-col.svg", p)))
@@ -38,7 +39,8 @@ test_that("Multi-plot labels work", {
     geom_col(position = "dodge") +
     plot_label(c("1", "2"),
                c(-0.25, 0.25),
-               c(1.2, 2.2))
+               c(1.2, 2.2),
+               auto_position = FALSE)
 
   withr::with_tempdir({
     suppressWarnings(expect_snapshot_file(save_e61("multi-label-plot-fill.svg", p)))
@@ -81,7 +83,8 @@ test_that("Plots with additional aes still work", {
     scale_y_continuous_e61(c(0, 2, 1)) +
     plot_label(c("Solid", "Dotted"),
                c(0.25, 0.25),
-               c(0.75, 1.75))
+               c(0.75, 1.75),
+               auto_position = FALSE)
 
   withr::with_tempdir({
     suppressWarnings(expect_snapshot_file(save_e61("label-with-extra-aes.svg", p)))
@@ -120,7 +123,8 @@ test_that("Specifying custom colours works in plot_label()", {
       c("Test 1", "Test 2"),
       c(1, 1),
       c(1, 2),
-      colour = c("#000000", "#cccccc"))
+      colour = c("#000000", "#cccccc"),
+      auto_position = FALSE)
 
   withr::with_tempdir({
     suppressWarnings(expect_snapshot_file(save_e61("label-cust-colours.svg", p)))
@@ -130,11 +134,11 @@ test_that("Specifying custom colours works in plot_label()", {
 
 test_that("Text and label plot labels work", {
   p1 <- minimal_plot_label +
-    plot_label("label", 2, 2, geom = "label") +
+    plot_label("label", 2, 2, geom = "label", auto_position = FALSE) +
     scale_y_continuous_e61()
 
   p2 <- minimal_plot_label +
-    plot_label("text", 2, 2, geom = "text")
+    plot_label("text", 2, 2, geom = "text", auto_position = FALSE)
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("label.svg", p1)))
@@ -164,9 +168,9 @@ test_that("Specifying incorrect length of label characteristics fails", {
 test_that("Changing horizontal alignment of text works", {
 
   p1 <- minimal_plot_label +
-    plot_label("Left-aligned text", 2, 1.5, hjust = 0) +
-    plot_label("Centre-aligned text", 2, 2, hjust = 0.5) +
-    plot_label("Right-aligned text", 2, 2.5, hjust = 1)
+    plot_label("Left-aligned text", 2, 1.5, hjust = 0, auto_position = FALSE) +
+    plot_label("Centre-aligned text", 2, 2, hjust = 0.5, auto_position = FALSE) +
+    plot_label("Right-aligned text", 2, 2.5, hjust = 1, auto_position = FALSE)
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("horiz-align-change.svg", p1)))
@@ -177,9 +181,9 @@ test_that("Label rotation works", {
 
   # Separate plot_labels work
   p1 <- minimal_plot_label +
-    plot_label("Normal text", 0.5, 1.5, angle = 90) +
-    plot_label("Vertical text", 1.5, 1.5, angle = 0) +
-    plot_label("Diagonal text", 2.5, 1.5, angle = 45) +
+    plot_label("Normal text", 0.5, 1.5, angle = 90, auto_position = FALSE) +
+    plot_label("Vertical text", 1.5, 1.5, angle = 0, auto_position = FALSE) +
+    plot_label("Diagonal text", 2.5, 1.5, angle = 45, auto_position = FALSE) +
     scale_y_continuous_e61(limits = c(0, 3))
 
   # plot_label with multiple angles works
@@ -187,7 +191,8 @@ test_that("Label rotation works", {
     plot_label(c("Normal text", "Vertical text", "Diagonal text"),
                 x = rep(2, 3),
                 y = c(2.1, 2.3, 2.15),
-                angle = c(0, 90, 45)) +
+                angle = c(0, 90, 45),
+                auto_position = FALSE) +
     scale_y_continuous_e61(c(0, 3))
 
   withr::with_tempdir({

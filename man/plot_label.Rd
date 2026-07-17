@@ -16,6 +16,7 @@ plot_label(
   angle = 0,
   panel = NULL,
   auto_position = TRUE,
+  print_position = FALSE,
   facet_name = lifecycle::deprecated(),
   facet_value = lifecycle::deprecated()
 )
@@ -31,6 +32,7 @@ plab(
   angle = 0,
   panel = NULL,
   auto_position = TRUE,
+  print_position = FALSE,
   facet_name = lifecycle::deprecated(),
   facet_value = lifecycle::deprecated()
 )
@@ -69,6 +71,13 @@ charts where the label's colour matches a line or point series in the
 plot, and to unrotated text (\code{angle = 0}); anything else silently keeps
 the position you specify. Set to FALSE to always use the exact \code{x}/\code{y}
 you supply.}
+
+\item{print_position}{Logical. If TRUE, print the plot's final
+(auto-positioned) label \code{label}/\code{x}/\code{y} to the console, as copy-pasteable
+\code{plot_label()} arguments, whenever the plot is displayed -- no need to
+call \code{save_e61()} first. Useful for grabbing the chosen positions once
+so you can pin them (or hand-tweak just one or two) instead of
+auto-positioning every time. Defaults to FALSE.}
 
 \item{facet_name, facet_value}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }

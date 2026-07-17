@@ -67,6 +67,23 @@ print.e61_ggplot <- function(x, ...) {
     activate_viewer_after_plot()
   }
 
+  # Print copy-pasteable auto-positioned label code (see autolabel-apply.R),
+  # if any plot_label() layer asked for it via print_position = TRUE. Uses
+  # save_single() directly, which resolves the chart's final size and
+  # applies auto-positioning but never writes a file, so this works without
+  # the user having to call save_e61() first.
+  if (t61_has_print_position_labels(x)) {
+    try(
+      suppressWarnings(
+        save_single(filename = NULL, plot = x, chart_type = NULL, auto_scale = auto_scale_preview,
+                    width = NULL, height = NULL, max_height = NULL, format = "svg",
+                    base_size = 10, pad_width = 0, pad_height = 0, bg_colour = "white",
+                    print_label_positions = TRUE)
+      ),
+      silent = TRUE
+    )
+  }
+
   invisible(x)
 }
 
