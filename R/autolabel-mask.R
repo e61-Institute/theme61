@@ -70,17 +70,37 @@ t61_panel_box_cm <- function(gt, width_cm, height_cm) {
 #' its gtable layout. Uses colour = NA (invisible, space still reserved),
 #' never element_blank() (which would collapse e.g. the axis-text column
 #' and shift the panel's offset relative to the real chart).
+#'
+#' Blanks the .major/.minor/.x/.y variants of grid/line/tick elements
+#' explicitly, not just their generic parents (panel.grid, axis.line,
+#' axis.ticks): theme_e61() sets those more specific elements directly, and
+#' ggplot2's theme merging keeps an already-explicit specific element over a
+#' later, more generic one -- so blanking only the parent silently failed to
+#' hide gridlines/axis lines/ticks, which then rendered as mask "ink" and
+#' blocked otherwise-good label candidates near any axis break or edge.
+#' Also blanks axis.title (rotated axis title text is real ink too).
 #' @noRd
 t61_strip_chrome <- function(plot) {
   plot + ggplot2::theme(
-    panel.grid       = ggplot2::element_line(colour = NA),
-    panel.border     = ggplot2::element_rect(colour = NA, fill = NA),
-    axis.line        = ggplot2::element_line(colour = NA),
-    axis.ticks       = ggplot2::element_line(colour = NA),
-    axis.text        = ggplot2::element_text(colour = NA),
-    panel.background = ggplot2::element_rect(fill = "white", colour = NA),
-    plot.background  = ggplot2::element_rect(fill = "white", colour = NA),
-    legend.position  = "none"
+    panel.grid          = ggplot2::element_line(colour = NA),
+    panel.grid.major    = ggplot2::element_line(colour = NA),
+    panel.grid.minor    = ggplot2::element_line(colour = NA),
+    panel.grid.major.x  = ggplot2::element_line(colour = NA),
+    panel.grid.major.y  = ggplot2::element_line(colour = NA),
+    panel.grid.minor.x  = ggplot2::element_line(colour = NA),
+    panel.grid.minor.y  = ggplot2::element_line(colour = NA),
+    panel.border        = ggplot2::element_rect(colour = NA, fill = NA),
+    axis.line           = ggplot2::element_line(colour = NA),
+    axis.line.x         = ggplot2::element_line(colour = NA),
+    axis.line.y         = ggplot2::element_line(colour = NA),
+    axis.ticks          = ggplot2::element_line(colour = NA),
+    axis.ticks.x        = ggplot2::element_line(colour = NA),
+    axis.ticks.y        = ggplot2::element_line(colour = NA),
+    axis.text           = ggplot2::element_text(colour = NA),
+    axis.title          = ggplot2::element_text(colour = NA),
+    panel.background    = ggplot2::element_rect(fill = "white", colour = NA),
+    plot.background     = ggplot2::element_rect(fill = "white", colour = NA),
+    legend.position      = "none"
   )
 }
 
@@ -133,6 +153,11 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   pp <- built$layout$panel_params
   if (length(pp) != 1) return(NULL) # faceted: not v1 scope
 
+  x_breaks <- pp[[1]]$x$breaks
+  y_breaks <- pp[[1]]$y$breaks
+  x_breaks <- x_breaks[is.finite(x_breaks) & x_breaks >= pp[[1]]$x.range[1] & x_breaks <= pp[[1]]$x.range[2]]
+  y_breaks <- y_breaks[is.finite(y_breaks) & y_breaks >= pp[[1]]$y.range[1] & y_breaks <= pp[[1]]$y.range[2]]
+
   list(
     occupancy   = occupancy,
     panel       = list(
@@ -144,7 +169,9 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
     px_per_cm_x = px_per_cm_x,
     px_per_cm_y = px_per_cm_y,
     x_range     = pp[[1]]$x.range,
-    y_range     = pp[[1]]$y.range
+    y_range     = pp[[1]]$y.range,
+    x_breaks    = x_breaks,
+    y_breaks    = y_breaks
   )
 }
 
@@ -159,4 +186,54 @@ t61_data_to_px <- function(x, y, mask) {
   row <- panel$top_px +
     (mask$y_range[2] - y) / diff(mask$y_range) * panel$height_px
   list(row = row, col = col)
+}
+
+#' Soft penalty for a candidate box sitting close to the panel's edge --
+#' text hugging the axis reads as cramped even when it's not actually
+#' clipped (the hard floor is t61_box_in_bounds(), which this does not
+#' replace). Zero once the box clears the edge by a full label-height;
+#' grows linearly as that clearance shrinks toward zero. Never excludes a
+#' candidate outright -- it only feeds into the tiebreak score alongside
+#' the buffer/gridline penalties, so an edge position is still chosen when
+#' nothing better is on offer.
+#' @noRd
+t61_edge_penalty_cm <- function(box, mask, label_cm) {
+  panel <- mask$panel
+
+  left_clear_cm   <- (min(box$col_range) - panel$left_px) / mask$px_per_cm_x
+  right_clear_cm  <- ((panel$left_px + panel$width_px) - max(box$col_range)) / mask$px_per_cm_x
+  top_clear_cm    <- (min(box$row_range) - panel$top_px) / mask$px_per_cm_y
+  bottom_clear_cm <- ((panel$top_px + panel$height_px) - max(box$row_range)) / mask$px_per_cm_y
+
+  min_clear_cm <- min(left_clear_cm, right_clear_cm, top_clear_cm, bottom_clear_cm)
+
+  max(0, label_cm$height_cm - min_clear_cm)
+}
+
+#' Soft penalty for a candidate box straddling a gridline break (x or y),
+#' one label-height's worth of penalty per axis it crosses. Like
+#' t61_edge_penalty_cm(), this only ever feeds the tiebreak score -- a
+#' candidate that overlaps a gridline is still chosen when it's the only
+#' option, it just loses to an otherwise-equal candidate that doesn't.
+#' @noRd
+t61_gridline_penalty_cm <- function(box, mask, label_cm) {
+  x_hit <- FALSE
+  for (brk in mask$x_breaks) {
+    col <- t61_data_to_px(brk, mean(mask$y_range), mask)$col
+    if (col >= min(box$col_range) && col <= max(box$col_range)) {
+      x_hit <- TRUE
+      break
+    }
+  }
+
+  y_hit <- FALSE
+  for (brk in mask$y_breaks) {
+    row <- t61_data_to_px(mean(mask$x_range), brk, mask)$row
+    if (row >= min(box$row_range) && row <= max(box$row_range)) {
+      y_hit <- TRUE
+      break
+    }
+  }
+
+  (as.numeric(x_hit) + as.numeric(y_hit)) * 0.5 * label_cm$height_cm
 }

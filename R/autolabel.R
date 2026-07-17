@@ -28,7 +28,7 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
                             hjust = 0, vjust = 0.5, n_x = 24, n_y = 32, margin = 0.08,
                             min_buffer_cm = NULL) {
 
-  if (is.null(min_buffer_cm)) min_buffer_cm <- 0.85 * label_cm$height_cm
+  if (is.null(min_buffer_cm)) min_buffer_cm <- 1.7 * label_cm$height_cm
 
   units <- t61_mask_units_cm(mask)
   grid <- t61_candidate_grid(mask$x_range, mask$y_range, n_x = n_x, n_y = n_y, margin = margin)
@@ -61,8 +61,13 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
       nearest_px <- t61_data_to_px(own$x, own$y, mask)
       los <- t61_line_of_sight(mask$occupancy, anchor$row, anchor$col, nearest_px$row, nearest_px$col)
 
+      edge_penalty_cm <- t61_edge_penalty_cm(box, mask, label_cm)
+      gridline_penalty_cm <- t61_gridline_penalty_cm(box, mask, label_cm)
+
       rows[[i]] <- data.frame(x = x, y = y, distance_cm = own$distance,
-                              next_closest_cm = next_closest, los = los)
+                              next_closest_cm = next_closest, los = los,
+                              edge_penalty_cm = edge_penalty_cm,
+                              gridline_penalty_cm = gridline_penalty_cm)
     }
 
     do.call(rbind, rows)
