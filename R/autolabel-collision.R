@@ -51,9 +51,23 @@ t61_text_box_px <- function(x, y, label_cm, mask, hjust = 0, vjust = 0.5, paddin
   )
 }
 
+#' Whether a pixel bounding box stays entirely within the mask's raster --
+#' a stricter check than t61_test_collision(), which clips a partially
+#' off-raster box down to whatever's visible rather than rejecting it.
+#' Callers that care whether a label would actually render fully on-panel
+#' (as opposed to just "not overlapping ink in the visible portion") should
+#' use this too.
+#' @noRd
+t61_box_in_bounds <- function(row_range, col_range, occupancy) {
+  nr <- nrow(occupancy); nc <- ncol(occupancy)
+  min(row_range) >= 1 && max(row_range) <= nr &&
+    min(col_range) >= 1 && max(col_range) <= nc
+}
+
 #' Does a pixel bounding box overlap any ink in the occupancy mask?
 #' Boxes (partially or fully) outside the raster are clipped to it; a box
 #' entirely outside the raster is treated as a collision (can't be placed).
+#' Use t61_box_in_bounds() first if a fully on-panel box is required.
 #' @noRd
 t61_test_collision <- function(occupancy, row_range, col_range) {
   nr <- nrow(occupancy); nc <- ncol(occupancy)

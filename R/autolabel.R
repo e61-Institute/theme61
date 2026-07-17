@@ -9,42 +9,69 @@
 #' against the current mask. Returns a list(x, y, box) on success, or NULL
 #' if every candidate either collides or there's nothing to evaluate.
 #'
+#' Candidates closer to their own series than `min_buffer_cm` are excluded
+#' on a first pass, so a comfortably-buffered spot anywhere on the panel is
+#' always preferred over a technically-closer but cramped one nearby --
+#' the selection tiebreak in t61_select_best_candidate() only chooses
+#' *among* whatever candidates are on offer, so it can't claim buffer that
+#' was never in the running to begin with. Only if that first pass finds
+#' nothing (e.g. a busy chart with no clear buffered spot anywhere) does
+#' this fall back to allowing tighter candidates, so a label degrades to
+#' "close" rather than disappearing.
+#'
 #' @param series Data-space x/y vectors for the series this label belongs
 #'   to (its own "home" series).
 #' @param other_series A list of other series (each list(x=, y=, geom_type=))
 #'   to measure "ambiguity" against -- see t61_selection_score().
 #' @noRd
 t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
-                            hjust = 0, vjust = 0.5, n_x = 9, n_y = 12, margin = 0.08) {
+                            hjust = 0, vjust = 0.5, n_x = 18, n_y = 24, margin = 0.08,
+                            min_buffer_cm = NULL) {
+
+  if (is.null(min_buffer_cm)) min_buffer_cm <- 0.5 * label_cm$height_cm
 
   units <- t61_mask_units_cm(mask)
   grid <- t61_candidate_grid(mask$x_range, mask$y_range, n_x = n_x, n_y = n_y, margin = margin)
 
-  rows <- vector("list", nrow(grid))
+  build_candidates <- function(enforce_min_buffer) {
+    rows <- vector("list", nrow(grid))
 
-  for (i in seq_len(nrow(grid))) {
-    x <- grid$x[i]; y <- grid$y[i]
+    for (i in seq_len(nrow(grid))) {
+      x <- grid$x[i]; y <- grid$y[i]
 
-    box <- t61_text_box_px(x, y, label_cm, mask, hjust = hjust, vjust = vjust)
-    if (t61_test_collision(mask$occupancy, box$row_range, box$col_range)) next
+      box <- t61_text_box_px(x, y, label_cm, mask, hjust = hjust, vjust = vjust)
+      # Unlike t61_test_collision() -- which silently clips a partially
+      # off-raster box to whatever's visible and only checks ink there --
+      # a box that hangs off the panel at all is rejected outright here,
+      # since ggplot2 clips drawn text to the panel and a partially
+      # off-panel label would render visibly truncated.
+      if (!t61_box_in_bounds(box$row_range, box$col_range, mask$occupancy)) next
+      if (t61_test_collision(mask$occupancy, box$row_range, box$col_range)) next
 
-    own <- t61_distance_to_series(x, y, series$x, series$y, geom_type, units)
+      own <- t61_distance_to_series(x, y, series$x, series$y, geom_type, units)
+      if (enforce_min_buffer && own$distance < min_buffer_cm) next
 
-    next_closest <- Inf
-    for (s in other_series) {
-      d <- t61_distance_to_series(x, y, s$x, s$y, s$geom_type, units)
-      if (d$distance < next_closest) next_closest <- d$distance
+      next_closest <- Inf
+      for (s in other_series) {
+        d <- t61_distance_to_series(x, y, s$x, s$y, s$geom_type, units)
+        if (d$distance < next_closest) next_closest <- d$distance
+      }
+
+      anchor <- t61_data_to_px(x, y, mask)
+      nearest_px <- t61_data_to_px(own$x, own$y, mask)
+      los <- t61_line_of_sight(mask$occupancy, anchor$row, anchor$col, nearest_px$row, nearest_px$col)
+
+      rows[[i]] <- data.frame(x = x, y = y, distance_cm = own$distance,
+                              next_closest_cm = next_closest, los = los)
     }
 
-    anchor <- t61_data_to_px(x, y, mask)
-    nearest_px <- t61_data_to_px(own$x, own$y, mask)
-    los <- t61_line_of_sight(mask$occupancy, anchor$row, anchor$col, nearest_px$row, nearest_px$col)
-
-    rows[[i]] <- data.frame(x = x, y = y, distance_cm = own$distance,
-                            next_closest_cm = next_closest, los = los)
+    do.call(rbind, rows)
   }
 
-  candidates <- do.call(rbind, rows)
+  candidates <- build_candidates(enforce_min_buffer = TRUE)
+  if (is.null(candidates) || nrow(candidates) == 0) {
+    candidates <- build_candidates(enforce_min_buffer = FALSE)
+  }
   if (is.null(candidates) || nrow(candidates) == 0) return(NULL)
 
   best <- t61_select_best_candidate(candidates, label_cm$height_cm)
