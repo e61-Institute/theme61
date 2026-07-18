@@ -28,7 +28,13 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
                             hjust = 0, vjust = 0.5, n_x = 24, n_y = 32, margin = 0.08,
                             min_buffer_cm = NULL) {
 
-  if (is.null(min_buffer_cm)) min_buffer_cm <- 1.7 * label_cm$height_cm
+  if (is.null(min_buffer_cm)) {
+    # Points get a much higher floor than lines -- see t61_target_buffer_cm()
+    # for why "distance to the nearest point" needs a bigger multiplier to
+    # actually clear a scattered cluster rather than just one point in it.
+    mult <- if (identical(geom_type, "point")) 5.1 else 1.7
+    min_buffer_cm <- mult * label_cm$height_cm
+  }
 
   units <- t61_mask_units_cm(mask)
   grid <- t61_candidate_grid(mask$x_range, mask$y_range, n_x = n_x, n_y = n_y, margin = margin)
@@ -79,7 +85,7 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
   }
   if (is.null(candidates) || nrow(candidates) == 0) return(NULL)
 
-  best <- t61_select_best_candidate(candidates, label_cm$height_cm)
+  best <- t61_select_best_candidate(candidates, label_cm$height_cm, geom_type = geom_type)
   box <- t61_text_box_px(best$x, best$y, label_cm, mask, hjust = hjust, vjust = vjust)
 
   list(x = best$x, y = best$y, box = box)

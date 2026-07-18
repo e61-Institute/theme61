@@ -43,8 +43,8 @@ t61_distance_tier <- function(distance_cm, label_height_cm) {
 #' target was tuned past it -- exactly what happened when the target grew
 #' past the old fixed 1.0x-label-height "near" cutoff.
 #' @noRd
-t61_selection_group <- function(distance_cm, label_height_cm) {
-  target <- t61_target_buffer_cm(label_height_cm)
+t61_selection_group <- function(distance_cm, label_height_cm, geom_type = "line") {
+  target <- t61_target_buffer_cm(label_height_cm, geom_type)
   if (distance_cm < 1.5 * target) return(1L)
   if (distance_cm < 2.5 * target) return(2L)
   3L
@@ -80,17 +80,30 @@ t61_selection_group <- function(distance_cm, label_height_cm) {
 #' the only hard exclusions are collision/off-panel, checked earlier in
 #' t61_place_label(). Defaulting both to 0 keeps candidates that predate
 #' these penalties (e.g. in tests) scored exactly as before.
+#'
+#' geom_type gets a much bigger multiplier for "point" than "line": a
+#' line has one "own" direction to step away from, so a buffer scaled off
+#' label height reads fine, but a scattered point cluster has no single
+#' direction -- "distance to the nearest point" collapses back down to a
+#' small value the moment a candidate sits anywhere near the cloud, no
+#' matter which way it moves, since some other point in the cluster is
+#' always nearby. A far larger target is needed for the result to actually
+#' read as clear of the cluster rather than merely clear of one point in it.
 #' @noRd
-t61_target_buffer_cm <- function(label_height_cm) 1.9 * label_height_cm
+t61_target_buffer_cm <- function(label_height_cm, geom_type = "line") {
+  mult <- if (identical(geom_type, "point")) 5.7 else 1.9
+  mult * label_height_cm
+}
 
 #' @noRd
 t61_selection_score <- function(distance_cm, next_closest_cm, los, label_height_cm,
-                                 edge_penalty_cm = 0, gridline_penalty_cm = 0) {
+                                 edge_penalty_cm = 0, gridline_penalty_cm = 0,
+                                 geom_type = "line") {
   c(
     ambiguous       = as.numeric(next_closest_cm <= distance_cm),
-    tier            = t61_selection_group(distance_cm, label_height_cm),
+    tier            = t61_selection_group(distance_cm, label_height_cm, geom_type),
     no_los          = as.numeric(!los),
-    buffer_penalty  = abs(distance_cm - t61_target_buffer_cm(label_height_cm)) +
+    buffer_penalty  = abs(distance_cm - t61_target_buffer_cm(label_height_cm, geom_type)) +
       edge_penalty_cm + gridline_penalty_cm
   )
 }
@@ -100,7 +113,7 @@ t61_selection_score <- function(distance_cm, next_closest_cm, los, label_height_
 #' gridline_penalty_cm are optional, treated as 0 if absent). Returns NULL
 #' if there are no candidates to choose from.
 #' @noRd
-t61_select_best_candidate <- function(candidates, label_height_cm) {
+t61_select_best_candidate <- function(candidates, label_height_cm, geom_type = "line") {
   if (nrow(candidates) == 0) return(NULL)
 
   edge_penalty_cm <- if (!is.null(candidates$edge_penalty_cm)) {
@@ -121,7 +134,7 @@ t61_select_best_candidate <- function(candidates, label_height_cm) {
     los                  = candidates$los,
     edge_penalty_cm      = edge_penalty_cm,
     gridline_penalty_cm  = gridline_penalty_cm,
-    MoreArgs = list(label_height_cm = label_height_cm)
+    MoreArgs = list(label_height_cm = label_height_cm, geom_type = geom_type)
   ))
 
   ord <- order(scores[, "ambiguous"], scores[, "tier"], scores[, "no_los"], scores[, "buffer_penalty"])
