@@ -1,3 +1,9 @@
+# theme61 (development version)
+
+#### Bug fixes
+
+* Fixed an issue where `labs_e61` would leave whitespace above the subtitle when a plot had a subtitle but no title (the empty title was still reserving vertical space).
+
 # theme61 0.7.1
 
 09 Jan 2026
