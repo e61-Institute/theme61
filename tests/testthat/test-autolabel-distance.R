@@ -71,3 +71,98 @@ test_that("t61_distance_to_series rejects unsupported geom types", {
     "unsupported geom_type"
   )
 })
+
+# t61_box_distance_to_series() measures from a candidate's actual box
+# footprint rather than a single anchor point (see its own documentation
+# for why); these use a synthetic mask with a 1:1 px:data-unit mapping and
+# units of 1 cm per data-unit, so distances below are exactly the
+# data-space Euclidean distance and easy to hand-check.
+t61_synthetic_mask <- function(range = c(0, 100)) {
+  list(
+    panel = list(left_px = 0, top_px = 0, width_px = diff(range), height_px = diff(range)),
+    x_range = range,
+    y_range = range
+  )
+}
+
+# Converts a data-space box [xmin,xmax] x [ymin,ymax] into the row/col
+# ranges t61_box_distance_to_series() expects, under t61_synthetic_mask()'s
+# 1:1 mapping (row 0 = top = y_range[2]).
+t61_synthetic_box <- function(xmin, xmax, ymin, ymax, range = c(0, 100)) {
+  list(col_range = c(xmin, xmax), row_range = c(range[2] - ymax, range[2] - ymin))
+}
+
+test_that("t61_box_distance_to_series 'point': exact point-to-box distance, nearest point wins", {
+  mask <- t61_synthetic_mask()
+  units <- list(x_per_unit_cm = 1, y_per_unit_cm = 1)
+  box <- t61_synthetic_box(10, 20, 10, 20)
+
+  series <- list(x = c(25, 90), y = c(15, 90))
+  d <- t61_box_distance_to_series(box, mask, series, "point", units)
+
+  expect_equal(d$distance, 5) # box's right edge (x=20) to the point at x=25, same y band
+  expect_equal(d$x, 25)
+  expect_equal(d$y, 15)
+})
+
+test_that("t61_box_distance_to_series 'line': exact box-to-segment distance", {
+  mask <- t61_synthetic_mask()
+  units <- list(x_per_unit_cm = 1, y_per_unit_cm = 1)
+  box <- t61_synthetic_box(10, 20, 10, 20)
+
+  # Horizontal segment at y=50 spanning the box's whole x-range: distance
+  # is the vertical gap from the box's top edge (y=20) to the line
+  series <- list(x = c(0, 100), y = c(50, 50))
+  d <- t61_box_distance_to_series(box, mask, series, "line", units)
+
+  expect_equal(d$distance, 30)
+})
+
+test_that("t61_box_distance_to_series 'column': exact rect-to-rect distance, nearest bar wins", {
+  mask <- t61_synthetic_mask()
+  units <- list(x_per_unit_cm = 1, y_per_unit_cm = 1)
+  box <- t61_synthetic_box(10, 20, 10, 20)
+
+  # Bar 1 sits just right of the box with overlapping y-range (gap = 5);
+  # bar 2 is far away
+  series <- list(xmin = c(25, 80), xmax = c(30, 85), ymin = c(0, 0), ymax = c(15, 15))
+  d <- t61_box_distance_to_series(box, mask, series, "column", units)
+
+  expect_equal(d$distance, 5)
+})
+
+test_that("t61_box_distance_to_series 'pointbar': each x is an independent vertical segment", {
+  mask <- t61_synthetic_mask()
+  units <- list(x_per_unit_cm = 1, y_per_unit_cm = 1)
+  box <- t61_synthetic_box(10, 20, 10, 20)
+
+  # Error bar 1 at x=25 spans y in [8,15] (overlaps the box's y-range);
+  # error bar 2 is far away
+  series <- list(x = c(25, 90), y = c(12, 90), ymin = c(8, 85), ymax = c(15, 95))
+  d <- t61_box_distance_to_series(box, mask, series, "pointbar", units)
+
+  expect_equal(d$distance, 5)
+})
+
+test_that("t61_box_distance_to_series 'area': treats the ymax boundary exactly like a 'line'", {
+  mask <- t61_synthetic_mask()
+  units <- list(x_per_unit_cm = 1, y_per_unit_cm = 1)
+  box <- t61_synthetic_box(10, 20, 10, 20)
+
+  series <- list(x = c(0, 100), ymin = c(0, 0), ymax = c(50, 50))
+  d_area <- t61_box_distance_to_series(box, mask, series, "area", units)
+  d_line <- t61_box_distance_to_series(box, mask, list(x = series$x, y = series$ymax), "line", units)
+
+  expect_equal(d_area, d_line)
+})
+
+test_that("t61_box_distance_to_series rejects unsupported geom types", {
+  mask <- t61_synthetic_mask()
+  units <- list(x_per_unit_cm = 1, y_per_unit_cm = 1)
+  box <- t61_synthetic_box(10, 20, 10, 20)
+
+  expect_error(
+    t61_box_distance_to_series(box, mask, list(x = 0, y = 0), "bar", units),
+    "unsupported geom_type"
+  )
+})
