@@ -17,15 +17,9 @@ prepare_plot.e61_plot <- function(plot,
 
   if (is.null(chart_type)) chart_type <- "normal"
 
-  # Auto-inject default theme spec only if user didn't add one
-  if (isTRUE(getOption("theme61.auto_theme", TRUE))) {
-    if (is.null(attr(plot, "e61_theme_spec", exact = TRUE))) {
-      attr(plot, "e61_theme_spec") <- theme_e61()
-    }
-  }
-
-  # Realise spec (after classification)
-  plot <- realise_e61_theme(plot)
+  # Plot is assumed already classified (map vs non-map) and to have had its
+  # theme_e61() spec realised into a real theme by finalise_e61_plot(), which
+  # save_e61() runs on every plot before dispatching here.
 
   # Existing sizing/margins logic for non-map plots (moved from save_single)
   legendTitle <- plot@theme$legend.title
@@ -56,13 +50,9 @@ prepare_plot.e61_map <- function(plot,
   auto_scale <- FALSE
   chart_type <- "custom"
 
-  if (isTRUE(getOption("theme61.auto_theme", TRUE))) {
-    if (is.null(attr(plot, "e61_theme_spec", exact = TRUE))) {
-      attr(plot, "e61_theme_spec") <- theme_e61()
-    }
-  }
-
-  plot <- realise_e61_theme(plot)
+  # Plot is assumed already classified (map vs non-map) and to have had its
+  # theme_e61() spec realised into a real theme by finalise_e61_plot(), which
+  # save_e61() runs on every plot before dispatching here.
 
   plot <- plot + ggplot2::theme(rect = ggplot2::element_rect(fill = bg_colour))
 

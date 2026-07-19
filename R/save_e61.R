@@ -113,9 +113,13 @@ save_e61 <- function(filename = NULL,
   # Ensure plots are e61 plots
   plots <- as_e61_plot(plots)
 
-  if (length(plots) == 1) {
-    plots[[1]] <- classify_e61_map(plots[[1]])
+  # Classify each plot as map/non-map and realise its theme_e61() spec into
+  # an actual ggplot2 theme. This has to happen for every panel (not just
+  # single-panel saves) since save_multi() reads the realised theme (e.g.
+  # legend position/title) straight off each plot.
+  plots <- lapply(plots, finalise_e61_plot)
 
+  if (length(plots) == 1) {
     prep <- prepare_plot(
       plots[[1]],
       chart_type = chart_type,

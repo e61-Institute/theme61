@@ -111,3 +111,28 @@ classify_e61_map.default <- function(x, ...) {
     " cannot be converted to an e61 map"
   )
 }
+
+# finalise_e61_plot ----
+
+#' Classify a single plot as map/non-map and resolve its theme_e61() spec
+#' into a real ggplot2 theme.
+#'
+#' This is the shared step that save_e61() runs (for every panel, single or
+#' multi) before handing plots to save_single()/save_multi(), and that
+#' print.e61_plot() runs before rendering to the Plots pane. Both
+#' classify_e61_map() and realise_e61_theme() are safe to call more than
+#' once on the same plot, so this can be re-run defensively without risk of
+#' double-applying a theme.
+#' @noRd
+finalise_e61_plot <- function(plot) {
+  plot <- classify_e61_map(plot)
+
+  # Auto-inject default theme spec only if the user didn't add one
+  if (isTRUE(getOption("theme61.auto_theme", TRUE))) {
+    if (is.null(attr(plot, "e61_theme_spec", exact = TRUE))) {
+      attr(plot, "e61_theme_spec") <- theme_e61()
+    }
+  }
+
+  realise_e61_theme(plot)
+}

@@ -23,8 +23,9 @@ print.e61_plot <- function(x, ...) {
       }
 
   # Plots pane render (must include theme61 defaults)
-  x_plot <- maybe_add_default_scales(x)
-  class(x_plot) <- setdiff(class(x_plot), "e61_plot")
+  x_plot <- finalise_e61_plot(x)
+  x_plot <- maybe_add_default_scales(x_plot)
+  class(x_plot) <- setdiff(class(x_plot), c("e61_map", "e61_plot"))
   print(x_plot)
 
   # Prefer Viewer focus by default (best-effort)

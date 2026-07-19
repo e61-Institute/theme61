@@ -2,11 +2,15 @@
 #' @export
 ggplot_build.e61_plot <- function(plot, ...) {
 
-  plot2 <- maybe_add_default_scales(plot)
+  # Classify + realise defensively, in case ggplot_build() is reached without
+  # going through print.e61_plot() or save_e61() first (e.g. a direct
+  # ggplot_build()/ggplotGrob() call). Both steps are no-ops if already done.
+  plot2 <- finalise_e61_plot(plot)
+  plot2 <- maybe_add_default_scales(plot2)
   plot2 <- maybe_adjust_facet_spacing(plot2)
 
   # prevent recursion: drop our class before calling ggplot2 build
-  class(plot2) <- setdiff(class(plot2), c("e61_plot"))
+  class(plot2) <- setdiff(class(plot2), c("e61_map", "e61_plot"))
 
   ggplot2::ggplot_build(plot2, ...)
 }
