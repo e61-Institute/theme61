@@ -87,3 +87,99 @@ t61_distance_to_series <- function(x, y, series_x, series_y, geom_type, units) {
 
   stop("t61_distance_to_series: unsupported geom_type '", geom_type, "' (v1 scope: point, line)")
 }
+
+#' Shortest distance from point P to the axis-aligned rectangle
+#' [xmin,xmax] x [ymin,ymax], all in a common physical unit (e.g. cm). 0 if
+#' P is inside (or on the boundary of) the rectangle.
+#' @noRd
+t61_point_rect_distance <- function(px, py, xmin, xmax, ymin, ymax) {
+  dx <- pmax(xmin - px, 0, px - xmax)
+  dy <- pmax(ymin - py, 0, py - ymax)
+  sqrt(dx^2 + dy^2)
+}
+
+#' Convert a candidate's pixel bounding box (see t61_text_box_px()) back to
+#' a data-space rectangle, via the inverse of t61_data_to_px().
+#' @noRd
+t61_box_data_rect <- function(box, mask) {
+  panel <- mask$panel
+  col_to_x <- function(col) mask$x_range[1] + (col - panel$left_px) / panel$width_px * diff(mask$x_range)
+  row_to_y <- function(row) mask$y_range[2] - (row - panel$top_px) / panel$height_px * diff(mask$y_range)
+
+  x1 <- col_to_x(min(box$col_range)); x2 <- col_to_x(max(box$col_range))
+  y1 <- row_to_y(min(box$row_range)); y2 <- row_to_y(max(box$row_range))
+
+  list(xmin = min(x1, x2), xmax = max(x1, x2), ymin = min(y1, y2), ymax = max(y1, y2))
+}
+
+#' Distance from a candidate's actual rendered footprint (its text bounding
+#' box, not just its anchor point) to the nearest point of a series, in cm,
+#' plus the data-space coordinate of that nearest point (used later for
+#' line-of-sight testing).
+#'
+#' t61_distance_to_series() measures from the anchor (x, y) alone, which is
+#' only the box's own corner/edge when hjust/vjust is 0.5 -- for the
+#' default hjust = 0, the box extends a full label-width away from the
+#' anchor, so an anchor that clears the buffer comfortably can still leave
+#' the box's near edge sitting right on top of a point (confirmed: an
+#' anchor 1.4cm from the nearest point in a dense cluster left only 0.02cm
+#' of actual box clearance). Using the box's footprint instead makes the
+#' buffer represent real visual clearance regardless of justification.
+#'
+#' For "point", this is exact (point-to-rectangle distance per point). For
+#' "line", the true minimum distance between a segment and a rectangle --
+#' both convex shapes -- is always realised either at a rectangle corner
+#' (distance to the segment) or a segment endpoint (distance to the
+#' rectangle), so checking both is exact, not an approximation.
+#' @noRd
+t61_box_distance_to_series <- function(box, mask, series_x, series_y, geom_type, units) {
+  rect <- t61_box_data_rect(box, mask)
+  sx <- units$x_per_unit_cm
+  sy <- units$y_per_unit_cm
+
+  rxmin <- rect$xmin * sx; rxmax <- rect$xmax * sx
+  rymin <- rect$ymin * sy; rymax <- rect$ymax * sy
+
+  if (identical(geom_type, "point")) {
+    qx <- series_x * sx
+    qy <- series_y * sy
+    d <- t61_point_rect_distance(qx, qy, rxmin, rxmax, rymin, rymax)
+    i <- which.min(d)
+    return(list(distance = d[i], x = series_x[i], y = series_y[i]))
+  }
+
+  if (identical(geom_type, "line")) {
+    n <- length(series_x)
+    if (n == 1) {
+      qx <- series_x * sx; qy <- series_y * sy
+      d <- t61_point_rect_distance(qx, qy, rxmin, rxmax, rymin, rymax)
+      return(list(distance = d, x = series_x, y = series_y))
+    }
+
+    corners <- expand.grid(x = c(rxmin, rxmax), y = c(rymin, rymax))
+    best <- NULL
+
+    update_best <- function(d, x, y) {
+      if (is.null(best) || d < best$distance) best <<- list(distance = d, x = x, y = y)
+    }
+
+    for (i in seq_len(n - 1)) {
+      ax <- series_x[i] * sx;     ay <- series_y[i] * sy
+      bx <- series_x[i + 1] * sx; by <- series_y[i + 1] * sy
+
+      # Segment endpoints against the rectangle.
+      update_best(t61_point_rect_distance(ax, ay, rxmin, rxmax, rymin, rymax), series_x[i], series_y[i])
+      update_best(t61_point_rect_distance(bx, by, rxmin, rxmax, rymin, rymax), series_x[i + 1], series_y[i + 1])
+
+      # Rectangle corners against the segment.
+      for (k in seq_len(nrow(corners))) {
+        seg <- t61_point_segment_distance(corners$x[k], corners$y[k], ax, ay, bx, by)
+        update_best(seg$distance, seg$x / sx, seg$y / sy)
+      }
+    }
+
+    return(best)
+  }
+
+  stop("t61_box_distance_to_series: unsupported geom_type '", geom_type, "' (v1 scope: point, line)")
+}

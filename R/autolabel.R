@@ -54,12 +54,17 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
       if (!t61_box_in_bounds(box$row_range, box$col_range, mask$occupancy)) next
       if (t61_test_collision(mask$occupancy, box$row_range, box$col_range)) next
 
-      own <- t61_distance_to_series(x, y, series$x, series$y, geom_type, units)
+      # Measured from the box's actual footprint, not just the (x, y)
+      # anchor: with the default hjust = 0 the box extends a full
+      # label-width away from the anchor, so an anchor that clears the
+      # buffer comfortably can still leave the box sitting right on top of
+      # a point or line -- see t61_box_distance_to_series().
+      own <- t61_box_distance_to_series(box, mask, series$x, series$y, geom_type, units)
       if (enforce_min_buffer && own$distance < min_buffer_cm) next
 
       next_closest <- Inf
       for (s in other_series) {
-        d <- t61_distance_to_series(x, y, s$x, s$y, s$geom_type, units)
+        d <- t61_box_distance_to_series(box, mask, s$x, s$y, s$geom_type, units)
         if (d$distance < next_closest) next_closest <- d$distance
       }
 
