@@ -403,3 +403,40 @@ test_that("t61_apply_autolabel prefers the caller's own x/y over random empty sp
   expect_equal(d$x, 2019)
   expect_equal(d$y, 4.5)
 })
+
+test_that("t61_apply_autolabel keeps fallbacks for coord_flip() plots (not v1 scope)", {
+  skip_on_cran()
+
+  data <- data.frame(
+    category = rep(c("A", "B", "C"), 2),
+    value = c(5, 8, 3, 6, 2, 9),
+    series = rep(c("X", "Y"), each = 3)
+  )
+  cols <- c(X = "#e57200", Y = "#1c3144")
+
+  p <- ggplot(data, aes(category, value, colour = series, group = series)) +
+    geom_line() +
+    geom_point() +
+    scale_colour_manual(values = cols) +
+    coord_flip() +
+    theme_bw(base_size = 10) +
+    plot_label(c("X", "Y"), x = c("C", "C"), y = c(8, 2), colour = unname(cols))
+
+  # Previously, coord_flip()'s screen axes don't match the x/y aesthetics
+  # (series matching and box-distance math both assume plain x-aes ->
+  # screen-x), so a "resolved" position got written back in the wrong
+  # coordinate space entirely -- landing outside the flipped scale's range
+  # and silently dropped by ggplot2, rather than erroring or keeping the
+  # caller's own position. t61_render_mask() now bails out (NULL) for
+  # coord_flip(), same as it already does for facets, so the label keeps
+  # exactly the position the caller gave it instead.
+  result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
+
+  label_layer <- which(vapply(result@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  d <- result@layers[[label_layer]]$data
+
+  expect_equal(d$x, c("C", "C"))
+  expect_equal(d$y, c(8, 2))
+})

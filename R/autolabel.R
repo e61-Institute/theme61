@@ -9,15 +9,17 @@
 #' against the current mask. Returns a list(x, y, box) on success, or NULL
 #' if every candidate either collides or there's nothing to evaluate.
 #'
-#' Candidates closer to their own series than `min_buffer_cm` are excluded
-#' on a first pass, so a comfortably-buffered spot anywhere on the panel is
-#' always preferred over a technically-closer but cramped one nearby --
-#' the selection tiebreak in t61_select_best_candidate() only chooses
-#' *among* whatever candidates are on offer, so it can't claim buffer that
-#' was never in the running to begin with. Only if that first pass finds
-#' nothing (e.g. a busy chart with no clear buffered spot anywhere) does
-#' this fall back to allowing tighter candidates, so a label degrades to
-#' "close" rather than disappearing.
+#' Candidates closer to their own series than `min_buffer_cm`, or whose box
+#' touches a y-axis gridline (theme_e61()'s default style shows y
+#' gridlines, not x), are excluded on a first pass, so a comfortably-clear
+#' spot anywhere on the panel is always preferred over a technically-closer
+#' or gridline-touching one nearby -- the selection tiebreak in
+#' t61_select_best_candidate() only chooses *among* whatever candidates are
+#' on offer, so it can't claim clearance that was never in the running to
+#' begin with. Only if that pass finds nothing does this relax, one
+#' constraint at a time (buffer first, gridline avoidance last), so a label
+#' degrades gracefully rather than disappearing -- it should only ever
+#' touch a gridline when there's truly no other way to place it.
 #'
 #' @param series The series this label belongs to (its own "home" series):
 #'   list(x=, y=) for "point"/"line", list(xmin=, xmax=, ymin=, ymax=) for
@@ -44,7 +46,7 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
   units <- t61_mask_units_cm(mask)
   grid <- t61_candidate_grid(mask$x_range, mask$y_range, n_x = n_x, n_y = n_y, margin = margin)
 
-  build_candidates <- function(enforce_min_buffer) {
+  build_candidates <- function(enforce_min_buffer, avoid_gridline) {
     rows <- vector("list", nrow(grid))
 
     for (i in seq_len(nrow(grid))) {
@@ -58,6 +60,7 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
       # off-panel label would render visibly truncated.
       if (!t61_box_in_bounds(box$row_range, box$col_range, mask)) next
       if (t61_test_collision(mask$occupancy, box$row_range, box$col_range)) next
+      if (avoid_gridline && t61_touches_y_gridline(box, mask)) next
 
       # Measured from the box's actual footprint, not just the (x, y)
       # anchor: with the default hjust = 0 the box extends a full
@@ -89,9 +92,19 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
     do.call(rbind, rows)
   }
 
-  candidates <- build_candidates(enforce_min_buffer = TRUE)
+  # Priority order: (1) buffered + gridline-clear, (2) tight-but-clear,
+  # (3) buffered-but-touching-a-gridline, (4) tight-and-touching -- gridline
+  # avoidance is exhausted across both buffer levels before a touch is ever
+  # allowed, so a label only touches a y gridline when nothing else works.
+  candidates <- build_candidates(enforce_min_buffer = TRUE, avoid_gridline = TRUE)
   if (is.null(candidates) || nrow(candidates) == 0) {
-    candidates <- build_candidates(enforce_min_buffer = FALSE)
+    candidates <- build_candidates(enforce_min_buffer = FALSE, avoid_gridline = TRUE)
+  }
+  if (is.null(candidates) || nrow(candidates) == 0) {
+    candidates <- build_candidates(enforce_min_buffer = TRUE, avoid_gridline = FALSE)
+  }
+  if (is.null(candidates) || nrow(candidates) == 0) {
+    candidates <- build_candidates(enforce_min_buffer = FALSE, avoid_gridline = FALSE)
   }
   if (is.null(candidates) || nrow(candidates) == 0) return(NULL)
 
@@ -114,6 +127,12 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
 #' visibly truncated. x_steps/y_steps reach all the way to the data range's
 #' own edges (mask$x_range[2] etc.), so this is routinely hit here, unlike
 #' t61_place_label()'s grid, which already keeps a margin off the edges.
+#'
+#' Also mirrors t61_place_label()'s gridline-avoidance pass: a spiral step
+#' that touches a y gridline is skipped on a first sweep, and only
+#' considered on a second if nothing clear turned up anywhere -- this tier
+#' is reached more often now that plot_label(x=, y=) is optional, so it
+#' should honour the same "only touch a gridline as a last resort" rule.
 #' @noRd
 t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_steps = 12) {
   x_mid <- mean(mask$x_range); y_mid <- mean(mask$y_range)
@@ -126,17 +145,23 @@ t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_s
   x_steps <- c(rbind(x_up, x_down))
   y_steps <- c(rbind(y_up, y_down))
 
-  for (x in x_steps) {
-    for (y in y_steps) {
-      box <- t61_text_box_px(x, y, label_cm, mask, hjust = hjust, vjust = vjust)
-      if (!t61_box_in_bounds(box$row_range, box$col_range, mask)) next
-      if (!t61_test_collision(mask$occupancy, box$row_range, box$col_range)) {
-        return(list(x = x, y = y, box = box))
+  search <- function(avoid_gridline) {
+    for (x in x_steps) {
+      for (y in y_steps) {
+        box <- t61_text_box_px(x, y, label_cm, mask, hjust = hjust, vjust = vjust)
+        if (!t61_box_in_bounds(box$row_range, box$col_range, mask)) next
+        if (avoid_gridline && t61_touches_y_gridline(box, mask)) next
+        if (!t61_test_collision(mask$occupancy, box$row_range, box$col_range)) {
+          return(list(x = x, y = y, box = box))
+        }
       }
     }
+    NULL
   }
 
-  NULL
+  result <- search(avoid_gridline = TRUE)
+  if (is.null(result)) result <- search(avoid_gridline = FALSE)
+  result
 }
 
 #' Place a set of labels on a single-panel plot, one at a time, updating

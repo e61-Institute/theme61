@@ -56,6 +56,37 @@ test_that("t61_panel_box_cm returns NULL for faceted plots (not v1 scope)", {
   expect_null(t61_panel_box_cm(gt, width_cm = 16, height_cm = 12))
 })
 
+test_that("t61_render_mask returns NULL for coord_flip() plots (not v1 scope)", {
+  skip_on_cran()
+
+  data <- data.frame(category = c("A", "B", "C"), value = c(5, 8, 3))
+  p <- ggplot(data, aes(category, value)) +
+    geom_col() +
+    coord_flip()
+
+  expect_null(t61_render_mask(p, width_cm = 16, height_cm = 12))
+})
+
+test_that("t61_touches_y_gridline detects a box straddling a y-axis break", {
+  mask <- list(
+    panel = list(left_px = 0, top_px = 0, width_px = 100, height_px = 100),
+    x_range = c(0, 10), y_range = c(0, 10),
+    y_breaks = c(5)
+  )
+
+  # y = 5 sits at the panel's exact vertical midpoint (row 50)
+  box_touching <- list(row_range = c(45, 55), col_range = c(10, 20))
+  box_clear    <- list(row_range = c(10, 20), col_range = c(10, 20))
+
+  expect_true(t61_touches_y_gridline(box_touching, mask))
+  expect_false(t61_touches_y_gridline(box_clear, mask))
+
+  # No y_breaks at all (e.g. x-only gridline theme): never a hit
+  mask_no_breaks <- mask
+  mask_no_breaks$y_breaks <- numeric(0)
+  expect_false(t61_touches_y_gridline(box_touching, mask_no_breaks))
+})
+
 test_that("t61_strip_chrome preserves the gtable layout of the real chart", {
   skip_on_cran()
 

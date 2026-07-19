@@ -118,6 +118,23 @@ t61_strip_chrome <- function(plot) {
 #' @noRd
 t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
 
+  built <- ggplot2::ggplot_build(plot)
+
+  # v1 scope: plain cartesian coordinates only. coord_flip() swaps which
+  # aesthetic lands on the screen's horizontal vs vertical axis for
+  # rendering, but every other autolabel-* module (series matching via
+  # ggplot_build()$data, box-distance/edge/gridline math, and the x/y
+  # written back onto the label's own layer data) all assume a plain
+  # x-aes -> screen-x, y-aes -> screen-y mapping straight off the data.
+  # Under coord_flip() that assumption silently breaks -- candidate
+  # positions get computed in screen space but written back as if they
+  # were pre-flip data coordinates, landing outside the flipped scale's
+  # range entirely (dropped by ggplot2 with a "removed rows" warning)
+  # rather than anywhere sensible. Bailing out here, the same "not v1
+  # scope" signal used for facets below, keeps the caller's own x/y (or
+  # NA) untouched instead of computing garbage.
+  if (inherits(built$layout$coord, "CoordFlip")) return(NULL)
+
   gt <- ggplot2::ggplotGrob(t61_strip_chrome(plot))
   panel_cm <- t61_panel_box_cm(gt, width_cm, height_cm)
   if (is.null(panel_cm)) return(NULL)
@@ -149,7 +166,6 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   px_per_cm_x <- ncol(raster) / width_cm
   px_per_cm_y <- nrow(raster) / height_cm
 
-  built <- ggplot2::ggplot_build(plot)
   pp <- built$layout$panel_params
   if (length(pp) != 1) return(NULL) # faceted: not v1 scope
 
@@ -210,11 +226,35 @@ t61_edge_penalty_cm <- function(box, mask, label_cm) {
   max(0, label_cm$height_cm - min_clear_cm)
 }
 
+#' Whether a candidate box's row_range crosses a y-axis gridline break --
+#' the hard-avoidance check behind t61_place_label()'s/
+#' t61_place_label_fallback()'s avoid_gridline pass (see their docs): a
+#' label should only ever touch a y gridline when every candidate does,
+#' not merely lose a tiebreak for it. Scoped to y only (not x) because
+#' theme_e61()'s default style shows y gridlines but blanks x ones -- x
+#' gridlines only exist under non-default theme variants, where the softer
+#' t61_gridline_penalty_cm() tiebreak (which still covers both axes) is
+#' judged sufficient.
+#' @noRd
+t61_touches_y_gridline <- function(box, mask) {
+  for (brk in mask$y_breaks) {
+    row <- t61_data_to_px(mean(mask$x_range), brk, mask)$row
+    if (row >= min(box$row_range) && row <= max(box$row_range)) {
+      return(TRUE)
+    }
+  }
+  FALSE
+}
+
 #' Soft penalty for a candidate box straddling a gridline break (x or y),
 #' one label-height's worth of penalty per axis it crosses. Like
 #' t61_edge_penalty_cm(), this only ever feeds the tiebreak score -- a
 #' candidate that overlaps a gridline is still chosen when it's the only
 #' option, it just loses to an otherwise-equal candidate that doesn't.
+#' The y component reuses t61_touches_y_gridline(), the same hard check
+#' t61_place_label() uses to avoid y gridlines outright; this penalty stays
+#' relevant on top of that for x gridlines, and for tiebreaking among
+#' candidates once avoidance has already been exhausted.
 #' @noRd
 t61_gridline_penalty_cm <- function(box, mask, label_cm) {
   x_hit <- FALSE
@@ -226,14 +266,7 @@ t61_gridline_penalty_cm <- function(box, mask, label_cm) {
     }
   }
 
-  y_hit <- FALSE
-  for (brk in mask$y_breaks) {
-    row <- t61_data_to_px(mean(mask$x_range), brk, mask)$row
-    if (row >= min(box$row_range) && row <= max(box$row_range)) {
-      y_hit <- TRUE
-      break
-    }
-  }
+  y_hit <- t61_touches_y_gridline(box, mask)
 
   (as.numeric(x_hit) + as.numeric(y_hit)) * 0.5 * label_cm$height_cm
 }

@@ -82,6 +82,101 @@ test_that("t61_place_label and t61_place_label_fallback return NULL when nothing
   ))
 })
 
+test_that("t61_place_label prefers a y-gridline-clear spot over a touching one", {
+  skip_on_cran()
+
+  setup <- autolabel_test_setup()
+  mask <- t61_render_mask(setup$plot, width_cm = 16, height_cm = 12, px_width = 400)
+  lab_cm <- t61_measure_label_cm("Series A", size_mm = 3.5, width_cm = 16, height_cm = 12)
+  far_series <- list(x = 1999, y = -100) # nowhere near any candidate: buffer never binds
+
+  # y = 5 is one of theme_bw()'s default gridline breaks. Saturate the mask
+  # except two windows: one sized to fit exactly the grid candidate closest
+  # to that break (so landing there necessarily touches it), and a second,
+  # clearly gridline-free window between the 2.5 and 5 breaks.
+  grid <- t61_candidate_grid(mask$x_range, mask$y_range, n_x = 24, n_y = 32, margin = 0.08)
+  y_on_grid <- unique(grid$y)[which.min(abs(unique(grid$y) - 5))]
+  gridline_window <- t61_text_box_px(mean(mask$x_range), y_on_grid, lab_cm, mask, hjust = 0)
+
+  mask$occupancy[, ] <- TRUE
+  r0 <- floor(min(gridline_window$row_range)); r1 <- ceiling(max(gridline_window$row_range))
+  mask$occupancy[r0:r1, ] <- FALSE
+
+  clear_row_top <- t61_data_to_px(mean(mask$x_range), 4.0, mask)$row
+  clear_row_bot <- t61_data_to_px(mean(mask$x_range), 3.0, mask)$row
+  mask$occupancy[floor(clear_row_top):ceiling(clear_row_bot), ] <- FALSE
+
+  result <- t61_place_label(series = far_series, geom_type = "line", other_series = list(),
+                             mask = mask, label_cm = lab_cm, hjust = 0)
+
+  expect_false(is.null(result))
+  box <- t61_text_box_px(result$x, result$y, lab_cm, mask, hjust = 0)
+  expect_false(t61_touches_y_gridline(box, mask))
+})
+
+test_that("t61_place_label only allows a y-gridline-touching box when nothing else fits", {
+  skip_on_cran()
+
+  setup <- autolabel_test_setup()
+  mask <- t61_render_mask(setup$plot, width_cm = 16, height_cm = 12, px_width = 400)
+  lab_cm <- t61_measure_label_cm("Series A", size_mm = 3.5, width_cm = 16, height_cm = 12)
+  far_series <- list(x = 1999, y = -100)
+
+  # Only the gridline-straddling window from the test above is left clear
+  # this time -- placement should still succeed (degrade gracefully rather
+  # than vanish), and the only way it can is by touching the gridline.
+  grid <- t61_candidate_grid(mask$x_range, mask$y_range, n_x = 24, n_y = 32, margin = 0.08)
+  y_on_grid <- unique(grid$y)[which.min(abs(unique(grid$y) - 5))]
+  gridline_window <- t61_text_box_px(mean(mask$x_range), y_on_grid, lab_cm, mask, hjust = 0)
+
+  mask$occupancy[, ] <- TRUE
+  r0 <- floor(min(gridline_window$row_range)); r1 <- ceiling(max(gridline_window$row_range))
+  mask$occupancy[r0:r1, ] <- FALSE
+
+  result <- t61_place_label(series = far_series, geom_type = "line", other_series = list(),
+                             mask = mask, label_cm = lab_cm, hjust = 0)
+
+  expect_false(is.null(result))
+  box <- t61_text_box_px(result$x, result$y, lab_cm, mask, hjust = 0)
+  expect_true(t61_touches_y_gridline(box, mask))
+})
+
+test_that("t61_place_label_fallback also avoids a y gridline when a clear spot exists, but degrades to touching one when it's the only option", {
+  skip_on_cran()
+
+  setup <- autolabel_test_setup()
+  mask <- t61_render_mask(setup$plot, width_cm = 16, height_cm = 12, px_width = 400)
+  lab_cm <- t61_measure_label_cm("Series A", size_mm = 3.5, width_cm = 16, height_cm = 12)
+
+  # t61_place_label_fallback() spirals out from the panel's y midpoint,
+  # which for this plot's y range happens to land exactly on the y = 5
+  # gridline break -- so a window sized to fit that first step necessarily
+  # touches it.
+  y_mid <- mean(mask$y_range)
+  gridline_window <- t61_text_box_px(mean(mask$x_range), y_mid, lab_cm, mask, hjust = 0)
+
+  mask$occupancy[, ] <- TRUE
+  r0 <- floor(min(gridline_window$row_range)); r1 <- ceiling(max(gridline_window$row_range))
+  mask$occupancy[r0:r1, ] <- FALSE
+
+  only_gridline <- t61_place_label_fallback(mask, lab_cm, hjust = 0)
+  expect_false(is.null(only_gridline))
+  box <- t61_text_box_px(only_gridline$x, only_gridline$y, lab_cm, mask, hjust = 0)
+  expect_true(t61_touches_y_gridline(box, mask))
+
+  # Opening up a second, gridline-free window (between the 2.5 and 5
+  # breaks) should now be preferred over the gridline-touching one.
+  mask_both <- mask
+  clear_row_top <- t61_data_to_px(mean(mask_both$x_range), 4.0, mask_both)$row
+  clear_row_bot <- t61_data_to_px(mean(mask_both$x_range), 3.0, mask_both)$row
+  mask_both$occupancy[floor(clear_row_top):ceiling(clear_row_bot), ] <- FALSE
+
+  both_open <- t61_place_label_fallback(mask_both, lab_cm, hjust = 0)
+  expect_false(is.null(both_open))
+  box2 <- t61_text_box_px(both_open$x, both_open$y, lab_cm, mask_both, hjust = 0)
+  expect_false(t61_touches_y_gridline(box2, mask_both))
+})
+
 test_that("t61_autolabel_plot keeps the fallback position when placement fails entirely", {
   skip_on_cran()
 
