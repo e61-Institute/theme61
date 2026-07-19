@@ -130,9 +130,16 @@ t61_box_data_rect <- function(box, mask) {
 #' "line", the true minimum distance between a segment and a rectangle --
 #' both convex shapes -- is always realised either at a rectangle corner
 #' (distance to the segment) or a segment endpoint (distance to the
-#' rectangle), so checking both is exact, not an approximation.
+#' rectangle), so checking both is exact, not an approximation. For
+#' "column", each bar is itself a rectangle (xmin/xmax/ymin/ymax, already
+#' position-adjusted -- e.g. dodged -- since it comes from
+#' ggplot_build()$data), so this is an exact rectangle-to-rectangle
+#' distance per bar.
+#'
+#' @param series For "point"/"line": list(x=, y=) in draw order. For
+#'   "column": list(xmin=, xmax=, ymin=, ymax=), one entry per bar.
 #' @noRd
-t61_box_distance_to_series <- function(box, mask, series_x, series_y, geom_type, units) {
+t61_box_distance_to_series <- function(box, mask, series, geom_type, units) {
   rect <- t61_box_data_rect(box, mask)
   sx <- units$x_per_unit_cm
   sy <- units$y_per_unit_cm
@@ -141,14 +148,15 @@ t61_box_distance_to_series <- function(box, mask, series_x, series_y, geom_type,
   rymin <- rect$ymin * sy; rymax <- rect$ymax * sy
 
   if (identical(geom_type, "point")) {
-    qx <- series_x * sx
-    qy <- series_y * sy
+    qx <- series$x * sx
+    qy <- series$y * sy
     d <- t61_point_rect_distance(qx, qy, rxmin, rxmax, rymin, rymax)
     i <- which.min(d)
-    return(list(distance = d[i], x = series_x[i], y = series_y[i]))
+    return(list(distance = d[i], x = series$x[i], y = series$y[i]))
   }
 
   if (identical(geom_type, "line")) {
+    series_x <- series$x; series_y <- series$y
     n <- length(series_x)
     if (n == 1) {
       qx <- series_x * sx; qy <- series_y * sy
@@ -181,5 +189,40 @@ t61_box_distance_to_series <- function(box, mask, series_x, series_y, geom_type,
     return(best)
   }
 
-  stop("t61_box_distance_to_series: unsupported geom_type '", geom_type, "' (v1 scope: point, line)")
+  if (identical(geom_type, "column")) {
+    xmin <- series$xmin * sx; xmax <- series$xmax * sx
+    ymin <- series$ymin * sy; ymax <- series$ymax * sy
+
+    # A representative "nearest point" for line-of-sight purposes only
+    # (not used for the distance itself): the closest point on each bar's
+    # boundary to the candidate box's centre.
+    box_cx <- (rxmin + rxmax) / 2
+    box_cy <- (rymin + rymax) / 2
+
+    n <- length(xmin)
+    best <- NULL
+    for (i in seq_len(n)) {
+      dx <- max(0, rxmin - xmax[i], xmin[i] - rxmax)
+      dy <- max(0, rymin - ymax[i], ymin[i] - rymax)
+      d <- sqrt(dx^2 + dy^2)
+
+      if (is.null(best) || d < best$distance) {
+        near_x <- min(max(box_cx, xmin[i]), xmax[i])
+        near_y <- min(max(box_cy, ymin[i]), ymax[i])
+        best <- list(distance = d, x = near_x / sx, y = near_y / sy)
+      }
+    }
+
+    return(best)
+  }
+
+  if (identical(geom_type, "area")) {
+    # For ambiguity/collision purposes against OTHER labels, treat the
+    # area's upper (ymax) boundary as its relevant edge -- the same
+    # simplification t61_place_label_area()'s outside-placement fallback
+    # uses when a label can't fit inside the band anywhere.
+    return(t61_box_distance_to_series(box, mask, list(x = series$x, y = series$ymax), "line", units))
+  }
+
+  stop("t61_box_distance_to_series: unsupported geom_type '", geom_type, "' (v1 scope: point, line, column, area)")
 }

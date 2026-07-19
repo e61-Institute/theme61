@@ -89,9 +89,15 @@ t61_selection_group <- function(distance_cm, label_height_cm, geom_type = "line"
 #' matter which way it moves, since some other point in the cluster is
 #' always nearby. A far larger target is needed for the result to actually
 #' read as clear of the cluster rather than merely clear of one point in it.
+#'
+#' These multipliers were tuned back when distance was still measured from
+#' the label's anchor point; now that t61_box_distance_to_series() measures
+#' from the box's actual footprint instead (a strictly larger, more
+#' truthful distance for the common hjust != 0.5 case), the same visual
+#' buffer needs a smaller multiplier -- reduced by a third across the board.
 #' @noRd
 t61_target_buffer_cm <- function(label_height_cm, geom_type = "line") {
-  mult <- if (identical(geom_type, "point")) 5.7 else 1.9
+  mult <- if (identical(geom_type, "point")) 3.8 else 1.27
   mult * label_height_cm
 }
 

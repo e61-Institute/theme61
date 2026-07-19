@@ -19,10 +19,12 @@
 #' this fall back to allowing tighter candidates, so a label degrades to
 #' "close" rather than disappearing.
 #'
-#' @param series Data-space x/y vectors for the series this label belongs
-#'   to (its own "home" series).
-#' @param other_series A list of other series (each list(x=, y=, geom_type=))
-#'   to measure "ambiguity" against -- see t61_selection_score().
+#' @param series The series this label belongs to (its own "home" series):
+#'   list(x=, y=) for "point"/"line", or list(xmin=, xmax=, ymin=, ymax=)
+#'   for "column" -- see t61_box_distance_to_series().
+#' @param other_series A list of other series (as above, each with a
+#'   geom_type= element added) to measure "ambiguity" against -- see
+#'   t61_selection_score().
 #' @noRd
 t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
                             hjust = 0, vjust = 0.5, n_x = 24, n_y = 32, margin = 0.08,
@@ -32,7 +34,9 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
     # Points get a much higher floor than lines -- see t61_target_buffer_cm()
     # for why "distance to the nearest point" needs a bigger multiplier to
     # actually clear a scattered cluster rather than just one point in it.
-    mult <- if (identical(geom_type, "point")) 5.1 else 1.7
+    # Reduced by a third from the original tuning, to match
+    # t61_target_buffer_cm() -- see its comment for why.
+    mult <- if (identical(geom_type, "point")) 3.4 else 1.13
     min_buffer_cm <- mult * label_cm$height_cm
   }
 
@@ -59,12 +63,12 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
       # label-width away from the anchor, so an anchor that clears the
       # buffer comfortably can still leave the box sitting right on top of
       # a point or line -- see t61_box_distance_to_series().
-      own <- t61_box_distance_to_series(box, mask, series$x, series$y, geom_type, units)
+      own <- t61_box_distance_to_series(box, mask, series, geom_type, units)
       if (enforce_min_buffer && own$distance < min_buffer_cm) next
 
       next_closest <- Inf
       for (s in other_series) {
-        d <- t61_box_distance_to_series(box, mask, s$x, s$y, s$geom_type, units)
+        d <- t61_box_distance_to_series(box, mask, s, s$geom_type, units)
         if (d$distance < next_closest) next_closest <- d$distance
       }
 
@@ -135,8 +139,11 @@ t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_s
 #' @param labels A data frame with columns: text, series (list-column of
 #'   list(x=,y=)), geom_type, hjust, size_mm, fallback_x, fallback_y.
 #' @param width_cm,height_cm Physical size the chart will be saved at.
-#' @return `labels` with x/y columns added (resolved position) and a
-#'   `placed` logical column (FALSE means fallback_x/fallback_y was kept).
+#' @return `labels` with x/y columns added (resolved position), a `placed`
+#'   logical column (FALSE means fallback_x/fallback_y was kept), and a
+#'   `colour` character column (NA_character_ unless an "area" label got
+#'   placed inside its band, in which case it holds the contrast colour to
+#'   render it in -- see t61_place_label_area()).
 #' @noRd
 t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400L) {
 
@@ -145,26 +152,60 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
   labels$x <- labels$fallback_x
   labels$y <- labels$fallback_y
   labels$placed <- FALSE
+  labels$colour <- NA_character_
 
   if (is.null(mask)) return(labels) # not v1 scope (e.g. facets): keep fallbacks
+
+  # A label meant to sit inside an area's own fill can't use `mask` for its
+  # collision check -- the fill itself is real rendered ink there, so every
+  # inside candidate would "collide" and placement would always fall back
+  # to outside. Rendered once, lazily, only when there's an area label to
+  # place, since it's a second full mask render.
+  area_mask <- NULL
+  if (any(labels$geom_type == "area")) {
+    area_mask <- t61_render_mask(t61_strip_area_layers(plot), width_cm = width_cm,
+                                  height_cm = height_cm, px_width = px_width)
+  }
 
   for (i in seq_len(nrow(labels))) {
     label_cm <- t61_measure_label_cm(labels$text[i], size_mm = labels$size_mm[i],
                                      width_cm = width_cm, height_cm = height_cm)
 
     own <- labels$series[[i]]
+    geom_type <- labels$geom_type[i]
     other_series <- lapply(setdiff(seq_len(nrow(labels)), i), function(j) {
       c(labels$series[[j]], list(geom_type = labels$geom_type[j]))
     })
 
-    result <- t61_place_label(
-      series = own,
-      geom_type = labels$geom_type[i],
-      other_series = other_series,
-      mask = mask,
-      label_cm = label_cm,
-      hjust = labels$hjust[i]
-    )
+    result <- NULL
+    result_colour <- NA_character_
+
+    if (identical(geom_type, "area") && !is.null(area_mask)) {
+      # Prefer a spot fully inside the band, in a colour that contrasts
+      # with the fill -- only fall back to the usual edge-hugging line
+      # treatment (against the area's top boundary, in the fill's own
+      # colour, unchanged) when the band is too narrow anywhere to fit the
+      # label inside it.
+      result <- t61_place_label_area(own, mask = area_mask, label_cm = label_cm, hjust = labels$hjust[i])
+      if (!is.null(result)) {
+        alpha <- if (is.null(own$alpha)) 1 else own$alpha
+        result_colour <- t61_contrast_colour(t61_blend_with_background(own$fill, alpha))
+      }
+    }
+
+    if (is.null(result)) {
+      series_for_line <- if (identical(geom_type, "area")) list(x = own$x, y = own$ymax) else own
+      line_geom_type <- if (identical(geom_type, "area")) "line" else geom_type
+
+      result <- t61_place_label(
+        series = series_for_line,
+        geom_type = line_geom_type,
+        other_series = other_series,
+        mask = mask,
+        label_cm = label_cm,
+        hjust = labels$hjust[i]
+      )
+    }
 
     if (is.null(result)) {
       result <- t61_place_label_fallback(mask, label_cm, hjust = labels$hjust[i])
@@ -174,7 +215,11 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
       labels$x[i] <- result$x
       labels$y[i] <- result$y
       labels$placed[i] <- TRUE
+      labels$colour[i] <- result_colour
       mask$occupancy <- t61_stamp_box(mask$occupancy, result$box$row_range, result$box$col_range)
+      if (!is.null(area_mask)) {
+        area_mask$occupancy <- t61_stamp_box(area_mask$occupancy, result$box$row_range, result$box$col_range)
+      }
     }
     # else: result still NULL even after fallback (mask has no clear space
     # left at all) -- keep the Phase-1 fallback_x/fallback_y untouched.

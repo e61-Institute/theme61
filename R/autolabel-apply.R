@@ -7,23 +7,32 @@
 # finds plot_label() layers eligible for auto-positioning, matches each to
 # a data series by colour (see t61_match_label_series()), and asks the
 # engine for a better spot. Anything not v1 scope (facetted plots, no
-# colour match, bar/area series, rotated text, auto_position = FALSE)
-# silently keeps the fallback position rather than erroring.
+# colour match, rotated text, auto_position = FALSE) silently keeps the
+# fallback position rather than erroring.
 
-#' Find a "point" or "line" data layer in a plot whose resolved colour
-#' matches a label's colour -- this is treated as the series the label
-#' belongs to (see issue #159 comment: labels are matched to series by
-#' colour, in the order the user supplies them).
+#' Find a "point", "line", "column" or "area" data layer in a plot whose
+#' resolved colour matches a label's colour -- this is treated as the
+#' series the label belongs to (see issue #159 comment: labels are matched
+#' to series by colour, in the order the user supplies them).
 #'
-#' v1 scope: only GeomLine/GeomPoint layers are matched, mirroring
-#' t61_distance_to_series()'s supported geom_types.
+#' Line/point series are matched on their `colour` aesthetic; column/bar
+#' and area series are matched on `fill` instead, since those charts almost
+#' always map the series to `fill`, not `colour` (there's usually no
+#' visible stroke colour to match against).
+#'
+#' v1 scope: only GeomLine/GeomPoint/GeomCol/GeomBar/GeomArea/GeomRibbon
+#' layers are matched.
 #'
 #' @param layers plot@layers.
 #' @param built_data ggplot2::ggplot_build(plot)$data (same length/order as
 #'   layers).
 #' @param colour The label's colour (anything grDevices::col2rgb() accepts).
-#' @return list(x=, y=, geom_type=) for the first matching layer (in draw
-#'   order), or NULL if nothing matches.
+#' @return For "point"/"line": list(x=, y=, geom_type=). For "column":
+#'   list(xmin=, xmax=, ymin=, ymax=, geom_type=) (one entry per bar,
+#'   already position-adjusted, e.g. dodged). For "area": list(x=, ymin=,
+#'   ymax=, fill=, geom_type=) (fill is the matched colour itself, carried
+#'   through for t61_place_label_area()'s outside-placement fallback and
+#'   contrast-colour decision). NULL if nothing matches.
 #' @noRd
 t61_match_label_series <- function(layers, built_data, colour) {
   target_rgb <- tryCatch(grDevices::col2rgb(colour), error = function(e) NULL)
@@ -36,6 +45,10 @@ t61_match_label_series <- function(layers, built_data, colour) {
       "line"
     } else if ("GeomPoint" %in% geom_class) {
       "point"
+    } else if ("GeomCol" %in% geom_class || "GeomBar" %in% geom_class) {
+      "column"
+    } else if ("GeomArea" %in% geom_class || "GeomRibbon" %in% geom_class) {
+      "area"
     } else {
       NA_character_
     }
@@ -43,13 +56,43 @@ t61_match_label_series <- function(layers, built_data, colour) {
     if (is.na(geom_type)) next
 
     d <- built_data[[i]]
-    if (is.null(d) || is.null(d$colour) || is.null(d$x) || is.null(d$y)) next
+    if (is.null(d)) next
 
-    d_rgb <- tryCatch(grDevices::col2rgb(d$colour), error = function(e) NULL)
+    if (identical(geom_type, "column")) {
+      if (is.null(d$fill) || is.null(d$xmin) || is.null(d$xmax) ||
+          is.null(d$ymin) || is.null(d$ymax)) next
+      match_colour <- d$fill
+    } else if (identical(geom_type, "area")) {
+      if (is.null(d$fill) || is.null(d$x) || is.null(d$ymin) || is.null(d$ymax)) next
+      match_colour <- d$fill
+      alpha <- if (is.null(d$alpha)) rep(1, nrow(d)) else ifelse(is.na(d$alpha), 1, d$alpha)
+    } else {
+      if (is.null(d$colour) || is.null(d$x) || is.null(d$y)) next
+      match_colour <- d$colour
+    }
+
+    d_rgb <- tryCatch(grDevices::col2rgb(match_colour), error = function(e) NULL)
     if (is.null(d_rgb)) next
 
     is_match <- colSums(abs(d_rgb - as.vector(target_rgb))) == 0
     if (!any(is_match)) next
+
+    if (identical(geom_type, "column")) {
+      ord <- order(d$xmin[is_match])
+      return(list(
+        xmin = d$xmin[is_match][ord], xmax = d$xmax[is_match][ord],
+        ymin = d$ymin[is_match][ord], ymax = d$ymax[is_match][ord],
+        geom_type = geom_type
+      ))
+    }
+
+    if (identical(geom_type, "area")) {
+      ord <- order(d$x[is_match])
+      return(list(
+        x = d$x[is_match][ord], ymin = d$ymin[is_match][ord], ymax = d$ymax[is_match][ord],
+        fill = match_colour[is_match][1], alpha = alpha[is_match][1], geom_type = geom_type
+      ))
+    }
 
     ord <- order(d$x[is_match])
     return(list(x = d$x[is_match][ord], y = d$y[is_match][ord], geom_type = geom_type))
@@ -113,7 +156,13 @@ t61_collect_autolabel_targets <- function(plot) {
       fallback_y <- c(fallback_y, d$y[r])
       is_date_x <- c(is_date_x, inherits(d$x[r], "Date"))
       is_date_y <- c(is_date_y, inherits(d$y[r], "Date"))
-      series[[length(series) + 1]] <- list(x = match$x, y = match$y)
+      series[[length(series) + 1]] <- if (identical(match$geom_type, "column")) {
+        list(xmin = match$xmin, xmax = match$xmax, ymin = match$ymin, ymax = match$ymax)
+      } else if (identical(match$geom_type, "area")) {
+        list(x = match$x, ymin = match$ymin, ymax = match$ymax, fill = match$fill, alpha = match$alpha)
+      } else {
+        list(x = match$x, y = match$y)
+      }
     }
   }
 
@@ -229,6 +278,15 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
     r <- targets$row_idx[k]
     plot@layers[[i]]$data$x[r] <- result$x[k]
     plot@layers[[i]]$data$y[r] <- result$y[k]
+
+    # Only set for "area" labels placed inside their band (see
+    # t61_place_label_area()): the contrast colour, overriding the fill
+    # colour the label was matched on. colour/hjust/size/angle are stored
+    # as per-row aes_params vectors, not data -- see
+    # t61_collect_autolabel_targets()'s note on why.
+    if (!is.na(result$colour[k])) {
+      plot@layers[[i]]$aes_params$colour[r] <- result$colour[k]
+    }
   }
 
   if (isTRUE(print_positions)) {
