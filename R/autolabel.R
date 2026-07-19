@@ -56,7 +56,7 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
       # a box that hangs off the panel at all is rejected outright here,
       # since ggplot2 clips drawn text to the panel and a partially
       # off-panel label would render visibly truncated.
-      if (!t61_box_in_bounds(box$row_range, box$col_range, mask$occupancy)) next
+      if (!t61_box_in_bounds(box$row_range, box$col_range, mask)) next
       if (t61_test_collision(mask$occupancy, box$row_range, box$col_range)) next
 
       # Measured from the box's actual footprint, not just the (x, y)
@@ -105,6 +105,15 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
 #' spiral outward from the panel centre (alternating toward each edge),
 #' looking only for *any* clear spot, ignoring distance/line-of-sight.
 #' Mirrors arphit's autolabel_fallback().
+#'
+#' Like t61_place_label()'s candidate loop, a box must fit fully in the
+#' mask's raster before it's accepted -- t61_test_collision() alone isn't
+#' enough here, since it silently clips a box that hangs off the edge to
+#' whatever's visible and only checks *that* for ink, so an edge-hugging
+#' box over empty margin space would otherwise pass as "clear" and render
+#' visibly truncated. x_steps/y_steps reach all the way to the data range's
+#' own edges (mask$x_range[2] etc.), so this is routinely hit here, unlike
+#' t61_place_label()'s grid, which already keeps a margin off the edges.
 #' @noRd
 t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_steps = 12) {
   x_mid <- mean(mask$x_range); y_mid <- mean(mask$y_range)
@@ -120,6 +129,7 @@ t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_s
   for (x in x_steps) {
     for (y in y_steps) {
       box <- t61_text_box_px(x, y, label_cm, mask, hjust = hjust, vjust = vjust)
+      if (!t61_box_in_bounds(box$row_range, box$col_range, mask)) next
       if (!t61_test_collision(mask$occupancy, box$row_range, box$col_range)) {
         return(list(x = x, y = y, box = box))
       }

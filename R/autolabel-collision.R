@@ -51,17 +51,28 @@ t61_text_box_px <- function(x, y, label_cm, mask, hjust = 0, vjust = 0.5, paddin
   )
 }
 
-#' Whether a pixel bounding box stays entirely within the mask's raster --
-#' a stricter check than t61_test_collision(), which clips a partially
+#' Whether a pixel bounding box stays entirely within the panel -- a
+#' stricter check than t61_test_collision(), which clips a partially
 #' off-raster box down to whatever's visible rather than rejecting it.
 #' Callers that care whether a label would actually render fully on-panel
 #' (as opposed to just "not overlapping ink in the visible portion") should
 #' use this too.
+#'
+#' Checked against the panel's own box (mask$panel), not the raster's full
+#' dimensions: the raster also covers the axis-title/tick-label gutter
+#' around the panel (t61_strip_chrome() blanks that chrome with
+#' colour = NA rather than element_blank(), specifically so the space
+#' stays reserved -- see its own docs), and that gutter reads as ink-free
+#' in the mask, same as genuinely empty panel space. A box can be fully
+#' inside the raster while still hanging off the actual plotting area into
+#' that gutter -- checking raster bounds alone would silently accept a
+#' box that will render overlapping the real axis text/title once the
+#' chrome comes back for the actual chart.
 #' @noRd
-t61_box_in_bounds <- function(row_range, col_range, occupancy) {
-  nr <- nrow(occupancy); nc <- ncol(occupancy)
-  min(row_range) >= 1 && max(row_range) <= nr &&
-    min(col_range) >= 1 && max(col_range) <= nc
+t61_box_in_bounds <- function(row_range, col_range, mask) {
+  panel <- mask$panel
+  min(row_range) >= panel$top_px && max(row_range) <= panel$top_px + panel$height_px &&
+    min(col_range) >= panel$left_px && max(col_range) <= panel$left_px + panel$width_px
 }
 
 #' Does a pixel bounding box overlap any ink in the occupancy mask?

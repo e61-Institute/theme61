@@ -125,13 +125,22 @@ t61_place_label_area <- function(series, mask, label_cm, hjust = 0, vjust = 0.5,
     band <- t61_area_band_extent(series, x_left, x_right)
     if (is.null(band)) next
 
+    # Clamped to the panel's actual visible y-range: the series' own
+    # ymin/ymax can extend beyond what the y-axis actually shows (e.g. an
+    # area's baseline at 0 when the axis floor auto-scaled to well above
+    # that), and a candidate centred using the unclamped band can end up
+    # outside the visible axis entirely, or just barely off the panel --
+    # the whole point of "inside the band" is inside what's actually drawn.
+    band$ymin <- max(band$ymin, mask$y_range[1])
+    band$ymax <- min(band$ymax, mask$y_range[2])
+
     slack <- (band$ymax - band$ymin) - height_data
     if (slack < 0) next
 
     y <- (band$ymin + band$ymax) / 2
 
     box <- t61_text_box_px(x, y, label_cm, mask, hjust = hjust, vjust = vjust)
-    if (!t61_box_in_bounds(box$row_range, box$col_range, mask$occupancy)) next
+    if (!t61_box_in_bounds(box$row_range, box$col_range, mask)) next
     if (t61_test_collision(mask$occupancy, box$row_range, box$col_range)) next
 
     edge_penalty_cm <- t61_edge_penalty_cm(box, mask, label_cm)
