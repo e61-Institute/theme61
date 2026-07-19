@@ -67,13 +67,16 @@ a named list, see the Details for the syntax.}
 automatically reposition the label to a nearby, non-overlapping spot on
 the chart, using \code{x}/\code{y} as a fallback if a better position can't be
 found. Automatic positioning only applies to single-panel (unfacetted)
-charts where the label's colour matches a line/point/column/area series
-in the plot (\code{colour} for lines and points, \code{fill} for columns and
-areas), and to unrotated text (\code{angle = 0}); anything else silently
-keeps the position you specify. For an area series, the label is placed
-fully inside the band where there's room, recoloured to contrast with
-the fill, or outside it (in the fill's own colour) where the band is
-too narrow. Set to FALSE to always use the exact \code{x}/\code{y} you supply.}
+charts where the label's colour matches a
+line/point/column/area/\code{geom_pointbar()} series in the plot (\code{colour}
+for lines, points and \code{geom_pointbar()}, \code{fill} for columns and areas),
+and to unrotated text (\code{angle = 0}); anything else silently keeps the
+position you specify. For an area series, the label is placed fully
+inside the band where there's room, recoloured to contrast with the
+fill, or outside it (in the fill's own colour) where the band is too
+narrow. For a \code{geom_pointbar()} series, the buffer accounts for the
+full error-bar extent, not just the point. Set to FALSE to always use
+the exact \code{x}/\code{y} you supply.}
 
 \item{print_position}{Logical. If TRUE, print the plot's final
 (auto-positioned) label \code{label}/\code{x}/\code{y} to the console, as copy-pasteable

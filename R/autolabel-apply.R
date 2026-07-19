@@ -10,18 +10,25 @@
 # colour match, rotated text, auto_position = FALSE) silently keeps the
 # fallback position rather than erroring.
 
-#' Find a "point", "line", "column" or "area" data layer in a plot whose
-#' resolved colour matches a label's colour -- this is treated as the
-#' series the label belongs to (see issue #159 comment: labels are matched
-#' to series by colour, in the order the user supplies them).
+#' Find a "point", "line", "column", "area" or "pointbar" data layer in a
+#' plot whose resolved colour matches a label's colour -- this is treated
+#' as the series the label belongs to (see issue #159 comment: labels are
+#' matched to series by colour, in the order the user supplies them).
 #'
-#' Line/point series are matched on their `colour` aesthetic; column/bar
-#' and area series are matched on `fill` instead, since those charts almost
-#' always map the series to `fill`, not `colour` (there's usually no
-#' visible stroke colour to match against).
+#' Line/point/pointbar series are matched on their `colour` aesthetic;
+#' column/bar and area series are matched on `fill` instead, since those
+#' charts almost always map the series to `fill`, not `colour` (there's
+#' usually no visible stroke colour to match against).
 #'
-#' v1 scope: only GeomLine/GeomPoint/GeomCol/GeomBar/GeomArea/GeomRibbon
-#' layers are matched.
+#' `geom_pointbar()` (this package's point + error-bar wrapper) draws two
+#' separate layers with the same colour -- a GeomErrorbar layer, then a
+#' GeomPoint layer on top. Matching GeomErrorbar as its own "pointbar" type
+#' means it wins the match first (it's earlier in layer/draw order), so the
+#' error bars' vertical extent is what the buffer is measured against, not
+#' just the point -- the GeomPoint half is never reached for that label.
+#'
+#' v1 scope: only GeomLine/GeomPoint/GeomCol/GeomBar/GeomArea/GeomRibbon/
+#' GeomErrorbar layers are matched.
 #'
 #' @param layers plot@layers.
 #' @param built_data ggplot2::ggplot_build(plot)$data (same length/order as
@@ -32,7 +39,8 @@
 #'   already position-adjusted, e.g. dodged). For "area": list(x=, ymin=,
 #'   ymax=, fill=, geom_type=) (fill is the matched colour itself, carried
 #'   through for t61_place_label_area()'s outside-placement fallback and
-#'   contrast-colour decision). NULL if nothing matches.
+#'   contrast-colour decision). For "pointbar": list(x=, y=, ymin=, ymax=,
+#'   geom_type=). NULL if nothing matches.
 #' @noRd
 t61_match_label_series <- function(layers, built_data, colour) {
   target_rgb <- tryCatch(grDevices::col2rgb(colour), error = function(e) NULL)
@@ -49,6 +57,8 @@ t61_match_label_series <- function(layers, built_data, colour) {
       "column"
     } else if ("GeomArea" %in% geom_class || "GeomRibbon" %in% geom_class) {
       "area"
+    } else if ("GeomErrorbar" %in% geom_class) {
+      "pointbar"
     } else {
       NA_character_
     }
@@ -66,6 +76,9 @@ t61_match_label_series <- function(layers, built_data, colour) {
       if (is.null(d$fill) || is.null(d$x) || is.null(d$ymin) || is.null(d$ymax)) next
       match_colour <- d$fill
       alpha <- if (is.null(d$alpha)) rep(1, nrow(d)) else ifelse(is.na(d$alpha), 1, d$alpha)
+    } else if (identical(geom_type, "pointbar")) {
+      if (is.null(d$colour) || is.null(d$x) || is.null(d$ymin) || is.null(d$ymax)) next
+      match_colour <- d$colour
     } else {
       if (is.null(d$colour) || is.null(d$x) || is.null(d$y)) next
       match_colour <- d$colour
@@ -91,6 +104,16 @@ t61_match_label_series <- function(layers, built_data, colour) {
       return(list(
         x = d$x[is_match][ord], ymin = d$ymin[is_match][ord], ymax = d$ymax[is_match][ord],
         fill = match_colour[is_match][1], alpha = alpha[is_match][1], geom_type = geom_type
+      ))
+    }
+
+    if (identical(geom_type, "pointbar")) {
+      ord <- order(d$x[is_match])
+      y_match <- if (is.null(d$y)) (d$ymin[is_match] + d$ymax[is_match]) / 2 else d$y[is_match]
+      return(list(
+        x = d$x[is_match][ord], y = y_match[ord],
+        ymin = d$ymin[is_match][ord], ymax = d$ymax[is_match][ord],
+        geom_type = geom_type
       ))
     }
 
@@ -160,6 +183,8 @@ t61_collect_autolabel_targets <- function(plot) {
         list(xmin = match$xmin, xmax = match$xmax, ymin = match$ymin, ymax = match$ymax)
       } else if (identical(match$geom_type, "area")) {
         list(x = match$x, ymin = match$ymin, ymax = match$ymax, fill = match$fill, alpha = match$alpha)
+      } else if (identical(match$geom_type, "pointbar")) {
+        list(x = match$x, y = match$y, ymin = match$ymin, ymax = match$ymax)
       } else {
         list(x = match$x, y = match$y)
       }

@@ -1,9 +1,9 @@
 # Orchestration: ties the mask/collision/distance/line-of-sight/selection
 # modules together to place one or more labels on a plot (issue #159).
 #
-# v1 scope: single-panel (unfacetted) plots, "point"/"line" geoms, 2-3
-# series -- see the architecture discussion on issue #159 for why this
-# scope was chosen as the starting point.
+# v1 scope: single-panel (unfacetted) plots, "point"/"line"/"column"/"area"/
+# "pointbar" geoms, 2-3 series -- see the architecture discussion on issue
+# #159 for why this scope was chosen as the starting point.
 
 #' Try to place a single label, evaluating every candidate in the grid
 #' against the current mask. Returns a list(x, y, box) on success, or NULL
@@ -20,8 +20,9 @@
 #' "close" rather than disappearing.
 #'
 #' @param series The series this label belongs to (its own "home" series):
-#'   list(x=, y=) for "point"/"line", or list(xmin=, xmax=, ymin=, ymax=)
-#'   for "column" -- see t61_box_distance_to_series().
+#'   list(x=, y=) for "point"/"line", list(xmin=, xmax=, ymin=, ymax=) for
+#'   "column", or list(x=, y=, ymin=, ymax=) for "pointbar" -- see
+#'   t61_box_distance_to_series().
 #' @param other_series A list of other series (as above, each with a
 #'   geom_type= element added) to measure "ambiguity" against -- see
 #'   t61_selection_score().

@@ -23,13 +23,16 @@
 #'   automatically reposition the label to a nearby, non-overlapping spot on
 #'   the chart, using `x`/`y` as a fallback if a better position can't be
 #'   found. Automatic positioning only applies to single-panel (unfacetted)
-#'   charts where the label's colour matches a line/point/column/area series
-#'   in the plot (`colour` for lines and points, `fill` for columns and
-#'   areas), and to unrotated text (`angle = 0`); anything else silently
-#'   keeps the position you specify. For an area series, the label is placed
-#'   fully inside the band where there's room, recoloured to contrast with
-#'   the fill, or outside it (in the fill's own colour) where the band is
-#'   too narrow. Set to FALSE to always use the exact `x`/`y` you supply.
+#'   charts where the label's colour matches a
+#'   line/point/column/area/`geom_pointbar()` series in the plot (`colour`
+#'   for lines, points and `geom_pointbar()`, `fill` for columns and areas),
+#'   and to unrotated text (`angle = 0`); anything else silently keeps the
+#'   position you specify. For an area series, the label is placed fully
+#'   inside the band where there's room, recoloured to contrast with the
+#'   fill, or outside it (in the fill's own colour) where the band is too
+#'   narrow. For a `geom_pointbar()` series, the buffer accounts for the
+#'   full error-bar extent, not just the point. Set to FALSE to always use
+#'   the exact `x`/`y` you supply.
 #' @param print_position Logical. If TRUE, print the plot's final
 #'   (auto-positioned) label `label`/`x`/`y` to the console, as copy-pasteable
 #'   `plot_label()` arguments, whenever the plot is displayed -- no need to

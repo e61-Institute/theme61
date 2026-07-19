@@ -224,5 +224,36 @@ t61_box_distance_to_series <- function(box, mask, series, geom_type, units) {
     return(t61_box_distance_to_series(box, mask, list(x = series$x, y = series$ymax), "line", units))
   }
 
-  stop("t61_box_distance_to_series: unsupported geom_type '", geom_type, "' (v1 scope: point, line, column, area)")
+  if (identical(geom_type, "pointbar")) {
+    # Each x has its own independent vertical segment (the error bar, from
+    # ymin to ymax) -- unlike "line", these aren't connected to their
+    # neighbours, so each is checked on its own rather than as segments
+    # between consecutive points. Same exact corner/endpoint reasoning as
+    # "line" otherwise: both shapes convex, so the true minimum is always
+    # at a rectangle corner or a segment endpoint.
+    x    <- series$x * sx
+    ymin <- series$ymin * sy
+    ymax <- series$ymax * sy
+
+    corners <- expand.grid(x = c(rxmin, rxmax), y = c(rymin, rymax))
+    best <- NULL
+
+    update_best <- function(d, xx, yy) {
+      if (is.null(best) || d < best$distance) best <<- list(distance = d, x = xx, y = yy)
+    }
+
+    for (i in seq_along(x)) {
+      update_best(t61_point_rect_distance(x[i], ymin[i], rxmin, rxmax, rymin, rymax), series$x[i], series$ymin[i])
+      update_best(t61_point_rect_distance(x[i], ymax[i], rxmin, rxmax, rymin, rymax), series$x[i], series$ymax[i])
+
+      for (k in seq_len(nrow(corners))) {
+        seg <- t61_point_segment_distance(corners$x[k], corners$y[k], x[i], ymin[i], x[i], ymax[i])
+        update_best(seg$distance, seg$x / sx, seg$y / sy)
+      }
+    }
+
+    return(best)
+  }
+
+  stop("t61_box_distance_to_series: unsupported geom_type '", geom_type, "' (v1 scope: point, line, column, area, pointbar)")
 }
