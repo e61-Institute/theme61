@@ -1,5 +1,5 @@
 # Tests for collision detection between a candidate label's bounding box
-# and the occupancy mask (issue #159).
+# and the occupancy mask.
 
 test_that("t61_measure_label_cm returns a positive, sensible text size", {
   skip_on_cran()

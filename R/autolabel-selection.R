@@ -1,14 +1,14 @@
 # Candidate position generation, and picking the best of a set of already-
-# evaluated candidates (issue #159).
+# evaluated candidates.
 
 #' A grid of candidate (x, y) anchor positions to try for a label, spread
 #' across the panel's data ranges. Anchors near the very edges are excluded
-#' (a label anchored right at the axis limit tends to look cramped and is
-#' likely to get clipped), mirroring arphit's x_anchors margin.
+#' -- a label anchored right at the axis limit tends to look cramped and is
+#' likely to get clipped.
 #'
-#' v1 scope: a uniform grid is enough for simple 2-3 series charts, unlike
-#' arphit's y-anchors (snapped to axis-break subdivisions) -- revisit if
-#' placements come out landing awkwardly close to gridlines/ticks.
+#' v1 scope: a uniform grid is enough for simple 2-3 series charts -- revisit
+#' if placements come out landing awkwardly close to gridlines/ticks (e.g.
+#' snapping y-anchors to axis-break subdivisions instead).
 #' @noRd
 t61_candidate_grid <- function(x_range, y_range, n_x = 9, n_y = 12, margin = 0.08) {
   x_pad <- diff(x_range) * margin
@@ -58,8 +58,8 @@ t61_selection_group <- function(distance_cm, label_height_cm, geom_type = "line"
 #'   2. group: coarse near/mid/far bucket (t61_selection_group())
 #'   3. no_los: 1 if the line back to the series is blocked, else 0
 #'   4. buffer_penalty: final tiebreak, smaller wins -- see below
-#' This plays the same role as arphit's assign_selection_group(), just
-#' expressed as an orderable key instead of ~20 enumerated cases.
+#' Expressed as an orderable key (for lexicographic sort) rather than
+#' enumerated cases, since the tiebreak priority is itself the point.
 #'
 #' The final tiebreak prefers a candidate close to a target buffer
 #' (t61_target_buffer_cm()) rather than literally the closest point
@@ -90,11 +90,11 @@ t61_selection_group <- function(distance_cm, label_height_cm, geom_type = "line"
 #' always nearby. A far larger target is needed for the result to actually
 #' read as clear of the cluster rather than merely clear of one point in it.
 #'
-#' These multipliers were tuned back when distance was still measured from
-#' the label's anchor point; now that t61_box_distance_to_series() measures
-#' from the box's actual footprint instead (a strictly larger, more
-#' truthful distance for the common hjust != 0.5 case), the same visual
-#' buffer needs a smaller multiplier -- reduced by a third across the board.
+#' Distance here is measured from the box's actual footprint
+#' (t61_box_distance_to_series()), not just the anchor point -- a strictly
+#' larger, more truthful distance for the common hjust != 0.5 case -- so
+#' these multipliers are correspondingly smaller than a naive visual buffer
+#' would suggest.
 #' @noRd
 t61_target_buffer_cm <- function(label_height_cm, geom_type = "line") {
   mult <- if (identical(geom_type, "point")) 3.8 else 1.27

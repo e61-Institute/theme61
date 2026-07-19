@@ -1,7 +1,7 @@
-# Tests for area-specific label placement (issue #159): does the inside-
-# the-band search find genuinely comfortable spots, degrade correctly to
-# the outside-placement fallback when the band is too narrow anywhere, and
-# pick a sensible contrast colour against the fill?
+# Tests for area-specific label placement: does the inside-the-band search
+# find genuinely comfortable spots, degrade correctly to the
+# outside-placement fallback when the band is too narrow anywhere, and pick
+# a sensible contrast colour against the fill?
 
 test_that("t61_area_interpolate is piecewise-linear between data points", {
   series <- list(x = c(0, 10, 20), ymin = c(0, 0, 0), ymax = c(10, 20, 10))

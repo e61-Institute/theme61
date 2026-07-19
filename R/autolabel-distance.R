@@ -3,10 +3,8 @@
 # axes even when they're scaled very differently (e.g. a wide date axis vs
 # a narrow percentage axis).
 #
-# v1 scope: "point" and "line" geoms only (bar/area/waterfall etc. would
-# need their own distance functions, added later -- see
-# get_distance_series_type() in arphit for the shape such a dispatch table
-# would eventually take).
+# v1 scope: "point" and "line" geoms only (other geoms need their own
+# distance functions, added as later cases in t61_box_distance_to_series()).
 
 #' Physical cm per one data-unit of x and y, for the panel described by a
 #' mask (see t61_render_mask()). Used to put x/y distances on a common,

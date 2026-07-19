@@ -6,17 +6,14 @@
 # coordinates to pixel coordinates in that matrix, so candidate label
 # positions and distance-to-series calculations can be evaluated against it.
 #
-# Unlike base-graphics approaches (e.g. arphit), ggplot2/grid have no
-# equivalent of par("usr")/par("pin") to read this off directly, so the
-# panel's pixel bounding box is derived from the plot's gtable layout.
+# ggplot2/grid have no equivalent of par("usr")/par("pin") to read this off
+# directly, so the panel's pixel bounding box is derived from the plot's
+# gtable layout instead.
 
-#' Work out which gtable width/height units are elastic ("null") vs fixed.
-#' Fixed units (points/cm/grobwidth/grobheight/sum) are resolvable without a
-#' device or layout context; "null" units only get an absolute size once
-#' rendered into a viewport of known size. Since save_e61()/the mask render
-#' both use a known, fixed physical page size, the "null" cell(s) can be
-#' assigned the remainder directly instead of needing to actually draw
-#' anything.
+#' Classify gtable width/height units as elastic ("null") vs fixed, so the
+#' null cell(s) -- normally only resolved by actually drawing into a
+#' viewport -- can instead be assigned the remainder directly, since
+#' save_e61()/the mask render both use a known, fixed physical page size.
 #' @noRd
 t61_panel_box_cm <- function(gt, width_cm, height_cm) {
 
@@ -120,20 +117,14 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
 
   built <- ggplot2::ggplot_build(plot)
 
-  # v1 scope: plain cartesian coordinates only. coord_flip() swaps which
-  # aesthetic lands on the screen's horizontal vs vertical axis for
-  # rendering, but every other autolabel-* module (series matching via
-  # ggplot_build()$data, box-distance/edge/gridline math, and the x/y
-  # written back onto the label's own layer data) all assume a plain
-  # x-aes -> screen-x, y-aes -> screen-y mapping straight off the data.
-  # Under coord_flip() that assumption silently breaks -- candidate
-  # positions get computed in screen space but written back as if they
-  # were pre-flip data coordinates, landing outside the flipped scale's
-  # range entirely (dropped by ggplot2 with a "removed rows" warning)
-  # rather than anywhere sensible. Bailing out here, the same "not v1
-  # scope" signal used for facets below, keeps the caller's own x/y (or
-  # NA) untouched instead of computing garbage.
-  if (inherits(built$layout$coord, "CoordFlip")) return(NULL)
+  # panel_params (used below for x_range/y_range/breaks) already reflects
+  # coord_flip() -- it describes the screen's rendered axes, not the raw
+  # aesthetics -- so the mask itself needs no special handling here. The
+  # caller (t61_autolabel_plot()) still needs to know a flip happened,
+  # since series data and the label's own x/y come from ggplot_build()$data
+  # in pre-flip (data-aesthetic) space and have to be remapped onto these
+  # screen axes.
+  flipped <- inherits(built$layout$coord, "CoordFlip")
 
   gt <- ggplot2::ggplotGrob(t61_strip_chrome(plot))
   panel_cm <- t61_panel_box_cm(gt, width_cm, height_cm)
@@ -187,8 +178,22 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
     x_range     = pp[[1]]$x.range,
     y_range     = pp[[1]]$y.range,
     x_breaks    = x_breaks,
-    y_breaks    = y_breaks
+    y_breaks    = y_breaks,
+    flipped     = flipped
   )
+}
+
+#' Swap x/y between pre-flip data-aesthetic space and the mask's screen
+#' space under coord_flip() -- self-inverse, so the same call converts
+#' either direction. Point/line positions are a plain (x, y) swap; a
+#' "column" bar's rectangle swaps its whole axis pairing, (xmin,xmax) with
+#' (ymin,ymax). Area/pointbar aren't handled -- see their callers.
+#' @noRd
+t61_flip_xy <- function(x, y) list(x = y, y = x)
+
+#' @noRd
+t61_flip_rect <- function(xmin, xmax, ymin, ymax) {
+  list(xmin = ymin, xmax = ymax, ymin = xmin, ymax = xmax)
 }
 
 #' Map a data-space (x, y) coordinate to (row, col) pixel space in a mask

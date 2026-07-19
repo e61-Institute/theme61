@@ -1,7 +1,8 @@
 # These tests exercise the internal coordinate-mapping foundation for
-# automatic plot_label() positioning (issue #159). They talk to
-# t61_render_mask()/t61_data_to_px() directly rather than through
-# plot_label()/save_e61(), since those aren't wired up yet.
+# automatic plot_label() positioning directly (t61_render_mask()/
+# t61_data_to_px()), rather than through plot_label()/save_e61(), so a
+# failure points at the coordinate math itself rather than anything in the
+# wiring layer.
 
 mask_test_plot <- function() {
   data <- data.frame(
@@ -56,7 +57,7 @@ test_that("t61_panel_box_cm returns NULL for faceted plots (not v1 scope)", {
   expect_null(t61_panel_box_cm(gt, width_cm = 16, height_cm = 12))
 })
 
-test_that("t61_render_mask returns NULL for coord_flip() plots (not v1 scope)", {
+test_that("t61_render_mask sets flipped = TRUE for coord_flip() plots, using panel_params' already-flipped axes", {
   skip_on_cran()
 
   data <- data.frame(category = c("A", "B", "C"), value = c(5, 8, 3))
@@ -64,7 +65,18 @@ test_that("t61_render_mask returns NULL for coord_flip() plots (not v1 scope)", 
     geom_col() +
     coord_flip()
 
-  expect_null(t61_render_mask(p, width_cm = 16, height_cm = 12))
+  mask <- t61_render_mask(p, width_cm = 16, height_cm = 12)
+
+  expect_false(is.null(mask))
+  expect_true(mask$flipped)
+  # x_range now holds "value" (the screen's horizontal axis post-flip), not
+  # "category" -- confirms the mask describes rendered/screen space, not
+  # the raw aesthetics.
+  expect_equal(mask$y_range[1] < mask$y_range[2], TRUE)
+  expect_true(diff(mask$x_range) > 3) # value's range, not category's ~3-level span
+
+  mask_unflipped <- t61_render_mask(ggplot(data, aes(category, value)) + geom_col(), width_cm = 16, height_cm = 12)
+  expect_false(mask_unflipped$flipped)
 })
 
 test_that("t61_touches_y_gridline detects a box straddling a y-axis break", {

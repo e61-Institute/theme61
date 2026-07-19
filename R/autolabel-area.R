@@ -1,4 +1,4 @@
-# Label placement for geom_area()/geom_ribbon() series (issue #159).
+# Label placement for geom_area()/geom_ribbon() series.
 #
 # Areas need a different placement strategy from point/line/column: the
 # preference is to sit the label fully INSIDE the coloured band, in a

@@ -1,4 +1,4 @@
-# Tests for distance-to-series scoring (issue #159). Distance is computed
+# Tests for distance-to-series scoring. Distance is computed
 # in physical cm (via t61_mask_units_cm()) so x and y are comparable even
 # when their data scales differ substantially.
 

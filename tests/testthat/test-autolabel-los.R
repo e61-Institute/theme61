@@ -1,4 +1,4 @@
-# Tests for line-of-sight (issue #159): is a candidate label position
+# Tests for line-of-sight -- is a candidate label position
 # visibly connected to its series, i.e. does the straight line between
 # them cross any other ink in the occupancy mask?
 

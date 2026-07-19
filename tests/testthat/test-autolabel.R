@@ -1,4 +1,4 @@
-# End-to-end tests for the autolabel orchestrator (issue #159): given a
+# End-to-end tests for the autolabel orchestrator -- given a
 # plot and a set of labels to place, does the whole pipeline (mask,
 # collision, distance, line-of-sight, selection) produce sensible,
 # non-overlapping placements, and does it degrade gracefully when nothing

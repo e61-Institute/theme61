@@ -1,19 +1,17 @@
 # Wires the autolabel engine (mask/collision/distance/los/selection/
-# orchestrator, see autolabel.R) into plot_label()/save_e61() (issue #159).
+# orchestrator, see autolabel.R) into plot_label()/save_e61().
 #
-# Design: plot_label(x, y) keeps x/y as a required "fallback" position (the
-# Phase-1 placeholder from the issue discussion). save_single() calls
-# t61_apply_autolabel() once the chart's final width/height are known; it
-# finds plot_label() layers eligible for auto-positioning, matches each to
-# a data series by colour (see t61_match_label_series()), and asks the
-# engine for a better spot. Anything not v1 scope (facetted plots, no
-# colour match, rotated text, auto_position = FALSE) silently keeps the
-# fallback position rather than erroring.
+# save_single() calls t61_apply_autolabel() once the chart's final
+# width/height are known; it finds plot_label() layers eligible for
+# auto-positioning, matches each to a data series by colour (see
+# t61_match_label_series()), and asks the engine for a better spot.
+# Anything not v1 scope (facetted plots, no colour match, rotated text,
+# auto_position = FALSE) silently keeps the fallback position rather than
+# erroring.
 
 #' Find a "point", "line", "column", "area" or "pointbar" data layer in a
 #' plot whose resolved colour matches a label's colour -- this is treated
-#' as the series the label belongs to (see issue #159 comment: labels are
-#' matched to series by colour, in the order the user supplies them).
+#' as the series the label belongs to.
 #'
 #' Line/point/pointbar series are matched on their `colour` aesthetic;
 #' column/bar and area series are matched on `fill` instead, since those

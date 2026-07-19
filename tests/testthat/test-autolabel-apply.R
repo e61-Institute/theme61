@@ -1,8 +1,8 @@
-# Tests for wiring the autolabel engine into plot_label()/save_e61()
-# (issue #159): does t61_apply_autolabel() find eligible plot_label()
-# labels, match them to their series by colour, and move them -- while
-# leaving everything out of v1 scope (opted-out, rotated, unmatched,
-# facetted) exactly where the user put it?
+# Tests for wiring the autolabel engine into plot_label()/save_e61(): does
+# t61_apply_autolabel() find eligible plot_label() labels, match them to
+# their series by colour, and move them -- while leaving everything out of
+# v1 scope (opted-out, rotated, unmatched, facetted) exactly where the user
+# put it?
 
 autolabel_apply_test_setup <- function(auto_position = TRUE) {
   data <- data.frame(
@@ -404,7 +404,33 @@ test_that("t61_apply_autolabel prefers the caller's own x/y over random empty sp
   expect_equal(d$y, 4.5)
 })
 
-test_that("t61_apply_autolabel keeps fallbacks for coord_flip() plots (not v1 scope)", {
+coord_flip_apply_test <- function(p) {
+  result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
+
+  label_layer <- which(vapply(result@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  d <- result@layers[[label_layer]]$data
+
+  expect_false(anyNA(d$x))
+  expect_false(anyNA(d$y))
+
+  # Rebuild the mask for the now-labelled plot and check each resolved
+  # position renders fully inside the flipped panel, not off the edge.
+  # d$x/d$y are stored in pre-flip data space (ggplot re-flips them at
+  # render time, same as any other layer), so they need converting to the
+  # mask's screen space before box math -- same conversion t61_autolabel_plot()
+  # itself does before stamping.
+  labelled_mask <- t61_render_mask(result, width_cm = 16, height_cm = 12)
+  for (i in seq_len(nrow(d))) {
+    lab_cm <- t61_measure_label_cm(d$label[i], size_mm = 3.5, width_cm = 16, height_cm = 12)
+    screen_xy <- t61_flip_xy(d$x[i], d$y[i])
+    box <- t61_text_box_px(screen_xy$x, screen_xy$y, lab_cm, labelled_mask, hjust = 0)
+    expect_true(t61_box_in_bounds(box$row_range, box$col_range, labelled_mask))
+  }
+}
+
+test_that("t61_apply_autolabel auto-positions labels on a coord_flip() line chart", {
   skip_on_cran()
 
   data <- data.frame(
@@ -420,23 +446,29 @@ test_that("t61_apply_autolabel keeps fallbacks for coord_flip() plots (not v1 sc
     scale_colour_manual(values = cols) +
     coord_flip() +
     theme_bw(base_size = 10) +
-    plot_label(c("X", "Y"), x = c("C", "C"), y = c(8, 2), colour = unname(cols))
+    plot_label(c("X", "Y"), colour = unname(cols))
 
-  # Previously, coord_flip()'s screen axes don't match the x/y aesthetics
-  # (series matching and box-distance math both assume plain x-aes ->
-  # screen-x), so a "resolved" position got written back in the wrong
-  # coordinate space entirely -- landing outside the flipped scale's range
-  # and silently dropped by ggplot2, rather than erroring or keeping the
-  # caller's own position. t61_render_mask() now bails out (NULL) for
-  # coord_flip(), same as it already does for facets, so the label keeps
-  # exactly the position the caller gave it instead.
-  result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
+  coord_flip_apply_test(p)
+})
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+test_that("t61_apply_autolabel auto-positions labels on a coord_flip() column chart", {
+  skip_on_cran()
 
-  expect_equal(d$x, c("C", "C"))
-  expect_equal(d$y, c(8, 2))
+  # The reported bug: no fallback x/y given, so a resolved position stayed
+  # NA (silently dropped from the chart) rather than an actual placement.
+  data <- data.frame(
+    category = rep(c("A", "B", "C"), 2),
+    value = c(5, 8, 3, 6, 2, 9),
+    series = rep(c("X", "Y"), each = 3)
+  )
+  cols <- c(X = "#e57200", Y = "#1c3144")
+
+  p <- ggplot(data, aes(category, value, fill = series)) +
+    geom_col(position = "dodge") +
+    scale_fill_manual(values = cols) +
+    coord_flip() +
+    theme_bw(base_size = 10) +
+    plot_label(c("X", "Y"), colour = unname(cols))
+
+  coord_flip_apply_test(p)
 })

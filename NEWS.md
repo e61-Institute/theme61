@@ -12,7 +12,7 @@
 * `save_e61` now always previews an SVG version of the graph in the Viewer pane, even when saving to other formats such as PDF or PNG. This fixes an error where RStudio's Viewer pane could fail to open non-SVG formats (e.g. a "chrome-extension" popup error when saving PDFs).
 * Y-axis text now defaults to left-aligned when the y-axis is categorical (e.g. horizontal bar charts), instead of hugging the axis line, so it lines up with the left-aligned plot title/subtitle/y-axis title. This can still be overridden with `theme(axis.text.y = element_text(hjust = ...))`.
 * Automatically-positioned `plot_label()` text could occasionally spill off the edge of the chart; the bounds check now correctly measures against the plotting panel rather than the full raster canvas (which also includes the axis-title/tick-label margin).
-* Automatic label positioning is now skipped (falling back to the position you supply, as if `auto_position = FALSE`) on charts using `coord_flip()`, rather than computing a position in the wrong coordinate space and dropping the label off the chart entirely.
+* Automatic label positioning now works on `coord_flip()` charts for `geom_line()`/`geom_point()`/`geom_col()`/`geom_bar()` series, instead of computing a position in the wrong coordinate space and dropping the label off the chart entirely. `geom_area()`/`geom_pointbar()` series aren't supported under `coord_flip()` yet and fall back to the position you supply.
 
 # theme61 0.7.1
 

@@ -1,4 +1,4 @@
-# Tests for candidate generation and selection scoring (issue #159).
+# Tests for candidate generation and selection scoring.
 
 test_that("t61_candidate_grid excludes the margin and covers the range", {
   grid <- t61_candidate_grid(c(0, 100), c(0, 10), n_x = 5, n_y = 5, margin = 0.1)
