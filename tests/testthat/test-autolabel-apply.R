@@ -323,3 +323,83 @@ test_that("t61_apply_autolabel repositions a geom_pointbar() label clear of the 
 
   expect_false(t61_test_collision(mask$occupancy, box$row_range, box$col_range))
 })
+
+# x/y are optional when auto_position = TRUE (see ?plot_label): the
+# fallback order is (1) a good spot found by the placement algorithm, (2)
+# the caller's own x/y if they gave one, (3) any empty space at all if
+# they didn't. These tests cover (1) and (3) end-to-end, and (2)'s
+# priority over (3) directly.
+
+test_that("t61_apply_autolabel resolves a real position with no x/y supplied at all", {
+  skip_on_cran()
+
+  data <- data.frame(x = 2000:2020, y = seq(0, 5, length.out = 21))
+  p <- ggplot(data, aes(x, y)) +
+    geom_line(colour = "#e57200", linewidth = 1) +
+    theme_bw(base_size = 10) +
+    plot_label("Series A", colour = "#e57200")
+
+  result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
+
+  label_layer <- which(vapply(result@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  d <- result@layers[[label_layer]]$data
+
+  expect_false(is.na(d$x))
+  expect_false(is.na(d$y))
+})
+
+test_that("t61_apply_autolabel still resolves a position when no series matches and no x/y was supplied", {
+  skip_on_cran()
+
+  data <- data.frame(x = 2000:2020, y = seq(0, 5, length.out = 21))
+  p <- ggplot(data, aes(x, y)) +
+    geom_line(colour = "#e57200", linewidth = 1) +
+    theme_bw(base_size = 10) +
+    plot_label("Unrelated", colour = "#123456") # matches no series, and no x/y given
+
+  result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
+
+  label_layer <- which(vapply(result@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  d <- result@layers[[label_layer]]$data
+
+  # Not NA (the old "keep the fallback" behaviour would leave it invisible,
+  # since there's no fallback to keep any more), and it shouldn't collide
+  # with the line
+  expect_false(is.na(d$x))
+  expect_false(is.na(d$y))
+
+  mask <- t61_render_mask(t61_strip_autolabel_layers(p), width_cm = 16, height_cm = 12)
+  cm <- t61_measure_label_cm("Unrelated", size_mm = 3.5, width_cm = 16, height_cm = 12)
+  box <- t61_text_box_px(d$x, d$y, cm, mask, hjust = 0)
+  expect_false(t61_test_collision(mask$occupancy, box$row_range, box$col_range))
+})
+
+test_that("t61_apply_autolabel prefers the caller's own x/y over random empty space", {
+  skip_on_cran()
+
+  data <- data.frame(x = 2000:2020, y = seq(0, 5, length.out = 21))
+  p <- ggplot(data, aes(x, y)) +
+    geom_line(colour = "#e57200", linewidth = 1) +
+    theme_bw(base_size = 10) +
+    plot_label("Series A", x = 2019, y = 4.5, colour = "#e57200")
+
+  # Force the "good spot" algorithm (tier 1) to fail, so the fallback
+  # tiers decide the outcome; the mask is otherwise wide open, so an "any
+  # empty space" search (tier 3) would trivially succeed too -- the test
+  # is which one wins.
+  testthat::local_mocked_bindings(t61_place_label = function(...) NULL)
+
+  result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
+
+  label_layer <- which(vapply(result@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  d <- result@layers[[label_layer]]$data
+
+  expect_equal(d$x, 2019)
+  expect_equal(d$y, 4.5)
+})

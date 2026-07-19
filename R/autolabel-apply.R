@@ -167,19 +167,39 @@ t61_collect_autolabel_targets <- function(plot) {
       if (!isTRUE(all.equal(angles[r], 0))) next # v1 scope: axis-aligned text only
 
       match <- t61_match_label_series(plot@layers, built_data, colours[r])
-      if (is.null(match)) next # no matching line/point series: keep fallback
+      # Not skipped even when no series matches: still eligible for the
+      # fallback tiers in t61_autolabel_plot() (the caller's own x/y, if
+      # supplied, else any empty space). Previously this could only ever
+      # mean "keep the caller's x/y exactly", back when x/y were mandatory;
+      # now that they're optional (see ?plot_label), a colour that matches
+      # nothing shouldn't leave the label invisible when no x/y was given
+      # either. series = list() is the "no series matched" sentinel.
 
       layer_idx <- c(layer_idx, i)
       row_idx   <- c(row_idx, r)
       text      <- c(text, d$label[r])
-      geom_type <- c(geom_type, match$geom_type)
+      geom_type <- c(geom_type, if (is.null(match)) NA_character_ else match$geom_type)
       hjust     <- c(hjust, hjusts[r])
       size_mm   <- c(size_mm, sizes[r])
       fallback_x <- c(fallback_x, d$x[r])
       fallback_y <- c(fallback_y, d$y[r])
-      is_date_x <- c(is_date_x, inherits(d$x[r], "Date"))
-      is_date_y <- c(is_date_y, inherits(d$y[r], "Date"))
-      series[[length(series) + 1]] <- if (identical(match$geom_type, "column")) {
+
+      if (is.null(match)) {
+        is_date_x <- c(is_date_x, inherits(d$x[r], "Date"))
+        is_date_y <- c(is_date_y, inherits(d$y[r], "Date"))
+      } else {
+        # Derived from the matched series' own data, not the label's
+        # fallback x/y -- the fallback may just be NA now that x/y are
+        # optional, which would otherwise always read as "not a date".
+        match_x <- if (identical(match$geom_type, "column")) match$xmin else match$x
+        match_y <- if (match$geom_type %in% c("column", "area")) match$ymin else match$y
+        is_date_x <- c(is_date_x, inherits(match_x, "Date"))
+        is_date_y <- c(is_date_y, inherits(match_y, "Date"))
+      }
+
+      series[[length(series) + 1]] <- if (is.null(match)) {
+        list()
+      } else if (identical(match$geom_type, "column")) {
         list(xmin = match$xmin, xmax = match$xmax, ymin = match$ymin, ymax = match$ymax)
       } else if (identical(match$geom_type, "area")) {
         list(x = match$x, ymin = match$ymin, ymax = match$ymax, fill = match$fill, alpha = match$alpha)

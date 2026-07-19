@@ -165,6 +165,29 @@ test_that("Specifying incorrect length of label characteristics fails", {
 
 })
 
+test_that("x/y are optional when auto_position = TRUE, required otherwise", {
+  # auto_position = FALSE has no algorithm to fall back on, so x/y stay required
+  expect_error(
+    plot_label("a", colour = "red", auto_position = FALSE),
+    "required when `auto_position = FALSE`"
+  )
+
+  # x and y must be supplied together, or not at all
+  expect_error(plot_label("a", x = 1, colour = "red"), "supplied together")
+  expect_error(plot_label("a", y = 1, colour = "red"), "supplied together")
+
+  # Both omitted, auto_position = TRUE (the default): no error
+  expect_no_error(plot_label("a", colour = "red"))
+
+  # A facetted plot has no automatic positioning to fall back on either
+  data <- data.frame(x = 1:10, y = 1:10, grp = rep(c("A", "B"), 5))
+  p <- ggplot(data, aes(x, y)) + geom_line(colour = "red") + facet_wrap(~grp)
+  expect_error(
+    p + plot_label("a", colour = "red"),
+    "facetted"
+  )
+})
+
 test_that("Changing horizontal alignment of text works", {
 
   p1 <- minimal_plot_label +

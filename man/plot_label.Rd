@@ -7,8 +7,8 @@
 \usage{
 plot_label(
   label,
-  x,
-  y,
+  x = NULL,
+  y = NULL,
   colour = NA,
   size = 3.5,
   hjust = 0,
@@ -23,8 +23,8 @@ plot_label(
 
 plab(
   label,
-  x,
-  y,
+  x = NULL,
+  y = NULL,
   colour = NA,
   size = 3.5,
   hjust = 0,
@@ -40,9 +40,13 @@ plab(
 \arguments{
 \item{label}{String vector. Label text to be displayed.}
 
-\item{x}{Numeric or string vector. X-axis positions of the label text.}
+\item{x}{(optional if \code{auto_position = TRUE}) Numeric or string vector.
+X-axis positions of the label text. Used as the preferred fallback
+position if automatic positioning can't find a good spot -- see
+\code{auto_position}. Required (along with \code{y}) if \code{auto_position = FALSE}.}
 
-\item{y}{Numeric or string vector. Y-axis positions of the label text.}
+\item{y}{(optional if \code{auto_position = TRUE}) Numeric or string vector.
+Y-axis positions of the label text. See \code{x}.}
 
 \item{colour}{(optional) Vector of colour names or strings. Default uses the
 e61 palette.}
@@ -65,9 +69,8 @@ a named list, see the Details for the syntax.}
 
 \item{auto_position}{Logical. If TRUE (default), \code{save_e61()} will try to
 automatically reposition the label to a nearby, non-overlapping spot on
-the chart, using \code{x}/\code{y} as a fallback if a better position can't be
-found. Automatic positioning only applies to single-panel (unfacetted)
-charts where the label's colour matches a
+the chart. Automatic positioning only applies to single-panel
+(unfacetted) charts where the label's colour matches a
 line/point/column/area/\code{geom_pointbar()} series in the plot (\code{colour}
 for lines, points and \code{geom_pointbar()}, \code{fill} for columns and areas),
 and to unrotated text (\code{angle = 0}); anything else silently keeps the
@@ -75,8 +78,13 @@ position you specify. For an area series, the label is placed fully
 inside the band where there's room, recoloured to contrast with the
 fill, or outside it (in the fill's own colour) where the band is too
 narrow. For a \code{geom_pointbar()} series, the buffer accounts for the
-full error-bar extent, not just the point. Set to FALSE to always use
-the exact \code{x}/\code{y} you supply.}
+full error-bar extent, not just the point.
+
+When a good position can't be found, the fallback order is: (1) your
+\code{x}/\code{y}, if you supplied them; (2) otherwise, any collision-free spot
+on the chart (i.e. empty space), even if it's not a particularly good
+one. Set to FALSE to always use the exact \code{x}/\code{y} you supply -- \code{x}
+and \code{y} are then required.}
 
 \item{print_position}{Logical. If TRUE, print the plot's final
 (auto-positioned) label \code{label}/\code{x}/\code{y} to the console, as copy-pasteable

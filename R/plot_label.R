@@ -4,8 +4,12 @@
 #'   onto the graph plot. This is preferred over using legends.
 #'
 #' @param label String vector. Label text to be displayed.
-#' @param x Numeric or string vector. X-axis positions of the label text.
-#' @param y Numeric or string vector. Y-axis positions of the label text.
+#' @param x (optional if `auto_position = TRUE`) Numeric or string vector.
+#'   X-axis positions of the label text. Used as the preferred fallback
+#'   position if automatic positioning can't find a good spot -- see
+#'   `auto_position`. Required (along with `y`) if `auto_position = FALSE`.
+#' @param y (optional if `auto_position = TRUE`) Numeric or string vector.
+#'   Y-axis positions of the label text. See `x`.
 #' @param colour (optional) Vector of colour names or strings. Default uses the
 #'   e61 palette.
 #' @param size (optional) Integer. Size of the text, the default size should be
@@ -21,9 +25,8 @@
 #'   a named list, see the Details for the syntax.
 #' @param auto_position Logical. If TRUE (default), `save_e61()` will try to
 #'   automatically reposition the label to a nearby, non-overlapping spot on
-#'   the chart, using `x`/`y` as a fallback if a better position can't be
-#'   found. Automatic positioning only applies to single-panel (unfacetted)
-#'   charts where the label's colour matches a
+#'   the chart. Automatic positioning only applies to single-panel
+#'   (unfacetted) charts where the label's colour matches a
 #'   line/point/column/area/`geom_pointbar()` series in the plot (`colour`
 #'   for lines, points and `geom_pointbar()`, `fill` for columns and areas),
 #'   and to unrotated text (`angle = 0`); anything else silently keeps the
@@ -31,8 +34,13 @@
 #'   inside the band where there's room, recoloured to contrast with the
 #'   fill, or outside it (in the fill's own colour) where the band is too
 #'   narrow. For a `geom_pointbar()` series, the buffer accounts for the
-#'   full error-bar extent, not just the point. Set to FALSE to always use
-#'   the exact `x`/`y` you supply.
+#'   full error-bar extent, not just the point.
+#'
+#'   When a good position can't be found, the fallback order is: (1) your
+#'   `x`/`y`, if you supplied them; (2) otherwise, any collision-free spot
+#'   on the chart (i.e. empty space), even if it's not a particularly good
+#'   one. Set to FALSE to always use the exact `x`/`y` you supply -- `x`
+#'   and `y` are then required.
 #' @param print_position Logical. If TRUE, print the plot's final
 #'   (auto-positioned) label `label`/`x`/`y` to the console, as copy-pasteable
 #'   `plot_label()` arguments, whenever the plot is displayed -- no need to
@@ -61,8 +69,8 @@
 #' @export
 plot_label <-
   function(label,
-           x,
-           y,
+           x = NULL,
+           y = NULL,
            colour = NA,
            size = 3.5,
            hjust = 0,
@@ -89,8 +97,15 @@ plot_label <-
       )
     }
 
-    if (!all.equal(length(label), length(x), length(y)))
+    if (is.null(x) != is.null(y)) {
+      stop("`x` and `y` must be supplied together, or both omitted.")
+    }
+    if (!isTRUE(auto_position) && is.null(x)) {
+      stop("`x` and `y` are required when `auto_position = FALSE` (there's no automatic positioning to fall back on).")
+    }
+    if (!is.null(x) && !all.equal(length(label), length(x), length(y))) {
       stop("The number of x and y positions must equal the number of labels.")
+    }
 
     geom <- match.arg(geom)
 
@@ -105,7 +120,7 @@ plot_label <-
 
     # Automatically convert dates to dates if specified, so the user doesn't have
     # to wrap dates in as.Date() which saves some room.
-    if (class(try(as.Date(as.character(x)), silent = TRUE)) != "try-error") {
+    if (!is.null(x) && class(try(as.Date(as.character(x)), silent = TRUE)) != "try-error") {
       x <- as.Date(x)
     }
 
@@ -215,10 +230,22 @@ plot_label <-
 .build_plot_label_layer <- function(object, plot) {
   n <- length(object$label)
 
+  facet_vars_chk <- .get_facet_vars(plot)
+  if (is.null(object$x) && length(facet_vars_chk)) {
+    stop(
+      "`x`/`y` are required when the plot is facetted (automatic positioning ",
+      "doesn't apply to facetted plots -- see `?plot_label`)."
+    )
+  }
+
+  # x/y are optional when auto_position = TRUE (see ?plot_label); NA
+  # placeholders keep the layer's data well-formed until t61_apply_autolabel()
+  # resolves a real position at save time. A facetted plot without x/y is
+  # rejected above rather than silently rendering invisible (NA-position) text.
   plot_lab_data <- data.table::data.table(
     label  = object$label,
-    x      = object$x,
-    y      = object$y,
+    x      = if (is.null(object$x)) rep(NA_real_, n) else object$x,
+    y      = if (is.null(object$y)) rep(NA_real_, n) else object$y,
     colour = object$colour,
     size   = .plab_len_chk(object$size, n),
     hjust  = .plab_len_chk(object$hjust, n),

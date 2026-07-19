@@ -131,20 +131,33 @@ t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_s
 
 #' Place a set of labels on a single-panel plot, one at a time, updating
 #' the occupancy mask after each placement so later labels avoid earlier
-#' ones. Failures degrade silently: a label that can't be placed keeps
-#' its `fallback_x`/`fallback_y` position (the Phase-1 placeholder a
-#' caller would already have drawn) rather than erroring or vanishing.
+#' ones.
+#'
+#' A label that the scored/inside-band placement can't resolve a good spot
+#' for falls back through, in order: (1) `fallback_x`/`fallback_y`, if the
+#' caller supplied one (`plot_label(x=, y=)`, i.e. `!is.na(fallback_x)`);
+#' (2) otherwise, any collision-free spot on the chart at all, ignoring
+#' buffer/distance preferences (t61_place_label_fallback(), effectively
+#' "empty space somewhere"); (3) if even that fails (the mask has no clear
+#' space anywhere) and there's no fallback position either, the panel
+#' centre, so the label is still visible somewhere rather than vanishing.
 #'
 #' @param plot A ggplot object, fully built (scales resolved etc.), not yet
 #'   containing the labels to be placed.
 #' @param labels A data frame with columns: text, series (list-column of
-#'   list(x=,y=)), geom_type, hjust, size_mm, fallback_x, fallback_y.
+#'   list(x=,y=)), geom_type, hjust, size_mm, fallback_x, fallback_y
+#'   (fallback_x/fallback_y may be NA -- see ?plot_label, x/y are optional
+#'   when auto_position = TRUE). A row with no matched series (colour
+#'   didn't match anything) has geom_type = NA and series = list() --
+#'   skips straight to the fallback tiers below.
 #' @param width_cm,height_cm Physical size the chart will be saved at.
 #' @return `labels` with x/y columns added (resolved position), a `placed`
-#'   logical column (FALSE means fallback_x/fallback_y was kept), and a
-#'   `colour` character column (NA_character_ unless an "area" label got
-#'   placed inside its band, in which case it holds the contrast colour to
-#'   render it in -- see t61_place_label_area()).
+#'   logical column (FALSE only when the resolved position is exactly the
+#'   caller's own unchanged fallback_x/fallback_y, so the caller can skip a
+#'   redundant write-back), and a `colour` character column
+#'   (NA_character_ unless an "area" label got placed inside its band, in
+#'   which case it holds the contrast colour to render it in -- see
+#'   t61_place_label_area()).
 #' @noRd
 t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400L) {
 
@@ -163,7 +176,7 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
   # to outside. Rendered once, lazily, only when there's an area label to
   # place, since it's a second full mask render.
   area_mask <- NULL
-  if (any(labels$geom_type == "area")) {
+  if (any(labels$geom_type == "area", na.rm = TRUE)) {
     area_mask <- t61_render_mask(t61_strip_area_layers(plot), width_cm = width_cm,
                                   height_cm = height_cm, px_width = px_width)
   }
@@ -174,14 +187,22 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
 
     own <- labels$series[[i]]
     geom_type <- labels$geom_type[i]
+    # series = list() (geom_type = NA) is the "no series matched" sentinel
+    # from t61_collect_autolabel_targets() -- nothing to score a "good"
+    # placement against, so skip straight to the fallback tiers below.
+    has_series <- length(own) > 0
+
     other_series <- lapply(setdiff(seq_len(nrow(labels)), i), function(j) {
-      c(labels$series[[j]], list(geom_type = labels$geom_type[j]))
+      s <- labels$series[[j]]
+      if (length(s) == 0) return(NULL)
+      c(s, list(geom_type = labels$geom_type[j]))
     })
+    other_series <- other_series[!vapply(other_series, is.null, logical(1))]
 
     result <- NULL
     result_colour <- NA_character_
 
-    if (identical(geom_type, "area") && !is.null(area_mask)) {
+    if (has_series && identical(geom_type, "area") && !is.null(area_mask)) {
       # Prefer a spot fully inside the band, in a colour that contrasts
       # with the fill -- only fall back to the usual edge-hugging line
       # treatment (against the area's top boundary, in the fill's own
@@ -194,7 +215,7 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
       }
     }
 
-    if (is.null(result)) {
+    if (has_series && is.null(result)) {
       series_for_line <- if (identical(geom_type, "area")) list(x = own$x, y = own$ymax) else own
       line_geom_type <- if (identical(geom_type, "area")) "line" else geom_type
 
@@ -208,22 +229,39 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
       )
     }
 
+    # Tier 2: the caller's own fallback position, if they gave one --
+    # preferred over a blind "any empty space" spot, since it's a position
+    # the caller actually chose.
+    has_user_position <- !is.na(labels$fallback_x[i]) && !is.na(labels$fallback_y[i])
+    used_user_fallback <- FALSE
+
+    if (is.null(result) && has_user_position) {
+      fx <- labels$fallback_x[i]; fy <- labels$fallback_y[i]
+      result <- list(x = fx, y = fy, box = t61_text_box_px(fx, fy, label_cm, mask, hjust = labels$hjust[i]))
+      used_user_fallback <- TRUE
+    }
+
+    # Tier 3: no user position to fall back on -- any collision-free spot
+    # at all, ignoring buffer/distance preferences.
     if (is.null(result)) {
       result <- t61_place_label_fallback(mask, label_cm, hjust = labels$hjust[i])
     }
 
-    if (!is.null(result)) {
-      labels$x[i] <- result$x
-      labels$y[i] <- result$y
-      labels$placed[i] <- TRUE
-      labels$colour[i] <- result_colour
-      mask$occupancy <- t61_stamp_box(mask$occupancy, result$box$row_range, result$box$col_range)
-      if (!is.null(area_mask)) {
-        area_mask$occupancy <- t61_stamp_box(area_mask$occupancy, result$box$row_range, result$box$col_range)
-      }
+    # Tier 4 (last resort): nothing worked and there's no user position --
+    # the panel centre, so the label is still visible rather than vanishing.
+    if (is.null(result)) {
+      cx <- mean(mask$x_range); cy <- mean(mask$y_range)
+      result <- list(x = cx, y = cy, box = t61_text_box_px(cx, cy, label_cm, mask, hjust = labels$hjust[i]))
     }
-    # else: result still NULL even after fallback (mask has no clear space
-    # left at all) -- keep the Phase-1 fallback_x/fallback_y untouched.
+
+    labels$x[i] <- result$x
+    labels$y[i] <- result$y
+    labels$placed[i] <- !used_user_fallback
+    labels$colour[i] <- result_colour
+    mask$occupancy <- t61_stamp_box(mask$occupancy, result$box$row_range, result$box$col_range)
+    if (!is.null(area_mask)) {
+      area_mask$occupancy <- t61_stamp_box(area_mask$occupancy, result$box$row_range, result$box$col_range)
+    }
   }
 
   labels
