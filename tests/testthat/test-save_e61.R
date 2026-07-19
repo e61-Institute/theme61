@@ -218,15 +218,39 @@ test_that("Does save_data work", {
   withr::with_tempdir({
     expect_no_error(suppressWarnings(save_e61("graph.svg", gg, save_data = TRUE)))
     expect_no_error(suppressWarnings(save_e61("graph", gg, format = "svg", save_data = TRUE)))
+
+    # The data file should include the .csv extension (#313)
+    expect_true(file.exists("graph.csv"))
   })
 
-  # This should leave the $data container empty
+  # Each panel gets its own "<graph name> <panel number>.csv", even when
+  # panels use different data frames
+  df1 <- data.frame(x = c(0, 1), y = c(0, 1))
+  df2 <- data.frame(x = c(0, 1), y = c(1, 4))
+
+  p1 <- ggplot(df1, aes(x, y)) + geom_point()
+  p2 <- ggplot(df2, aes(x, y)) + geom_point()
+
+  withr::with_tempdir({
+    expect_no_error(suppressWarnings(save_e61("multi-data.svg", plotlist = list(p1, p2), save_data = TRUE)))
+
+    expect_equal(data.table::fread("multi-data 1.csv")$y, df1$y)
+    expect_equal(data.table::fread("multi-data 2.csv")$y, df2$y)
+  })
+
+  # Data supplied per-geom rather than to ggplot() itself leaves $data empty,
+  # so save_data should error instead of writing something useless
   gg <- ggplot() +
     geom_point(data = data, aes(x, y)) +
     geom_point(data = data, aes(x, y))
 
   withr::with_tempdir({
     expect_error(suppressWarnings(save_e61("graph.svg", save_data = TRUE)))
+  })
+
+  # The validation should catch a bad panel anywhere, not just plots[[1]]
+  withr::with_tempdir({
+    expect_error(suppressWarnings(save_e61("multi-bad.svg", plotlist = list(p1, gg), save_data = TRUE)))
   })
 })
 
