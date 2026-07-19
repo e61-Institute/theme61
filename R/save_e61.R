@@ -281,7 +281,8 @@ save_e61 <- function(filename = NULL,
       align = align,
       axis = axis,
       rel_heights = rel_heights,
-      bg_colour = bg_colour
+      bg_colour = bg_colour,
+      print_label_positions = print_label_positions
     )
   } else {
 

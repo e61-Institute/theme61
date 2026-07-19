@@ -6,6 +6,7 @@
 * `x`/`y` are now optional in `plot_label()` when `auto_position = TRUE` (the default) -- if you don't supply them, the label falls back through: a good spot found by the placement algorithm, then any empty space on the chart at all if it can't find one (e.g. if the label's colour doesn't match any series). If you do supply `x`/`y`, they're preferred over a blind "empty space" placement whenever the algorithm can't find a good spot.
 * Set `plot_label(..., print_position = TRUE)` to have the chart's final label positions printed to the console (as copy-pasteable `plot_label()` arguments) whenever the plot is displayed, or pass `save_e61(..., print_label_positions = TRUE)` to do the same when saving. Handy for pinning the auto-positioned spots, or hand-tweaking just one or two.
 * Automatically-positioned `plot_label()` text now avoids sitting on top of a y-axis gridline where possible, only touching one if there's genuinely no other spot available for it.
+* Automatic positioning now also works on multi-panel `save_e61()` charts (e.g. `save_e61(plot1, plot2, ...)`), positioning each panel's labels independently against its own data. Previously these labels were silently dropped unless you supplied `x`/`y` yourself.
 
 #### Bug fixes
 

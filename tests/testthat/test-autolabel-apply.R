@@ -492,3 +492,101 @@ test_that("t61_apply_autolabel auto-positions labels on a coord_flip() column ch
 
   coord_flip_apply_test(p)
 })
+
+# save_multi() (save_e61(plot1, plot2, ...)) combines independent
+# single-panel plots via patchwork rather than through save_single(), so it
+# needs its own call to t61_apply_autolabel() per panel -- these tests
+# exercise that wiring directly, since save_e61() itself doesn't return the
+# plot object to inspect.
+
+#' Pull a plot_label() layer's resolved data out of a save_multi() result.
+#' `graph` is a patchwork object: the base plot's own layers hold the first
+#' panel, and `graph$patches$plots` holds the rest, in the order the caller
+#' passed them (see ?patchwork::wrap_plots internals) -- matched here by the
+#' label text itself rather than assumed index order, since that ordering
+#' isn't part of patchwork's contract.
+#' @noRd
+multi_panel_label_data <- function(graph, panel_index) {
+  panel <- if (panel_index == 1) graph else graph$patches$plots[[panel_index - 1]]
+  label_layer <- which(vapply(panel@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  panel@layers[[label_layer]]$data
+}
+
+save_multi_test <- function(plots) {
+  theme61:::save_multi(
+    filename = NULL, format = "svg", plots = plots, chart_type = "normal",
+    title = NULL, subtitle = NULL, footnotes = NULL, sources = NULL,
+    width = NULL, height = NULL, auto_scale = TRUE,
+    title_spacing_adj = 1, subtitle_spacing_adj = 1, base_size = 10,
+    pad_width = 0, pad_height = 0, height_adj = NULL,
+    ncol = 2, nrow = NULL, align = "v", axis = "none", rel_heights = NULL,
+    bg_colour = "white"
+  )
+}
+
+test_that("save_multi() auto-positions labels independently on each panel", {
+  skip_on_cran()
+
+  # Two panels sharing series names but with different underlying data, so
+  # a correct per-panel resolve should land on genuinely different
+  # positions -- if the panels ended up identical, that would mean the
+  # second panel's mask/series were never actually rebuilt for its own data.
+  data1 <- data.frame(
+    x = rep(2000:2020, 2),
+    y = c(seq(0, 5, length.out = 21), seq(10, 2, length.out = 21)),
+    series = rep(c("A", "B"), each = 21)
+  )
+  data2 <- data.frame(
+    x = rep(2000:2020, 2),
+    y = c(seq(2, 9, length.out = 21), rep(1, 21)),
+    series = rep(c("A", "B"), each = 21)
+  )
+  cols <- c(A = "#e57200", B = "#1c3144")
+
+  make_panel <- function(data) {
+    ggplot(data, aes(x, y, colour = series)) +
+      geom_line(linewidth = 1) +
+      scale_colour_manual(values = cols) +
+      theme_bw(base_size = 10) +
+      theme(legend.position = "none") +
+      plot_label(c("A", "B"), colour = unname(cols))
+  }
+
+  sv <- save_multi_test(list(make_panel(data1), make_panel(data2)))
+
+  d1 <- multi_panel_label_data(sv$graph, 1)
+  d2 <- multi_panel_label_data(sv$graph, 2)
+
+  expect_false(anyNA(d1$x)); expect_false(anyNA(d1$y))
+  expect_false(anyNA(d2$x)); expect_false(anyNA(d2$y))
+
+  # Each panel's "A" label should sit closer to its own series' y-range
+  # than to the other panel's -- confirms it was matched/placed against
+  # this panel's own data, not e.g. reusing panel 1's layout for panel 2.
+  a1_y <- d1$y[d1$label == "A"]; a2_y <- d2$y[d2$label == "A"]
+  expect_lt(abs(a1_y - 2.5), 3) # data1's A ranges 0-5
+  expect_lt(abs(a2_y - 5.5), 4) # data2's A ranges 2-9
+  expect_false(isTRUE(all.equal(a1_y, a2_y)))
+})
+
+test_that("save_multi() leaves explicit plot_label(x=, y=) positions untouched", {
+  skip_on_cran()
+
+  data <- data.frame(x = 1:10, y = 1:10)
+  make_panel <- function(title) {
+    ggplot(data, aes(x, y)) +
+      geom_line(colour = "#e57200") +
+      theme_bw(base_size = 10) +
+      labs_e61(title = title) +
+      plot_label("Fixed", x = 5, y = 5, colour = "#e57200", auto_position = FALSE)
+  }
+
+  sv <- save_multi_test(list(make_panel("Panel 1"), make_panel("Panel 2")))
+
+  expect_equal(multi_panel_label_data(sv$graph, 1)$x, 5)
+  expect_equal(multi_panel_label_data(sv$graph, 1)$y, 5)
+  expect_equal(multi_panel_label_data(sv$graph, 2)$x, 5)
+  expect_equal(multi_panel_label_data(sv$graph, 2)$y, 5)
+})
