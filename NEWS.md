@@ -13,6 +13,7 @@
 * Y-axis text now defaults to left-aligned when the y-axis is categorical (e.g. horizontal bar charts), instead of hugging the axis line, so it lines up with the left-aligned plot title/subtitle/y-axis title. This can still be overridden with `theme(axis.text.y = element_text(hjust = ...))`.
 * Automatically-positioned `plot_label()` text could occasionally spill off the edge of the chart; the bounds check now correctly measures against the plotting panel rather than the full raster canvas (which also includes the axis-title/tick-label margin).
 * Automatic label positioning now works on `coord_flip()` charts for `geom_line()`/`geom_point()`/`geom_col()`/`geom_bar()` series, instead of computing a position in the wrong coordinate space and dropping the label off the chart entirely. `geom_area()`/`geom_pointbar()` series aren't supported under `coord_flip()` yet and fall back to the position you supply.
+* Resolving an auto-positioned `plot_label()` (e.g. via `save_e61()`, or automatically when a plot is printed) could leave the *original* plot object mutated with that resolved position too, since a plot layer's data is a data.table and mutates by reference. This meant printing a plot and then saving it separately could re-run positioning against a stale, already-resolved position from the print instead of a clean one.
 
 # theme61 0.7.1
 

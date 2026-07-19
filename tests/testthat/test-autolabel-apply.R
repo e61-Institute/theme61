@@ -47,6 +47,26 @@ test_that("t61_apply_autolabel moves matching labels away from a bad fallback", 
   expect_lt(abs(d$y[2] - 6), 5)   # series B ranges 2-10
 })
 
+test_that("t61_apply_autolabel doesn't mutate the caller's own plot object", {
+  skip_on_cran()
+
+  # A layer's data is a data.table, and the layer itself is a ggproto
+  # (environment) -- both mutate by reference, so writing a resolved
+  # position into the RETURNED plot could silently write through to the
+  # plot the caller still holds too (e.g. one print()/save_e61() call
+  # leaving stale positions behind for a later, independent call on the
+  # same object).
+  p <- autolabel_apply_test_setup()
+  label_layer <- which(vapply(p@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  before <- data.table::copy(p@layers[[label_layer]]$data)
+
+  invisible(t61_apply_autolabel(p, width_cm = 16, height_cm = 12))
+
+  expect_equal(p@layers[[label_layer]]$data, before)
+})
+
 test_that("t61_apply_autolabel leaves auto_position = FALSE labels untouched", {
   skip_on_cran()
 

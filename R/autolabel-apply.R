@@ -314,11 +314,29 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
   )
   if (is.null(result)) return(plot)
 
+  # A ggplot2 Layer is a ggproto object, i.e. an environment -- writing
+  # `plot@layers[[i]]$data <- ...` mutates that shared environment in
+  # place, so it reaches every other reference to the SAME layer too (e.g.
+  # a plot printed once, then saved separately still points at the same
+  # layer object), breaking the "leaves `plot` unmodified" contract above.
+  # Its `data` is additionally a data.table, which mutates its columns by
+  # reference on top of that. Cloning the layer (via ggproto(NULL, ...),
+  # ggplot2's usual way of getting an independent copy) and copying its
+  # data.table, once per layer right before its first write, undoes both.
+  copied_layers <- integer(0)
+
   for (k in seq_len(nrow(result))) {
     if (!isTRUE(result$placed[k])) next # fallback already in place: nothing to update
 
     i <- targets$layer_idx[k]
     r <- targets$row_idx[k]
+
+    if (!(i %in% copied_layers)) {
+      old_layer <- plot@layers[[i]]
+      plot@layers[[i]] <- ggplot2::ggproto(NULL, old_layer, data = data.table::copy(old_layer$data))
+      copied_layers <- c(copied_layers, i)
+    }
+
     plot@layers[[i]]$data$x[r] <- result$x[k]
     plot@layers[[i]]$data$y[r] <- result$y[k]
 
