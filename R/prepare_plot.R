@@ -21,16 +21,8 @@ prepare_plot.e61_plot <- function(plot,
   # theme_e61() spec realised into a real theme by finalise_e61_plot(), which
   # save_e61() runs on every plot before dispatching here.
 
-  # Existing sizing/margins logic for non-map plots (moved from save_single)
-  legendTitle <- plot@theme$legend.title
-  legendPosition <- plot@theme$legend.position
-
-  plot <- plot + ggplot2::theme(text = ggplot2::element_text(size = base_size))
-  plot <- plot + update_margins(base_size = base_size, legend_title = legendTitle)
-
-  if (!is.null(legendPosition)) {
-    plot <- plot + ggplot2::theme(legend.position = legendPosition)
-  }
+  # Text sizing/margins/legend-position are handled by save_single() (via
+  # resolve_text_size() + update_margins()), so they're not duplicated here.
 
   # Background fill
   plot <- plot + ggplot2::theme(rect = ggplot2::element_rect(fill = bg_colour))

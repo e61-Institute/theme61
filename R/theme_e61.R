@@ -377,9 +377,10 @@ format_flip <- function(x_adj = 0, current_theme = NULL) {
 
   # When called internally by save_e61(), skip any element the user has
   # already customised away from the theme_e61() default, rather than
-  # silently overriding it.
+  # silently overriding it. theme_e61() itself only returns a deferred spec
+  # (not subsettable), so realise it into an actual theme first.
   if (!is.null(current_theme)) {
-    baseline <- theme_e61()
+    baseline <- build_theme_e61_plot(theme_e61()@args)
 
     unchanged <- vapply(names(flip_args), function(el) {
       identical(current_theme[[el]], baseline[[el]])
