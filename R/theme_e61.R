@@ -54,7 +54,7 @@ theme_e61 <- function(
 
   base_family <- if (is_testing()) "sans" else "pt-sans"
 
-  base_size <- getOption("t61_base_size", default = 10)
+  base_size <- getOption("theme61.base_size")
 
   half_line <- base_size / 2
 
@@ -187,13 +187,13 @@ theme_e61_spatial <- function(
     if (!is.numeric(legend_position) || length(legend_position) != 2) {
       stop("legend_position needs to be a length two numeric vector.")
 
-    if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
-      stop("Both legend_position values must be between 0 and 1.")
+      if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
+        stop("Both legend_position values must be between 0 and 1.")
     }
   }
 
   base_family <- if (is_testing()) "sans" else base_family
-  base_size <- getOption("t61_base_size", default = 10)
+  base_size <- getOption("theme61.base_size")
   half_line <- base_size / 2
 
   ret <-
@@ -304,27 +304,42 @@ square_legend_symbols <- function(size = 6) {
 #' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
 #' the default works for most graphs. A negative value moves the
 #' title up, a positive value moves the title down.
+#' @param current_theme The plot's current theme, used internally by
+#' `save_e61()` to skip any element the user has already customised away
+#' from the `theme_e61()` default. Leave as `NULL` for normal manual use.
 #'
 #' @return ggplot object
 #' @export
 
-format_flip <- function(x_adj = 0) {
+format_flip <- function(x_adj = 0, current_theme = NULL) {
 
-  retval <-
-    theme(
-      panel.grid.major.x = element_line(colour = e61_greylight6, linewidth = points_to_mm(0.5)),
-      panel.grid.major.y = element_blank(),
-      axis.text.x.top = element_blank(),
-      axis.ticks.x.top = element_blank(),
-      axis.title.x.top = element_blank(),
-      plot.title.position = "plot",
-      plot.caption.position = "plot",
-      axis.title.x.bottom = element_text(
-        margin = margin(t = 0, b = 5),
-        hjust = 0.5, angle = 0)
-    )
+  flip_args <- list(
+    panel.grid.major.x = element_line(colour = e61_greylight6, linewidth = points_to_mm(0.5)),
+    panel.grid.major.y = element_blank(),
+    axis.text.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    axis.title.x.top = element_blank(),
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    axis.title.x.bottom = element_text(
+      margin = margin(t = 0, b = 5),
+      hjust = 0.5, angle = 0)
+  )
 
-  return(retval)
+  # When called internally by save_e61(), skip any element the user has
+  # already customised away from the theme_e61() default, rather than
+  # silently overriding it.
+  if (!is.null(current_theme)) {
+    baseline <- theme_e61()
+
+    unchanged <- vapply(names(flip_args), function(el) {
+      identical(current_theme[[el]], baseline[[el]])
+    }, logical(1))
+
+    flip_args <- flip_args[unchanged]
+  }
+
+  do.call(theme, flip_args)
 
 }
 
@@ -342,7 +357,7 @@ set_base_size <- function(base_size) {
     stop("base_size must be a single positive number.")
   }
 
-  options(t61_base_size = base_size)
+  options(theme61.base_size = base_size)
   invisible()
 }
 

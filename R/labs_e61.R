@@ -165,8 +165,8 @@ labs_e61 <- function(title = NULL,
   if(wrap_caption_trk) attr(caption_text, "caption_wrap") <- TRUE
 
   # Add the y-axis text once the subtitle has been processed
-  primary_size <- getOption("t61_base_size", default = 10) * 1
-  secondary_size <- getOption("t61_base_size", default = 10) * 0.9
+  primary_size <- getOption("theme61.base_size", default = 10) * 1
+  secondary_size <- getOption("theme61.base_size", default = 10) * 0.9
 
   # Set y = "" to NULL because it just breaks code later
   if (!is.null(y) && y == "") y <- NULL
