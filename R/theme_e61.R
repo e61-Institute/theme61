@@ -402,8 +402,11 @@ realise_e61_theme <- function(plot) {
 
   plot <- plot + th
 
-  # Prevent double application if prepare_plot is called multiple times
+  # Prevent double application if prepare_plot is called multiple times, and
+  # mark the plot as realised so finalise_e61_plot() knows not to re-inject a
+  # default spec on a later call (see finalise_e61_plot()).
   attr(plot, "e61_theme_spec") <- NULL
+  attr(plot, "e61_theme_realised") <- TRUE
   plot
 }
 

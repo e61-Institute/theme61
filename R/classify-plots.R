@@ -127,9 +127,14 @@ classify_e61_map.default <- function(x, ...) {
 finalise_e61_plot <- function(plot) {
   plot <- classify_e61_map(plot)
 
-  # Auto-inject default theme spec only if the user didn't add one
+  # Auto-inject default theme spec only if the user didn't add one AND the
+  # plot hasn't already been realised. Without the second check, calling
+  # finalise_e61_plot() again after realise_e61_theme() has already cleared
+  # the spec would re-inject a *default* theme_e61() and silently clobber
+  # whatever theme_e61() options the user actually asked for.
   if (isTRUE(getOption("theme61.auto_theme", TRUE))) {
-    if (is.null(attr(plot, "e61_theme_spec", exact = TRUE))) {
+    if (is.null(attr(plot, "e61_theme_spec", exact = TRUE)) &&
+        !isTRUE(attr(plot, "e61_theme_realised", exact = TRUE))) {
       attr(plot, "e61_theme_spec") <- theme_e61()
     }
   }
