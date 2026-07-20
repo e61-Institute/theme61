@@ -33,6 +33,10 @@ t61_env <- NULL
   # Keep geom_ribbon() semi-transparent by default.
   update_geom_defaults("ribbon", aes(fill = e61_tealdark, alpha = 0.1))
 
+  # Restore ggplot2 defaults for geoms that inherit from GeomRibbon so they
+  # do not unintentionally inherit ribbon transparency.
+  update_geom_defaults("area", aes(alpha = NA))
+
   # Ensure namespaces are available
   if (!requireNamespace("S7", quietly = TRUE)) {
     stop("S7 must be installed.", call. = FALSE)
