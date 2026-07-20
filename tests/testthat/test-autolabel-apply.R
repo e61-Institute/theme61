@@ -500,18 +500,27 @@ test_that("t61_apply_autolabel auto-positions labels on a coord_flip() column ch
 # plot object to inspect.
 
 #' Pull a plot_label() layer's resolved data out of a save_multi() result.
-#' `graph` is a patchwork object: the base plot's own layers hold the first
-#' panel, and `graph$patches$plots` holds the rest, in the order the caller
-#' passed them (see ?patchwork::wrap_plots internals) -- matched here by the
-#' label text itself rather than assumed index order, since that ordering
-#' isn't part of patchwork's contract.
+#' `graph` is a patchwork object: the base plot's own layers hold one panel,
+#' and `graph$patches$plots` holds the rest -- but which panel ends up as
+#' the base grob isn't part of patchwork's contract, so a fixed
+#' index-to-panel mapping is unreliable (confirmed empirically: it flips
+#' between runs). Matched instead by comparing each candidate panel's first
+#' (non-label) layer's rendered y-values against the source plot's, which
+#' uniquely identifies the panel regardless of patchwork's internal order.
 #' @noRd
-multi_panel_label_data <- function(graph, panel_index) {
-  panel <- if (panel_index == 1) graph else graph$patches$plots[[panel_index - 1]]
-  label_layer <- which(vapply(panel@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  panel@layers[[label_layer]]$data
+multi_panel_label_data <- function(graph, source_plot) {
+  candidates <- c(list(graph), graph$patches$plots)
+  source_y <- sort(ggplot2::ggplot_build(source_plot)$data[[1]]$y)
+  for (panel in candidates) {
+    panel_y <- sort(ggplot2::ggplot_build(panel)$data[[1]]$y)
+    if (isTRUE(all.equal(panel_y, source_y, tolerance = 1e-6))) {
+      label_layer <- which(vapply(panel@layers, function(ly) {
+        !is.null(ly$data) && !is.null(ly$data$auto_position)
+      }, logical(1)))
+      return(panel@layers[[label_layer]]$data)
+    }
+  }
+  stop("Could not match panel to source plot")
 }
 
 save_multi_test <- function(plots) {
@@ -554,10 +563,11 @@ test_that("save_multi() auto-positions labels independently on each panel", {
       plot_label(c("A", "B"), colour = unname(cols))
   }
 
-  sv <- save_multi_test(list(make_panel(data1), make_panel(data2)))
+  p1 <- make_panel(data1); p2 <- make_panel(data2)
+  sv <- save_multi_test(list(p1, p2))
 
-  d1 <- multi_panel_label_data(sv$graph, 1)
-  d2 <- multi_panel_label_data(sv$graph, 2)
+  d1 <- multi_panel_label_data(sv$graph, p1)
+  d2 <- multi_panel_label_data(sv$graph, p2)
 
   expect_false(anyNA(d1$x)); expect_false(anyNA(d1$y))
   expect_false(anyNA(d2$x)); expect_false(anyNA(d2$y))
@@ -585,8 +595,18 @@ test_that("save_multi() leaves explicit plot_label(x=, y=) positions untouched",
 
   sv <- save_multi_test(list(make_panel("Panel 1"), make_panel("Panel 2")))
 
-  expect_equal(multi_panel_label_data(sv$graph, 1)$x, 5)
-  expect_equal(multi_panel_label_data(sv$graph, 1)$y, 5)
-  expect_equal(multi_panel_label_data(sv$graph, 2)$x, 5)
-  expect_equal(multi_panel_label_data(sv$graph, 2)$y, 5)
+  # Both panels use identical data, so there's nothing to match against --
+  # unlike the test above, that's fine here since the expected position is
+  # the same (5, 5) for either panel, regardless of patchwork's internal
+  # base/patches ordering.
+  panels <- c(list(sv$graph), sv$graph$patches$plots)
+  expect_length(panels, 2)
+  for (panel in panels) {
+    label_layer <- which(vapply(panel@layers, function(ly) {
+      !is.null(ly$data) && !is.null(ly$data$auto_position)
+    }, logical(1)))
+    d <- panel@layers[[label_layer]]$data
+    expect_equal(d$x, 5)
+    expect_equal(d$y, 5)
+  }
 })

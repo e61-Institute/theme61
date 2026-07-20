@@ -127,8 +127,10 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   flipped <- inherits(built$layout$coord, "CoordFlip")
 
   gt <- ggplot2::ggplotGrob(t61_strip_chrome(plot))
-  panel_cm <- t61_panel_box_cm(gt, width_cm, height_cm)
-  if (is.null(panel_cm)) return(NULL)
+  # Still used for its facet bail-out (exactly one panel cell, structurally
+  # checked via the gtable layout) -- but NOT for the cm box it would
+  # otherwise compute; see t61_render_panel_box_px() for why.
+  if (is.null(t61_panel_box_cm(gt, width_cm, height_cm))) return(NULL)
 
   px_height <- round(px_width * height_cm / width_cm)
 
@@ -157,6 +159,9 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   px_per_cm_x <- ncol(raster) / width_cm
   px_per_cm_y <- nrow(raster) / height_cm
 
+  panel_px <- t61_render_panel_box_px(plot, width_cm, height_cm, px_width, px_height)
+  if (is.null(panel_px)) return(NULL)
+
   pp <- built$layout$panel_params
   if (length(pp) != 1) return(NULL) # faceted: not v1 scope
 
@@ -167,12 +172,7 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
 
   list(
     occupancy   = occupancy,
-    panel       = list(
-      left_px   = panel_cm$left_cm * px_per_cm_x,
-      top_px    = panel_cm$top_cm * px_per_cm_y,
-      width_px  = panel_cm$width_cm * px_per_cm_x,
-      height_px = panel_cm$height_cm * px_per_cm_y
-    ),
+    panel       = panel_px,
     px_per_cm_x = px_per_cm_x,
     px_per_cm_y = px_per_cm_y,
     x_range     = pp[[1]]$x.range,
@@ -180,6 +180,65 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
     x_breaks    = x_breaks,
     y_breaks    = y_breaks,
     flipped     = flipped
+  )
+}
+
+#' The panel's pixel bounding box, measured from an actual render rather
+#' than predicted from the gtable's declared row/column units (see
+#' t61_panel_box_cm()). ggplot2 sometimes sizes a row/column with a
+#' compound unit -- e.g. axis-label height expressed as
+#' sum(fixed, ..., 1null, ...), when the axis needs to dynamically
+#' accommodate label sizing -- and a "null" embedded like that only
+#' resolves correctly once actually rendered into a real device.
+#' t61_panel_box_cm()'s offline resolution treats anything not literally
+#' typed "null" as already-fixed, silently collapsing an embedded null (and
+#' the real space it represents) to zero -- underestimating that row/column
+#' and, in turn, mis-sizing the panel itself (confirmed: exact agreement
+#' with the real occupancy raster once measured this way instead).
+#'
+#' Renders a throwaway version of the plot with every geom layer removed
+#' and the panel background set to a colour that won't otherwise appear,
+#' then locates that colour's bounding box in the raster -- same
+#' svglite -> rsvg pipeline as the occupancy raster itself, so this is only
+#' ever wrong if that raster is too.
+#'
+#' @return list(left_px=, top_px=, width_px=, height_px=), or NULL if the
+#'   marker colour doesn't appear at all (shouldn't happen for a genuine
+#'   single-panel plot).
+#' @noRd
+t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_height) {
+  marker_colour <- "#FF00FF"
+
+  marker <- t61_strip_chrome(plot)
+  marker@layers <- list()
+  marker <- marker + ggplot2::theme(panel.background = ggplot2::element_rect(fill = marker_colour, colour = NA))
+
+  svg_file <- tempfile(fileext = ".svg")
+  on.exit(unlink(svg_file), add = TRUE)
+  svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
+  print(marker)
+  grDevices::dev.off()
+
+  png_file <- tempfile(fileext = ".png")
+  on.exit(unlink(png_file), add = TRUE)
+  rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height)
+
+  img <- magick::image_read(png_file)
+  raster <- as.raster(img)
+
+  rgb_vals <- col2rgb(raster)
+  is_marker <- colSums(abs(rgb_vals - as.vector(col2rgb(marker_colour)))) < 30
+  occ <- matrix(is_marker, nrow = nrow(raster), byrow = TRUE)
+
+  rows_with <- which(rowSums(occ) > 0)
+  cols_with <- which(colSums(occ) > 0)
+  if (length(rows_with) == 0 || length(cols_with) == 0) return(NULL)
+
+  list(
+    left_px   = min(cols_with),
+    top_px    = min(rows_with),
+    width_px  = max(cols_with) - min(cols_with),
+    height_px = max(rows_with) - min(rows_with)
   )
 }
 
