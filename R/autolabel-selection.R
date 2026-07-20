@@ -39,9 +39,8 @@ t61_distance_tier <- function(distance_cm, label_height_cm) {
 #' height: the target must always fall well inside group 1, or the buffer
 #' tiebreak below would never get to prefer a candidate near the target
 #' over one that merely hugs the series, since group is compared before
-#' the tiebreak. A fixed cutoff would silently stop working as soon as the
-#' target was tuned past it -- exactly what happened when the target grew
-#' past the old fixed 1.0x-label-height "near" cutoff.
+#' the tiebreak. A fixed cutoff would silently stop guaranteeing that
+#' the moment the target buffer was tuned past it.
 #' @noRd
 t61_selection_group <- function(distance_cm, label_height_cm, geom_type = "line") {
   target <- t61_target_buffer_cm(label_height_cm, geom_type)
@@ -78,8 +77,9 @@ t61_selection_group <- function(distance_cm, label_height_cm, geom_type = "line"
 #' should make a candidate less attractive relative to others, but must
 #' never exclude it outright or promote a worse-tier candidate over it --
 #' the only hard exclusions are collision/off-panel, checked earlier in
-#' t61_place_label(). Defaulting both to 0 keeps candidates that predate
-#' these penalties (e.g. in tests) scored exactly as before.
+#' t61_place_label(). Both are optional (default 0, i.e. no penalty), so
+#' a caller that doesn't have them to hand can still score candidates on
+#' distance/line-of-sight alone.
 #'
 #' geom_type gets a much bigger multiplier for "point" than "line": a
 #' line has one "own" direction to step away from, so a buffer scaled off

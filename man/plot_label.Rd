@@ -73,18 +73,22 @@ the chart. Automatic positioning only applies to single-panel
 (unfacetted) charts where the label's colour matches a
 line/point/column/area/\code{geom_pointbar()} series in the plot (\code{colour}
 for lines, points and \code{geom_pointbar()}, \code{fill} for columns and areas),
-and to unrotated text (\code{angle = 0}); anything else silently keeps the
-position you specify. For an area series, the label is placed fully
-inside the band where there's room, recoloured to contrast with the
-fill, or outside it (in the fill's own colour) where the band is too
-narrow. For a \code{geom_pointbar()} series, the buffer accounts for the
-full error-bar extent, not just the point.
+and to unrotated text (\code{angle = 0}); anything else keeps the position
+you specify, with a warning if you didn't specify one (there's then
+nothing for the label to fall back on, and it may not appear). For an
+area series, the label is placed fully inside the band where there's
+room, recoloured to contrast with the fill, or outside it (in the
+fill's own colour) where the band is too narrow. For a
+\code{geom_pointbar()} series, the buffer accounts for the full error-bar
+extent, not just the point.
 
-When a good position can't be found, the fallback order is: (1) your
-\code{x}/\code{y}, if you supplied them; (2) otherwise, any collision-free spot
-on the chart (i.e. empty space), even if it's not a particularly good
-one. Set to FALSE to always use the exact \code{x}/\code{y} you supply -- \code{x}
-and \code{y} are then required.}
+If you supply \code{x}/\code{y}, that position is always used exactly as given.
+If you don't, the fallback order is: (1) a good spot found by the
+placement algorithm; (2) any collision-free spot on the chart (i.e.
+empty space), even if it's not a particularly good one; (3) the
+centre of the panel, so the label stays visible rather than
+vanishing. Set to FALSE to always use the exact \code{x}/\code{y} you supply --
+\code{x} and \code{y} are then required.}
 
 \item{print_position}{Logical. If TRUE, print the plot's final
 (auto-positioned) label \code{label}/\code{x}/\code{y} to the console, as copy-pasteable

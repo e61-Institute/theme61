@@ -5,9 +5,11 @@
 # width/height are known; it finds plot_label() layers eligible for
 # auto-positioning, matches each to a data series by colour (see
 # t61_match_label_series()), and asks the engine for a better spot.
-# Anything not v1 scope (facetted plots, no colour match, rotated text,
-# auto_position = FALSE) silently keeps the fallback position rather than
-# erroring.
+# Anything not v1 scope (facetted plots, auto_position = FALSE) keeps the
+# fallback position rather than erroring. A colour that matches no series
+# still gets a position via the engine's own fallback tiers (see
+# t61_autolabel_plot()); rotated text (angle != 0) is the one case that's
+# never touched at all, and warns if no x/y was given either.
 
 #' Find a "point", "line", "column", "area" or "pointbar" data layer in a
 #' plot whose resolved colour matches a label's colour -- this is treated
@@ -162,16 +164,25 @@ t61_collect_autolabel_targets <- function(plot) {
 
     for (r in seq_len(n)) {
       if (!isTRUE(d$auto_position[r])) next
-      if (!isTRUE(all.equal(angles[r], 0))) next # v1 scope: axis-aligned text only
+      if (!isTRUE(all.equal(angles[r], 0))) {
+        # Rotated text is out of v1 scope entirely -- with no x/y given
+        # either, the label would otherwise end up at NA and vanish
+        # silently (ggplot drops NA-position rows with its own generic
+        # warning). An explicit position is unaffected by this and
+        # renders exactly where given, same as auto_position = FALSE.
+        if (is.na(d$x[r]) && is.na(d$y[r])) {
+          warning("plot_label() cannot auto-position rotated text (angle != 0); ",
+                  "supply x/y explicitly, or the label will not appear.", call. = FALSE)
+        }
+        next
+      }
 
       match <- t61_match_label_series(plot@layers, built_data, colours[r])
       # Not skipped even when no series matches: still eligible for the
-      # fallback tiers in t61_autolabel_plot() (the caller's own x/y, if
-      # supplied, else any empty space). Previously this could only ever
-      # mean "keep the caller's x/y exactly", back when x/y were mandatory;
-      # now that they're optional (see ?plot_label), a colour that matches
-      # nothing shouldn't leave the label invisible when no x/y was given
-      # either. series = list() is the "no series matched" sentinel.
+      # fallback tiers in t61_autolabel_plot() (the caller's own x/y if
+      # supplied, else any empty space, else the panel centre -- see
+      # ?plot_label) rather than leaving the label invisible.
+      # series = list() is the "no series matched" sentinel.
 
       layer_idx <- c(layer_idx, i)
       row_idx   <- c(row_idx, r)

@@ -142,6 +142,30 @@ test_that("t61_apply_autolabel skips rotated labels (v1 scope: angle = 0 only)",
   expect_equal(d$y, 1)
 })
 
+test_that("t61_apply_autolabel warns when a rotated label has no x/y to fall back on", {
+  skip_on_cran()
+
+  data <- data.frame(x = 2000:2020, y = seq(0, 5, length.out = 21))
+  p_no_xy <- ggplot(data, aes(x, y)) +
+    geom_line(colour = "#e57200", linewidth = 1) +
+    theme_bw(base_size = 10) +
+    plot_label("Series A", colour = "#e57200", angle = 45)
+
+  expect_warning(
+    t61_apply_autolabel(p_no_xy, width_cm = 16, height_cm = 12),
+    "cannot auto-position rotated text"
+  )
+
+  # An explicit position is unaffected -- it renders exactly where given,
+  # so there's nothing to warn about.
+  p_with_xy <- ggplot(data, aes(x, y)) +
+    geom_line(colour = "#e57200", linewidth = 1) +
+    theme_bw(base_size = 10) +
+    plot_label("Series A", x = 2005, y = 1, colour = "#e57200", angle = 45)
+
+  expect_no_warning(t61_apply_autolabel(p_with_xy, width_cm = 16, height_cm = 12))
+})
+
 test_that("t61_apply_autolabel keeps the fallback when the label colour matches no series", {
   skip_on_cran()
 
@@ -563,10 +587,10 @@ test_that("save_e61(fast_labels = TRUE) skips the search but still resolves a po
 test_that("save_e61(preview = TRUE, fast_labels = TRUE) doesn't crash on a steeply diverging line chart", {
   skip_on_cran()
 
-  # Regression test: two lines that pull apart, each ending near its own
-  # max -- t61_place_label_fast()'s offset used to be unclamped and could
-  # push the label's y beyond the y-axis limits update_scales() already
-  # fixed earlier in save_single()'s pipeline, which errored at render
+  # Two lines that pull apart, each ending near its own max -- an
+  # unclamped fast-mode offset could push a label's y beyond the y-axis
+  # limits update_scales() already fixed earlier in save_single()'s
+  # pipeline (see t61_place_label_fast()'s clamping), erroring at render
   # time ("Supplied limits are outside the data's range") instead of
   # rendering imprecisely. This is exactly print.e61_ggplot()'s Viewer
   # preview call.
@@ -642,8 +666,8 @@ test_that("t61_apply_autolabel auto-positions labels on a coord_flip() line char
 test_that("t61_apply_autolabel auto-positions labels on a coord_flip() column chart", {
   skip_on_cran()
 
-  # The reported bug: no fallback x/y given, so a resolved position stayed
-  # NA (silently dropped from the chart) rather than an actual placement.
+  # No fallback x/y given -- checks the resolved position is a real
+  # placement, not NA (which ggplot would silently drop from the chart).
   data <- data.frame(
     category = rep(c("A", "B", "C"), 2),
     value = c(5, 8, 3, 6, 2, 9),

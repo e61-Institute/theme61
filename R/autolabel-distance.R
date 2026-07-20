@@ -119,10 +119,9 @@ t61_box_data_rect <- function(box, mask) {
 #' only the box's own corner/edge when hjust/vjust is 0.5 -- for the
 #' default hjust = 0, the box extends a full label-width away from the
 #' anchor, so an anchor that clears the buffer comfortably can still leave
-#' the box's near edge sitting right on top of a point (confirmed: an
-#' anchor 1.4cm from the nearest point in a dense cluster left only 0.02cm
-#' of actual box clearance). Using the box's footprint instead makes the
-#' buffer represent real visual clearance regardless of justification.
+#' the box's near edge sitting right on top of a point. Using the box's
+#' footprint instead makes the buffer represent real visual clearance
+#' regardless of justification.
 #'
 #' For "point", this is exact (point-to-rectangle distance per point). For
 #' "line", the true minimum distance between a segment and a rectangle --

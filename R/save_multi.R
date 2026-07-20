@@ -151,11 +151,6 @@ save_multi <-
       left_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-l"), get_grob_width(p, grob_name = "axis-l"))
       max_left_axis_width <- pmax(max_left_axis_width, left_axis_width)
 
-      # OLD - keep for testing
-      # widths <- grid::convertWidth(p$widths, "cm", valueOnly = TRUE)
-      # temp_width <- sum(widths)
-      # if(i <= ncol) known_width <- known_width + temp_width
-
       if(is.null(max_left_axis_width) || length(max_left_axis_width) == 0)
         max_left_axis_width <- 0
 
@@ -226,10 +221,10 @@ save_multi <-
       }
     }
 
-    # Identify how much padding to put between charts -- moved up from
-    # below (where it used to only get applied to the combined multi_plot
-    # via `&`) so each panel already has its real, final plot.margin before
-    # t61_apply_autolabel() measures it just below.
+    # Padding between charts, computed here (rather than only applied to
+    # the combined multi_plot further down) so each panel already carries
+    # its real, final plot.margin before t61_apply_autolabel() measures it
+    # just below.
     chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
     chart_height_pad <- points_to_mm(5.5) + pad_height * 10
 
@@ -249,13 +244,12 @@ save_multi <-
     # eligible labels.
     #
     # The width/height passed to t61_apply_autolabel() has to be each
-    # panel's own total footprint including that margin (not just
-    # panel_width + axis, which is what it added up to before the margin
-    # existed) -- this is exactly tot_width/ncol and (p_h)/nrow end up
-    # being below, once title/subtitle/caption and the rest of the
-    # top-level padding are worked out, but those aren't available yet at
-    # this point in the function, so it's reconstructed directly here from
-    # the same pieces instead.
+    # panel's own total footprint, including that margin -- not just
+    # panel_width + axis. This matches what tot_width/ncol and (p_h)/nrow
+    # end up being further below, once title/subtitle/caption and the
+    # rest of the top-level padding are worked out, but those aren't
+    # available yet at this point in the function, so it's reconstructed
+    # directly here from the same pieces instead.
     panel_total_width  <- panel_width + max_left_axis_width + max_right_axis_width + 2 * chart_width_pad / 10
     panel_total_height <- panel_height + known_height + 2 * chart_height_pad / 10
 

@@ -193,8 +193,9 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
 #' t61_panel_box_cm()'s offline resolution treats anything not literally
 #' typed "null" as already-fixed, silently collapsing an embedded null (and
 #' the real space it represents) to zero -- underestimating that row/column
-#' and, in turn, mis-sizing the panel itself (confirmed: exact agreement
-#' with the real occupancy raster once measured this way instead).
+#' and, in turn, mis-sizing the panel itself. Measuring the render directly
+#' avoids that failure mode entirely, since it never has to predict how a
+#' compound unit resolves.
 #'
 #' Renders a throwaway version of the plot with every geom layer removed
 #' and the panel background set to a colour that won't otherwise appear,

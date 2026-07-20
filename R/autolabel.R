@@ -181,9 +181,10 @@ t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_s
 #' estimate of the panel's plotted width. That estimate is deliberately
 #' conservative (80% of the chart's total width, and assuming the
 #' series' own x-span roughly matches the panel's plotted x-range, true
-#' whenever auto-scaling is on): erring toward stepping back further than
-#' strictly necessary is harmless, stepping back too little is the actual
-#' bug this exists to fix. Falls back to a fixed fraction if measurement
+#' whenever auto-scaling is on): stepping back further than strictly
+#' necessary just sits the label a bit further from the series than it
+#' needs to, but stepping back too little risks the label clipping off
+#' the panel edge again. Falls back to a fixed fraction if measurement
 #' fails for any reason.
 #'
 #' @param own The label's own series, same shapes as t61_place_label().
@@ -256,9 +257,11 @@ t61_place_label_fast <- function(own, geom_type, index = 1, hjust = 0,
 #' scored/inside-band search, if `fast = FALSE`; (2) any collision-free
 #' spot at all, ignoring buffer/distance preferences; (3) the panel
 #' centre, so the label stays visible rather than vanishing. Under
-#' `fast = TRUE`, (1)-(3) are all replaced by a single cheap, render-free
+#' `fast = TRUE`, (1)-(2) are replaced by a single cheap, render-free
 #' placement (see t61_place_label_fast()) -- used for the automatic Viewer
-#' preview on print(), where speed matters more than an optimal spot.
+#' preview on print(), where speed matters more than an optimal spot --
+#' but (3), the panel-centre last resort, still applies either way, so a
+#' label always ends up visible somewhere rather than silently vanishing.
 #'
 #' @param plot A ggplot object, fully built (scales resolved etc.), not yet
 #'   containing the labels to be placed.
@@ -320,6 +323,23 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
   to_screen <- function(x, y) if (flipped) t61_flip_xy(x, y) else list(x = x, y = y)
   to_data   <- to_screen # the swap is its own inverse
 
+  # `fast`'s last-resort fallback (no series matched, no position given):
+  # computed lazily, and only once, from a single ggplot_build() -- cheap
+  # relative to the mask render `fast` exists to avoid, but still not
+  # worth paying for plots where every label matches a series.
+  fast_panel_centre <- NULL
+  get_fast_panel_centre <- function() {
+    if (!is.null(fast_panel_centre)) return(fast_panel_centre)
+    built <- tryCatch(ggplot2::ggplot_build(plot), error = function(e) NULL)
+    pp <- if (!is.null(built) && length(built$layout$panel_params) == 1) built$layout$panel_params[[1]] else NULL
+    fast_panel_centre <<- if (is.null(pp)) {
+      list(x = NA_real_, y = NA_real_)
+    } else {
+      list(x = mean(pp$x.range), y = mean(pp$y.range))
+    }
+    fast_panel_centre
+  }
+
   for (i in seq_len(nrow(labels))) {
     own <- labels$series[[i]]
     geom_type <- labels$geom_type[i]
@@ -354,14 +374,17 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
 
     } else if (fast) {
       # No mask, no search -- a cheap offset from the label's own series if
-      # one matched, otherwise nothing to derive a spot from cheaply, so
-      # the label keeps its (possibly NA) fallback, same as the "not v1
-      # scope" case above.
+      # one matched, else the panel centre (see get_fast_panel_centre()),
+      # so a label without a colour match still ends up visible rather
+      # than vanishing.
       if (has_series) {
         fp <- t61_place_label_fast(own, geom_type, index = i, hjust = labels$hjust[i],
                                    text = labels$text[i], size_mm = labels$size_mm[i],
                                    width_cm = width_cm, height_cm = height_cm)
         result <- list(x = fp$x, y = fp$y, box = NULL)
+      } else {
+        centre <- get_fast_panel_centre()
+        if (!anyNA(unlist(centre))) result <- list(x = centre$x, y = centre$y, box = NULL)
       }
 
     } else {

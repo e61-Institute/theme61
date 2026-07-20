@@ -242,9 +242,8 @@ test_that("t61_place_label_fast() never places a label outside its own series' d
   # "looking imprecise": save_single() already fixed the y-axis scale's
   # limits (via update_scales()) by the time this runs, sized to the real
   # data but not by a guaranteed margin, so an unclamped overshoot can
-  # exceed those limits and hard-error at render time (reported: a
-  # diverging-lines chart crashed with "Supplied limits are outside the
-  # data's range").
+  # exceed those limits and hard-error at render time ("Supplied limits
+  # are outside the data's range").
   y <- seq(0, 5, length.out = 21)
   own_line <- list(x = 2000:2020, y = y)
   for (i in 1:5) {
@@ -268,12 +267,11 @@ test_that("t61_place_label_fast() never places a label outside its own series' d
 test_that("t61_place_label_fast() steps back further from the end for a longer label", {
   skip_on_cran()
 
-  # Regression test: a label anchored right at the series' rightmost point
-  # with the default hjust = 0 (left-justified, text extends rightward)
-  # used to render cut off past the panel's right edge -- reported against
-  # a real chart with long labels ("Wages"/"Productivity"). The step-back
-  # is based on the label's own measured width, so a longer label should
-  # end up further from the true endpoint than a short one.
+  # A label anchored right at the series' rightmost point with the
+  # default hjust = 0 (left-justified, text extends rightward) can render
+  # cut off past the panel's right edge for a long enough label -- the
+  # step-back is based on the label's own measured width, so a longer
+  # label should end up further from the true endpoint than a short one.
   own <- list(x = 2000:2020, y = seq(0, 5, length.out = 21))
 
   p_short <- t61_place_label_fast(own, "line", index = 1, hjust = 0, text = "A",
@@ -299,8 +297,8 @@ test_that("t61_apply_autolabel(fast = TRUE) keeps a long label's box within the 
 
   # End-to-end version of the step-back test above: drives the real
   # wiring (t61_apply_autolabel(), not t61_place_label_fast() directly)
-  # and checks the resolved position's actual rendered box, the same way
-  # the reported crash/clipping was diagnosed.
+  # and checks the resolved position's actual rendered box stays inside
+  # the panel.
   set.seed(1)
   data1 <- data.frame(
     year = rep(2005:2024, 2),
@@ -346,7 +344,7 @@ test_that("t61_autolabel_plot(fast = TRUE) still lets an explicit position win o
   expect_false(any(result$placed)) # unchanged from the caller's own fallback
 })
 
-test_that("t61_autolabel_plot(fast = TRUE) keeps the fallback when no series matches", {
+test_that("t61_autolabel_plot(fast = TRUE) falls back to the panel centre when no series matches", {
   skip_on_cran()
 
   setup <- autolabel_test_setup()
@@ -354,7 +352,11 @@ test_that("t61_autolabel_plot(fast = TRUE) keeps the fallback when no series mat
 
   result <- t61_autolabel_plot(setup$plot, setup$labels, width_cm = 16, height_cm = 12, px_width = 400, fast = TRUE)
 
-  expect_true(all(is.na(result$x)))
-  expect_true(all(is.na(result$y)))
-  expect_false(any(result$placed))
+  # A label with no colour match and no given position still ends up
+  # visible (at the panel centre) rather than silently vanishing at NA,
+  # the same guarantee the non-fast search's own last-resort tier makes.
+  expect_false(anyNA(result$x)); expect_false(anyNA(result$y))
+  expect_equal(result$x[1], result$x[2]) # both land on the same centre
+  expect_equal(result$y[1], result$y[2])
+  expect_true(all(result$placed))
 })

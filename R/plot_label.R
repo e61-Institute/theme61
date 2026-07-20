@@ -29,18 +29,22 @@
 #'   (unfacetted) charts where the label's colour matches a
 #'   line/point/column/area/`geom_pointbar()` series in the plot (`colour`
 #'   for lines, points and `geom_pointbar()`, `fill` for columns and areas),
-#'   and to unrotated text (`angle = 0`); anything else silently keeps the
-#'   position you specify. For an area series, the label is placed fully
-#'   inside the band where there's room, recoloured to contrast with the
-#'   fill, or outside it (in the fill's own colour) where the band is too
-#'   narrow. For a `geom_pointbar()` series, the buffer accounts for the
-#'   full error-bar extent, not just the point.
+#'   and to unrotated text (`angle = 0`); anything else keeps the position
+#'   you specify, with a warning if you didn't specify one (there's then
+#'   nothing for the label to fall back on, and it may not appear). For an
+#'   area series, the label is placed fully inside the band where there's
+#'   room, recoloured to contrast with the fill, or outside it (in the
+#'   fill's own colour) where the band is too narrow. For a
+#'   `geom_pointbar()` series, the buffer accounts for the full error-bar
+#'   extent, not just the point.
 #'
-#'   When a good position can't be found, the fallback order is: (1) your
-#'   `x`/`y`, if you supplied them; (2) otherwise, any collision-free spot
-#'   on the chart (i.e. empty space), even if it's not a particularly good
-#'   one. Set to FALSE to always use the exact `x`/`y` you supply -- `x`
-#'   and `y` are then required.
+#'   If you supply `x`/`y`, that position is always used exactly as given.
+#'   If you don't, the fallback order is: (1) a good spot found by the
+#'   placement algorithm; (2) any collision-free spot on the chart (i.e.
+#'   empty space), even if it's not a particularly good one; (3) the
+#'   centre of the panel, so the label stays visible rather than
+#'   vanishing. Set to FALSE to always use the exact `x`/`y` you supply --
+#'   `x` and `y` are then required.
 #' @param print_position Logical. If TRUE, print the plot's final
 #'   (auto-positioned) label `label`/`x`/`y` to the console, as copy-pasteable
 #'   `plot_label()` arguments, whenever the plot is displayed -- no need to
@@ -147,7 +151,9 @@ plot_label <-
         panel = panel,
         auto_position = auto_position,
         print_position = print_position,
-        # preserve current behaviour: mark TRUE if default size used
+        # Marks whether the default size was used, so update_plot_label()
+        # (aes_labs.R) can scale it with the chart's base_size -- an
+        # explicit custom size is left alone instead.
         adj_plot_label = isTRUE(all.equal(size, 3.5))
       ),
       class = "e61_plot_label"
