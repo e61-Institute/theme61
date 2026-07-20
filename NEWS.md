@@ -1,5 +1,9 @@
 # theme61 (development version)
 
+#### Performance
+
+* `save_e61()`/`print()` no longer re-render the same plot from scratch several times over. `update_scales()` now builds the plot once and reuses that build for its internal y-variable, secondary-axis and y-min/max checks (previously up to 3 separate builds), and `save_single()` no longer builds the plot just to check for `coord_flip()` (reads the coord class off the plot object instead) or builds it unconditionally to count facet panels (now only when facets are actually present). No change in output.
+
 #### Bug fixes
 
 * `save_e61` now always previews an SVG version of the graph in the Viewer pane, even when saving to other formats such as PDF or PNG. This fixes an error where RStudio's Viewer pane could fail to open non-SVG formats (e.g. a "chrome-extension" popup error when saving PDFs).
