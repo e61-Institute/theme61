@@ -355,6 +355,45 @@ test_that("t61_apply_autolabel places an area label inside its band with a contr
   expect_equal(result@layers[[label_layer]]$aes_params$colour, "white")
 })
 
+test_that("t61_apply_autolabel falls back to edge-hugging line-style placement when an area's band is too narrow everywhere", {
+  skip_on_cran()
+
+  # Same narrow-band shape as t61_place_label_area()'s own "too narrow"
+  # unit test (test-autolabel-area.R) -- a thin sliver of fill inside a
+  # much taller panel, so there's genuinely nowhere inside the band for
+  # a label to fit. Unlike that unit test, this drives the *orchestrator*
+  # (t61_apply_autolabel(), not t61_place_label_area() directly), to
+  # confirm it actually falls through to the ordinary edge-hugging
+  # line-style search (against the area's top boundary) instead of
+  # skipping straight to the "any empty space" tier.
+  data <- data.frame(x = 0:20, y = rep(0.05, 21))
+  p <- ggplot(data, aes(x, y)) +
+    geom_area(fill = "#e57200") +
+    theme_bw(base_size = 10) +
+    coord_cartesian(ylim = c(0, 10)) +
+    plot_label("Series A", colour = "#e57200")
+
+  result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
+
+  label_layer <- which(vapply(result@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  d <- result@layers[[label_layer]]$data
+
+  expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
+
+  # The inside-the-band placement is the only path that overrides the
+  # label's colour to a contrast colour -- it staying at the original
+  # fill colour confirms the edge-hugging fallback ran instead, not the
+  # inside placement somehow succeeding despite the narrow band.
+  expect_equal(result@layers[[label_layer]]$aes_params$colour, "#e57200")
+
+  mask <- t61_render_mask(t61_strip_autolabel_layers(p), width_cm = 16, height_cm = 12)
+  cm <- t61_measure_label_cm("Series A", size_mm = 3.5, width_cm = 16, height_cm = 12)
+  box <- t61_text_box_px(d$x, d$y, cm, mask, hjust = 0)
+  expect_false(t61_test_collision(mask$occupancy, box$row_range, box$col_range))
+})
+
 test_that("t61_apply_autolabel repositions a geom_pointbar() label clear of the error bars", {
   skip_on_cran()
 
@@ -521,6 +560,38 @@ test_that("save_e61(fast_labels = TRUE) skips the search but still resolves a po
   expect_false(isTRUE(all.equal(d_fast$y, d_slow$y)))
 })
 
+test_that("save_e61(preview = TRUE, fast_labels = TRUE) doesn't crash on a steeply diverging line chart", {
+  skip_on_cran()
+
+  # Regression test: two lines that pull apart, each ending near its own
+  # max -- t61_place_label_fast()'s offset used to be unclamped and could
+  # push the label's y beyond the y-axis limits update_scales() already
+  # fixed earlier in save_single()'s pipeline, which errored at render
+  # time ("Supplied limits are outside the data's range") instead of
+  # rendering imprecisely. This is exactly print.e61_ggplot()'s Viewer
+  # preview call.
+  set.seed(1)
+  data1 <- data.frame(
+    year = rep(2005:2024, 2),
+    value = c(100 + cumsum(rnorm(20, 1.5, 1)), 100 + cumsum(rnorm(20, 3.5, 1))),
+    series = rep(c("Wages", "Productivity"), each = 20)
+  )
+  cols1 <- c(Wages = "#e57200", Productivity = "#1c3144")
+
+  p <- ggplot(data1, aes(year, value, colour = series)) +
+    geom_line(linewidth = 1) +
+    scale_colour_manual(values = cols1) +
+    theme_e61() +
+    labs_e61(title = "Diverging series") +
+    plot_label(c("Wages", "Productivity"), colour = unname(cols1))
+
+  expect_no_error(
+    suppressWarnings(suppressMessages(
+      save_e61(plot = p, preview = TRUE, format = "svg", auto_scale = TRUE, fast_labels = TRUE)
+    ))
+  )
+})
+
 coord_flip_apply_test <- function(p) {
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
@@ -588,6 +659,96 @@ test_that("t61_apply_autolabel auto-positions labels on a coord_flip() column ch
     plot_label(c("X", "Y"), colour = unname(cols))
 
   coord_flip_apply_test(p)
+})
+
+test_that("t61_apply_autolabel keeps a coord_flip() column label clear of every bar", {
+  skip_on_cran()
+
+  # coord_flip_apply_test() (used above) only checks the resolved position
+  # renders in-bounds -- this checks the stronger property that actually
+  # matters: the label doesn't land on top of bar ink, the same way the
+  # unflipped "repositions a column label clear of every bar" test does.
+  data <- data.frame(
+    category = rep(c("A", "B", "C", "D", "E"), 2),
+    value = c(5, 8, 3, 9, 4, 6, 2, 9, 5, 7),
+    series = rep(c("X", "Y"), each = 5)
+  )
+  cols <- c(X = "#e57200", Y = "#1c3144")
+
+  p <- ggplot(data, aes(category, value, fill = series)) +
+    geom_col(position = "dodge") +
+    scale_fill_manual(values = cols) +
+    coord_flip() +
+    theme_bw(base_size = 10) +
+    plot_label(c("X", "Y"), colour = unname(cols))
+
+  result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
+
+  label_layer <- which(vapply(result@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  d <- result@layers[[label_layer]]$data
+  expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
+
+  # d$x/d$y are stored in pre-flip data space (see t61_flip_xy()'s
+  # docs) -- the occupancy mask is in the flipped screen space ggplot
+  # actually renders into, so the box for collision-checking needs the
+  # same conversion t61_autolabel_plot() applies before stamping.
+  mask <- t61_render_mask(t61_strip_autolabel_layers(p), width_cm = 16, height_cm = 12)
+  cm_x <- t61_measure_label_cm("X", size_mm = 3.5, width_cm = 16, height_cm = 12)
+  cm_y <- t61_measure_label_cm("Y", size_mm = 3.5, width_cm = 16, height_cm = 12)
+  screen_x <- t61_flip_xy(d$x[1], d$y[1])
+  screen_y <- t61_flip_xy(d$x[2], d$y[2])
+  box_x <- t61_text_box_px(screen_x$x, screen_x$y, cm_x, mask, hjust = 0)
+  box_y <- t61_text_box_px(screen_y$x, screen_y$y, cm_y, mask, hjust = 0)
+
+  expect_false(t61_test_collision(mask$occupancy, box_x$row_range, box_x$col_range))
+  expect_false(t61_test_collision(mask$occupancy, box_y$row_range, box_y$col_range))
+})
+
+test_that("t61_apply_autolabel falls back (doesn't crash or misplace) for a geom_pointbar() label under coord_flip()", {
+  skip_on_cran()
+
+  # geom_pointbar()'s error-bar orientation isn't flip-aware (see
+  # t61_autolabel_plot()'s docs: area/pointbar are treated as unmatched
+  # under a flip, skipping straight to the fallback tiers) -- this
+  # confirms that bail-out actually happens rather than, say, erroring or
+  # scoring against the error bars as if they were still vertical.
+  data <- data.frame(x = 2000:2010, y = seq(0, 5, length.out = 11))
+  data$ymin <- data$y - 1
+  data$ymax <- data$y + 1
+
+  p <- ggplot(data, aes(x, y, ymin = ymin, ymax = ymax)) +
+    geom_pointbar(colour = "#e57200") +
+    coord_flip() +
+    theme_bw(base_size = 10) +
+    plot_label("Series A", colour = "#e57200")
+
+  # If the bail-out didn't happen, t61_place_label() would be called with
+  # geom_type = "pointbar" (has_series would stay TRUE); asserting it's
+  # never called at all proves the series really was invalidated, not
+  # just that some other tier happened to win.
+  search_ran <- FALSE
+  testthat::local_mocked_bindings(t61_place_label = function(...) { search_ran <<- TRUE; NULL })
+
+  result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
+
+  expect_false(search_ran)
+
+  label_layer <- which(vapply(result@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  d <- result@layers[[label_layer]]$data
+  expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
+
+  # Still expected to land somewhere valid via the fallback tiers (any
+  # collision-free spot, or the panel centre as a last resort), not just
+  # "not NA".
+  mask <- t61_render_mask(t61_strip_autolabel_layers(p), width_cm = 16, height_cm = 12)
+  cm <- t61_measure_label_cm("Series A", size_mm = 3.5, width_cm = 16, height_cm = 12)
+  screen_xy <- t61_flip_xy(d$x, d$y)
+  box <- t61_text_box_px(screen_xy$x, screen_xy$y, cm, mask, hjust = 0)
+  expect_true(t61_box_in_bounds(box$row_range, box$col_range, mask))
 })
 
 # save_multi() (save_e61(plot1, plot2, ...)) combines independent

@@ -232,6 +232,38 @@ test_that("t61_autolabel_plot(fast = TRUE) places labels without rendering a mas
   expect_lt(abs(result$y[2] - setup$b$y[nrow(setup$b)]), 2) # series B ends near y = 2
 })
 
+test_that("t61_place_label_fast() never places a label outside its own series' data range", {
+  skip_on_cran()
+
+  # A monotonically rising series whose last point already sits at the
+  # series' own max -- any positive offset from there would overshoot the
+  # data's range entirely unless clamped. This matters beyond just
+  # "looking imprecise": save_single() already fixed the y-axis scale's
+  # limits (via update_scales()) by the time this runs, sized to the real
+  # data but not by a guaranteed margin, so an unclamped overshoot can
+  # exceed those limits and hard-error at render time (reported: a
+  # diverging-lines chart crashed with "Supplied limits are outside the
+  # data's range").
+  y <- seq(0, 5, length.out = 21)
+  own_line <- list(x = 2000:2020, y = y)
+  for (i in 1:5) {
+    p <- t61_place_label_fast(own_line, "line", index = i)
+    expect_gte(p$y, min(y)); expect_lte(p$y, max(y))
+  }
+
+  own_column <- list(xmin = 0:9, xmax = 1:10, ymin = rep(0, 10), ymax = seq(10, 19))
+  for (i in 1:5) {
+    p <- t61_place_label_fast(own_column, "column", index = i)
+    expect_gte(p$y, 0); expect_lte(p$y, 19)
+  }
+
+  own_area <- list(x = 0:20, ymin = rep(0, 21), ymax = seq(20, 40))
+  for (i in 1:5) {
+    p <- t61_place_label_fast(own_area, "area", index = i)
+    expect_gte(p$y, min(own_area$ymax)); expect_lte(p$y, max(own_area$ymax))
+  }
+})
+
 test_that("t61_autolabel_plot(fast = TRUE) still lets an explicit position win outright", {
   skip_on_cran()
 

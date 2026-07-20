@@ -154,29 +154,42 @@ t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_s
 #' it only ever touches the series' own data-space values, which are
 #' already in the same aesthetic space plot_label() writes to regardless
 #' of coord_flip().
+#'
+#' The offset is clamped to the series' own actual [min, max] -- by the
+#' time this runs, the y-axis scale's limits are usually already fixed
+#' (see update_scales(), called earlier in save_single()'s pipeline), sized
+#' to comfortably contain the real data but not by a guaranteed or
+#' predictable margin. An unclamped offset could land outside those
+#' limits and hard-error at render time instead of just rendering
+#' slightly imprecisely -- clamping to the data's own extent is always
+#' safe, since a scale's limits can never be narrower than the data they
+#' were built from.
+#'
 #' @param own The label's own series, same shapes as t61_place_label().
 #' @param index The label's 1-based position among all labels being placed
 #'   this call, used only to stagger repeated placements apart.
 #' @noRd
 t61_place_label_fast <- function(own, geom_type, index = 1) {
-  stagger <- function(y, yr) {
+  stagger <- function(y, y_all) {
+    yr <- diff(range(y_all, na.rm = TRUE))
     if (!is.finite(yr) || yr == 0) yr <- max(abs(y), 1)
-    y + 0.06 * yr + (index %% 3) * 0.05 * yr
+    offset <- 0.06 * yr + (index %% 3) * 0.05 * yr
+    min(max(y + offset, min(y_all, na.rm = TRUE)), max(y_all, na.rm = TRUE))
   }
 
   if (identical(geom_type, "column")) {
     j <- length(own$xmin)
     x <- (own$xmin[j] + own$xmax[j]) / 2
-    y <- stagger(own$ymax[j], diff(range(c(own$ymin, own$ymax), na.rm = TRUE)))
+    y <- stagger(own$ymax[j], c(own$ymin, own$ymax))
   } else if (identical(geom_type, "area")) {
     j <- length(own$x)
     x <- own$x[j]
-    y <- stagger(own$ymax[j], diff(range(own$ymax, na.rm = TRUE)))
+    y <- stagger(own$ymax[j], own$ymax)
   } else {
     # line / point / pointbar
     j <- length(own$x)
     x <- own$x[j]
-    y <- stagger(own$y[j], diff(range(own$y, na.rm = TRUE)))
+    y <- stagger(own$y[j], own$y)
   }
 
   list(x = x, y = y)
