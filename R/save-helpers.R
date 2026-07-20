@@ -74,6 +74,30 @@ is_testing <- function() {
   identical(Sys.getenv("TESTTHAT"), "true")
 }
 
+#' Create a temp SVG file to preview a graph in the Viewer pane, regardless
+#' of which format(s) were saved to disk
+#' @noRd
+make_preview_svg <- function(graph, format, filename, width, height, bg_colour, res) {
+
+  preview_svg <- tempfile(fileext = ".svg")
+
+  if ("svg" %in% format) {
+    file.copy(paste0(filename, ".svg"), preview_svg, overwrite = TRUE)
+  } else {
+    save_graph(
+      graph = graph,
+      format = "svg",
+      filename = tools::file_path_sans_ext(preview_svg),
+      width = width,
+      height = height,
+      bg_colour = bg_colour,
+      res = res
+    )
+  }
+
+  invisible(preview_svg)
+}
+
 #' Function to check if a plot has a discrete y-scale
 #' @noRd
 has_discrete_y_scale <- function(plot) {
@@ -115,6 +139,44 @@ has_discrete_y_scale <- function(plot) {
   }
 
   return(FALSE)
+}
+
+#' Work out the aspect ratio for a chart_type, but respect an aspect ratio
+#' the user has already customised away from theme_e61()'s default of 0.75.
+#' @noRd
+resolve_aspect_ratio <- function(plot, chart_type) {
+  current <- plot@theme$aspect.ratio
+
+  customised <- !is.null(current) && !isTRUE(all.equal(current, 0.75))
+
+  if (customised) return(plot)
+
+  target <- switch(chart_type,
+                   normal = 0.75,
+                   square = 1,
+                   wide = 0.5,
+                   NULL)
+
+  if (is.null(target)) return(plot)
+
+  plot + theme(aspect.ratio = target)
+}
+
+#' Work out the text size to apply, but respect a size the user has already
+#' customised away from theme_e61()'s default (the theme61.base_size option).
+#' Returns the plot plus the effective size to use for any size-dependent
+#' formatting done afterwards (e.g. update_margins()), so spacing stays
+#' proportional to whichever size actually ends up on the plot.
+#' @noRd
+resolve_text_size <- function(plot, base_size) {
+  current <- plot@theme$text$size
+  default_size <- getOption("theme61.base_size", default = 10)
+
+  customised <- !is.null(current) && !isTRUE(all.equal(current, default_size))
+
+  if (customised) return(list(plot = plot, base_size = current))
+
+  list(plot = plot + theme(text = element_text(size = base_size)), base_size = base_size)
 }
 
 #' Helper function that spell checks any string vector that is supplied

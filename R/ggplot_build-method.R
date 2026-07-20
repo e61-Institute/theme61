@@ -8,6 +8,7 @@ ggplot_build.e61_plot <- function(plot, ...) {
   plot2 <- finalise_e61_plot(plot)
   plot2 <- maybe_add_default_scales(plot2)
   plot2 <- maybe_adjust_facet_spacing(plot2)
+  plot2 <- maybe_leftalign_discrete_y_text(plot2)
 
   # prevent recursion: drop our class before calling ggplot2 build
   class(plot2) <- setdiff(class(plot2), c("e61_map", "e61_plot"))
@@ -308,4 +309,24 @@ maybe_adjust_facet_spacing <- function(plot) {
   }
 
   plot
+}
+
+# Left-align y-axis text when the y-axis is categorical.
+maybe_leftalign_discrete_y_text <- function(plot) {
+
+  if (!has_discrete_y_scale(plot)) return(plot)
+
+  th <- plot@theme
+
+  # Respect any user-specified alignment for y-axis text.
+  has_hjust <- function(el) inherits(el, "element_text") && !is.null(el$hjust)
+
+  theme_args <- list()
+
+  if (!has_hjust(th$axis.text.y)) theme_args$axis.text.y <- element_text(hjust = 0)
+  if (!has_hjust(th$axis.text.y.right)) theme_args$axis.text.y.right <- element_text(hjust = 0)
+
+  if (length(theme_args) == 0) return(plot)
+
+  plot + do.call(theme, theme_args)
 }

@@ -117,8 +117,15 @@ scale_y_continuous_e61 <- function(limits = NULL,
     retval$train <- function(x) {
       # Call the original train to update x based on data
       orig_train(x)
+
+      # Fixes issues with -Inf and Inf when adding shaded areas to graphs
+      x_ok <- x[is.finite(x)]
+
+      # If nothing left after filtering (e.g. only Inf/-Inf annotations), don't enforce the check
+      if (length(x_ok) == 0L) return(invisible())
+
       # x now contains the data values (possibly transformed) used to train the scale
-      data_range <- range(x, na.rm = TRUE)
+      data_range <- range(x_ok, na.rm = TRUE)
 
       # Stop if actual data range fall outside the provided limits
       if (limits[1] > data_range[1] || limits[2] < data_range[2]) {

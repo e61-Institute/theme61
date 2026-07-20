@@ -353,27 +353,42 @@ square_legend_symbols <- function(size = 6) {
 #' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
 #' the default works for most graphs. A negative value moves the
 #' title up, a positive value moves the title down.
+#' @param current_theme The plot's current theme, used internally by
+#' `save_e61()` to skip any element the user has already customised away
+#' from the `theme_e61()` default. Leave as `NULL` for normal manual use.
 #'
 #' @return ggplot object
 #' @export
 
-format_flip <- function(x_adj = 0) {
+format_flip <- function(x_adj = 0, current_theme = NULL) {
 
-  retval <-
-    theme(
-      panel.grid.major.x = element_line(colour = e61_greylight6, linewidth = points_to_mm(0.5)),
-      panel.grid.major.y = element_blank(),
-      axis.text.x.top = element_blank(),
-      axis.ticks.x.top = element_blank(),
-      axis.title.x.top = element_blank(),
-      plot.title.position = "plot",
-      plot.caption.position = "plot",
-      axis.title.x.bottom = element_text(
-        margin = margin(t = 0, b = 5),
-        hjust = 0.5, angle = 0)
-    )
+  flip_args <- list(
+    panel.grid.major.x = element_line(colour = e61_greylight6, linewidth = points_to_mm(0.5)),
+    panel.grid.major.y = element_blank(),
+    axis.text.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    axis.title.x.top = element_blank(),
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    axis.title.x.bottom = element_text(
+      margin = margin(t = 0, b = 5),
+      hjust = 0.5, angle = 0)
+  )
 
-  return(retval)
+  # When called internally by save_e61(), skip any element the user has
+  # already customised away from the theme_e61() default, rather than
+  # silently overriding it.
+  if (!is.null(current_theme)) {
+    baseline <- theme_e61()
+
+    unchanged <- vapply(names(flip_args), function(el) {
+      identical(current_theme[[el]], baseline[[el]])
+    }, logical(1))
+
+    flip_args <- flip_args[unchanged]
+  }
+
+  do.call(theme, flip_args)
 
 }
 

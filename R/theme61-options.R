@@ -1,36 +1,40 @@
-# This is where all the set/unset option functions live
-
-#'Set various options in the theme61 package
+#' Set various options in the theme61 package
 #'
-#'@param opt A named list of options to set. See Details for available options.
-#'@param print If TRUE, returns a list of available options and their current
-#'  values.
+#' To see the list of available options, just run the function in the console
+#' with no arguments i.e. \code{set_t61_options()}.
 #'
-#'@details The following options are available to set:
-#' \itemize{
-#'   \item \code{theme61.open_e61_graph}: If TRUE, graphs will open in the browser instead of the Viewer pane. This is FALSE by default.
-#'   \item \code{theme61.default_save_format}: The default file save format if format is not specified in [save_e61] and the file extension is not provided in \code{filename}. This is "svg" by default.
-#'   \item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
-#'   \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
+#' @param opt A named list of options to set. See Details for available options.
+#'
+#' @details The following options are available to set:
+#'  \itemize{
+#'    \item \code{theme61.open_e61_graph}: If TRUE, graphs will open in the browser instead of the Viewer pane. This is FALSE by default.
+#'    \item \code{theme61.default_save_format}: The default file save format if format is not specified in [save_e61] and the file extension is not provided in \code{filename}. This is "svg" by default.
+#'    \item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
+#'    \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
+#'  }
+#' @return This function is used for its side effects.
+#'
+#' @examples
+#' \dontrun{
+#' # Set the default save format to "png"
+#' set_t61_options(list(theme61.default_save_format = "png"))
 #' }
-#'@return This function is used for its side effects.
-#'@export
-set_e61_options <- function(opt = NULL, print = FALSE) {
-  if (print) {
+#'
+#' @export
+set_t61_options <- function(opt = NULL) {
+  if (is.null(opt)) {
     t61_opts <- names(options())[data.table::like(names(options()), "^theme61\\..*")] |> as.list()
 
     t61_set_opts <- sapply(t61_opts, options)
 
     # Print options as a pretty list displayed as 'option = value'
-    cli::cli_bullets(c("v" = "Current theme61 options:"))
+    cli::cli_bullets(c("i" = "Current theme61 options:"))
     for (opt in names(t61_set_opts)) {
       cli::cli_bullets(c(" " = paste0(opt, " = ", t61_set_opts[[opt]])))
     }
 
     return(invisible(t61_set_opts))
-  }
-
-  if (!is.null(opt)) {
+  } else {
     if (!is.list(opt) || is.null(names(opt))) {
       stop("opt must be a named list of options to set.")
     }
@@ -41,12 +45,12 @@ set_e61_options <- function(opt = NULL, print = FALSE) {
     if (length(invalid_opts) > 0) {
       stop(paste0("Invalid options supplied: ", paste(invalid_opts, collapse = ",
 ")), ". Valid options are: ", paste(valid_opts, collapse = ", "))
-  }
+    }
 
     options(opt)
   }
 
-  invisible(TRUE)
+  invisible(NULL)
 }
 
 #' Set option to open graphs in the browser instead of the Viewer pane

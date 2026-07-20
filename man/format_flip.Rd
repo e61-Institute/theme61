@@ -4,12 +4,16 @@
 \alias{format_flip}
 \title{Applies changes to the theme for horizontal bar graphs}
 \usage{
-format_flip(x_adj = 0)
+format_flip(x_adj = 0, current_theme = NULL)
 }
 \arguments{
 \item{x_adj}{Numeric. Adjusts the vertical position of the x-axis title,
 the default works for most graphs. A negative value moves the
 title up, a positive value moves the title down.}
+
+\item{current_theme}{The plot's current theme, used internally by
+\code{save_e61()} to skip any element the user has already customised away
+from the \code{theme_e61()} default. Leave as \code{NULL} for normal manual use.}
 }
 \value{
 ggplot object

@@ -27,8 +27,12 @@
 #' @param dim An optional named list specifying the plot height and width.
 #'   Defaults to NULL which means the graph dimensions will be calculated
 #'   automatically.
-#' @param pad_width Numeric. Add horizontal whitespace to the sides of the
-#'   graph. Defaults to no additional padding.
+#' @param pad_width Numeric (mm). Adds horizontal whitespace to the sides of all
+#'   graphs. If saving multiple charts this will add the same spacing to all
+#'   charts. Defaults to no additional padding.
+#' @param pad_height Numeric (mm). Adds vertical whitespace to the sides of all
+#'   graphs. If saving multiple charts this will add the same spacing to all
+#'   charts. Defaults to no additional padding.
 #' @param max_height Numeric. The maximum height of your plot in cm. This is
 #'   used to constrain the plot resizing algorithm in cases where you want to
 #'   limit the height of your charts. Defaults to NULL which does not restrict
@@ -79,6 +83,7 @@ save_e61 <- function(filename = NULL,
                      auto_scale = TRUE,
                      dim = list(height = NULL, width = NULL),
                      pad_width = 0,
+                     pad_height = 0,
                      max_height = NULL,
                      preview = FALSE,
                      save_data = FALSE,
@@ -188,9 +193,11 @@ save_e61 <- function(filename = NULL,
     format <- match.arg(format, several.ok = TRUE)
   }
 
-  # Check if the data frame can be written
-  if (save_data && !is.data.frame(plots[[1]]@data))
-    stop("You have set save_data = TRUE, but the data frame could not be extracted from the ggplot. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
+  # Check if the data frame(s) can be written - every panel needs its own
+  # extractable data frame, not just the first, since multi-panel graphs are
+  # often built from a different data frame per panel.
+  if (save_data && !all(vapply(plots, function(p) is.data.frame(p@data), logical(1))))
+    stop("You have set save_data = TRUE, but the data frame could not be extracted from one or more of the ggplots. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
   # Check list args are valid
   if (!all(names(dim) %in% c("height", "width")))
@@ -238,13 +245,13 @@ save_e61 <- function(filename = NULL,
       sources = sources,
       width = dim$width, # control width of the chart
       height = dim$height, # control height of the chart
-      max_height = max_height, # control maximum height of the chart
       auto_scale = auto_scale,
       title_spacing_adj = spacing_adj$title, # adjust the amount of space given to the title
       subtitle_spacing_adj = spacing_adj$subtitle, # adjust the amount of space given to the subtitle
       height_adj = height_adj, # adjust the vertical spacing of the mpanel charts
       base_size = base_size,
       pad_width = pad_width,
+      pad_height = pad_height,
       ncol = ncol,
       nrow = nrow,
       align = align,
@@ -265,6 +272,7 @@ save_e61 <- function(filename = NULL,
       format = format,
       base_size = base_size,
       pad_width = pad_width,
+      pad_height = pad_height,
       bg_colour = bg_colour
     )
   }
@@ -293,7 +301,16 @@ save_e61 <- function(filename = NULL,
   if (save_data) {
 
     for (i in seq_along(plots)) {
-      data_name <- gsub("\\.(\\w{3})$", paste0(i, ".csv"), filename)
+      # Give each plot's data file the same name as the graph. When there are
+      # multiple plots (multi-panel), append the panel number to keep the
+      # file names unique, since each panel may be built from a different
+      # data frame.
+      data_name <- if (length(plots) > 1) {
+        paste0(filename, " ", i, ".csv")
+      } else {
+        paste0(filename, ".csv")
+      }
+
       data.table::fwrite(plots[[i]]@data, data_name)
     }
   }
@@ -312,10 +329,19 @@ save_e61 <- function(filename = NULL,
   } else if (interactive()) {
     # Only run this in interactive mode
     # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
-    temp_file <- tempfile(fileext = paste0(".", format[[1]]))
-    file.copy(file_to_open, temp_file)
 
-    out <- try(rstudioapi::viewer(temp_file))
+    # Always preview an SVG, even if the saved format(s) are not SVG
+    preview_svg <- make_preview_svg(
+      graph = save_input$graph,
+      format = format,
+      filename = filename,
+      width = save_input$width,
+      height = save_input$height,
+      bg_colour = bg_colour,
+      res = res
+    )
+
+    out <- try(rstudioapi::viewer(preview_svg))
 
     if (!is.null(out)) warning("Graph file could not be opened.")
 
@@ -327,3 +353,80 @@ save_e61 <- function(filename = NULL,
   invisible(retval)
 }
 
+#' Converts SVG to a bitmap file
+#'
+#' Converts an SVG file to a bitmap file, currently supports JPEG and PNG.
+#'
+#' @param file_in File path to the SVG image to convert.
+#' @param file_out File path to the PNG or JPEG. image to save. Default saves a
+#'   file with the same name and location (except for the file extension).
+#' @param delete Logical. Delete the original SVG file? (defaults to FALSE).
+#' @param res Numeric. Increase the dimensions of the saved PNG or JPEG. E.g.
+#'   `res = 2` doubles the dimensions of the saved graph.
+#' @return Invisibly returns the file path to the PNG image
+#' @keywords internal
+#' @export
+svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
+
+  res <- res * 4 # res = 1 produces exceedingly small images now apparently
+
+  if (!grepl(".*\\.svg$", file_in))
+    stop("file_in must be an svg file.")
+
+  # If file_out is null, then save to a PNG by default
+  if (is.null(file_out)) {
+    file_out <- gsub("(.*)\\.svg$", "\\1.png", file_in)
+  } else if (!grepl(".*\\.png$", file_out) & !grepl(".*\\.jpg$", file_out)) {
+    stop("file_out must be a png or jpg file.")
+  }
+
+  if(grepl(".*\\.png$", file_out)) fmt <- "png" else fmt <- "jpg"
+
+  if (res != 1) {
+    # This approach to rescaling starts by saving a rescaled SVG before
+    # converting it to PNG. Hence the need for temp files.
+    file_temp_svg <- "intermed.svg"
+    file_temp_out <- paste0("intermed.", fmt)
+
+    # For some reason this changed at some point and the scaling is fine now.
+    # Keeping this here in case it reverts back in the future.
+    # res <- res / 1.25 # For some reason any res > 1 scales 1:1.25...
+
+    rsvg::rsvg_png(svg = file_in, file = file_temp_out)
+
+    g_info <- magick::image_info(magick::image_read(file_temp_out))
+
+    rsvg::rsvg_svg(svg = file_in,
+                   file = file_temp_svg,
+                   width = g_info$width * res,
+                   height = g_info$height * res
+                   )
+
+    if(fmt == "png"){
+      rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
+
+    } else if(fmt == "jpg"){
+      image_temp <- magick::image_read_svg(file_temp_svg)
+
+      magick::image_write(image = image_temp, path = file_out, format = "jpg")
+    }
+
+    unlink(file_temp_svg)
+    unlink(file_temp_out)
+
+  } else {
+
+    if(fmt == "png"){
+      rsvg::rsvg_png(svg = file_in, file = file_out)
+
+    } else if(fmt == "jpg"){
+      image_temp <- magick::image_read_svg(file_in)
+
+      magick::image_write(image = image_temp, path = file_out, format = "jpg")
+    }
+  }
+
+  if (delete) unlink(file_in)
+
+  invisible(file_out)
+}
