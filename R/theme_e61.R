@@ -57,6 +57,18 @@ theme_e61 <- function(
     choices = c("none", "bottom", "top", "left", "right", "inside")
   )
 
+  # Validate legend_position eagerly, at spec-construction time, rather than
+  # only when the spec is realised into a theme - otherwise invalid input
+  # only surfaces much later, deep inside save_e61()/print().
+  if (legend == "inside") {
+    if (!is.numeric(legend_position) || length(legend_position) != 2)
+      stop("legend_position needs to be a length two numeric vector.")
+
+    if (!(data.table::between(legend_position[[1]], 0, 1) |
+          data.table::between(legend_position[[2]], 0, 1)))
+      stop("Both legend_position values must be between 0 and 1.")
+  }
+
   args <- list(
     legend = legend,
     legend_position = legend_position,

@@ -201,9 +201,11 @@ save_e61 <- function(filename = NULL,
 
   # Spell checker -------------------------------------------------------
 
-  if (!spell_check) {
-    # Loop through the plots
-    spell_chk <- lapply(plots, check_plot_spelling)
+  if (spell_check) {
+    # Loop through the plots. unlist() (not c()) so that plots with no typos
+    # (check_plot_spelling() returns NULL) are dropped rather than counted as
+    # an empty message.
+    spell_chk <- unlist(lapply(plots, check_plot_spelling))
 
     # Compile the messages
     adv_msg <- c(spell_chk)
@@ -216,7 +218,7 @@ save_e61 <- function(filename = NULL,
     }
 
     # Print advisory messages
-    if (length(adv_msg) + length(bad_msg) > 0) print_adv()
+    if (length(adv_msg) > 0) print_adv()
 
   }
 
