@@ -52,6 +52,13 @@
 #'   to the console as copy-pasteable arguments, so you can pin the chosen
 #'   positions (or hand-tweak just one or two) instead of leaving them to
 #'   auto-position again next time. Defaults to FALSE.
+#' @param fast_labels (single-panel specific) Logical. Set to TRUE to skip the
+#'   auto-positioning search for any `plot_label()` without an explicit `x`/`y`
+#'   and use a cheap, render-free approximate position instead (near the
+#'   label's own series, not collision-checked against other content). Much
+#'   faster, at the cost of placement quality -- intended for quick previews
+#'   while iterating, not the version you'd actually publish. Explicit `x`/`y`
+#'   positions are unaffected either way. Defaults to FALSE.
 #' @param spell_check Logical. Check spelling of words in the title and caption.
 #'   Defaults to TRUE. Set to FALSE to turn off.
 #' @param preview Logical. Set to TRUE to show a preview of the graph in the
@@ -94,6 +101,7 @@ save_e61 <- function(filename = NULL,
                      save_data = FALSE,
                      print_info = FALSE,
                      print_label_positions = FALSE,
+                     fast_labels = FALSE,
                      spell_check = TRUE,
                      base_size = 10,
                      res = 1,
@@ -303,7 +311,8 @@ save_e61 <- function(filename = NULL,
       pad_width = pad_width,
       pad_height = pad_height,
       bg_colour = bg_colour,
-      print_label_positions = print_label_positions
+      print_label_positions = print_label_positions,
+      fast_labels = fast_labels
     )
   }
 

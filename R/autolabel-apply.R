@@ -300,8 +300,13 @@ t61_print_label_positions <- function(text, x, y, is_date_x, is_date_y) {
 #'
 #' @param print_positions Logical. If TRUE, print the final label/x/y as
 #'   copy-pasteable plot_label() arguments (see t61_print_label_positions()).
+#' @param fast Logical. Skip the mask render and scored search, using a
+#'   cheap render-free placement instead (see t61_place_label_fast()) for
+#'   any label without an explicit x/y. Used for the automatic Viewer
+#'   preview on print(), where iteration speed matters more than an
+#'   optimal spot; save_e61() itself always resolves the real position.
 #' @noRd
-t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FALSE) {
+t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FALSE, fast = FALSE) {
 
   targets <- tryCatch(t61_collect_autolabel_targets(plot), error = function(e) NULL)
   if (is.null(targets) || nrow(targets$labels) == 0) return(plot)
@@ -309,7 +314,7 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
   plot_for_mask <- t61_strip_autolabel_layers(plot)
 
   result <- tryCatch(
-    t61_autolabel_plot(plot_for_mask, targets$labels, width_cm = width_cm, height_cm = height_cm),
+    t61_autolabel_plot(plot_for_mask, targets$labels, width_cm = width_cm, height_cm = height_cm, fast = fast),
     error = function(e) NULL
   )
   if (is.null(result)) return(plot)

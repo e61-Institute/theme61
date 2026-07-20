@@ -19,6 +19,7 @@ save_e61(
   save_data = FALSE,
   print_info = FALSE,
   print_label_positions = FALSE,
+  fast_labels = FALSE,
   spell_check = TRUE,
   base_size = 10,
   res = 1,
@@ -100,6 +101,14 @@ print the final \code{label}/\code{x}/\code{y} of any auto-positioned \code{plot
 to the console as copy-pasteable arguments, so you can pin the chosen
 positions (or hand-tweak just one or two) instead of leaving them to
 auto-position again next time. Defaults to FALSE.}
+
+\item{fast_labels}{(single-panel specific) Logical. Set to TRUE to skip the
+auto-positioning search for any \code{plot_label()} without an explicit \code{x}/\code{y}
+and use a cheap, render-free approximate position instead (near the
+label's own series, not collision-checked against other content). Much
+faster, at the cost of placement quality -- intended for quick previews
+while iterating, not the version you'd actually publish. Explicit \code{x}/\code{y}
+positions are unaffected either way. Defaults to FALSE.}
 
 \item{spell_check}{Logical. Check spelling of words in the title and caption.
 Defaults to TRUE. Set to FALSE to turn off.}

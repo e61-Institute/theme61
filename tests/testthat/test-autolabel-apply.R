@@ -11,23 +11,32 @@ autolabel_apply_test_setup <- function(auto_position = TRUE) {
     series = rep(c("A", "B"), each = 21)
   )
 
+  # x/y are only given for auto_position = FALSE, which requires them --
+  # an explicit position always wins outright now (the search never even
+  # runs for that label, see t61_autolabel_plot()), so testing "the search
+  # finds a good spot" means giving it nothing to fall back on.
+  label_args <- if (auto_position) {
+    list()
+  } else {
+    list(x = c(2005, 2005), y = c(1, 1)) # deliberately bad, same spot
+  }
+
   p <- ggplot(data, aes(x, y, colour = series)) +
     geom_line(linewidth = 1) +
     scale_colour_manual(values = c(A = "#e57200", B = "#1c3144")) +
     theme_bw(base_size = 10) +
     theme(legend.position = "none") +
     labs(x = NULL, y = NULL) +
-    plot_label(
-      c("Series A", "Series B"),
-      x = c(2005, 2005), y = c(1, 1), # deliberately bad, same spot
-      colour = c("#e57200", "#1c3144"),
-      auto_position = auto_position
-    )
+    do.call(plot_label, c(
+      list(c("Series A", "Series B")),
+      label_args,
+      list(colour = c("#e57200", "#1c3144"), auto_position = auto_position)
+    ))
 
   p
 }
 
-test_that("t61_apply_autolabel moves matching labels away from a bad fallback", {
+test_that("t61_apply_autolabel finds a good spot near each series when no position is given", {
   skip_on_cran()
 
   p <- autolabel_apply_test_setup()
@@ -38,13 +47,44 @@ test_that("t61_apply_autolabel moves matching labels away from a bad fallback", 
   }, logical(1)))
   d <- result@layers[[label_layer]]$data
 
-  # Moved away from the shared, deliberately bad fallback position
-  expect_false(isTRUE(all.equal(d$x[1], 2005)) && isTRUE(all.equal(d$y[1], 1)))
-  expect_false(isTRUE(all.equal(d$x[2], 2005)) && isTRUE(all.equal(d$y[2], 1)))
+  expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 
   # Each label should have moved close to its own series' colour-matched line
   expect_lt(abs(d$y[1] - 2.5), 3) # series A ranges 0-5
   expect_lt(abs(d$y[2] - 6), 5)   # series B ranges 2-10
+})
+
+test_that("t61_apply_autolabel leaves an explicit position untouched even when auto_position = TRUE", {
+  skip_on_cran()
+
+  data <- data.frame(
+    x = rep(2000:2020, 2),
+    y = c(seq(0, 5, length.out = 21), seq(10, 2, length.out = 21)),
+    series = rep(c("A", "B"), each = 21)
+  )
+  p <- ggplot(data, aes(x, y, colour = series)) +
+    geom_line(linewidth = 1) +
+    scale_colour_manual(values = c(A = "#e57200", B = "#1c3144")) +
+    theme_bw(base_size = 10) +
+    theme(legend.position = "none") +
+    plot_label(
+      c("Series A", "Series B"),
+      x = c(2005, 2005), y = c(1, 1), # deliberately bad, same spot as each other
+      colour = c("#e57200", "#1c3144"),
+      auto_position = TRUE
+    )
+
+  result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
+
+  label_layer <- which(vapply(result@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  d <- result@layers[[label_layer]]$data
+
+  # An explicit position always wins outright -- the search never runs for
+  # it, so it stays exactly where given, however bad a spot that is.
+  expect_equal(d$x, c(2005, 2005))
+  expect_equal(d$y, c(1, 1))
 })
 
 test_that("t61_apply_autolabel doesn't mutate the caller's own plot object", {
@@ -129,7 +169,7 @@ test_that("t61_apply_autolabel matches point-geom series too", {
   p <- ggplot(data, aes(x, y)) +
     geom_point(colour = "#e57200", size = 2) +
     theme_bw(base_size = 10) +
-    plot_label("Series A", x = 2005, y = 1, colour = "#e57200")
+    plot_label("Series A", colour = "#e57200")
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
@@ -138,7 +178,7 @@ test_that("t61_apply_autolabel matches point-geom series too", {
   }, logical(1)))
   d <- result@layers[[label_layer]]$data
 
-  expect_false(isTRUE(all.equal(d$x, 2005)) && isTRUE(all.equal(d$y, 1)))
+  expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 })
 
 test_that("t61_apply_autolabel is a no-op when there are no plot_label() layers", {
@@ -272,7 +312,7 @@ test_that("t61_apply_autolabel repositions a column label clear of every bar", {
     geom_col(position = "dodge") +
     scale_fill_manual(values = c(A = "#e57200", B = "#1c3144")) +
     theme_bw(base_size = 10) +
-    plot_label(c("A", "B"), x = c(2016, 2016), y = c(1, 1), colour = c("#e57200", "#1c3144"))
+    plot_label(c("A", "B"), colour = c("#e57200", "#1c3144"))
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
@@ -281,8 +321,7 @@ test_that("t61_apply_autolabel repositions a column label clear of every bar", {
   }, logical(1)))
   d <- result@layers[[label_layer]]$data
 
-  expect_false(isTRUE(all.equal(d$x[1], 2016)) && isTRUE(all.equal(d$y[1], 1)))
-  expect_false(isTRUE(all.equal(d$x[2], 2016)) && isTRUE(all.equal(d$y[2], 1)))
+  expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 
   mask <- t61_render_mask(t61_strip_autolabel_layers(p), width_cm = 16, height_cm = 12)
   cm_a <- t61_measure_label_cm("A", size_mm = 3.5, width_cm = 16, height_cm = 12)
@@ -301,7 +340,7 @@ test_that("t61_apply_autolabel places an area label inside its band with a contr
   p <- ggplot(data, aes(year, value)) +
     geom_area(fill = "#1c3144", alpha = 1) + # a dark fill -> expect white text
     theme_bw(base_size = 10) +
-    plot_label("Series A", x = 2001, y = 1, colour = "#1c3144") # deliberately bad, off the band
+    plot_label("Series A", colour = "#1c3144")
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
@@ -310,8 +349,8 @@ test_that("t61_apply_autolabel places an area label inside its band with a contr
   }, logical(1)))
   d <- result@layers[[label_layer]]$data
 
-  expect_false(isTRUE(all.equal(d$x, 2001)) && isTRUE(all.equal(d$y, 1)))
-  expect_gt(d$y, 0) # moved up into the visible (growing) band, not left at y=1
+  expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
+  expect_gt(d$y, 0) # placed inside the visible (growing) band
 
   expect_equal(result@layers[[label_layer]]$aes_params$colour, "white")
 })
@@ -326,7 +365,7 @@ test_that("t61_apply_autolabel repositions a geom_pointbar() label clear of the 
   p <- ggplot(data, aes(x, y, ymin = ymin, ymax = ymax)) +
     geom_pointbar(colour = "#e57200") +
     theme_bw(base_size = 10) +
-    plot_label("Series A", x = 2005, y = -3, colour = "#e57200") # deliberately bad, below the bars
+    plot_label("Series A", colour = "#e57200")
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
@@ -335,7 +374,7 @@ test_that("t61_apply_autolabel repositions a geom_pointbar() label clear of the 
   }, logical(1)))
   d <- result@layers[[label_layer]]$data
 
-  expect_false(isTRUE(all.equal(d$x, 2005)) && isTRUE(all.equal(d$y, -3)))
+  expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 
   mask <- t61_render_mask(t61_strip_autolabel_layers(p), width_cm = 16, height_cm = 12)
   cm <- t61_measure_label_cm("Series A", size_mm = 3.5, width_cm = 16, height_cm = 12)
@@ -407,13 +446,21 @@ test_that("t61_apply_autolabel prefers the caller's own x/y over random empty sp
     theme_bw(base_size = 10) +
     plot_label("Series A", x = 2019, y = 4.5, colour = "#e57200")
 
-  # Force the "good spot" algorithm (tier 1) to fail, so the fallback
-  # tiers decide the outcome; the mask is otherwise wide open, so an "any
-  # empty space" search (tier 3) would trivially succeed too -- the test
-  # is which one wins.
-  testthat::local_mocked_bindings(t61_place_label = function(...) NULL)
+  # An explicit position always wins outright -- the scored search (tier
+  # 1) never even runs for a label that has one, so it can't be
+  # overridden by something the algorithm merely scores "better" (or
+  # anything else it might do). A flag set by the mock (rather than e.g.
+  # stop()) makes that assertion concrete without relying on
+  # t61_apply_autolabel()'s own error-swallowing tryCatch(), which would
+  # otherwise mask a stop() here as a silent "keep the original plot" --
+  # coincidentally identical to what's being asserted below, so a stop()
+  # would pass even if the search wrongly ran.
+  search_ran <- FALSE
+  testthat::local_mocked_bindings(t61_place_label = function(...) { search_ran <<- TRUE; NULL })
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
+
+  expect_false(search_ran)
 
   label_layer <- which(vapply(result@layers, function(ly) {
     !is.null(ly$data) && !is.null(ly$data$auto_position)
@@ -422,6 +469,56 @@ test_that("t61_apply_autolabel prefers the caller's own x/y over random empty sp
 
   expect_equal(d$x, 2019)
   expect_equal(d$y, 4.5)
+})
+
+test_that("t61_apply_autolabel(fast = TRUE) resolves a position without rendering a mask", {
+  skip_on_cran()
+
+  p <- autolabel_apply_test_setup() # no x/y given (auto_position = TRUE default)
+
+  render_calls <- 0
+  testthat::local_mocked_bindings(t61_render_mask = function(...) { render_calls <<- render_calls + 1; NULL })
+
+  result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = TRUE)
+
+  expect_equal(render_calls, 0)
+
+  label_layer <- which(vapply(result@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  d <- result@layers[[label_layer]]$data
+
+  expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
+})
+
+test_that("save_e61(fast_labels = TRUE) skips the search but still resolves a position", {
+  skip_on_cran()
+
+  p <- autolabel_apply_test_setup() # no x/y given (auto_position = TRUE default)
+
+  sv_fast <- theme61:::save_single(
+    filename = NULL, plot = p, chart_type = "normal", auto_scale = TRUE,
+    width = NULL, height = NULL, max_height = NULL, format = "svg", base_size = 10,
+    pad_width = 0, pad_height = 0, bg_colour = "white", fast_labels = TRUE
+  )
+  label_layer <- which(vapply(sv_fast$graph@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  d_fast <- sv_fast$graph@layers[[label_layer]]$data
+
+  expect_false(anyNA(d_fast$x)); expect_false(anyNA(d_fast$y))
+
+  # fast_labels = FALSE (the save_e61() default) still runs the real
+  # search and should generally land somewhere different, since it's
+  # scored against collision/distance rather than a fixed cheap offset.
+  sv_slow <- theme61:::save_single(
+    filename = NULL, plot = p, chart_type = "normal", auto_scale = TRUE,
+    width = NULL, height = NULL, max_height = NULL, format = "svg", base_size = 10,
+    pad_width = 0, pad_height = 0, bg_colour = "white", fast_labels = FALSE
+  )
+  d_slow <- sv_slow$graph@layers[[label_layer]]$data
+
+  expect_false(isTRUE(all.equal(d_fast$y, d_slow$y)))
 })
 
 coord_flip_apply_test <- function(p) {

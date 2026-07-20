@@ -25,8 +25,11 @@ autolabel_test_setup <- function() {
     geom_type = c("line", "line"),
     hjust = c(0, 0),
     size_mm = c(3.5, 3.5),
-    fallback_x = c(2005, 2005), # deliberately bad placeholder, same spot
-    fallback_y = c(1, 1)
+    # NA -- an explicit position always wins outright (the search never
+    # runs for it, see t61_autolabel_plot()), so testing the search means
+    # giving it nothing to fall back on.
+    fallback_x = c(NA_real_, NA_real_),
+    fallback_y = c(NA_real_, NA_real_)
   )
   labels$series <- list(list(x = a$x, y = a$y), list(x = b$x, y = b$y))
 
@@ -195,10 +198,63 @@ test_that("t61_autolabel_plot keeps the fallback position when placement fails e
     }
   )
 
+  # An explicit fallback position, unlike the shared setup's NA (used by
+  # the other tests in this file to force the search to actually run) --
+  # this test is specifically about what happens when placement fails
+  # *and* there's a user-given position to fall back to.
   one_label <- setup$labels[1, ]
+  one_label$fallback_x <- 2005
+  one_label$fallback_y <- 1
   result <- t61_autolabel_plot(setup$plot, one_label, width_cm = 16, height_cm = 12, px_width = 400)
 
   expect_false(result$placed)
   expect_equal(result$x, one_label$fallback_x)
   expect_equal(result$y, one_label$fallback_y)
+})
+
+test_that("t61_autolabel_plot(fast = TRUE) places labels without rendering a mask", {
+  skip_on_cran()
+
+  setup <- autolabel_test_setup()
+
+  render_calls <- 0
+  testthat::local_mocked_bindings(t61_render_mask = function(...) { render_calls <<- render_calls + 1; NULL })
+
+  result <- t61_autolabel_plot(setup$plot, setup$labels, width_cm = 16, height_cm = 12, px_width = 400, fast = TRUE)
+
+  expect_equal(render_calls, 0)
+  expect_false(anyNA(result$x)); expect_false(anyNA(result$y))
+  expect_true(all(result$placed))
+
+  # Cheap, not optimal -- anchored to the series' own last data point (see
+  # t61_place_label_fast()), nudged up a bit, not to the range's midpoint.
+  expect_lt(abs(result$y[1] - setup$a$y[nrow(setup$a)]), 2) # series A ends near y = 5
+  expect_lt(abs(result$y[2] - setup$b$y[nrow(setup$b)]), 2) # series B ends near y = 2
+})
+
+test_that("t61_autolabel_plot(fast = TRUE) still lets an explicit position win outright", {
+  skip_on_cran()
+
+  setup <- autolabel_test_setup()
+  setup$labels$fallback_x <- c(2005, 2005)
+  setup$labels$fallback_y <- c(1, 1)
+
+  result <- t61_autolabel_plot(setup$plot, setup$labels, width_cm = 16, height_cm = 12, px_width = 400, fast = TRUE)
+
+  expect_equal(result$x, c(2005, 2005))
+  expect_equal(result$y, c(1, 1))
+  expect_false(any(result$placed)) # unchanged from the caller's own fallback
+})
+
+test_that("t61_autolabel_plot(fast = TRUE) keeps the fallback when no series matches", {
+  skip_on_cran()
+
+  setup <- autolabel_test_setup()
+  setup$labels$series <- list(list(), list()) # no colour match, either row
+
+  result <- t61_autolabel_plot(setup$plot, setup$labels, width_cm = 16, height_cm = 12, px_width = 400, fast = TRUE)
+
+  expect_true(all(is.na(result$x)))
+  expect_true(all(is.na(result$y)))
+  expect_false(any(result$placed))
 })

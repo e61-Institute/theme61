@@ -50,10 +50,15 @@ print.e61_ggplot <- function(x, ...) {
   # opt-in (default OFF): focus Viewer after printing
   focus_viewer <- isTRUE(getOption("theme61.focus_viewer_on_print", FALSE))
 
-  # Viewer preview (render in background)
+  # Viewer preview (render in background). Auto-positioned plot_label()
+  # text without an explicit x/y uses the cheap, render-free fast
+  # placement here (see t61_place_label_fast()) rather than the full
+  # search -- this runs on every print(), so it needs to stay fast for
+  # quick iteration. save_e61() itself (without preview = TRUE) always
+  # resolves the real, optimised position regardless.
   if (in_rstudio) {
     suppressWarnings(
-      suppressMessages(save_e61(plot = x, preview = TRUE, format = "svg", auto_scale = auto_scale_preview))
+      suppressMessages(save_e61(plot = x, preview = TRUE, format = "svg", auto_scale = auto_scale_preview, fast_labels = TRUE))
       )
   }
 

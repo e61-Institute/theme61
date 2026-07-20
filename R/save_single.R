@@ -13,7 +13,8 @@ save_single <- function(
     pad_width,
     pad_height,
     bg_colour,
-    print_label_positions = FALSE
+    print_label_positions = FALSE,
+    fast_labels = FALSE
 ) {
 
 
@@ -226,7 +227,7 @@ save_single <- function(
   # is known (see autolabel-apply.R). No-ops when there are no eligible
   # labels.
   plot <- t61_apply_autolabel(plot, width_cm = width, height_cm = height,
-                              print_positions = print_label_positions)
+                              print_positions = print_label_positions, fast = fast_labels)
 
   # Return objects needed to save the graph ----
   retval <- list(graph = plot,

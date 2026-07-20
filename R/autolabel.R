@@ -146,14 +146,55 @@ t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_s
   result
 }
 
+#' Cheap, render-free placement used when `fast = TRUE` (see
+#' t61_autolabel_plot()): a fixed offset from the label's own matched
+#' series -- near its last data point, nudged up and staggered by the
+#' label's position in the loop to reduce (not guarantee) label-on-label
+#' overlap. No mask, no collision search, no coord_flip handling needed --
+#' it only ever touches the series' own data-space values, which are
+#' already in the same aesthetic space plot_label() writes to regardless
+#' of coord_flip().
+#' @param own The label's own series, same shapes as t61_place_label().
+#' @param index The label's 1-based position among all labels being placed
+#'   this call, used only to stagger repeated placements apart.
+#' @noRd
+t61_place_label_fast <- function(own, geom_type, index = 1) {
+  stagger <- function(y, yr) {
+    if (!is.finite(yr) || yr == 0) yr <- max(abs(y), 1)
+    y + 0.06 * yr + (index %% 3) * 0.05 * yr
+  }
+
+  if (identical(geom_type, "column")) {
+    j <- length(own$xmin)
+    x <- (own$xmin[j] + own$xmax[j]) / 2
+    y <- stagger(own$ymax[j], diff(range(c(own$ymin, own$ymax), na.rm = TRUE)))
+  } else if (identical(geom_type, "area")) {
+    j <- length(own$x)
+    x <- own$x[j]
+    y <- stagger(own$ymax[j], diff(range(own$ymax, na.rm = TRUE)))
+  } else {
+    # line / point / pointbar
+    j <- length(own$x)
+    x <- own$x[j]
+    y <- stagger(own$y[j], diff(range(own$y, na.rm = TRUE)))
+  }
+
+  list(x = x, y = y)
+}
+
 #' Place a set of labels on a single-panel plot, one at a time, updating
 #' the occupancy mask after each so later labels avoid earlier ones.
 #'
-#' A label that can't get a good scored/inside-band spot falls back
-#' through, in order: (1) the caller's own fallback_x/fallback_y, if given;
-#' (2) any collision-free spot at all, ignoring buffer/distance
-#' preferences; (3) the panel centre, so the label stays visible rather
-#' than vanishing.
+#' An explicit fallback_x/fallback_y always wins outright -- the
+#' scored/inside-band search never runs for that label, so a position the
+#' caller deliberately chose can't be second-guessed. Failing that (no
+#' user position given), a label falls back through, in order: (1) the
+#' scored/inside-band search, if `fast = FALSE`; (2) any collision-free
+#' spot at all, ignoring buffer/distance preferences; (3) the panel
+#' centre, so the label stays visible rather than vanishing. Under
+#' `fast = TRUE`, (1)-(3) are all replaced by a single cheap, render-free
+#' placement (see t61_place_label_fast()) -- used for the automatic Viewer
+#' preview on print(), where speed matters more than an optimal spot.
 #'
 #' @param plot A ggplot object, fully built (scales resolved etc.), not yet
 #'   containing the labels to be placed.
@@ -164,6 +205,10 @@ t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_s
 #'   match anything) has geom_type = NA and series = list() -- skips
 #'   straight to the fallback tiers below.
 #' @param width_cm,height_cm Physical size the chart will be saved at.
+#' @param fast Logical. Skip the mask render and scored search entirely,
+#'   using t61_place_label_fast() instead for any label without an
+#'   explicit position. Much cheaper, at the cost of placement quality (no
+#'   collision avoidance against other content or other labels).
 #' @return `labels` with x/y columns added (resolved position), a `placed`
 #'   logical column (FALSE only when the resolved position is exactly the
 #'   caller's own unchanged fallback_x/fallback_y, so the caller can skip a
@@ -171,156 +216,180 @@ t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_s
 #'   (NA_character_ unless an "area" label got placed inside its band, in
 #'   which case it holds the contrast colour to render it in).
 #' @noRd
-t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400L) {
-
-  mask <- t61_render_mask(plot, width_cm = width_cm, height_cm = height_cm, px_width = px_width)
+t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400L, fast = FALSE) {
 
   labels$x <- labels$fallback_x
   labels$y <- labels$fallback_y
   labels$placed <- FALSE
   labels$colour <- NA_character_
 
-  if (is.null(mask)) return(labels) # not v1 scope (e.g. facets): keep fallbacks
+  mask <- NULL
+  area_mask <- NULL
+  flipped <- FALSE
 
-  # Everything below operates in the mask's screen space, which
-  # panel_params has already remapped for coord_flip() -- but series data
-  # and the label's own x/y come from ggplot_build()$data in pre-flip
-  # data-aesthetic space. Only point/line/column reduce to a plain axis
-  # swap under flip; area's band search and pointbar's error-bar
-  # orientation would each need their own flipped-geometry logic, so under
-  # a flip they're treated as unmatched (skip to the fallback tiers) rather
-  # than placed incorrectly.
-  flipped <- isTRUE(mask$flipped)
+  if (!fast) {
+    mask <- t61_render_mask(plot, width_cm = width_cm, height_cm = height_cm, px_width = px_width)
+    if (is.null(mask)) return(labels) # not v1 scope (e.g. facets): keep fallbacks
+
+    # Everything below (mask-dependent branches only) operates in the
+    # mask's screen space, which panel_params has already remapped for
+    # coord_flip() -- but series data and the label's own x/y come from
+    # ggplot_build()$data in pre-flip data-aesthetic space. Only
+    # point/line/column reduce to a plain axis swap under flip; area's
+    # band search and pointbar's error-bar orientation would each need
+    # their own flipped-geometry logic, so under a flip they're treated as
+    # unmatched (skip to the fallback tiers) rather than placed
+    # incorrectly.
+    flipped <- isTRUE(mask$flipped)
+
+    # An area label sitting inside its own fill can't use `mask` for
+    # collision -- the fill itself reads as ink there, so every inside
+    # candidate would "collide". Rendered lazily (a second full mask
+    # render) only when an area label needs it, and skipped entirely under
+    # coord_flip() (see above).
+    if (!flipped && any(labels$geom_type == "area", na.rm = TRUE)) {
+      area_mask <- t61_render_mask(t61_strip_area_layers(plot), width_cm = width_cm,
+                                    height_cm = height_cm, px_width = px_width)
+    }
+  }
+
   to_screen <- function(x, y) if (flipped) t61_flip_xy(x, y) else list(x = x, y = y)
   to_data   <- to_screen # the swap is its own inverse
 
-  # An area label sitting inside its own fill can't use `mask` for
-  # collision -- the fill itself reads as ink there, so every inside
-  # candidate would "collide". Rendered lazily (a second full mask render)
-  # only when an area label needs it, and skipped entirely under
-  # coord_flip() (see above).
-  area_mask <- NULL
-  if (!flipped && any(labels$geom_type == "area", na.rm = TRUE)) {
-    area_mask <- t61_render_mask(t61_strip_area_layers(plot), width_cm = width_cm,
-                                  height_cm = height_cm, px_width = px_width)
-  }
-
   for (i in seq_len(nrow(labels))) {
-    label_cm <- t61_measure_label_cm(labels$text[i], size_mm = labels$size_mm[i],
-                                     width_cm = width_cm, height_cm = height_cm)
-
     own <- labels$series[[i]]
     geom_type <- labels$geom_type[i]
-    if (flipped && geom_type %in% c("area", "pointbar")) {
+    if (!fast && flipped && geom_type %in% c("area", "pointbar")) {
       own <- list(); geom_type <- NA_character_
     }
     # series = list() (geom_type = NA) is the "no series matched" sentinel
-    # -- nothing to score a "good" placement against, so skip straight to
-    # the fallback tiers below.
+    # -- nothing to place a "good" spot against, so skip straight to the
+    # fallback tiers below.
     has_series <- length(own) > 0
 
-    other_series <- lapply(setdiff(seq_len(nrow(labels)), i), function(j) {
-      s <- labels$series[[j]]
-      if (length(s) == 0) return(NULL)
-      gt <- labels$geom_type[j]
-      if (flipped && gt %in% c("area", "pointbar")) return(NULL)
-      s <- c(s, list(geom_type = gt))
-      if (flipped) {
-        if (identical(gt, "column")) {
-          s[c("xmin", "xmax", "ymin", "ymax")] <- t61_flip_rect(s$xmin, s$xmax, s$ymin, s$ymax)
-        } else {
-          s[c("x", "y")] <- t61_flip_xy(s$x, s$y)
-        }
-      }
-      s
-    })
-    other_series <- other_series[!vapply(other_series, is.null, logical(1))]
+    # An explicit position always wins outright: the search below never
+    # even runs for this label, so it can't be overridden by something the
+    # algorithm merely scores "better".
+    has_user_position <- !is.na(labels$fallback_x[i]) && !is.na(labels$fallback_y[i])
+    used_user_fallback <- FALSE
 
     result <- NULL
     result_colour <- NA_character_
 
-    if (has_series && identical(geom_type, "area") && !is.null(area_mask)) {
-      # Prefer a spot fully inside the band, in a colour that contrasts
-      # with the fill -- only fall back to the usual edge-hugging line
-      # treatment (against the area's top boundary, in the fill's own
-      # colour, unchanged) when the band is too narrow anywhere to fit the
-      # label inside it.
-      result <- t61_place_label_area(own, mask = area_mask, label_cm = label_cm, hjust = labels$hjust[i])
-      if (!is.null(result)) {
-        alpha <- if (is.null(own$alpha)) 1 else own$alpha
-        result_colour <- t61_contrast_colour(t61_blend_with_background(own$fill, alpha))
+    if (has_user_position) {
+      fx <- labels$fallback_x[i]; fy <- labels$fallback_y[i]
+      box <- NULL
+      if (!is.null(mask)) {
+        label_cm <- t61_measure_label_cm(labels$text[i], size_mm = labels$size_mm[i],
+                                         width_cm = width_cm, height_cm = height_cm)
+        screen_xy <- to_screen(fx, fy)
+        box <- t61_text_box_px(screen_xy$x, screen_xy$y, label_cm, mask, hjust = labels$hjust[i])
       }
-    }
+      result <- list(x = fx, y = fy, box = box)
+      used_user_fallback <- TRUE
 
-    if (has_series && is.null(result)) {
-      series_for_line <- if (identical(geom_type, "area")) list(x = own$x, y = own$ymax) else own
-      line_geom_type <- if (identical(geom_type, "area")) "line" else geom_type
+    } else if (fast) {
+      # No mask, no search -- a cheap offset from the label's own series if
+      # one matched, otherwise nothing to derive a spot from cheaply, so
+      # the label keeps its (possibly NA) fallback, same as the "not v1
+      # scope" case above.
+      if (has_series) {
+        fp <- t61_place_label_fast(own, geom_type, index = i)
+        result <- list(x = fp$x, y = fp$y, box = NULL)
+      }
 
-      if (flipped) {
-        if (identical(line_geom_type, "column")) {
-          series_for_line[c("xmin", "xmax", "ymin", "ymax")] <-
-            t61_flip_rect(series_for_line$xmin, series_for_line$xmax, series_for_line$ymin, series_for_line$ymax)
-        } else {
-          series_for_line[c("x", "y")] <- t61_flip_xy(series_for_line$x, series_for_line$y)
+    } else {
+      label_cm <- t61_measure_label_cm(labels$text[i], size_mm = labels$size_mm[i],
+                                       width_cm = width_cm, height_cm = height_cm)
+
+      if (has_series && identical(geom_type, "area") && !is.null(area_mask)) {
+        # Prefer a spot fully inside the band, in a colour that contrasts
+        # with the fill -- only fall back to the usual edge-hugging line
+        # treatment (against the area's top boundary, in the fill's own
+        # colour, unchanged) when the band is too narrow anywhere to fit
+        # the label inside it.
+        result <- t61_place_label_area(own, mask = area_mask, label_cm = label_cm, hjust = labels$hjust[i])
+        if (!is.null(result)) {
+          alpha <- if (is.null(own$alpha)) 1 else own$alpha
+          result_colour <- t61_contrast_colour(t61_blend_with_background(own$fill, alpha))
         }
       }
 
-      result <- t61_place_label(
-        series = series_for_line,
-        geom_type = line_geom_type,
-        other_series = other_series,
-        mask = mask,
-        label_cm = label_cm,
-        hjust = labels$hjust[i]
-      )
-      if (!is.null(result)) {
-        xy <- to_data(result$x, result$y)
-        result$x <- xy$x; result$y <- xy$y
+      if (has_series && is.null(result)) {
+        other_series <- lapply(setdiff(seq_len(nrow(labels)), i), function(j) {
+          s <- labels$series[[j]]
+          if (length(s) == 0) return(NULL)
+          gt <- labels$geom_type[j]
+          if (flipped && gt %in% c("area", "pointbar")) return(NULL)
+          s <- c(s, list(geom_type = gt))
+          if (flipped) {
+            if (identical(gt, "column")) {
+              s[c("xmin", "xmax", "ymin", "ymax")] <- t61_flip_rect(s$xmin, s$xmax, s$ymin, s$ymax)
+            } else {
+              s[c("x", "y")] <- t61_flip_xy(s$x, s$y)
+            }
+          }
+          s
+        })
+        other_series <- other_series[!vapply(other_series, is.null, logical(1))]
+
+        series_for_line <- if (identical(geom_type, "area")) list(x = own$x, y = own$ymax) else own
+        line_geom_type <- if (identical(geom_type, "area")) "line" else geom_type
+
+        if (flipped) {
+          if (identical(line_geom_type, "column")) {
+            series_for_line[c("xmin", "xmax", "ymin", "ymax")] <-
+              t61_flip_rect(series_for_line$xmin, series_for_line$xmax, series_for_line$ymin, series_for_line$ymax)
+          } else {
+            series_for_line[c("x", "y")] <- t61_flip_xy(series_for_line$x, series_for_line$y)
+          }
+        }
+
+        result <- t61_place_label(
+          series = series_for_line,
+          geom_type = line_geom_type,
+          other_series = other_series,
+          mask = mask,
+          label_cm = label_cm,
+          hjust = labels$hjust[i]
+        )
+        if (!is.null(result)) {
+          xy <- to_data(result$x, result$y)
+          result$x <- xy$x; result$y <- xy$y
+        }
+      }
+
+      # No user position and no scored/inside-band spot -- any
+      # collision-free spot at all, ignoring buffer/distance preferences.
+      if (is.null(result)) {
+        result <- t61_place_label_fallback(mask, label_cm, hjust = labels$hjust[i])
+        if (!is.null(result)) {
+          xy <- to_data(result$x, result$y)
+          result$x <- xy$x; result$y <- xy$y
+        }
+      }
+
+      # Last resort: nothing worked and there's no user position -- the
+      # panel centre, so the label is still visible rather than vanishing.
+      if (is.null(result)) {
+        cx <- mean(mask$x_range); cy <- mean(mask$y_range)
+        box <- t61_text_box_px(cx, cy, label_cm, mask, hjust = labels$hjust[i])
+        xy <- to_data(cx, cy)
+        result <- list(x = xy$x, y = xy$y, box = box)
       }
     }
 
-    # Tier 2: the caller's own fallback position, if they gave one --
-    # preferred over a blind "any empty space" spot, since it's a position
-    # the caller actually chose. Given in the same pre-flip aesthetic space
-    # as everything else the caller writes, so it's stored as-is; only the
-    # box (screen space, for collision stamping) needs the flip.
-    has_user_position <- !is.na(labels$fallback_x[i]) && !is.na(labels$fallback_y[i])
-    used_user_fallback <- FALSE
-
-    if (is.null(result) && has_user_position) {
-      fx <- labels$fallback_x[i]; fy <- labels$fallback_y[i]
-      screen_xy <- to_screen(fx, fy)
-      box <- t61_text_box_px(screen_xy$x, screen_xy$y, label_cm, mask, hjust = labels$hjust[i])
-      result <- list(x = fx, y = fy, box = box)
-      used_user_fallback <- TRUE
-    }
-
-    # Tier 3: no user position to fall back on -- any collision-free spot
-    # at all, ignoring buffer/distance preferences.
-    if (is.null(result)) {
-      result <- t61_place_label_fallback(mask, label_cm, hjust = labels$hjust[i])
-      if (!is.null(result)) {
-        xy <- to_data(result$x, result$y)
-        result$x <- xy$x; result$y <- xy$y
+    if (!is.null(result)) {
+      labels$x[i] <- result$x
+      labels$y[i] <- result$y
+      labels$placed[i] <- !used_user_fallback
+      labels$colour[i] <- result_colour
+      if (!is.null(mask) && !is.null(result$box)) {
+        mask$occupancy <- t61_stamp_box(mask$occupancy, result$box$row_range, result$box$col_range)
+        if (!is.null(area_mask)) {
+          area_mask$occupancy <- t61_stamp_box(area_mask$occupancy, result$box$row_range, result$box$col_range)
+        }
       }
-    }
-
-    # Tier 4 (last resort): nothing worked and there's no user position --
-    # the panel centre, so the label is still visible rather than vanishing.
-    if (is.null(result)) {
-      cx <- mean(mask$x_range); cy <- mean(mask$y_range)
-      box <- t61_text_box_px(cx, cy, label_cm, mask, hjust = labels$hjust[i])
-      xy <- to_data(cx, cy)
-      result <- list(x = xy$x, y = xy$y, box = box)
-    }
-
-    labels$x[i] <- result$x
-    labels$y[i] <- result$y
-    labels$placed[i] <- !used_user_fallback
-    labels$colour[i] <- result_colour
-    mask$occupancy <- t61_stamp_box(mask$occupancy, result$box$row_range, result$box$col_range)
-    if (!is.null(area_mask)) {
-      area_mask$occupancy <- t61_stamp_box(area_mask$occupancy, result$box$row_range, result$box$col_range)
     }
   }
 
