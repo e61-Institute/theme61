@@ -155,7 +155,7 @@ t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_s
 #' already in the same aesthetic space plot_label() writes to regardless
 #' of coord_flip().
 #'
-#' The offset is clamped to the series' own actual [min, max] -- by the
+#' The y offset is clamped to the series' own actual [min, max] -- by the
 #' time this runs, the y-axis scale's limits are usually already fixed
 #' (see update_scales(), called earlier in save_single()'s pipeline), sized
 #' to comfortably contain the real data but not by a guaranteed or
@@ -165,11 +165,36 @@ t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_s
 #' safe, since a scale's limits can never be narrower than the data they
 #' were built from.
 #'
+#' The anchor also steps back from the series' actual last point (by
+#' index, not distance, so it works for unevenly-spaced data too) when
+#' `hjust` is low -- with the default hjust = 0 (left-justified text
+#' extends rightward from the anchor), anchoring right at the last point
+#' pushes the label past the panel's right edge and off the visible chart.
+#' No step-back at hjust = 1 (right-justified text extends leftward, so
+#' the last point is already a safe anchor there); linearly less step-back
+#' as hjust rises toward 1.
+#'
+#' How far back is estimated from the label's own measured width (via
+#' t61_measure_label_cm() -- cheap, ~2ms, a throwaway svglite device with
+#' no rsvg/raster conversion, unlike the mask render this whole `fast`
+#' path exists to avoid), converted to data-space x units against a rough
+#' estimate of the panel's plotted width. That estimate is deliberately
+#' conservative (80% of the chart's total width, and assuming the
+#' series' own x-span roughly matches the panel's plotted x-range, true
+#' whenever auto-scaling is on): erring toward stepping back further than
+#' strictly necessary is harmless, stepping back too little is the actual
+#' bug this exists to fix. Falls back to a fixed fraction if measurement
+#' fails for any reason.
+#'
 #' @param own The label's own series, same shapes as t61_place_label().
 #' @param index The label's 1-based position among all labels being placed
 #'   this call, used only to stagger repeated placements apart.
+#' @param hjust The label's horizontal justification (0 = left, 1 = right).
+#' @param text,size_mm,width_cm,height_cm Passed through to
+#'   t61_measure_label_cm() to estimate the label's own width.
 #' @noRd
-t61_place_label_fast <- function(own, geom_type, index = 1) {
+t61_place_label_fast <- function(own, geom_type, index = 1, hjust = 0,
+                                  text = "", size_mm = 3.5, width_cm = 16, height_cm = 12) {
   stagger <- function(y, y_all) {
     yr <- diff(range(y_all, na.rm = TRUE))
     if (!is.finite(yr) || yr == 0) yr <- max(abs(y), 1)
@@ -177,17 +202,43 @@ t61_place_label_fast <- function(own, geom_type, index = 1) {
     min(max(y + offset, min(y_all, na.rm = TRUE)), max(y_all, na.rm = TRUE))
   }
 
+  step_from_end <- function(x_all) {
+    n <- length(x_all)
+    if (n <= 1 || hjust >= 1) return(n) # hjust = 1: anchor at the end is already safe
+
+    xr <- diff(range(x_all, na.rm = TRUE))
+    if (!is.finite(xr) || xr == 0) return(n)
+
+    label_cm <- tryCatch(
+      t61_measure_label_cm(text, size_mm = size_mm, width_cm = width_cm, height_cm = height_cm),
+      error = function(e) NULL
+    )
+    needed_x <- if (is.null(label_cm)) {
+      0.15 * (1 - min(max(hjust, 0), 1)) * xr # measurement failed: crude fallback
+    } else {
+      approx_panel_width_cm <- 0.80 * width_cm
+      (label_cm$width_cm / approx_panel_width_cm) * xr * (1 - min(max(hjust, 0), 1))
+    }
+    if (needed_x <= 0) return(n)
+
+    target_x <- max(x_all, na.rm = TRUE) - needed_x
+    idx <- which(x_all <= target_x)
+    if (length(idx) == 0) return(1) # label wider than the whole series: use the first point
+    max(idx)
+  }
+
   if (identical(geom_type, "column")) {
-    j <- length(own$xmin)
-    x <- (own$xmin[j] + own$xmax[j]) / 2
+    x_all <- (own$xmin + own$xmax) / 2
+    j <- step_from_end(x_all)
+    x <- x_all[j]
     y <- stagger(own$ymax[j], c(own$ymin, own$ymax))
   } else if (identical(geom_type, "area")) {
-    j <- length(own$x)
+    j <- step_from_end(own$x)
     x <- own$x[j]
     y <- stagger(own$ymax[j], own$ymax)
   } else {
     # line / point / pointbar
-    j <- length(own$x)
+    j <- step_from_end(own$x)
     x <- own$x[j]
     y <- stagger(own$y[j], own$y)
   }
@@ -307,7 +358,9 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
       # the label keeps its (possibly NA) fallback, same as the "not v1
       # scope" case above.
       if (has_series) {
-        fp <- t61_place_label_fast(own, geom_type, index = i)
+        fp <- t61_place_label_fast(own, geom_type, index = i, hjust = labels$hjust[i],
+                                   text = labels$text[i], size_mm = labels$size_mm[i],
+                                   width_cm = width_cm, height_cm = height_cm)
         result <- list(x = fp$x, y = fp$y, box = NULL)
       }
 

@@ -226,10 +226,11 @@ test_that("t61_autolabel_plot(fast = TRUE) places labels without rendering a mas
   expect_false(anyNA(result$x)); expect_false(anyNA(result$y))
   expect_true(all(result$placed))
 
-  # Cheap, not optimal -- anchored to the series' own last data point (see
-  # t61_place_label_fast()), nudged up a bit, not to the range's midpoint.
-  expect_lt(abs(result$y[1] - setup$a$y[nrow(setup$a)]), 2) # series A ends near y = 5
-  expect_lt(abs(result$y[2] - setup$b$y[nrow(setup$b)]), 2) # series B ends near y = 2
+  # Cheap, not optimal -- anchored near (not exactly at, see
+  # t61_place_label_fast()'s step-back-from-the-end for hjust = 0) the
+  # label's own series, nudged up a bit, not to the range's midpoint.
+  expect_lt(abs(result$y[1] - setup$a$y[nrow(setup$a)]), 3) # series A ends near y = 5
+  expect_lt(abs(result$y[2] - setup$b$y[nrow(setup$b)]), 3) # series B ends near y = 2
 })
 
 test_that("t61_place_label_fast() never places a label outside its own series' data range", {
@@ -261,6 +262,73 @@ test_that("t61_place_label_fast() never places a label outside its own series' d
   for (i in 1:5) {
     p <- t61_place_label_fast(own_area, "area", index = i)
     expect_gte(p$y, min(own_area$ymax)); expect_lte(p$y, max(own_area$ymax))
+  }
+})
+
+test_that("t61_place_label_fast() steps back further from the end for a longer label", {
+  skip_on_cran()
+
+  # Regression test: a label anchored right at the series' rightmost point
+  # with the default hjust = 0 (left-justified, text extends rightward)
+  # used to render cut off past the panel's right edge -- reported against
+  # a real chart with long labels ("Wages"/"Productivity"). The step-back
+  # is based on the label's own measured width, so a longer label should
+  # end up further from the true endpoint than a short one.
+  own <- list(x = 2000:2020, y = seq(0, 5, length.out = 21))
+
+  p_short <- t61_place_label_fast(own, "line", index = 1, hjust = 0, text = "A",
+                                   size_mm = 3.5, width_cm = 16, height_cm = 12)
+  p_long <- t61_place_label_fast(own, "line", index = 1, hjust = 0,
+                                  text = "A Very Long Series Label Indeed",
+                                  size_mm = 3.5, width_cm = 16, height_cm = 12)
+
+  expect_lt(p_long$x, p_short$x)
+  expect_lte(p_short$x, max(own$x)) # still within the series either way
+  expect_gte(p_long$x, min(own$x))
+
+  # hjust = 1 (right-justified, text extends leftward): the last point is
+  # already a safe anchor, so no step-back regardless of label length.
+  p_right_just <- t61_place_label_fast(own, "line", index = 1, hjust = 1,
+                                        text = "A Very Long Series Label Indeed",
+                                        size_mm = 3.5, width_cm = 16, height_cm = 12)
+  expect_equal(p_right_just$x, max(own$x))
+})
+
+test_that("t61_apply_autolabel(fast = TRUE) keeps a long label's box within the panel", {
+  skip_on_cran()
+
+  # End-to-end version of the step-back test above: drives the real
+  # wiring (t61_apply_autolabel(), not t61_place_label_fast() directly)
+  # and checks the resolved position's actual rendered box, the same way
+  # the reported crash/clipping was diagnosed.
+  set.seed(1)
+  data1 <- data.frame(
+    year = rep(2005:2024, 2),
+    value = c(100 + cumsum(rnorm(20, 1.5, 1)), 100 + cumsum(rnorm(20, 3.5, 1))),
+    series = rep(c("Wages", "Productivity"), each = 20)
+  )
+  cols1 <- c(Wages = "#e57200", Productivity = "#1c3144")
+
+  p <- ggplot(data1, aes(year, value, colour = series)) +
+    geom_line(linewidth = 1) +
+    scale_colour_manual(values = cols1) +
+    theme_bw(base_size = 10) +
+    theme(legend.position = "none") +
+    plot_label(c("Wages", "Productivity"), colour = unname(cols1))
+
+  result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = TRUE)
+
+  label_layer <- which(vapply(result@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  d <- result@layers[[label_layer]]$data
+  expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
+
+  mask <- t61_render_mask(t61_strip_autolabel_layers(p), width_cm = 16, height_cm = 12)
+  for (i in seq_len(nrow(d))) {
+    cm <- t61_measure_label_cm(d$label[i], size_mm = d$size[i], width_cm = 16, height_cm = 12)
+    box <- t61_text_box_px(d$x[i], d$y[i], cm, mask, hjust = d$hjust[i])
+    expect_true(t61_box_in_bounds(box$row_range, box$col_range, mask))
   }
 })
 
