@@ -98,11 +98,7 @@ save_single <- function(
   # Get facet dimensions if applicable
   if (length(plot@facet$params) != 0) {
 
-    # Only build here - it's otherwise unused, and most theme61 charts are
-    # single-panel (no facets), so this used to render every chart just to
-    # throw the result away. Facet panel counts don't depend on the y-scale/
-    # theme mutations already applied above, so building at this later point
-    # gives the same COL/ROW values as building earlier would have.
+    # Only build when actually needed - most theme61 charts are single-panel
     plot_build <- ggplot_build(plot)
 
     n_panel_cols <- max(plot_build$layout$layout$COL)
@@ -123,9 +119,7 @@ save_single <- function(
   # check whether the user has supplied a given width first (i.e. different to the default 8.5cm)
   if(is.null(width)) {
 
-    # When coord_flip() is used to make a plot horizontal, the default dims are too small.
-    # The coord class is available directly on the plot object, so check that
-    # rather than paying for a full ggplot_build() just to read $layout$coord.
+    # When coord_flip() is used to make a plot horizontal, the default dims are too small
     if (isTRUE("CoordFlip" %in% class(plot@coordinates))) {
 
       width <- max_width

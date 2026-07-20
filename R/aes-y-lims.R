@@ -25,12 +25,8 @@ update_scales <- function(plot, auto_scale){
     return(plot)
   }
 
-  # check_for_y_var(), the sec-axis check below, and get_y_minmax() (called
-  # from update_chart_scales()) all used to separately ggplot_build()/
-  # ggplotGrob() this same, not-yet-rescaled `plot` - three full renders of
-  # identical input. Build it once here and thread it through instead. This
-  # is safe because none of plot's mutations (the eventual y-scale addition)
-  # happen until update_chart_scales() returns, i.e. after every use below.
+  # Build once and share it with check_for_y_var()/the sec-axis check/
+  # get_y_minmax() below - plot isn't mutated until update_chart_scales() returns.
   build <- ggplot_build(plot)
 
   # check if we have a numeric y-variable
@@ -56,8 +52,7 @@ update_scales <- function(plot, auto_scale){
   }
 
   # check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
-  # ggplot_gtable(build) is what ggplotGrob(plot) does internally once the
-  # build step is already done, so this reuses `build` instead of re-building.
+  # ggplot_gtable(build) == ggplotGrob(plot), reusing the build above
   grobs <- ggplot_gtable(build)
 
   test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
@@ -80,8 +75,7 @@ update_scales <- function(plot, auto_scale){
 }
 
 #' Check whether the dataset has a y-variable that can be used for scaling
-#' build - optional, an already-computed ggplot_build(plot) to reuse instead
-#'   of building the plot again.
+#' build - optional, reuse an existing ggplot_build(plot) instead of rebuilding
 #'@noRd
 check_for_y_var <- function(plot, build = NULL){
 
@@ -130,8 +124,7 @@ check_for_y_var <- function(plot, build = NULL){
 }
 
 #' Aesthetically update the y-axis scales and labels
-#' build - optional, an already-computed ggplot_build(plot) to reuse instead
-#'   of building the plot again in get_y_minmax().
+#' build - optional, reuse an existing ggplot_build(plot) instead of rebuilding
 #' @noRd
 update_chart_scales <- function(plot, auto_scale, sec_axis, build = NULL){
 
@@ -247,8 +240,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis, build = NULL){
 }
 
 #' Get the minimum and maximum y-axis data in the chart data
-#' build - optional, an already-computed ggplot_build(plot) to reuse instead
-#'   of building the plot again.
+#' build - optional, reuse an existing ggplot_build(plot) instead of rebuilding
 #' @noRd
 get_y_minmax <- function(plot, build = NULL){
 
