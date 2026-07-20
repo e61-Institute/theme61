@@ -247,8 +247,17 @@ save_multi <-
     # label sitting just outside that assumed edge land on real content
     # once the real (larger) panel renders. No-ops on a panel with no
     # eligible labels.
-    panel_total_width  <- panel_width + max_left_axis_width + max_right_axis_width
-    panel_total_height <- panel_height + known_height
+    #
+    # The width/height passed to t61_apply_autolabel() has to be each
+    # panel's own total footprint including that margin (not just
+    # panel_width + axis, which is what it added up to before the margin
+    # existed) -- this is exactly tot_width/ncol and (p_h)/nrow end up
+    # being below, once title/subtitle/caption and the rest of the
+    # top-level padding are worked out, but those aren't available yet at
+    # this point in the function, so it's reconstructed directly here from
+    # the same pieces instead.
+    panel_total_width  <- panel_width + max_left_axis_width + max_right_axis_width + 2 * chart_width_pad / 10
+    panel_total_height <- panel_height + known_height + 2 * chart_height_pad / 10
 
     for (i in seq_along(clean_plotlist)) {
       clean_plotlist[[i]] <- clean_plotlist[[i]] +
