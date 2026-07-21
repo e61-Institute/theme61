@@ -188,6 +188,30 @@ test_that("x/y are optional when auto_position = TRUE, required otherwise", {
   )
 })
 
+test_that("Rotated text requires x/y (angle != 0 has no automatic positioning to fall back on)", {
+  expect_error(
+    plot_label("a", colour = "red", angle = 45),
+    "angle != 0"
+  )
+
+  # A mix of rotated and unrotated labels still requires x/y for all of
+  # them, since they're one auto_position call, not resolved individually.
+  expect_error(
+    plot_label(c("a", "b"), colour = c("red", "blue"), angle = c(0, 45)),
+    "angle != 0"
+  )
+
+  # An explicit position is fine regardless of rotation.
+  expect_no_error(plot_label("a", x = 1, y = 1, colour = "red", angle = 45))
+
+  # auto_position = FALSE already requires x/y on its own -- rotation
+  # doesn't change that error.
+  expect_error(
+    plot_label("a", colour = "red", angle = 45, auto_position = FALSE),
+    "auto_position = FALSE"
+  )
+})
+
 test_that("Changing horizontal alignment of text works", {
 
   p1 <- minimal_plot_label +

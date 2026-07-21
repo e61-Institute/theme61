@@ -4,12 +4,12 @@
 #'   onto the graph plot. This is preferred over using legends.
 #'
 #' @param label String vector. Label text to be displayed.
-#' @param x (optional if `auto_position = TRUE`) Numeric or string vector.
-#'   X-axis positions of the label text. Used as the preferred fallback
-#'   position if automatic positioning can't find a good spot -- see
-#'   `auto_position`. Required (along with `y`) if `auto_position = FALSE`.
-#' @param y (optional if `auto_position = TRUE`) Numeric or string vector.
-#'   Y-axis positions of the label text. See `x`.
+#' @param x (optional if `auto_position = TRUE` and `angle = 0`) Numeric or
+#'   string vector. X-axis positions of the label text. If supplied, this
+#'   exact position is always used -- see `auto_position`. Required (along
+#'   with `y`) if `auto_position = FALSE`, or if any `angle != 0`.
+#' @param y (optional if `auto_position = TRUE` and `angle = 0`) Numeric or
+#'   string vector. Y-axis positions of the label text. See `x`.
 #' @param colour (optional) Vector of colour names or strings. Default uses the
 #'   e61 palette.
 #' @param size (optional) Integer. Size of the text, the default size should be
@@ -19,7 +19,8 @@
 #' @param geom (optional) String. Either "text" (default) or "label". "label"
 #'   adds a white box around the text which could be useful sometimes.
 #' @param angle (optional) Numeric. Rotate the labels. Defaults to 0 which is
-#'   normal left-to-right text.
+#'   normal left-to-right text. Rotated text can't be auto-positioned, so
+#'   `x`/`y` are required whenever `angle != 0`.
 #' @param panel Optional named list. If the plot is facetted, you can restrict
 #'   the label(s) to a specific panel by supplying the facetting variable(s) as
 #'   a named list, see the Details for the syntax.
@@ -30,13 +31,12 @@
 #'   line/point/column/area/`geom_pointbar()` series in the plot (`colour`
 #'   for lines, points and `geom_pointbar()`, `fill` for columns and areas),
 #'   and to unrotated text (`angle = 0`); anything else keeps the position
-#'   you specify, with a warning if you didn't specify one (there's then
-#'   nothing for the label to fall back on, and it may not appear). For an
-#'   area series, the label is placed fully inside the band where there's
-#'   room, recoloured to contrast with the fill, or outside it (in the
-#'   fill's own colour) where the band is too narrow. For a
-#'   `geom_pointbar()` series, the buffer accounts for the full error-bar
-#'   extent, not just the point.
+#'   you specify (`x`/`y` are required for rotated text, since there's
+#'   nothing to auto-position it against). For an area series, the label
+#'   is placed fully inside the band where there's room, recoloured to
+#'   contrast with the fill, or outside it (in the fill's own colour)
+#'   where the band is too narrow. For a `geom_pointbar()` series, the
+#'   buffer accounts for the full error-bar extent, not just the point.
 #'
 #'   If you supply `x`/`y`, that position is always used exactly as given.
 #'   If you don't, the fallback order is: (1) a good spot found by the
@@ -106,6 +106,12 @@ plot_label <-
     }
     if (!isTRUE(auto_position) && is.null(x)) {
       stop("`x` and `y` are required when `auto_position = FALSE` (there's no automatic positioning to fall back on).")
+    }
+    if (isTRUE(auto_position) && is.null(x) && any(angle != 0)) {
+      stop(
+        "`x`/`y` are required when `angle != 0` (automatic positioning ",
+        "doesn't apply to rotated text -- see `?plot_label`)."
+      )
     }
     if (!is.null(x) && !all.equal(length(label), length(x), length(y))) {
       stop("The number of x and y positions must equal the number of labels.")

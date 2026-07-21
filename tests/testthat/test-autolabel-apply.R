@@ -142,30 +142,6 @@ test_that("t61_apply_autolabel skips rotated labels (v1 scope: angle = 0 only)",
   expect_equal(d$y, 1)
 })
 
-test_that("t61_apply_autolabel warns when a rotated label has no x/y to fall back on", {
-  skip_on_cran()
-
-  data <- data.frame(x = 2000:2020, y = seq(0, 5, length.out = 21))
-  p_no_xy <- ggplot(data, aes(x, y)) +
-    geom_line(colour = "#e57200", linewidth = 1) +
-    theme_bw(base_size = 10) +
-    plot_label("Series A", colour = "#e57200", angle = 45)
-
-  expect_warning(
-    t61_apply_autolabel(p_no_xy, width_cm = 16, height_cm = 12),
-    "cannot auto-position rotated text"
-  )
-
-  # An explicit position is unaffected -- it renders exactly where given,
-  # so there's nothing to warn about.
-  p_with_xy <- ggplot(data, aes(x, y)) +
-    geom_line(colour = "#e57200", linewidth = 1) +
-    theme_bw(base_size = 10) +
-    plot_label("Series A", x = 2005, y = 1, colour = "#e57200", angle = 45)
-
-  expect_no_warning(t61_apply_autolabel(p_with_xy, width_cm = 16, height_cm = 12))
-})
-
 test_that("t61_apply_autolabel keeps the fallback when the label colour matches no series", {
   skip_on_cran()
 

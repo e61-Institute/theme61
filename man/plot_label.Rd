@@ -40,13 +40,13 @@ plab(
 \arguments{
 \item{label}{String vector. Label text to be displayed.}
 
-\item{x}{(optional if \code{auto_position = TRUE}) Numeric or string vector.
-X-axis positions of the label text. Used as the preferred fallback
-position if automatic positioning can't find a good spot -- see
-\code{auto_position}. Required (along with \code{y}) if \code{auto_position = FALSE}.}
+\item{x}{(optional if \code{auto_position = TRUE} and \code{angle = 0}) Numeric or
+string vector. X-axis positions of the label text. If supplied, this
+exact position is always used -- see \code{auto_position}. Required (along
+with \code{y}) if \code{auto_position = FALSE}, or if any \code{angle != 0}.}
 
-\item{y}{(optional if \code{auto_position = TRUE}) Numeric or string vector.
-Y-axis positions of the label text. See \code{x}.}
+\item{y}{(optional if \code{auto_position = TRUE} and \code{angle = 0}) Numeric or
+string vector. Y-axis positions of the label text. See \code{x}.}
 
 \item{colour}{(optional) Vector of colour names or strings. Default uses the
 e61 palette.}
@@ -61,7 +61,8 @@ the text. 0 left-aligns (default), 0.5 centre-aligns and 1 right-aligns.}
 adds a white box around the text which could be useful sometimes.}
 
 \item{angle}{(optional) Numeric. Rotate the labels. Defaults to 0 which is
-normal left-to-right text.}
+normal left-to-right text. Rotated text can't be auto-positioned, so
+\code{x}/\code{y} are required whenever \code{angle != 0}.}
 
 \item{panel}{Optional named list. If the plot is facetted, you can restrict
 the label(s) to a specific panel by supplying the facetting variable(s) as
@@ -74,13 +75,12 @@ the chart. Automatic positioning only applies to single-panel
 line/point/column/area/\code{geom_pointbar()} series in the plot (\code{colour}
 for lines, points and \code{geom_pointbar()}, \code{fill} for columns and areas),
 and to unrotated text (\code{angle = 0}); anything else keeps the position
-you specify, with a warning if you didn't specify one (there's then
-nothing for the label to fall back on, and it may not appear). For an
-area series, the label is placed fully inside the band where there's
-room, recoloured to contrast with the fill, or outside it (in the
-fill's own colour) where the band is too narrow. For a
-\code{geom_pointbar()} series, the buffer accounts for the full error-bar
-extent, not just the point.
+you specify (\code{x}/\code{y} are required for rotated text, since there's
+nothing to auto-position it against). For an area series, the label
+is placed fully inside the band where there's room, recoloured to
+contrast with the fill, or outside it (in the fill's own colour)
+where the band is too narrow. For a \code{geom_pointbar()} series, the
+buffer accounts for the full error-bar extent, not just the point.
 
 If you supply \code{x}/\code{y}, that position is always used exactly as given.
 If you don't, the fallback order is: (1) a good spot found by the
