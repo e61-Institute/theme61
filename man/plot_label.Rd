@@ -40,13 +40,12 @@ plab(
 \arguments{
 \item{label}{String vector. Label text to be displayed.}
 
-\item{x}{(optional if \code{auto_position = TRUE} and \code{angle = 0}) Numeric or
-string vector. X-axis positions of the label text. If supplied, this
-exact position is always used -- see \code{auto_position}. Required (along
-with \code{y}) if \code{auto_position = FALSE}, or if any \code{angle != 0}.}
+\item{x}{(optional, see Details) Numeric or string vector. X-axis
+positions of the label text. If supplied, this exact position is
+always used.}
 
-\item{y}{(optional if \code{auto_position = TRUE} and \code{angle = 0}) Numeric or
-string vector. Y-axis positions of the label text. See \code{x}.}
+\item{y}{(optional, see Details) Numeric or string vector. Y-axis
+positions of the label text. See \code{x}.}
 
 \item{colour}{(optional) Vector of colour names or strings. Default uses the
 e61 palette.}
@@ -61,33 +60,16 @@ the text. 0 left-aligns (default), 0.5 centre-aligns and 1 right-aligns.}
 adds a white box around the text which could be useful sometimes.}
 
 \item{angle}{(optional) Numeric. Rotate the labels. Defaults to 0 which is
-normal left-to-right text. Rotated text can't be auto-positioned, so
-\code{x}/\code{y} are required whenever \code{angle != 0}.}
+normal left-to-right text. See Details for how this interacts with \code{x}/\code{y}.}
 
 \item{panel}{Optional named list. If the plot is facetted, you can restrict
 the label(s) to a specific panel by supplying the facetting variable(s) as
-a named list, see the Details for the syntax.}
+a named list, see Details for the syntax.}
 
 \item{auto_position}{Logical. If TRUE (default), \code{save_e61()} will try to
 automatically reposition the label to a nearby, non-overlapping spot on
-the chart. Automatic positioning only applies to single-panel
-(unfacetted) charts where the label's colour matches a
-line/point/column/area/\code{geom_pointbar()} series in the plot (\code{colour}
-for lines, points and \code{geom_pointbar()}, \code{fill} for columns and areas),
-and to unrotated text (\code{angle = 0}); anything else keeps the position
-you specify (\code{x}/\code{y} are required for rotated text, since there's
-nothing to auto-position it against). For an area series, the label
-is placed fully inside the band where there's room, recoloured to
-contrast with the fill, or outside it (in the fill's own colour)
-where the band is too narrow. For a \code{geom_pointbar()} series, the
-buffer accounts for the full error-bar extent, not just the point.
-
-If you supply \code{x}/\code{y}, that position is always used exactly as given.
-If you don't, the fallback order is: (1) a good spot found by the
-placement algorithm; (2) any collision-free spot on the chart (i.e.
-empty space), even if it's not a particularly good one; (3) the
-centre of the panel, so the label stays visible rather than
-vanishing. Set to FALSE to always use the exact \code{x}/\code{y} you supply --
+the chart. See Details for exactly when this applies and how positions
+are chosen. Set to FALSE to always use the exact \code{x}/\code{y} you supply --
 \code{x} and \code{y} are then required.}
 
 \item{print_position}{Logical. If TRUE, print the plot's final
@@ -107,8 +89,35 @@ Add text labels for lines, columns or other elements directly
 onto the graph plot. This is preferred over using legends.
 }
 \details{
-The syntax for getting labels to appear on certain facet panels is
-as follows.
+\subsection{Automatic positioning}{
+
+When \code{auto_position = TRUE} (the default), \code{save_e61()} tries to move the
+label to a nearby, non-overlapping spot -- but only for single-panel
+(unfacetted) charts where the label's colour matches a
+line/point/column/area/\code{geom_pointbar()} series in the plot (\code{colour} for
+lines, points and \code{geom_pointbar()}, \code{fill} for columns and areas), and
+only for unrotated text (\code{angle = 0}). For an area series, the label is
+placed fully inside the band where there's room, recoloured to contrast
+with the fill, or outside it (in the fill's own colour) where the band is
+too narrow. For a \code{geom_pointbar()} series, the buffer accounts for the
+full error-bar extent, not just the point.
+
+If you supply \code{x}/\code{y}, that position is always used exactly as given --
+the placement algorithm never runs for that label. If you don't, the
+fallback order is: (1) a good spot found by the placement algorithm; (2)
+any collision-free spot on the chart (i.e. empty space), even if it's not
+a particularly good one; (3) the centre of the panel, so the label stays
+visible rather than vanishing.
+
+A facetted plot, or rotated text (\code{angle != 0}), has no automatic
+positioning to fall back on, so \code{x}/\code{y} are required in those cases (as
+they are whenever \code{auto_position = FALSE}).
+}
+
+\subsection{Facet targeting}{
+
+The syntax for getting labels to appear on certain facet panels is as
+follows.
 
 For facet wraps, supply a named list with the facetting variable name(s)
 and the facet value(s) you want the labels to appear on. For example, to
@@ -121,4 +130,5 @@ facet variables are \code{r} and \code{c}, use \code{panel = list(r = "A", c = "
 get the labels to appear on the panel at row \code{A} and column \code{1}. If you
 have 2 labels you want to appear on panel \code{A1} and \code{B2}, use
 \code{panel = list(r = c("A", "B"), c = c("1", "2"))}.
+}
 }

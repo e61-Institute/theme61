@@ -4,12 +4,11 @@
 #'   onto the graph plot. This is preferred over using legends.
 #'
 #' @param label String vector. Label text to be displayed.
-#' @param x (optional if `auto_position = TRUE` and `angle = 0`) Numeric or
-#'   string vector. X-axis positions of the label text. If supplied, this
-#'   exact position is always used -- see `auto_position`. Required (along
-#'   with `y`) if `auto_position = FALSE`, or if any `angle != 0`.
-#' @param y (optional if `auto_position = TRUE` and `angle = 0`) Numeric or
-#'   string vector. Y-axis positions of the label text. See `x`.
+#' @param x (optional, see Details) Numeric or string vector. X-axis
+#'   positions of the label text. If supplied, this exact position is
+#'   always used.
+#' @param y (optional, see Details) Numeric or string vector. Y-axis
+#'   positions of the label text. See `x`.
 #' @param colour (optional) Vector of colour names or strings. Default uses the
 #'   e61 palette.
 #' @param size (optional) Integer. Size of the text, the default size should be
@@ -19,31 +18,14 @@
 #' @param geom (optional) String. Either "text" (default) or "label". "label"
 #'   adds a white box around the text which could be useful sometimes.
 #' @param angle (optional) Numeric. Rotate the labels. Defaults to 0 which is
-#'   normal left-to-right text. Rotated text can't be auto-positioned, so
-#'   `x`/`y` are required whenever `angle != 0`.
+#'   normal left-to-right text. See Details for how this interacts with `x`/`y`.
 #' @param panel Optional named list. If the plot is facetted, you can restrict
 #'   the label(s) to a specific panel by supplying the facetting variable(s) as
-#'   a named list, see the Details for the syntax.
+#'   a named list, see Details for the syntax.
 #' @param auto_position Logical. If TRUE (default), `save_e61()` will try to
 #'   automatically reposition the label to a nearby, non-overlapping spot on
-#'   the chart. Automatic positioning only applies to single-panel
-#'   (unfacetted) charts where the label's colour matches a
-#'   line/point/column/area/`geom_pointbar()` series in the plot (`colour`
-#'   for lines, points and `geom_pointbar()`, `fill` for columns and areas),
-#'   and to unrotated text (`angle = 0`); anything else keeps the position
-#'   you specify (`x`/`y` are required for rotated text, since there's
-#'   nothing to auto-position it against). For an area series, the label
-#'   is placed fully inside the band where there's room, recoloured to
-#'   contrast with the fill, or outside it (in the fill's own colour)
-#'   where the band is too narrow. For a `geom_pointbar()` series, the
-#'   buffer accounts for the full error-bar extent, not just the point.
-#'
-#'   If you supply `x`/`y`, that position is always used exactly as given.
-#'   If you don't, the fallback order is: (1) a good spot found by the
-#'   placement algorithm; (2) any collision-free spot on the chart (i.e.
-#'   empty space), even if it's not a particularly good one; (3) the
-#'   centre of the panel, so the label stays visible rather than
-#'   vanishing. Set to FALSE to always use the exact `x`/`y` you supply --
+#'   the chart. See Details for exactly when this applies and how positions
+#'   are chosen. Set to FALSE to always use the exact `x`/`y` you supply --
 #'   `x` and `y` are then required.
 #' @param print_position Logical. If TRUE, print the plot's final
 #'   (auto-positioned) label `label`/`x`/`y` to the console, as copy-pasteable
@@ -53,21 +35,46 @@
 #'   auto-positioning every time. Defaults to FALSE.
 #' @param facet_name,facet_value `r lifecycle::badge("deprecated")`
 #'
-#' @details The syntax for getting labels to appear on certain facet panels is
-#'   as follows.
+#' @details
+#' ## Automatic positioning
+#' When `auto_position = TRUE` (the default), `save_e61()` tries to move the
+#' label to a nearby, non-overlapping spot -- but only for single-panel
+#' (unfacetted) charts where the label's colour matches a
+#' line/point/column/area/`geom_pointbar()` series in the plot (`colour` for
+#' lines, points and `geom_pointbar()`, `fill` for columns and areas), and
+#' only for unrotated text (`angle = 0`). For an area series, the label is
+#' placed fully inside the band where there's room, recoloured to contrast
+#' with the fill, or outside it (in the fill's own colour) where the band is
+#' too narrow. For a `geom_pointbar()` series, the buffer accounts for the
+#' full error-bar extent, not just the point.
 #'
-#'   For facet wraps, supply a named list with the facetting variable name(s)
-#'   and the facet value(s) you want the labels to appear on. For example, to
-#'   get labels to appear only on panel `1`, use `panel = list(grp = "1")`. If
-#'   you have 2 labels that you want to appear on panels `1` and `2`, use `panel
-#'   = list(grp = c("1", "2"))`.
+#' If you supply `x`/`y`, that position is always used exactly as given --
+#' the placement algorithm never runs for that label. If you don't, the
+#' fallback order is: (1) a good spot found by the placement algorithm; (2)
+#' any collision-free spot on the chart (i.e. empty space), even if it's not
+#' a particularly good one; (3) the centre of the panel, so the label stays
+#' visible rather than vanishing.
 #'
-#'   For facet grids, you need to supply both the x- and y-dimension facet
-#'   variables to get the plot labels to appear correctly. For example, if your
-#'   facet variables are `r` and `c`, use `panel = list(r = "A", c = "1")` to
-#'   get the labels to appear on the panel at row `A` and column `1`. If you
-#'   have 2 labels you want to appear on panel `A1` and `B2`, use
-#'   `panel = list(r = c("A", "B"), c = c("1", "2"))`.
+#' A facetted plot, or rotated text (`angle != 0`), has no automatic
+#' positioning to fall back on, so `x`/`y` are required in those cases (as
+#' they are whenever `auto_position = FALSE`).
+#'
+#' ## Facet targeting
+#' The syntax for getting labels to appear on certain facet panels is as
+#' follows.
+#'
+#' For facet wraps, supply a named list with the facetting variable name(s)
+#' and the facet value(s) you want the labels to appear on. For example, to
+#' get labels to appear only on panel `1`, use `panel = list(grp = "1")`. If
+#' you have 2 labels that you want to appear on panels `1` and `2`, use `panel
+#' = list(grp = c("1", "2"))`.
+#'
+#' For facet grids, you need to supply both the x- and y-dimension facet
+#' variables to get the plot labels to appear correctly. For example, if your
+#' facet variables are `r` and `c`, use `panel = list(r = "A", c = "1")` to
+#' get the labels to appear on the panel at row `A` and column `1`. If you
+#' have 2 labels you want to appear on panel `A1` and `B2`, use
+#' `panel = list(r = c("A", "B"), c = c("1", "2"))`.
 #'
 #' @return Object to add to a ggplot (via `+`).
 #' @export
