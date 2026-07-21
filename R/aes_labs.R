@@ -494,31 +494,78 @@ get_lines <- function(text, font_size, plot_width, font_face = 1){
 }
 
 #' Calculate the width of text in ggplot titles, subtitles and footnotes
+#'
+#' Measured using a throwaway svglite device (rather than base R's built-in
+#' font metric tables) so that the measurement reflects the real glyph
+#' widths of the font that will actually be used to render the graph. Base
+#' R's "sans" metric table doesn't know about "pt-sans" and under-measures
+#' real text width by roughly 10-15%, which left text wrapping decisions
+#' allowing lines that were wider than they actually had room for.
 #' text - String. Text to be measured.
 #' font_size - Numeric. Size of the font of the text.
+#' font_face - Numeric. Face of the font (1 = normal, 2 = bold)
 #' @noRd
 get_text_width <- function(text, font_size = 10, font_face = 1) {
 
-  R.devices::devEval("nulldev", {
-    par(family = "sans", ps = font_size, font = font_face)
-    ret <- graphics::strwidth(text, units = "inches") * 2.54
-  })
+  if (length(text) == 0) return(numeric(0))
 
-  return(ret)
+  family <- if (is_testing()) "sans" else "pt-sans"
+  face <- if (font_face == 2) "bold" else "plain"
+
+  measure_device({
+    grid::pushViewport(grid::viewport(
+      gp = grid::gpar(fontfamily = family, fontsize = font_size, fontface = face)
+    ))
+
+    ret <- grid::convertWidth(grid::stringWidth(text), "cm", valueOnly = TRUE)
+
+    grid::popViewport()
+
+    ret
+  })
 }
 
 #' Calculate the height of text in ggplot titles, subtitles and footnotes
+#'
+#' See [get_text_width] for why this measures using a real graphics device
+#' rather than base R's built-in font metric tables.
 #' text - String. Text to be measured.
 #' font_size - Numeric. Size of the font of the text.
 #' @noRd
 get_text_height <- function(text, font_size = 10) {
 
-  R.devices::devEval("nulldev", {
-    par(family = "sans", ps = font_size)
-    ret <- graphics::strheight(text, units = "inches") * 2.54
-  })
+  if (length(text) == 0) return(numeric(0))
 
-  return(ret)
+  family <- if (is_testing()) "sans" else "pt-sans"
+
+  measure_device({
+    grid::pushViewport(grid::viewport(
+      gp = grid::gpar(fontfamily = family, fontsize = font_size)
+    ))
+
+    ret <- grid::convertHeight(grid::stringHeight(text), "cm", valueOnly = TRUE)
+
+    grid::popViewport()
+
+    ret
+  })
+}
+
+#' Run `expr` with a throwaway svglite device as the active graphics device,
+#' so text can be measured with real font metrics. The device is opened and
+#' closed around `expr`, which restores whatever device (if any) was active
+#' beforehand as a side effect of `dev.off()`, so this never disturbs a
+#' device the user has open.
+#' @noRd
+measure_device <- function(expr) {
+
+  measure_file <- tempfile(fileext = ".svg")
+  on.exit(unlink(measure_file))
+
+  svglite::svglite(measure_file, width = 10, height = 10)
+  on.exit(grDevices::dev.off(), add = TRUE)
+
+  expr
 }
 
 #' Split a character string into its individual words
