@@ -2,6 +2,7 @@
 
 #### Bug fixes
 
+* Fixed an issue where `labs_e61` would leave whitespace above the subtitle when a plot had a subtitle but no title (the empty title was still reserving vertical space).
 * `save_e61` now always previews an SVG version of the graph in the Viewer pane, even when saving to other formats such as PDF or PNG. This fixes an error where RStudio's Viewer pane could fail to open non-SVG formats (e.g. a "chrome-extension" popup error when saving PDFs).
 * Y-axis text now defaults to left-aligned when the y-axis is categorical (e.g. horizontal bar charts), instead of hugging the axis line, so it lines up with the left-aligned plot title/subtitle/y-axis title. This can still be overridden with `theme(axis.text.y = element_text(hjust = ...))`.
 

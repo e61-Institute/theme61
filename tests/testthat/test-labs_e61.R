@@ -1,3 +1,11 @@
+test_that("Title stays NULL when not supplied, so no space is reserved for it", {
+  lab <- labs_e61(subtitle = "Subtitle")
+  expect_null(lab$title)
+
+  lab <- labs_e61(title = NULL, subtitle = "Subtitle", title_wrap = 50L)
+  expect_null(lab$title)
+})
+
 test_that("Users should not be able to supply a caption if footnotes or sources are supplied", {
   expect_error(
     labs_e61(title = "Something", footnotes = "Test", caption = "Fail")

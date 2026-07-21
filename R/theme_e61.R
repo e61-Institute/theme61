@@ -108,7 +108,7 @@ theme_e61 <- function(
         hjust = 0,
         margin = margin(t = 12)
       ),
-      plot.margin = margin(t = 14, r = 8, b = 8, l = 8),
+      plot.margin = margin(t = 4, r = 2, b = 2, l = 2),
 
       # Strip (facets)
       strip.background = element_blank(),

@@ -81,7 +81,13 @@ labs_e61 <- function(title = NULL,
 
   # Title ----
   # For each label check whether to wrap the title
-  if (!is.null(title_wrap)) {
+  if (is.null(title)) {
+
+    # Keep title as NULL so ggplot2 does not reserve space for an empty
+    # title grob (an empty string title still takes up vertical space)
+    title_text <- NULL
+
+  } else if (!is.null(title_wrap)) {
 
     # Check the title and title_wrap have been correctly supplied
     if (!is.numeric(title_wrap) || title_wrap < 0) {
