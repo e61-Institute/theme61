@@ -6,6 +6,20 @@ test_that("Title stays NULL when not supplied, so no space is reserved for it", 
   expect_null(lab$title)
 })
 
+test_that("y-axis title (y_top = TRUE) doesn't get an empty leading line when no subtitle is supplied", {
+  lab <- labs_e61(y = "Y label")
+  expect_equal(lab$subtitle, "<span style='font-size:9pt'>Y label</span>", ignore_attr = TRUE)
+  expect_false(grepl("^<span[^>]*></span><br>", lab$subtitle))
+
+  # subtitle actually supplied - should still combine subtitle + y-axis title
+  lab <- labs_e61(subtitle = "Subtitle", y = "Y label")
+  expect_equal(
+    lab$subtitle,
+    "<span style='font-size:10pt'>Subtitle</span><br><span style='font-size:9pt'>Y label</span>",
+    ignore_attr = TRUE
+  )
+})
+
 test_that("Users should not be able to supply a caption if footnotes or sources are supplied", {
   expect_error(
     labs_e61(title = "Something", footnotes = "Test", caption = "Fail")
