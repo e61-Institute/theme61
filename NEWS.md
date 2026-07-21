@@ -1,5 +1,9 @@
 # theme61 (development version)
 
+#### Performance
+
+* `save_e61()`/`print()` no longer re-render the same plot from scratch several times over. `update_scales()` now builds the plot once and reuses that build for its internal y-variable, secondary-axis and y-min/max checks (previously up to 3 separate builds), and `save_single()` no longer builds the plot just to check for `coord_flip()` (reads the coord class off the plot object instead) or builds it unconditionally to count facet panels (now only when facets are actually present). No change in output.
+
 #### Bug fixes
 
 * Fixed an issue where `labs_e61` would leave whitespace above the subtitle when a plot had a subtitle but no title (the empty title was still reserving vertical space).

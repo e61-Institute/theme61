@@ -60,10 +60,6 @@ save_multi <-
     max_panel_asps <- 0
     max_left_axis_width <- 0
     max_right_axis_width <- 0
-    y_lab_max_size <- 0
-    max_break_width <- 0
-    any_neg_break <- FALSE
-    any_dec_break <- FALSE
 
     # track the effective text size used per panel, in case a panel has
     # already customised its own text size away from the theme_e61() default
@@ -126,34 +122,12 @@ save_multi <-
 
       max_panel_asps <- pmax(max_panel_asps, panel_asps[1,1])
 
-      # keep track of the maximum y-axis title size in cm
-      y_font_size <- get_font_size(temp_plot, elem = "axis.text.y", parent = "axis.text")
-
-      y_lab_size <- get_text_width(temp_plot@labels$y, font_size = y_font_size)
-      y_lab_max_size <- pmax(y_lab_size, y_lab_max_size, na.rm = T)
-
-      # keep track of the maximum break size
-      break_width <- get_y_break_width(temp_plot)
-      max_break_width <- pmax(break_width, max_break_width, na.rm = T)
-
-      # track whether any label has a - or . - these are measured poorly in the multi plots for some reason
-
-      break_type <- check_y_break_type(temp_plot)
-
-      any_neg_break <- any(break_type$any_neg, any_neg_break, na.rm = T)
-      any_dec_break <- any(break_type$any_dec, any_dec_break, na.rm = T)
-
       # keep track of the max right axis and left axis widths as all charts are set to have the same dimensions
       right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r"))
       max_right_axis_width <- pmax(max_right_axis_width, right_axis_width)
 
       left_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-l"), get_grob_width(p, grob_name = "axis-l"))
       max_left_axis_width <- pmax(max_left_axis_width, left_axis_width)
-
-      # OLD - keep for testing
-      # widths <- grid::convertWidth(p$widths, "cm", valueOnly = TRUE)
-      # temp_width <- sum(widths)
-      # if(i <= ncol) known_width <- known_width + temp_width
 
       if(is.null(max_left_axis_width) || length(max_left_axis_width) == 0)
         max_left_axis_width <- 0
