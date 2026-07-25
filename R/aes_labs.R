@@ -453,8 +453,16 @@ get_lines <- function(text, font_size, plot_width, font_face = 1){
   words <- split_text_into_words(text)
   words[, word_width := get_text_width(paste0(word, " "), font_size, font_face)]
 
+  # Each word_width above includes a trailing space, but the last word on a
+  # line never actually needs that trailing space rendered (there's no word
+  # after it on that line). Without correcting for it, the cumulative width
+  # below overestimates every candidate line by one space's width, which
+  # rejects a word that would otherwise have fit and wraps a line earlier
+  # than necessary.
+  space_width <- get_text_width(" ", font_size, font_face)
+
   # assign words to different lines based on the cumulative length
-  words[, cumsum_word_width := cumsum(word_width) / plot_width]
+  words[, cumsum_word_width := (cumsum(word_width) - space_width) / plot_width]
 
   check_lines <- T
   i <- 1
@@ -478,7 +486,7 @@ get_lines <- function(text, font_size, plot_width, font_face = 1){
 
     }
 
-    words <- words[, cumsum_word_width := cumsum(word_width) / plot_width]
+    words <- words[, cumsum_word_width := (cumsum(word_width) - space_width) / plot_width]
 
     i <- i + 1
 
