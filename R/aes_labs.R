@@ -453,12 +453,9 @@ get_lines <- function(text, font_size, plot_width, font_face = 1){
   words <- split_text_into_words(text)
   words[, word_width := get_text_width(paste0(word, " "), font_size, font_face)]
 
-  # Each word_width above includes a trailing space, but the last word on a
-  # line never actually needs that trailing space rendered (there's no word
-  # after it on that line). Without correcting for it, the cumulative width
-  # below overestimates every candidate line by one space's width, which
-  # rejects a word that would otherwise have fit and wraps a line earlier
-  # than necessary.
+  # word_width includes a trailing space, but the last word on a line never
+  # renders one (nothing follows it), so subtract one space width from the
+  # running total below to match what's actually drawn.
   space_width <- get_text_width(" ", font_size, font_face)
 
   # assign words to different lines based on the cumulative length
@@ -503,12 +500,9 @@ get_lines <- function(text, font_size, plot_width, font_face = 1){
 
 #' Calculate the width of text in ggplot titles, subtitles and footnotes
 #'
-#' Measured using a throwaway svglite device (rather than base R's built-in
-#' font metric tables) so that the measurement reflects the real glyph
-#' widths of the font that will actually be used to render the graph. Base
-#' R's "sans" metric table doesn't know about "pt-sans" and under-measures
-#' real text width by roughly 10-15%, which left text wrapping decisions
-#' allowing lines that were wider than they actually had room for.
+#' Measured on a throwaway svglite device using the real render font, rather
+#' than base R's built-in metric tables, which don't know about "pt-sans"
+#' and measure it inaccurately.
 #' text - String. Text to be measured.
 #' font_size - Numeric. Size of the font of the text.
 #' font_face - Numeric. Face of the font (1 = normal, 2 = bold)

@@ -169,10 +169,10 @@ save_multi <-
     panel_width <- free_wd / ncol # width of each panel
     panel_height <- panel_width * max_panel_asps # height of the tallest panel (width * aspect ratio)
 
-    # Identify how much padding to put between charts - computed here (rather
-    # than just before it's needed for patchwork below) because the per-panel
-    # label wrapping below also needs it: each panel gets this margin applied
-    # on its own left/right, so it's part of that panel's true rendered width.
+    # Padding between charts. Needed here (not just below, where it's used
+    # for patchwork) because the per-panel label wrapping below also needs
+    # it: each panel gets this margin applied on its own left/right via
+    # patchwork's `&` operator, so it's part of that panel's true width.
     chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
     chart_height_pad <- points_to_mm(5.5) + pad_height * 10
 
@@ -187,10 +187,9 @@ save_multi <-
 
         temp_plot <- clean_plotlist[[i]]
 
-        # update labels - for each set the limit as width divided by the
-        # number of columns we have, plus this panel's own left/right margin
-        # (applied per-panel below via patchwork's `&` operator), which is
-        # part of its true rendered width and was previously left out
+        # update labels - the wrap limit is this panel's share of width and
+        # axes, plus its own left/right margin (chart_width_pad), which is
+        # part of its true rendered width
         temp_plot <- update_labs(temp_plot, panel_width + known_width / ncol + 2 * chart_width_pad / 10)
 
         # update any plot label sizes
@@ -230,13 +229,8 @@ save_multi <-
     tot_width_pad <- ncol * 2 * chart_width_pad / 10
     tot_height_pad <- nrow * 2 * chart_height_pad / 10
 
-    # Get the interior width. Previously this also subtracted patchwork's own
-    # default annotation margin (2 * 5.5pt) on top of the panel margins
-    # already folded into tot_width_pad, because patchwork sizes the title/
-    # subtitle/caption row with a throwaway ggplot using ITS default
-    # plot.margin, and places those grobs outside of it. We now zero out that
-    # margin's l/r explicitly on the annotation theme (see below), so it no
-    # longer needs to be subtracted here.
+    # Interior width available to the title/subtitle/caption text (see the
+    # plot.margin note below for why no further margin needs subtracting).
     tot_width <- width + tot_width_pad
     internal_width <- tot_width - 4 * pad_width
 
@@ -283,13 +277,10 @@ save_multi <-
               vjust = 0.5,
               margin = margin(t = 5.5, b = title_subtitle_spacing, l = 0, r = 0)
             ),
-            # patchwork sizes the title/subtitle/caption row using a throwaway
-            # ggplot with its OWN default plot.margin, which becomes two extra
-            # columns bracketing the whole composition that the title/caption
-            # grobs are never placed into. Zero out the l/r margin (keeping
-            # t/b, which the height calculations below rely on) so that
-            # doesn't reserve horizontal space beyond what internal_width
-            # already accounts for.
+            # patchwork sizes this row with a throwaway ggplot using its own
+            # default plot.margin, adding columns outside where the text is
+            # placed. Zero out l/r (keeping t/b, used by the height
+            # calculations below) so the text can use the full internal_width.
             plot.margin = margin(t = 5.5, r = 0, b = 5.5, l = 0)
           )
         )

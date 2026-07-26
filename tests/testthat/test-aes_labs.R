@@ -5,8 +5,7 @@ test_that("get_lines fills each line as tightly as possible without overflowing"
     "This is a very long footnote that is designed to wrap across several",
     "lines so we can check that the text wrapping algorithm fills each line",
     "as much as possible without letting any words spill past the right edge",
-    "of the chart, which was the original bug that was reported and",
-    "subsequently fixed."
+    "of the chart."
   )
 
   font_size <- 8
