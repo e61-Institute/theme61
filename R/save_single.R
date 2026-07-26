@@ -162,7 +162,7 @@ save_single <- function(
   # update the width after this check
   width <- tot_panel_width + known_wd
 
-  plot <- update_labs(plot, 0.99 * width)
+  plot <- update_labs(plot, width)
 
   if(!is_spatial_chart){
 

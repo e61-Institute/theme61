@@ -177,6 +177,15 @@ labs_e61 <- function(title = NULL,
       subtitle_text <- glue::glue(
         "<span style='font-size:{primary_size}pt'>{subtitle_text}</span>"
       )
+    } else if (subtitle_text == "") {
+      # No subtitle: show the y-axis title on its own line rather than
+      # prefixing it with an empty line, which would still reserve a
+      # blank line's worth of height above it.
+      subtitle_text <- glue::glue(
+        "<span style='font-size:{secondary_size}pt'>{y}</span>"
+      )
+
+      y <- NULL
     } else {
       subtitle_text <- glue::glue(
         "<span style='font-size:{primary_size}pt'>{subtitle_text}</span><br><span style='font-size:{secondary_size}pt'>{y}</span>"
