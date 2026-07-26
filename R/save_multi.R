@@ -225,9 +225,15 @@ save_multi <-
     tot_width_pad <- ncol * 2 * chart_width_pad / 10
     tot_height_pad <- nrow * 2 * chart_height_pad / 10
 
-    # Get the interior width - not include the spacing on the left and right, for the width padding these will be centered
+    # Get the interior width. Previously this also subtracted patchwork's own
+    # default annotation margin (2 * 5.5pt) on top of the panel margins
+    # already folded into tot_width_pad, because patchwork sizes the title/
+    # subtitle/caption row with a throwaway ggplot using ITS default
+    # plot.margin, and places those grobs outside of it. We now zero out that
+    # margin's l/r explicitly on the annotation theme (see below), so it no
+    # longer needs to be subtracted here.
     tot_width <- width + tot_width_pad
-    internal_width <- tot_width - 2 * points_to_mm(5.5) / 10 - 4 * pad_width
+    internal_width <- tot_width - 4 * pad_width
 
 
     # Prepare titles, subtitles etc. --------------------------------------
@@ -271,7 +277,15 @@ save_multi <-
               hjust = 0,
               vjust = 0.5,
               margin = margin(t = 5.5, b = title_subtitle_spacing, l = 0, r = 0)
-            )
+            ),
+            # patchwork sizes the title/subtitle/caption row using a throwaway
+            # ggplot with its OWN default plot.margin, which becomes two extra
+            # columns bracketing the whole composition that the title/caption
+            # grobs are never placed into. Zero out the l/r margin (keeping
+            # t/b, which the height calculations below rely on) so that
+            # doesn't reserve horizontal space beyond what internal_width
+            # already accounts for.
+            plot.margin = margin(t = 5.5, r = 0, b = 5.5, l = 0)
           )
         )
     }
@@ -300,7 +314,8 @@ save_multi <-
               hjust = 0,
               vjust = 0.5,
               margin = margin(t = 0, b = subtitle_charts_spacing, l = 0, r = 0)
-            )
+            ),
+            plot.margin = margin(t = 5.5, r = 0, b = 5.5, l = 0)
           )
         )
     }
@@ -336,7 +351,8 @@ save_multi <-
               hjust = 0,
               vjust = 0.5,
               margin = margin(b = 5.5, t = caption_spacing, l = 0, r = 0)
-            )
+            ),
+            plot.margin = margin(t = 5.5, r = 0, b = 5.5, l = 0)
           )
         )
     }
