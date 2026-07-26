@@ -293,18 +293,14 @@ test_that("categorical y-axis text is left-aligned by default (#298)", {
   expect_equal(th$axis.text.y.right$hjust, 0)
 })
 
-test_that("continuous y-axis text alignment is untouched (#298)", {
-
+test_that("continuous y-axis text alignment is untouched", {
   df <- data.frame(x = 1:5, y = (1:5)^2)
+  p <- ggplot(df, aes(x, y)) + geom_point()
 
-  p <- ggplot(df, aes(x, y)) +
-    geom_point()
+  built <- maybe_add_default_scales(p)
+  built <- maybe_adjust_facet_spacing(built)
 
-  b <- ggplot_build(p)
-  th <- b@plot@theme
-
-  expect_null(th$axis.text.y$hjust)
-  expect_null(th$axis.text.y.right$hjust)
+  expect_identical(maybe_leftalign_discrete_y_text(built), built)
 })
 
 test_that("user-specified y-axis text alignment is not overridden (#298)", {
