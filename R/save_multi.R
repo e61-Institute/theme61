@@ -169,6 +169,12 @@ save_multi <-
     panel_width <- free_wd / ncol # width of each panel
     panel_height <- panel_width * max_panel_asps # height of the tallest panel (width * aspect ratio)
 
+    # Identify how much padding to put between charts - computed here (rather
+    # than just before it's needed for patchwork below) because the per-panel
+    # label wrapping below also needs it: each panel gets this margin applied
+    # on its own left/right, so it's part of that panel's true rendered width.
+    chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
+    chart_height_pad <- points_to_mm(5.5) + pad_height * 10
 
     # Update the labels -------------------------------------------------------
 
@@ -181,8 +187,11 @@ save_multi <-
 
         temp_plot <- clean_plotlist[[i]]
 
-        # update labels - for each set the limit as width divided by the number of columns we have
-        temp_plot <- update_labs(temp_plot, panel_width + known_width / ncol)
+        # update labels - for each set the limit as width divided by the
+        # number of columns we have, plus this panel's own left/right margin
+        # (applied per-panel below via patchwork's `&` operator), which is
+        # part of its true rendered width and was previously left out
+        temp_plot <- update_labs(temp_plot, panel_width + known_width / ncol + 2 * chart_width_pad / 10)
 
         # update any plot label sizes
         temp_plot <- update_plot_label(temp_plot, chart_type, panel_base_sizes[i])
@@ -207,10 +216,6 @@ save_multi <-
     if (is.null(nrow)) {
       nrow <- ceiling(length(plots) / ncol)
     }
-
-    # Identify how much padding to put between charts
-    chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
-    chart_height_pad <- points_to_mm(5.5) + pad_height * 10
 
     # Create the main chart
     multi_plot <- patchwork::wrap_plots(
