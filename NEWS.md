@@ -6,6 +6,8 @@
 
 #### Bug fixes
 
+* Fixed multi-panel charts (`save_e61()` with more than one plot) rendering with overlapping panel titles and extra whitespace on the left. The panel margin used to measure title/subtitle/caption wrap widths no longer disagreed with the (much smaller) margin theme_e61() actually applies, which was throwing off the wrapping calculations.
+* Fixed the shared title/subtitle/footnote text on multi-panel charts sometimes clipping past the right edge of the graph. These weren't rendered in the chart's font family, so their wrap width was measured against the wrong font.
 * Fixed an issue where `labs_e61` would leave whitespace above the subtitle when a plot had a subtitle but no title (the empty title was still reserving vertical space).
 * `save_e61` now always previews an SVG version of the graph in the Viewer pane, even when saving to other formats such as PDF or PNG. This fixes an error where RStudio's Viewer pane could fail to open non-SVG formats (e.g. a "chrome-extension" popup error when saving PDFs).
 * Y-axis text now defaults to left-aligned when the y-axis is categorical (e.g. horizontal bar charts), instead of hugging the axis line, so it lines up with the left-aligned plot title/subtitle/y-axis title. This can still be overridden with `theme(axis.text.y = element_text(hjust = ...))`.
