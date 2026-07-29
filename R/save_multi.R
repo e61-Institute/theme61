@@ -237,11 +237,11 @@ save_multi <-
 
     # Get the interior width - not include the spacing on the left and right, for the width padding these will be centered
     tot_width <- width + tot_width_pad
-    # 0.85 buffer keeps title/subtitle/caption text clear of the panel axes -
+    # 0.9 buffer keeps title/subtitle/caption text clear of the panel axes -
     # text-width measurement doesn't perfectly track the rendered glyph widths,
     # and patchwork always spans title/subtitle/caption the full figure width
     # regardless of how much of that width the panels/axes actually use
-    internal_width <- 0.85 * (tot_width - 2 * points_to_mm(5.5) / 10 - 4 * pad_width)
+    internal_width <- 0.9 * (tot_width - 2 * points_to_mm(5.5) / 10 - 4 * pad_width)
 
 
     # Prepare titles, subtitles etc. --------------------------------------
