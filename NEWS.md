@@ -6,6 +6,8 @@
 
 #### Bug fixes
 
+* Fixed multi-panel charts (`save_e61()` with more than one plot) rendering with overlapping panel titles and extra whitespace on the left. The panel margin used to measure title/subtitle/caption wrap widths no longer disagreed with the (much smaller) margin theme_e61() actually applies, which was throwing off the wrapping calculations.
+* Fixed the shared title/subtitle/footnote text on multi-panel charts sometimes clipping past the right edge of the graph. These weren't rendered in the chart's font family, so their wrap width was measured against the wrong font.
 * Fixed an issue where `labs_e61` would leave whitespace above the subtitle when a plot had a subtitle but no title (the empty title was still reserving vertical space).
 * Fixed the same issue for a y-axis title with no subtitle (`labs_e61(y = ...)` with `y_top = TRUE`, the default) - it was being prefixed with an empty, invisible subtitle line that still reserved space above it.
 * Reduced the outer `plot.margin` in `theme_e61()` so graphs have less dead space above the title, below the footnotes, and to the left/right of the axes.

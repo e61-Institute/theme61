@@ -50,6 +50,13 @@ save_multi <-
     pad_width <- pad_width / 10
     pad_height <- pad_height / 10
 
+    # Identify how much padding to put between charts - applied to each panel
+    # below so that title/subtitle/caption wrapping widths (measured before
+    # the panels are combined) are calculated against the same margin that
+    # ends up in the final render, rather than theme_e61()'s default margin
+    chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
+    chart_height_pad <- points_to_mm(5.5) + pad_height * 10
+
     # Format each plot in the plotlist and get dimensions ----------------------------------------
 
     # for each plot update the y-axis scales
@@ -81,6 +88,13 @@ save_multi <-
 
       # set the background colour
       temp_plot <- temp_plot + theme(rect = element_rect(fill = bg_colour))
+
+      # apply the same inter-panel margin used in the final render now, so
+      # that title/subtitle/caption wrap widths are measured against it
+      # instead of theme_e61()'s (much smaller) default plot.margin
+      temp_plot <- temp_plot +
+        theme(plot.margin = margin(t = chart_height_pad, b = chart_height_pad,
+                                   r = chart_width_pad, l = chart_width_pad, unit = "mm"))
 
       # check whether to apply the autoscaler or not
       if(auto_scale) {
@@ -232,7 +246,8 @@ save_multi <-
     # Interior width available to the title/subtitle/caption text (see the
     # plot.margin note below for why no further margin needs subtracting).
     tot_width <- width + tot_width_pad
-    internal_width <- tot_width - 4 * pad_width
+    # 0.9 buffer keeps title/subtitle/caption text clear of the panel axes 
+    internal_width <- 0.9 * (tot_width - 2 * points_to_mm(5.5) / 10 - 4 * pad_width)
 
 
     # Prepare titles, subtitles etc. --------------------------------------
@@ -273,6 +288,7 @@ save_multi <-
             plot.title = element_text(
               size = title_text_size,
               face = "bold",
+              family = theme61_settings$text$family,
               hjust = 0,
               vjust = 0.5,
               margin = margin(t = 5.5, b = title_subtitle_spacing, l = 0, r = 0)
@@ -307,6 +323,7 @@ save_multi <-
             plot.subtitle = element_text(
               size = subtitle_text_size,
               face = "plain",
+              family = theme61_settings$text$family,
               hjust = 0,
               vjust = 0.5,
               margin = margin(t = 0, b = subtitle_charts_spacing, l = 0, r = 0)
@@ -344,6 +361,7 @@ save_multi <-
             plot.caption = element_text(
               size = footer_text_size,
               face = "plain",
+              family = theme61_settings$text$family,
               hjust = 0,
               vjust = 0.5,
               margin = margin(b = 5.5, t = caption_spacing, l = 0, r = 0)
