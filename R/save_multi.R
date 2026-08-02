@@ -202,9 +202,13 @@ save_multi <-
         temp_plot <- clean_plotlist[[i]]
 
         # update labels - the wrap limit is this panel's share of width and
-        # axes, plus its own left/right margin (chart_width_pad), which is
-        # part of its true rendered width
-        temp_plot <- update_labs(temp_plot, panel_width + known_width / ncol + 2 * chart_width_pad / 10)
+        # axes. Deliberately excludes chart_width_pad: that margin isn't
+        # available to this panel's own text (it's outside the panel's
+        # rendered cell), so including it caused caption/title text to wrap
+        # too wide and get clipped by the neighbouring panel, worst in
+        # layouts with more columns where the fixed margin is a bigger
+        # fraction of a narrower panel_width.
+        temp_plot <- update_labs(temp_plot, panel_width + known_width / ncol)
 
         # update any plot label sizes
         temp_plot <- update_plot_label(temp_plot, chart_type, panel_base_sizes[i])
