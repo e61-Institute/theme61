@@ -37,11 +37,11 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
 
     } else if (fmt == "pdf") {
       rsvg::rsvg_pdf(svg = file_name_i, file = file_i)
-      unlink(file_name)
+      unlink(file_name_i)
 
     } else if (fmt == "eps") {
       rsvg::rsvg_eps(svg = file_name_i, file = file_i)
-      unlink(file_name)
+      unlink(file_name_i)
     }
   })
 }
