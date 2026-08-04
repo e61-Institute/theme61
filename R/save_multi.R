@@ -189,6 +189,20 @@ save_multi <-
     # patchwork's `&` operator, so it's part of that panel's true width.
     chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
     chart_height_pad <- points_to_mm(5.5) + pad_height * 10
+    base_margin <- points_to_mm(5.5)
+
+    # nrow is needed already at this point (not just below, where it's used
+    # for patchwork) so the per-panel margin - and therefore known_height,
+    # measured from each panel's own rendered grob below - reflects the
+    # margin the panel will actually be given, rather than theme_e61()'s
+    # own default plot.margin. Measuring known_height before that swap
+    # under-counted the true margin and over-allocated the figure height by
+    # the difference, which patchwork then rendered as equal blank bands
+    # above the title and below the caption (it centres the whole
+    # composition vertically within whatever height it's given).
+    if (is.null(nrow)) {
+      nrow <- ceiling(length(plots) / ncol)
+    }
 
     # Update the labels -------------------------------------------------------
 
@@ -213,6 +227,30 @@ save_multi <-
         # update any plot label sizes
         temp_plot <- update_plot_label(temp_plot, chart_type, panel_base_sizes[i])
 
+        # pad_width/pad_height only make sense as *space between panels*:
+        # the outer edges of the whole grid (left of column 1, right of the
+        # last column, above row 1, below the last row) aren't between
+        # anything, so giving every panel the full
+        # chart_width_pad/chart_height_pad on all sides put that same
+        # padding on the outside of the figure too, where it just reads as
+        # extra whitespace nobody asked for. Panels on the outer edge of
+        # the grid get just the baseline ggplot margin there instead; only
+        # edges that actually sit between two panels get the extra
+        # pad_width/pad_height padding. Applied here (before measuring
+        # known_height below), not just via `&` after patchwork::wrap_plots
+        # like the other shared theming, so the height measurement below
+        # reflects the margin that will actually be used.
+        row_i <- ceiling(i / ncol)
+        col_i <- ((i - 1) %% ncol) + 1
+
+        top_i <- if (row_i == 1) base_margin else chart_height_pad
+        bottom_i <- if (row_i == nrow) base_margin else chart_height_pad
+        left_i <- if (col_i == 1) base_margin else chart_width_pad
+        right_i <- if (col_i == ncol) base_margin else chart_width_pad
+
+        temp_plot <- temp_plot +
+          theme(plot.margin = margin(t = top_i, b = bottom_i, r = right_i, l = left_i, unit = "mm"))
+
         # save the plot
         clean_plotlist[[i]] <- temp_plot
 
@@ -230,21 +268,9 @@ save_multi <-
 
     plots <- clean_plotlist
 
-    if (is.null(nrow)) {
-      nrow <- ceiling(length(plots) / ncol)
-    }
-
-    # pad_width/pad_height only make sense as *space between panels*: the
-    # outer edges of the whole grid (left of column 1, right of the last
-    # column, above row 1, below the last row) aren't between anything, so
-    # giving every panel the full chart_width_pad/chart_height_pad on all
-    # sides via `&` put that same padding on the outside of the figure too,
-    # where it just reads as extra whitespace nobody asked for. Panels on
-    # the outer edge of the grid get just the baseline ggplot margin there
-    # instead; only edges that actually sit between two panels get the
-    # extra pad_width/pad_height padding.
-    base_margin <- points_to_mm(5.5)
-
+    # Still needed unconditionally (not just when auto_scale is TRUE, unlike
+    # the loop above) so every panel gets its margin even when auto_scale is
+    # off. A no-op for panels the loop above already covered.
     for (i in seq_along(plots)) {
       row_i <- ceiling(i / ncol)
       col_i <- ((i - 1) %% ncol) + 1
