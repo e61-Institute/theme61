@@ -234,18 +234,39 @@ save_multi <-
       nrow <- ceiling(length(plots) / ncol)
     }
 
+    # pad_height only makes sense as *space between rows*: the gap above the
+    # top row and below the bottom row is already accounted for separately
+    # (subtitle_charts_spacing/caption_spacing below, part of s_h/f_h), so
+    # giving every panel the full chart_height_pad on all sides via `&`
+    # would double up that outer space on top of it. Panels on the outer
+    # edge of the grid get just the baseline ggplot margin there instead;
+    # only edges that actually sit between two panels get the extra
+    # pad_height padding.
+    base_margin <- points_to_mm(5.5)
+
+    for (i in seq_along(plots)) {
+      row_i <- ceiling(i / ncol)
+
+      top_i <- if (row_i == 1) base_margin else chart_height_pad
+      bottom_i <- if (row_i == nrow) base_margin else chart_height_pad
+
+      plots[[i]] <- plots[[i]] +
+        theme(plot.margin = margin(t = top_i, b = bottom_i, r = chart_width_pad, l = chart_width_pad, unit = "mm"))
+    }
+
     # Create the main chart
     multi_plot <- patchwork::wrap_plots(
         plots,
         ncol = ncol,
         nrow = nrow
-      ) &
-      theme(plot.margin = margin(t = chart_height_pad, b = chart_height_pad, r = chart_width_pad, l = chart_width_pad, unit = "mm"))
+      )
 
-    # Update width to take into account margins - these are applied to every plot
-    # in the same way so we need to scale for the number of columns and rows
+    # Update width/height to take into account margins actually applied
+    # above: chart_width_pad on every column edge (unchanged), but
+    # chart_height_pad only on the (nrow - 1) interior row edges, plus the
+    # baseline margin on the two outer edges.
     tot_width_pad <- ncol * 2 * chart_width_pad / 10
-    tot_height_pad <- nrow * 2 * chart_height_pad / 10
+    tot_height_pad <- (2 * base_margin + (nrow - 1) * 2 * chart_height_pad) / 10
 
     # Interior width available to the title/subtitle/caption text (see the
     # plot.margin note below for why no further margin needs subtracting).
