@@ -14,6 +14,13 @@
 
 #### Bug fixes
 
+* Fixed an issue where `labs_e61` would leave whitespace above the subtitle when a plot had a subtitle but no title (the empty title was still reserving vertical space).
+* Fixed the same issue for a y-axis title with no subtitle (`labs_e61(y = ...)` with `y_top = TRUE`, the default) - it was being prefixed with an empty, invisible subtitle line that still reserved space above it.
+* Reduced the outer `plot.margin` in `theme_e61()` so graphs have less dead space above the title, below the footnotes, and to the left/right of the axes.
+* Fixed text wrapping for titles, subtitles and footnotes (especially on multi-panel graphs with long footnotes) undershooting or overflowing the available width. Text width is now measured using the actual font that will be rendered instead of an approximate built-in font table, which was under-measuring text by 10-15% and could let wrapped lines run past the edge of the graph.
+* Fixed the text-wrapping algorithm wrapping lines earlier than necessary: it was charging every candidate line for a trailing space that is never actually rendered after the line's last word, which could reject a word that would otherwise have fit.
+* Fixed the multi-panel title/subtitle/caption width budget being ~0.4cm narrower than it needed to be: `patchwork` sizes that row using a throwaway plot with its own default margin and places the text outside of it, reserving horizontal space beyond what was already accounted for. That margin is now explicitly zeroed out so the full available width gets used.
+* Fixed the per-panel title/subtitle/footnote width budget in multi-panel graphs (`labs_e61()` applied to an individual panel) being narrower than that panel's true rendered width: it accounted for the panel's content and axes but not its own left/right margin. Also removed an unexplained 1% haircut applied to the width budget for single-panel graphs.
 * `save_e61` now always previews an SVG version of the graph in the Viewer pane, even when saving to other formats such as PDF or PNG. This fixes an error where RStudio's Viewer pane could fail to open non-SVG formats (e.g. a "chrome-extension" popup error when saving PDFs).
 * Y-axis text now defaults to left-aligned when the y-axis is categorical (e.g. horizontal bar charts), instead of hugging the axis line, so it lines up with the left-aligned plot title/subtitle/y-axis title. This can still be overridden with `theme(axis.text.y = element_text(hjust = ...))`.
 * Automatically-positioned `plot_label()` text could occasionally spill off the edge of the chart; the bounds check now correctly measures against the plotting panel rather than the full raster canvas (which also includes the axis-title/tick-label margin).

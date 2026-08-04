@@ -453,8 +453,13 @@ get_lines <- function(text, font_size, plot_width, font_face = 1){
   words <- split_text_into_words(text)
   words[, word_width := get_text_width(paste0(word, " "), font_size, font_face)]
 
+  # word_width includes a trailing space, but the last word on a line never
+  # renders one (nothing follows it), so subtract one space width from the
+  # running total below to match what's actually drawn.
+  space_width <- get_text_width(" ", font_size, font_face)
+
   # assign words to different lines based on the cumulative length
-  words[, cumsum_word_width := cumsum(word_width) / plot_width]
+  words[, cumsum_word_width := (cumsum(word_width) - space_width) / plot_width]
 
   check_lines <- T
   i <- 1
@@ -478,7 +483,7 @@ get_lines <- function(text, font_size, plot_width, font_face = 1){
 
     }
 
-    words <- words[, cumsum_word_width := cumsum(word_width) / plot_width]
+    words <- words[, cumsum_word_width := (cumsum(word_width) - space_width) / plot_width]
 
     i <- i + 1
 
@@ -494,31 +499,75 @@ get_lines <- function(text, font_size, plot_width, font_face = 1){
 }
 
 #' Calculate the width of text in ggplot titles, subtitles and footnotes
+#'
+#' Measured on a throwaway svglite device using the real render font, rather
+#' than base R's built-in metric tables, which don't know about "pt-sans"
+#' and measure it inaccurately.
 #' text - String. Text to be measured.
 #' font_size - Numeric. Size of the font of the text.
+#' font_face - Numeric. Face of the font (1 = normal, 2 = bold)
 #' @noRd
 get_text_width <- function(text, font_size = 10, font_face = 1) {
 
-  R.devices::devEval("nulldev", {
-    par(family = "sans", ps = font_size, font = font_face)
-    ret <- graphics::strwidth(text, units = "inches") * 2.54
-  })
+  if (length(text) == 0) return(numeric(0))
 
-  return(ret)
+  family <- if (is_testing()) "sans" else "pt-sans"
+  face <- if (font_face == 2) "bold" else "plain"
+
+  measure_device({
+    grid::pushViewport(grid::viewport(
+      gp = grid::gpar(fontfamily = family, fontsize = font_size, fontface = face)
+    ))
+
+    ret <- grid::convertWidth(grid::stringWidth(text), "cm", valueOnly = TRUE)
+
+    grid::popViewport()
+
+    ret
+  })
 }
 
 #' Calculate the height of text in ggplot titles, subtitles and footnotes
+#'
+#' See [get_text_width] for why this measures using a real graphics device
+#' rather than base R's built-in font metric tables.
 #' text - String. Text to be measured.
 #' font_size - Numeric. Size of the font of the text.
 #' @noRd
 get_text_height <- function(text, font_size = 10) {
 
-  R.devices::devEval("nulldev", {
-    par(family = "sans", ps = font_size)
-    ret <- graphics::strheight(text, units = "inches") * 2.54
-  })
+  if (length(text) == 0) return(numeric(0))
 
-  return(ret)
+  family <- if (is_testing()) "sans" else "pt-sans"
+
+  measure_device({
+    grid::pushViewport(grid::viewport(
+      gp = grid::gpar(fontfamily = family, fontsize = font_size)
+    ))
+
+    ret <- grid::convertHeight(grid::stringHeight(text), "cm", valueOnly = TRUE)
+
+    grid::popViewport()
+
+    ret
+  })
+}
+
+#' Run `expr` with a throwaway svglite device as the active graphics device,
+#' so text can be measured with real font metrics. The device is opened and
+#' closed around `expr`, which restores whatever device (if any) was active
+#' beforehand as a side effect of `dev.off()`, so this never disturbs a
+#' device the user has open.
+#' @noRd
+measure_device <- function(expr) {
+
+  measure_file <- tempfile(fileext = ".svg")
+  on.exit(unlink(measure_file))
+
+  svglite::svglite(measure_file, width = 10, height = 10)
+  on.exit(grDevices::dev.off(), add = TRUE)
+
+  expr
 }
 
 #' Split a character string into its individual words
