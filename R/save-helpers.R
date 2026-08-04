@@ -7,28 +7,14 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
 
     file_i <- paste0(filename, ".", fmt)
 
-    # png/jpg/eps/pdf are all produced by rendering an SVG first and then
-    # converting it with rsvg, rather than writing directly with a
-    # cairo_pdf()/cairo_ps() device. Those devices only work on R builds
-    # compiled with Cairo support, which the standard macOS build of R does
-    # not have, so cairo_pdf()/cairo_ps() error out and no file gets
-    # written. rsvg links its own bundled librsvg instead of relying on R's
-    # own Cairo capability, so it works the same way on every platform.
+    # png/jpg/eps/pdf are all produced by rendering an SVG first and then converting it with rsvg
     needs_temp_svg <- fmt %in% c("png", "jpg", "eps", "pdf")
-    if (needs_temp_svg) file_temp <- tempfile(fileext = ".svg")
+    file_name_i <- if (needs_temp_svg) tempfile(fileext = ".svg") else file_i
 
     # add very slight width buffer
     width <- width + 0.1
 
-    switch(
-      fmt,
-      svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
-      # When saving PDF, EPS, PNG or JPEG we save the SVG first then convert it
-      eps = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
-      pdf = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
-      png = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
-      jpg = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
-    )
+    svglite::svglite(filename = file_name_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
 
     closed <- FALSE
     on.exit({
@@ -44,18 +30,18 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
 
     # Convert the rendered SVG into the requested format
     if (fmt == "png") {
-      svg_to_bitmap(file_temp, paste0(filename, ".png"), delete = TRUE, res = res)
+      svg_to_bitmap(file_name_i, paste0(filename, ".png"), delete = TRUE, res = res)
 
     } else if (fmt == "jpg") {
-      svg_to_bitmap(file_temp, paste0(filename, ".jpg"), delete = TRUE, res = res)
+      svg_to_bitmap(file_name_i, paste0(filename, ".jpg"), delete = TRUE, res = res)
 
     } else if (fmt == "pdf") {
-      rsvg::rsvg_pdf(svg = file_temp, file = file_i)
-      unlink(file_temp)
+      rsvg::rsvg_pdf(svg = file_name_i, file = file_i)
+      unlink(file_name)
 
     } else if (fmt == "eps") {
-      rsvg::rsvg_eps(svg = file_temp, file = file_i)
-      unlink(file_temp)
+      rsvg::rsvg_eps(svg = file_name_i, file = file_i)
+      unlink(file_name)
     }
   })
 }
