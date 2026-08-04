@@ -234,24 +234,28 @@ save_multi <-
       nrow <- ceiling(length(plots) / ncol)
     }
 
-    # pad_height only makes sense as *space between rows*: the gap above the
-    # top row and below the bottom row is already accounted for separately
-    # (subtitle_charts_spacing/caption_spacing below, part of s_h/f_h), so
-    # giving every panel the full chart_height_pad on all sides via `&`
-    # would double up that outer space on top of it. Panels on the outer
-    # edge of the grid get just the baseline ggplot margin there instead;
-    # only edges that actually sit between two panels get the extra
-    # pad_height padding.
+    # pad_width/pad_height only make sense as *space between panels*: the
+    # outer edges of the whole grid (left of column 1, right of the last
+    # column, above row 1, below the last row) aren't between anything, so
+    # giving every panel the full chart_width_pad/chart_height_pad on all
+    # sides via `&` put that same padding on the outside of the figure too,
+    # where it just reads as extra whitespace nobody asked for. Panels on
+    # the outer edge of the grid get just the baseline ggplot margin there
+    # instead; only edges that actually sit between two panels get the
+    # extra pad_width/pad_height padding.
     base_margin <- points_to_mm(5.5)
 
     for (i in seq_along(plots)) {
       row_i <- ceiling(i / ncol)
+      col_i <- ((i - 1) %% ncol) + 1
 
       top_i <- if (row_i == 1) base_margin else chart_height_pad
       bottom_i <- if (row_i == nrow) base_margin else chart_height_pad
+      left_i <- if (col_i == 1) base_margin else chart_width_pad
+      right_i <- if (col_i == ncol) base_margin else chart_width_pad
 
       plots[[i]] <- plots[[i]] +
-        theme(plot.margin = margin(t = top_i, b = bottom_i, r = chart_width_pad, l = chart_width_pad, unit = "mm"))
+        theme(plot.margin = margin(t = top_i, b = bottom_i, r = right_i, l = left_i, unit = "mm"))
     }
 
     # Create the main chart
@@ -262,17 +266,18 @@ save_multi <-
       )
 
     # Update width/height to take into account margins actually applied
-    # above: chart_width_pad on every column edge (unchanged), but
-    # chart_height_pad only on the (nrow - 1) interior row edges, plus the
-    # baseline margin on the two outer edges.
-    tot_width_pad <- ncol * 2 * chart_width_pad / 10
+    # above: chart_width_pad/chart_height_pad only on the interior edges
+    # between panels ((ncol - 1) column gaps, (nrow - 1) row gaps), plus the
+    # baseline margin on the outer edges of the grid.
+    tot_width_pad <- (2 * base_margin + (ncol - 1) * 2 * chart_width_pad) / 10
     tot_height_pad <- (2 * base_margin + (nrow - 1) * 2 * chart_height_pad) / 10
 
-    # Interior width available to the title/subtitle/caption text (see the
-    # plot.margin note below for why no further margin needs subtracting).
+    # Interior width available to the title/subtitle/caption text: total
+    # width minus the (baseline-only) outer margins, since those aren't
+    # usable content space either.
     tot_width <- width + tot_width_pad
-    # 0.9 buffer keeps title/subtitle/caption text clear of the panel axes 
-    internal_width <- 0.9 * (tot_width - 2 * points_to_mm(5.5) / 10 - 4 * pad_width)
+    # 0.9 buffer keeps title/subtitle/caption text clear of the panel axes
+    internal_width <- 0.9 * (tot_width - 2 * base_margin / 10)
 
 
     # Prepare titles, subtitles etc. --------------------------------------
