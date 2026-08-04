@@ -183,23 +183,16 @@ save_multi <-
     panel_width <- free_wd / ncol # width of each panel
     panel_height <- panel_width * max_panel_asps # height of the tallest panel (width * aspect ratio)
 
-    # Padding between charts. Needed here (not just below, where it's used
-    # for patchwork) because the per-panel label wrapping below also needs
-    # it: each panel gets this margin applied on its own left/right via
-    # patchwork's `&` operator, so it's part of that panel's true width.
+    # Calc padding between charts because the per-panel label wrapping below
+    # also needs it: each panel gets this margin applied on its own left/right
+    # via patchwork's `&` operator, so it's part of that panel's true width.
     chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
     chart_height_pad <- points_to_mm(5.5) + pad_height * 10
     base_margin <- points_to_mm(5.5)
 
-    # nrow is needed already at this point (not just below, where it's used
-    # for patchwork) so the per-panel margin - and therefore known_height,
-    # measured from each panel's own rendered grob below - reflects the
-    # margin the panel will actually be given, rather than theme_e61()'s
-    # own default plot.margin. Measuring known_height before that swap
-    # under-counted the true margin and over-allocated the figure height by
-    # the difference, which patchwork then rendered as equal blank bands
-    # above the title and below the caption (it centres the whole
-    # composition vertically within whatever height it's given).
+    # calc nrow so the per-panel margin - and therefore known_height, measured
+    # from each panel's own rendered grob below - reflects the margin the panel
+    # will actually be given, rather than theme_e61()'s own default plot.margin
     if (is.null(nrow)) {
       nrow <- ceiling(length(plots) / ncol)
     }
@@ -218,28 +211,15 @@ save_multi <-
         # update labels - the wrap limit is this panel's share of width and
         # axes. Deliberately excludes chart_width_pad: that margin isn't
         # available to this panel's own text (it's outside the panel's
-        # rendered cell), so including it caused caption/title text to wrap
-        # too wide and get clipped by the neighbouring panel, worst in
-        # layouts with more columns where the fixed margin is a bigger
-        # fraction of a narrower panel_width.
+        # rendered cell)
         temp_plot <- update_labs(temp_plot, panel_width + known_width / ncol)
 
         # update any plot label sizes
         temp_plot <- update_plot_label(temp_plot, chart_type, panel_base_sizes[i])
 
-        # pad_width/pad_height only make sense as *space between panels*:
-        # the outer edges of the whole grid (left of column 1, right of the
-        # last column, above row 1, below the last row) aren't between
-        # anything, so giving every panel the full
-        # chart_width_pad/chart_height_pad on all sides put that same
-        # padding on the outside of the figure too, where it just reads as
-        # extra whitespace nobody asked for. Panels on the outer edge of
-        # the grid get just the baseline ggplot margin there instead; only
-        # edges that actually sit between two panels get the extra
-        # pad_width/pad_height padding. Applied here (before measuring
-        # known_height below), not just via `&` after patchwork::wrap_plots
-        # like the other shared theming, so the height measurement below
-        # reflects the margin that will actually be used.
+        # ensure pad_width/pad_height only measure space between panels: the
+        # outer edges of the whole grid (left of column 1, right of the last
+        # column, above row 1, below the last row)
         row_i <- ceiling(i / ncol)
         col_i <- ((i - 1) %% ncol) + 1
 
