@@ -11,7 +11,10 @@ ggplot <- function(data = NULL,
 
   p <- ggplot2::ggplot(data = data, mapping = mapping, environment = environment)
 
-  if (isTRUE(getOption("theme61.auto_theme", TRUE))) {
+  auto_theme <- isTRUE(getOption("theme61.auto_theme", TRUE)) &&
+    !isTRUE(getOption("theme61.iterate_mode", FALSE))
+
+  if (auto_theme) {
     p <- p + theme_e61()
   }
 
