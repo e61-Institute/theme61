@@ -9,8 +9,11 @@ ggplot <- function(data = NULL,
                    ...,
                    environment = parent.frame()) {
 
-  p <- ggplot2::ggplot(data = data, mapping = mapping, environment = environment) +
-    theme_e61()
+  p <- ggplot2::ggplot(data = data, mapping = mapping, environment = environment)
+
+  if (isTRUE(getOption("theme61.auto_theme", TRUE))) {
+    p <- p + theme_e61()
+  }
 
   class(p) <- c("e61_ggplot", class(p))
 

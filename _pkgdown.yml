@@ -34,6 +34,8 @@ reference:
   - unset_open_graph_browser
   - set_format
   - unset_format
+  - set_auto_theme
+  - unset_auto_theme
 
 - title: Colours
   contents:

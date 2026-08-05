@@ -1,5 +1,9 @@
 # theme61 (development version)
 
+#### New features
+
+* Added a `theme61.auto_theme` option (default `TRUE`) that controls whether `ggplot()` automatically applies `theme_e61()`. Set it to `FALSE` (e.g. via `unset_auto_theme()` or `set_t61_options(list(theme61.auto_theme = FALSE))`) to apply your own theme instead. `set_auto_theme()`/`unset_auto_theme()` follow the same pattern as `set_open_graph_browser()`/`unset_open_graph_browser()`.
+
 #### Performance
 
 * `save_e61()`/`print()` no longer re-render the same plot from scratch several times over. `update_scales()` now builds the plot once and reuses that build for its internal y-variable, secondary-axis and y-min/max checks (previously up to 3 separate builds), and `save_single()` no longer builds the plot just to check for `coord_flip()` (reads the coord class off the plot object instead) or builds it unconditionally to count facet panels (now only when facets are actually present). No change in output.

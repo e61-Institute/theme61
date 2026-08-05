@@ -23,6 +23,7 @@ The following options are available to set:
 \item \code{theme61.default_save_format}: The default file save format if format is not specified in \link{save_e61} and the file extension is not provided in \code{filename}. This is "svg" by default.
 \item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
 \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
+\item \code{theme61.auto_theme}: If TRUE (default), \code{theme_e61()} is automatically applied whenever you call \code{ggplot()}. Set to FALSE to turn this off and apply your own theme instead.
 }
 }
 \examples{

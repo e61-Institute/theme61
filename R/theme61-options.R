@@ -11,6 +11,7 @@
 #'    \item \code{theme61.default_save_format}: The default file save format if format is not specified in [save_e61] and the file extension is not provided in \code{filename}. This is "svg" by default.
 #'    \item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
 #'    \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
+#'    \item \code{theme61.auto_theme}: If TRUE (default), \code{theme_e61()} is automatically applied whenever you call \code{ggplot()}. Set to FALSE to turn this off and apply your own theme instead.
 #'  }
 #' @return This function is used for its side effects.
 #'
@@ -72,6 +73,29 @@ set_open_graph_browser <- function() {
 #' @export
 unset_open_graph_browser <- function() {
   options(theme61.open_e61_graph = FALSE)
+
+  invisible(FALSE)
+}
+
+#' Set option to turn off automatic application of theme_e61()
+#'
+#' By default, \code{ggplot()} automatically applies \code{theme_e61()} to
+#' every plot. If you'd rather apply your own theme, or apply
+#' \code{theme_e61()} manually, turn this behaviour off with this function.
+#'
+#' @return This function is used for its side effects.
+#' @rdname auto_theme
+#' @export
+set_auto_theme <- function() {
+  options(theme61.auto_theme = TRUE)
+
+  invisible(TRUE)
+}
+
+#' @rdname auto_theme
+#' @export
+unset_auto_theme <- function() {
+  options(theme61.auto_theme = FALSE)
 
   invisible(FALSE)
 }
