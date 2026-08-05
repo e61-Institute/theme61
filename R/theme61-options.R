@@ -7,7 +7,7 @@
 #'
 #' @details The following options are available to set:
 #'  \itemize{
-#'    \item \code{theme61.open_in_browser}: If TRUE, graphs will open in the browser instead of the Viewer pane. This is FALSE by default.
+#'    \item \code{theme61.open_in_browser}: If TRUE, graphs will also open in the browser in addition to the Viewer pane. This is FALSE by default.
 #'    \item \code{theme61.default_save_format}: The default file save format if format is not specified in [save_e61] and the file extension is not provided in \code{filename}. This is "svg" by default.
 #'    \item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
 #'    \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
@@ -55,11 +55,12 @@ set_t61_options <- function(opt = NULL) {
   invisible(NULL)
 }
 
-#' Set option to open graphs in the browser instead of the Viewer pane
+#' Set option to also open graphs in the browser
 #'
 #' Previous versions of theme61 opened graphs in the browser instead of the
 #' Viewer pane. You can bring back this functionality by running this function,
-#' which sets a session-wide option.
+#' which sets a session-wide option. Graphs will still appear in the Viewer
+#' pane as normal.
 #'
 #' @return This function is used for its side effects.
 #' @rdname open_graph_browser
