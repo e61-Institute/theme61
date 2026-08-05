@@ -12,6 +12,7 @@
 
 #### Bug fixes
 
+* Renamed the undocumented `quiet_wrap` option to `theme61.quiet_wrap` (it controls the messages shown when the masked `ggsave()`/`labs()` pass your call through to `save_e61()`/`labs_e61()`). It wasn't namespaced under `theme61.*`, so `set_t61_options()` couldn't set or list it. Set it via `set_t61_options(list(theme61.quiet_wrap = TRUE))`.
 * Fixed an issue where `labs_e61` would leave whitespace above the subtitle when a plot had a subtitle but no title (the empty title was still reserving vertical space).
 * Fixed the same issue for a y-axis title with no subtitle (`labs_e61(y = ...)` with `y_top = TRUE`, the default) - it was being prefixed with an empty, invisible subtitle line that still reserved space above it.
 * Reduced the outer `plot.margin` in `theme_e61()` so graphs have less dead space above the title, below the footnotes, and to the left/right of the axes.

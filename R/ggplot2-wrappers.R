@@ -30,7 +30,7 @@ ggplot <- function(data = NULL,
 ggsave <- function(...) {
 
   # Throw warning message (unless testing)
-  if (!isTRUE(getOption("quiet_wrap")))
+  if (!isTRUE(getOption("theme61.quiet_wrap", FALSE)))
     cli::cli_bullets(c("x" = "Your function arguments have been passed to save_e61() automatically. Please use save_e61() instead of ggsave() to ensure your graphs conform to the e61 style correctly. If you still want to use ggplot2's ggsave(), provide the namespace explicitly."))
 
   save_e61(...)
@@ -43,7 +43,7 @@ ggsave <- function(...) {
 labs <- function(...) {
 
   # Throw warning message (unless testing)
-  if (!isTRUE(getOption("quiet_wrap")))
+  if (!isTRUE(getOption("theme61.quiet_wrap", FALSE)))
     cli::cli_bullets(c("x" = "Your function arguments have been passed to labs_e61() automatically. Please use labs_e61() instead of labs() to ensure your graphs conform to the e61 style correctly. If you still want to use ggplot2's labs(), provide the namespace explicitly."))
 
   labs_e61(...)

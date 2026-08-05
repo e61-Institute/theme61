@@ -65,3 +65,17 @@ test_that("set_t61_options accepts theme61.iterate_mode as a valid option", {
   set_t61_options(list(theme61.iterate_mode = TRUE))
   expect_true(getOption("theme61.iterate_mode"))
 })
+
+test_that("theme61.quiet_wrap suppresses the ggsave()/labs() masking messages", {
+  withr::local_options(list(theme61.quiet_wrap = TRUE))
+
+  expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), minimal_plot + labs()))
+  expect_no_message(ggsave(withr::local_tempfile(fileext = ".svg"), minimal_plot))
+})
+
+test_that("set_t61_options accepts theme61.quiet_wrap as a valid option", {
+  withr::defer(options(theme61.quiet_wrap = FALSE))
+
+  set_t61_options(list(theme61.quiet_wrap = TRUE))
+  expect_true(getOption("theme61.quiet_wrap"))
+})

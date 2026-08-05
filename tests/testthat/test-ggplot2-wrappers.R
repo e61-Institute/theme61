@@ -1,5 +1,5 @@
 test_that("ggplot2 functions are masked by theme61", {
-  withr::local_options(list(quiet_wrap = FALSE))
+  withr::local_options(list(theme61.quiet_wrap = FALSE))
 
   # Check if labs() throws a msg
   suppressWarnings(expect_message(save_e61(withr::local_tempfile(fileext = ".svg"), minimal_plot + labs()), "Your function.*"))
@@ -201,7 +201,7 @@ test_that("Inference works when plot-level data is NULL and mapping comes from l
 
 test_that("facet spacing depends on theme61 facet axes setting", {
 
-  old <- options(quiet_wrap = TRUE)
+  old <- options(theme61.quiet_wrap = TRUE)
   on.exit(options(old), add = TRUE)
 
   df <- data.frame(
@@ -237,7 +237,7 @@ test_that("facet spacing depends on theme61 facet axes setting", {
 
 test_that("user-specified panel.spacing is not overridden", {
 
-  old <- options(quiet_wrap = TRUE)
+  old <- options(theme61.quiet_wrap = TRUE)
   on.exit(options(old), add = TRUE)
 
   df <- data.frame(
@@ -311,7 +311,7 @@ test_that("user-specified y-axis text alignment is not overridden (#298)", {
 
 testthat::test_that("ggplot2::facet_wrap is not auto-adjusted (facet not tagged)", {
 
-  old <- options(quiet_wrap = TRUE)
+  old <- options(theme61.quiet_wrap = TRUE)
   on.exit(options(old), add = TRUE)
 
   df <- data.frame(

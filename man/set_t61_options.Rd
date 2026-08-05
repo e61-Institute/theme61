@@ -25,6 +25,7 @@ The following options are available to set:
 \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
 \item \code{theme61.auto_theme}: If TRUE (default), \code{theme_e61()} is automatically applied whenever you call \code{ggplot()}. Set to FALSE to turn this off and apply your own theme instead.
 \item \code{theme61.iterate_mode}: If TRUE, all of theme61's automatic styling and Viewer pane preview rendering is skipped, so graphs print to the Plots pane with plain ggplot2 defaults as fast as possible. This is FALSE by default. Any theme61 functions you call explicitly (e.g. \code{scale_colour_e61()}, \code{theme_e61()}) still apply as normal, since they become part of the plot object regardless of this option.
+\item \code{theme61.quiet_wrap}: If TRUE, suppresses the messages shown when the masked \code{ggsave()}/\code{labs()} pass your call through to \code{save_e61()}/\code{labs_e61()}. This is FALSE by default.
 }
 }
 \examples{

@@ -44,7 +44,8 @@ t61_env <- NULL
     theme61.default_save_format = "svg",
     theme61.iterate_mode = FALSE,
     theme61.open_in_browser = FALSE,
-    theme61.preview_on_print = TRUE
+    theme61.preview_on_print = TRUE,
+    theme61.quiet_wrap = FALSE
   )
 
   to_set <- !(names(op.theme61) %in% names(op))
