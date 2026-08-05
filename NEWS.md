@@ -2,7 +2,7 @@
 
 #### New features
 
-* Added a `theme61.auto_theme` option (default `TRUE`) that controls whether `ggplot()` automatically applies `theme_e61()`. Set it to `FALSE` (e.g. via `unset_auto_theme()` or `set_t61_options(list(theme61.auto_theme = FALSE))`) to apply your own theme instead. `set_auto_theme()`/`unset_auto_theme()` follow the same pattern as `set_open_graph_browser()`/`unset_open_graph_browser()`.
+* Added a `theme61.auto_theme` option (default `TRUE`) that controls whether `ggplot()` automatically applies `theme_e61()`. Set it to `FALSE` via `set_t61_options(list(theme61.auto_theme = FALSE))` to apply your own theme instead.
 
 #### Performance
 

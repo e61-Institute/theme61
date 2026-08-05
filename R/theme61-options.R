@@ -77,29 +77,6 @@ unset_open_graph_browser <- function() {
   invisible(FALSE)
 }
 
-#' Set option to turn off automatic application of theme_e61()
-#'
-#' By default, \code{ggplot()} automatically applies \code{theme_e61()} to
-#' every plot. If you'd rather apply your own theme, or apply
-#' \code{theme_e61()} manually, turn this behaviour off with this function.
-#'
-#' @return This function is used for its side effects.
-#' @rdname auto_theme
-#' @export
-set_auto_theme <- function() {
-  options(theme61.auto_theme = TRUE)
-
-  invisible(TRUE)
-}
-
-#' @rdname auto_theme
-#' @export
-unset_auto_theme <- function() {
-  options(theme61.auto_theme = FALSE)
-
-  invisible(FALSE)
-}
-
 #' Sets the default file save format if format is not specified
 #'
 #' This function sets the file save format if \code{format} is not specified in
