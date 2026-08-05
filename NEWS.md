@@ -5,6 +5,7 @@
 * Added a `theme61.auto_theme` option (default `TRUE`) that controls whether `ggplot()` automatically applies `theme_e61()`. Set it to `FALSE` via `set_t61_options(list(theme61.auto_theme = FALSE))` to apply your own theme instead.
 * Added a `theme61.iterate_mode` option (default `FALSE`) for fast data-analysis iteration. When `TRUE`, `ggplot()`/`print()` skip all of theme61's automatic styling (theme, scales, facet spacing) and the Viewer pane preview render entirely, so graphs print to the Plots pane with plain ggplot2 defaults as quickly as possible. theme61 functions you call explicitly (e.g. `scale_colour_e61()`) still apply as normal. Enable it with `set_t61_options(list(theme61.iterate_mode = TRUE))`.
 * Renamed the `theme61.open_e61_graph` option to `theme61.open_in_browser` to better reflect what it does (controls whether `save_e61()` also opens the saved graph in the browser, alongside the Viewer pane). `set_open_graph_browser()`/`unset_open_graph_browser()` are unaffected; only users setting the option directly via `options()`/`set_t61_options()` need to update the name.
+* Added `THEME61_DISABLE_GEOM_DEFAULTS` and `THEME61_DISABLE_VERSION_CHECK` environment variables (both enabled by default) to opt out of theme61 overwriting ggplot2's session-wide geom colour/fill defaults, and the startup check against GitHub for a newer release, respectively. Unlike the `theme61.*` options, these run once at load time, so they must be set (to `"1"`) before `library(theme61)` is called - see `?set_t61_options` for details. Joins the existing `THEME61_DISABLE_FONT_DOWNLOAD`, which is now documented in the same place.
 
 #### Performance
 
@@ -12,7 +13,7 @@
 
 #### Bug fixes
 
-* Renamed the undocumented `quiet_wrap` option to `theme61.quiet_wrap` (it controls the messages shown when the masked `ggsave()`/`labs()` pass your call through to `save_e61()`/`labs_e61()`). It wasn't namespaced under `theme61.*`, so `set_t61_options()` couldn't set or list it. Set it via `set_t61_options(list(theme61.quiet_wrap = TRUE))`.
+* Renamed the undocumented `quiet_wrap` option to `theme61.quiet_mask` (it controls the messages shown when the masked `ggsave()`/`labs()` pass your call through to `save_e61()`/`labs_e61()`). It wasn't namespaced under `theme61.*`, so `set_t61_options()` couldn't set or list it. Set it via `set_t61_options(list(theme61.quiet_mask = TRUE))`.
 * Fixed an issue where `labs_e61` would leave whitespace above the subtitle when a plot had a subtitle but no title (the empty title was still reserving vertical space).
 * Fixed the same issue for a y-axis title with no subtitle (`labs_e61(y = ...)` with `y_top = TRUE`, the default) - it was being prefixed with an empty, invisible subtitle line that still reserved space above it.
 * Reduced the outer `plot.margin` in `theme_e61()` so graphs have less dead space above the title, below the footnotes, and to the left/right of the axes.

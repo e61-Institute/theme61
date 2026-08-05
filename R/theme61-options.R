@@ -13,14 +13,30 @@
 #'    \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
 #'    \item \code{theme61.auto_theme}: If TRUE (default), \code{theme_e61()} is automatically applied whenever you call \code{ggplot()}. Set to FALSE to turn this off and apply your own theme instead.
 #'    \item \code{theme61.iterate_mode}: If TRUE, all of theme61's automatic styling and Viewer pane preview rendering is skipped, so graphs print to the Plots pane with plain ggplot2 defaults as fast as possible. This is FALSE by default. Any theme61 functions you call explicitly (e.g. \code{scale_colour_e61()}, \code{theme_e61()}) still apply as normal, since they become part of the plot object regardless of this option.
-#'    \item \code{theme61.quiet_wrap}: If TRUE, suppresses the messages shown when the masked \code{ggsave()}/\code{labs()} pass your call through to \code{save_e61()}/\code{labs_e61()}. This is FALSE by default.
+#'    \item \code{theme61.quiet_mask}: If TRUE, suppresses the messages shown when the masked \code{ggsave()}/\code{labs()} pass your call through to \code{save_e61()}/\code{labs_e61()}. This is FALSE by default.
 #'  }
-#' @return This function is used for its side effects.
+#'
+#' @section Environment variables:
+#' A few behaviours run once, when theme61 is loaded (e.g. by \code{library(theme61)}),
+#' before any \code{options()} call in your script would take effect. These
+#' can't be controlled by \code{set_t61_options()} - instead, set the
+#' corresponding environment variable to \code{"1"} \emph{before} theme61 is
+#' loaded, e.g. in your \code{.Renviron} file or CI configuration:
+#' \itemize{
+#'   \item \code{THEME61_DISABLE_FONT_DOWNLOAD}: Skips downloading/registering the PT Sans font. Useful on CI or airgapped machines with no internet access. Enabled (font download happens) by default.
+#'   \item \code{THEME61_DISABLE_GEOM_DEFAULTS}: Skips overwriting ggplot2's session-wide geom colour/fill defaults (e.g. \code{geom_point()}'s default colour). Enabled (defaults are overwritten) by default.
+#'   \item \code{THEME61_DISABLE_VERSION_CHECK}: Skips the startup check against GitHub for a newer theme61 release. Enabled (the check runs) by default.
+#' }
 #'
 #' @examples
 #' \dontrun{
 #' # Set the default save format to "png"
 #' set_t61_options(list(theme61.default_save_format = "png"))
+#'
+#' # Environment variables must be set before library(theme61) is called,
+#' # e.g. at the top of your script or in .Renviron:
+#' Sys.setenv(THEME61_DISABLE_VERSION_CHECK = "1")
+#' library(theme61)
 #' }
 #'
 #' @export
