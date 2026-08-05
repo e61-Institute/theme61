@@ -342,7 +342,7 @@ save_e61 <- function(filename = NULL,
   # Put filename back together
   file_to_open <- paste0(filename, ".", format[[1]])
 
-  if (isTRUE(getOption("theme61.open_e61_graph", FALSE))) {
+  if (isTRUE(getOption("theme61.open_in_browser", FALSE))) {
     file_to_open <- shQuote(here::here(file_to_open))
 
     out <- try(system2("open", file_to_open))

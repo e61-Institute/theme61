@@ -4,6 +4,7 @@
 
 * Added a `theme61.auto_theme` option (default `TRUE`) that controls whether `ggplot()` automatically applies `theme_e61()`. Set it to `FALSE` via `set_t61_options(list(theme61.auto_theme = FALSE))` to apply your own theme instead.
 * Added a `theme61.iterate_mode` option (default `FALSE`) for fast data-analysis iteration. When `TRUE`, `ggplot()`/`print()` skip all of theme61's automatic styling (theme, scales, facet spacing) and the Viewer pane preview render entirely, so graphs print to the Plots pane with plain ggplot2 defaults as quickly as possible. theme61 functions you call explicitly (e.g. `scale_colour_e61()`) still apply as normal. Enable it with `set_t61_options(list(theme61.iterate_mode = TRUE))`.
+* Renamed the `theme61.open_e61_graph` option to `theme61.open_in_browser` to better reflect what it does (controls whether `save_e61()` opens the saved graph in the browser instead of the Viewer pane). `set_open_graph_browser()`/`unset_open_graph_browser()` are unaffected; only users setting the option directly via `options()`/`set_t61_options()` need to update the name.
 
 #### Performance
 
