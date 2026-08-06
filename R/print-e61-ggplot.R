@@ -2,7 +2,7 @@
 #'
 #' - Always draws a plot in the Plots pane
 #' - Also renders a preview in the Viewer (opt-out via option)
-#' - Prefers Plots focus by default
+#' - Prefers Viewer focus by default (best-effort)
 #' - All of the above is skipped in `theme61.iterate_mode`
 #'
 #' @keywords internal
@@ -59,9 +59,6 @@ print.e61_ggplot <- function(x, ...) {
     }
   }
 
-  # opt-in (default OFF): focus Viewer after printing
-  focus_viewer <- isTRUE(getOption("theme61.focus_viewer_on_print", FALSE))
-
   # Viewer preview (render in background)
   if (in_rstudio) {
     suppressWarnings(
@@ -74,8 +71,9 @@ print.e61_ggplot <- function(x, ...) {
   class(x_plot) <- setdiff(class(x_plot), "e61_ggplot")
   print(x_plot)
 
-  # Optional Viewer focus (off by default)
-  if (in_rstudio && focus_viewer) {
+  # Prefer Viewer focus by default (best-effort). Users who don't want any
+  # of this can use theme61.iterate_mode instead.
+  if (in_rstudio) {
     activate_viewer_after_plot()
   }
 
