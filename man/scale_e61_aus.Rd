@@ -12,7 +12,7 @@ scale_fill_e61_aus(...)
 }
 \arguments{
 \item{...}{
-  Arguments passed on to \code{\link[ggplot2:scale_manual]{ggplot2::scale_colour_manual}}, \code{\link[ggplot2:scale_manual]{ggplot2::scale_fill_manual}}
+  Arguments passed on to \code{\link[ggplot2:scale_colour_manual]{ggplot2::scale_colour_manual}}, \code{\link[ggplot2:scale_fill_manual]{ggplot2::scale_fill_manual}}
   \describe{
     \item{\code{values}}{a set of aesthetic values to map data values to. The values
 will be matched in order (usually alphabetical) with the limits of the
