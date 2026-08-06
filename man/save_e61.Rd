@@ -35,7 +35,8 @@ save_e61(
   nrow = NULL,
   align = c("v", "none", "h", "hv"),
   axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-  rel_heights = NULL
+  rel_heights = NULL,
+  return_plot_obj = FALSE
 )
 }
 \arguments{
@@ -159,6 +160,16 @@ Must be specified if any of the graphs are complex (e.g. faceted) and alignment 
 
 \item{rel_heights}{(multi-panel specific) A numeric vector giving the
 relative proportions of each graph component (title, plots, footer).}
+
+\item{return_plot_obj}{(multi-panel specific) Logical. If TRUE, skips
+saving entirely and returns the composed multi-panel plot object instead
+(e.g. to print it in the Plots pane, or use it in a Shiny app). Only
+supported for multi-panel graphs (2 or more plots) - for a single plot,
+just print the ggplot object directly. Defaults to FALSE. Like a saved
+graph, the returned object's layout (text sizes, panel spacing) is
+computed for a fixed target size (\code{dim}, or the same defaults \code{save_e61}
+would otherwise use) - it won't reflow if you resize the device
+afterwards.}
 }
 \value{
 Invisibly returns the file name.
