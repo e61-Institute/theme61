@@ -121,8 +121,21 @@ save_e61 <- function(filename = NULL,
                      rel_heights = NULL
                      ) {
 
-  # Compile plots
-  plots <- c(list(...), plotlist)
+  # `filename` is the first formal, ahead of `...` -- so a multi-panel call
+  # that passes its plots positionally without naming filename (the natural
+  # shape for preview = TRUE, which has no path to give -- e.g.
+  # save_e61(p1, p2, preview = TRUE)) silently matches the first plot to
+  # `filename` instead of `...`, dropping it from the graph. Reclaim it as
+  # the first plot instead: `filename` staying NULL then falls through to
+  # the ordinary "no path supplied" error below when one is actually needed
+  # (i.e. preview = FALSE).
+  if (!is.null(filename) && ggplot2::is_ggplot(filename)) {
+    plots <- c(list(filename), list(...), plotlist)
+    filename <- NULL
+  } else {
+    # Compile plots
+    plots <- c(list(...), plotlist)
+  }
 
   # For single-panel graphs
   if (length(plots) == 0) plots <- list(plot)

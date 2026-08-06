@@ -10,6 +10,31 @@
 # directly, so the panel's pixel bounding box is derived from the plot's
 # gtable layout instead.
 
+#' Strip the e61_ggplot class before print()-ing a throwaway render (an
+#' occupancy raster, a panel-box marker): print.e61_ggplot() has side
+#' effects (a Viewer preview, console output) meant for a plot the user is
+#' actually looking at, not an internal measurement render -- dispatching
+#' to it here would fire those side effects once per panel, per mask
+#' render, stomping on the real preview/save this call is itself part of.
+#'
+#' ggplot_build.e61_ggplot() (see ggplot_build-method.R) applies its own
+#' mutations -- default scales, facet spacing, discrete y-text alignment --
+#' before building, and every other read of this plot (e.g. t61_render_mask()'s
+#' own ggplot_build() call for panel_params) goes through that dispatch.
+#' Applying the same mutations here before stripping the class keeps this
+#' raster's coordinate system consistent with those reads, rather than
+#' silently reverting to plain ggplot2 defaults for this render alone.
+#' @noRd
+t61_drop_e61_class <- function(plot) {
+  if (inherits(plot, "e61_ggplot")) {
+    plot <- maybe_add_default_scales(plot)
+    plot <- maybe_adjust_facet_spacing(plot)
+    plot <- maybe_leftalign_discrete_y_text(plot)
+    class(plot) <- setdiff(class(plot), "e61_ggplot")
+  }
+  plot
+}
+
 #' Classify gtable width/height units as elastic ("null") vs fixed, so the
 #' null cell(s) -- normally only resolved by actually drawing into a
 #' viewport -- can instead be assigned the remainder directly, since
@@ -137,7 +162,8 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
   svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
-  print(t61_strip_chrome(plot))
+
+  print(t61_strip_chrome(t61_drop_e61_class(plot)))
   grDevices::dev.off()
 
   png_file <- tempfile(fileext = ".png")
@@ -165,10 +191,30 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   pp <- built$layout$panel_params
   if (length(pp) != 1) return(NULL) # faceted: not v1 scope
 
+  # panel_params$y.range is the visible viewport -- wider than the scale's
+  # own hard limits whenever coord_cartesian(ylim = ...) zooms out beyond
+  # them (e.g. to show a narrow band with room to breathe). When explicit
+  # numeric limits were supplied, scale_y_continuous_e61() installs a
+  # train()-time check (see axes.R) that hard-errors if a value outside
+  # those limits is later trained into the scale -- which a label placed
+  # anywhere in the wider coord_cartesian() viewport can trigger once it's
+  # actually added to the plot. Only intersect in that case: a scale with
+  # no explicit limits has no such check, and get_limits() would otherwise
+  # just be its auto-trained (often data-degenerate) range, which
+  # coord_cartesian() is legitimately free to show more of.
+  y_scale <- built$layout$panel_scales_y[[1]]
+  y_range <- pp[[1]]$y.range
+  if (!is.null(y_scale) && !is.null(y_scale$limits) && is.numeric(y_scale$limits)) {
+    y_limits <- tryCatch(y_scale$get_limits(), error = function(e) NULL)
+    if (!is.null(y_limits) && all(is.finite(y_limits))) {
+      y_range <- c(max(y_range[1], min(y_limits)), min(y_range[2], max(y_limits)))
+    }
+  }
+
   x_breaks <- pp[[1]]$x$breaks
   y_breaks <- pp[[1]]$y$breaks
   x_breaks <- x_breaks[is.finite(x_breaks) & x_breaks >= pp[[1]]$x.range[1] & x_breaks <= pp[[1]]$x.range[2]]
-  y_breaks <- y_breaks[is.finite(y_breaks) & y_breaks >= pp[[1]]$y.range[1] & y_breaks <= pp[[1]]$y.range[2]]
+  y_breaks <- y_breaks[is.finite(y_breaks) & y_breaks >= y_range[1] & y_breaks <= y_range[2]]
 
   list(
     occupancy   = occupancy,
@@ -176,7 +222,7 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
     px_per_cm_x = px_per_cm_x,
     px_per_cm_y = px_per_cm_y,
     x_range     = pp[[1]]$x.range,
-    y_range     = pp[[1]]$y.range,
+    y_range     = y_range,
     x_breaks    = x_breaks,
     y_breaks    = y_breaks,
     flipped     = flipped
@@ -213,6 +259,7 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
   marker <- t61_strip_chrome(plot)
   marker@layers <- list()
   marker <- marker + ggplot2::theme(panel.background = ggplot2::element_rect(fill = marker_colour, colour = NA))
+  marker <- t61_drop_e61_class(marker)
 
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
