@@ -83,16 +83,16 @@ charts. Defaults to no additional padding.}
 
 \item{outer_width}{(multi-panel specific) Numeric (mm). Overrides the
 margin between the left/right edges of the figure and the outermost
-panels. Defaults to NULL, which uses the built-in margin. Set lower
-(including to 0, or negative) to tighten the outer edge of the figure;
-unlike \code{pad_width}, this does not affect the gap between panels.}
+panels. Defaults to NULL, which uses the built-in margin (0mm). Set
+higher to add whitespace around the outer edge of the figure; unlike
+\code{pad_width}, this does not affect the gap between panels.}
 
 \item{outer_height}{(multi-panel specific) Numeric (mm). Overrides the
 margin between the top/bottom edges of the figure (i.e. above the title
 and below the footnotes/sources) and the panels. Defaults to NULL, which
-uses the built-in margin. Set lower (including to 0, or negative) to
-tighten the outer edge of the figure; unlike \code{pad_height}, this does not
-affect the gap between panel rows.}
+uses the built-in margin (0mm). Set higher to add whitespace around the
+outer edge of the figure; unlike \code{pad_height}, this does not affect the
+gap between panel rows.}
 
 \item{max_height}{Numeric. The maximum height of your plot in cm. This is
 used to constrain the plot resizing algorithm in cases where you want to

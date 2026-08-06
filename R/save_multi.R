@@ -61,14 +61,16 @@ save_multi <-
 
     # outer_width/outer_height override the margin at the outer edge of the
     # whole figure (as opposed to pad_width/pad_height, which only add space
-    # *between* panels). NULL (the default) keeps the built-in margin.
+    # *between* panels). NULL (the default) keeps the built-in margin, which
+    # is 0 - tested against every sample-graphs/label_wrapping stress case
+    # (long titles/subtitles/footnotes, all panel layouts) with no clipping.
     # Kept in both mm (for the per-panel plot.margin, which is set in mm) and
     # points (for the title/subtitle/caption plot_annotation margins below,
     # which - like the rest of ggplot2 - are in points) so neither needs a
     # unit conversion at the point of use.
-    outer_height_mm <- if (is.null(outer_height)) points_to_mm(5.5) else outer_height
-    outer_height_pt <- if (is.null(outer_height)) 5.5 else mm_to_points(outer_height)
-    outer_width_mm <- if (is.null(outer_width)) points_to_mm(5.5) else outer_width
+    outer_height_mm <- if (is.null(outer_height)) 0 else outer_height
+    outer_height_pt <- if (is.null(outer_height)) 0 else mm_to_points(outer_height)
+    outer_width_mm <- if (is.null(outer_width)) 0 else outer_width
 
     # Format each plot in the plotlist and get dimensions ----------------------------------------
 
