@@ -35,7 +35,7 @@ test_that("t61_distance_to_series finds ~0 distance on the line and identifies t
     scale_colour_manual(values = c(A = "#e57200", B = "#1c3144")) +
     theme_bw(base_size = 10) +
     theme(legend.position = "none") +
-    labs(x = NULL, y = NULL)
+    ggplot2::labs(x = NULL, y = NULL)
 
   mask <- t61_render_mask(p, width_cm = 16, height_cm = 12, px_width = 400)
   units <- t61_mask_units_cm(mask)

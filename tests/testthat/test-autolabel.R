@@ -15,7 +15,7 @@ autolabel_test_setup <- function() {
     scale_colour_manual(values = c(A = "#e57200", B = "#1c3144")) +
     theme_bw(base_size = 10) +
     theme(legend.position = "none") +
-    labs(x = NULL, y = NULL)
+    ggplot2::labs(x = NULL, y = NULL)
 
   a <- data[data$series == "A", ]
   b <- data[data$series == "B", ]

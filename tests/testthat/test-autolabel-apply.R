@@ -26,7 +26,7 @@ autolabel_apply_test_setup <- function(auto_position = TRUE) {
     scale_colour_manual(values = c(A = "#e57200", B = "#1c3144")) +
     theme_bw(base_size = 10) +
     theme(legend.position = "none") +
-    labs(x = NULL, y = NULL) +
+    ggplot2::labs(x = NULL, y = NULL) +
     do.call(plot_label, c(
       list(c("Series A", "Series B")),
       label_args,

@@ -29,7 +29,7 @@ test_that("collision detection matches known-occupied and known-clear regions", 
     scale_colour_manual(values = c(A = "#e57200", B = "#1c3144")) +
     theme_bw(base_size = 10) +
     theme(legend.position = "none") +
-    labs(x = NULL, y = NULL)
+    ggplot2::labs(x = NULL, y = NULL)
 
   mask <- t61_render_mask(p, width_cm = 16, height_cm = 12, px_width = 400)
   lab_cm <- t61_measure_label_cm("Source A", size_mm = 3.5, width_cm = 16, height_cm = 12)
