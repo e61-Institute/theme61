@@ -67,6 +67,12 @@ labs_e61 <- function(title = NULL,
     if (!is.null(i) && !is.character(i)) stop(i, " must be a string.")
   }
 
+  # theme61.iterate_mode: theme_e61() isn't applied automatically in this
+  # mode, so the ggtext::element_markdown() that normally renders the HTML/
+  # markdown tags below isn't either - skip generating them so the graph
+  # doesn't show literal "<span>"/"<br>" text in the subtitle/y-axis title.
+  iterate_mode <- isTRUE(getOption("theme61.iterate_mode", FALSE))
+
   # Track whether a label has been wrapped
   wrap_title_trk <- FALSE
   wrap_subtitle_trk <- FALSE
@@ -136,8 +142,10 @@ labs_e61 <- function(title = NULL,
       stop("y must be a string.")
     }
 
-    # Wrap the ytitle text
-    y <- paste(strwrap(y, width = ytitle_wrap), collapse = "<br>")
+    # Wrap the ytitle text. In iterate_mode, the y-axis title below won't be
+    # merged into the (markdown-rendered) subtitle, so join with a plain
+    # newline instead of "<br>" - it stays a normal, non-markdown axis title.
+    y <- paste(strwrap(y, width = ytitle_wrap), collapse = if (iterate_mode) "\n" else "<br>")
 
     wrap_ytitle_trk <- TRUE
 
@@ -171,30 +179,36 @@ labs_e61 <- function(title = NULL,
   # Set y = "" to NULL because it just breaks code later
   if (!is.null(y) && y == "") y <- NULL
 
-  if (y_top) {
+  # Skip the HTML/markdown subtitle styling in iterate_mode - it relies on
+  # ggtext::element_markdown(), which theme_e61() isn't applying. Leave
+  # subtitle_text as plain text and y as a normal y-axis title instead
+  # (rendered wherever ggplot2 would normally put it).
+  if (!iterate_mode) {
+    if (y_top) {
 
-    if (is.null(y)) {
-      subtitle_text <- glue::glue(
-        "<span style='font-size:{primary_size}pt'>{subtitle_text}</span>"
-      )
-    } else if (subtitle_text == "") {
-      # No subtitle: show the y-axis title on its own line rather than
-      # prefixing it with an empty line, which would still reserve a
-      # blank line's worth of height above it.
-      subtitle_text <- glue::glue(
-        "<span style='font-size:{secondary_size}pt'>{y}</span>"
-      )
+      if (is.null(y)) {
+        subtitle_text <- glue::glue(
+          "<span style='font-size:{primary_size}pt'>{subtitle_text}</span>"
+        )
+      } else if (subtitle_text == "") {
+        # No subtitle: show the y-axis title on its own line rather than
+        # prefixing it with an empty line, which would still reserve a
+        # blank line's worth of height above it.
+        subtitle_text <- glue::glue(
+          "<span style='font-size:{secondary_size}pt'>{y}</span>"
+        )
 
-      y <- NULL
+        y <- NULL
+      } else {
+        subtitle_text <- glue::glue(
+          "<span style='font-size:{primary_size}pt'>{subtitle_text}</span><br><span style='font-size:{secondary_size}pt'>{y}</span>"
+        )
+
+        y <- NULL
+      }
     } else {
-      subtitle_text <- glue::glue(
-        "<span style='font-size:{primary_size}pt'>{subtitle_text}</span><br><span style='font-size:{secondary_size}pt'>{y}</span>"
-      )
-
-      y <- NULL
+      subtitle_text <- glue::glue("<span style='font-size:{primary_size}pt'>{subtitle_text}</span>")
     }
-  } else {
-    subtitle_text <- glue::glue("<span style='font-size:{primary_size}pt'>{subtitle_text}</span>")
   }
 
   # add to a ggplot object and return

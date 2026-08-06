@@ -65,3 +65,30 @@ test_that("set_t61_options accepts theme61.iterate_mode as a valid option", {
   set_t61_options(list(theme61.iterate_mode = TRUE))
   expect_true(getOption("theme61.iterate_mode"))
 })
+
+test_that("labs_e61() skips HTML/markdown subtitle styling in iterate_mode", {
+  withr::local_options(list(theme61.iterate_mode = FALSE))
+
+  l_normal <- labs_e61(subtitle = "hi")
+  expect_match(l_normal$subtitle, "^<span", fixed = FALSE)
+
+  withr::local_options(list(theme61.iterate_mode = TRUE))
+
+  l_iter <- labs_e61(subtitle = "hi")
+  expect_identical(l_iter$subtitle, "hi")
+})
+
+test_that("labs_e61() leaves the y-axis title as a normal axis title in iterate_mode", {
+  withr::local_options(list(theme61.iterate_mode = TRUE))
+
+  # Normally (y_top = TRUE default) the y title gets folded into the
+  # subtitle and y is set to NULL - in iterate_mode it should stay a
+  # plain y-axis title instead, with no HTML in either.
+  l <- labs_e61(subtitle = "hi", y = "Y title")
+  expect_identical(l$subtitle, "hi")
+  expect_identical(l$y, "Y title")
+
+  # Wrapped y titles should use a plain newline, not "<br>"
+  l_wrap <- labs_e61(y = "A really quite long y axis title", ytitle_wrap = 10)
+  expect_false(grepl("<br>", l_wrap$y, fixed = TRUE))
+})
