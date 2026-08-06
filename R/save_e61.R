@@ -71,7 +71,7 @@
 #' @param rel_heights (multi-panel specific) A numeric vector giving the
 #'   relative proportions of each graph component (title, plots, footer).
 #' @inheritParams labs_e61
-#' @inheritParams cowplot::plot_grid
+#' @inheritParams patchwork::plot_layout
 #' @return Invisibly returns the file name.
 #' @export
 

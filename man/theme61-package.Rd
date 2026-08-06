@@ -22,6 +22,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Aaron Wong \email{aaron.wong@e61.in}
   \item Elyse Dwyer \email{elyse.dwyer@e61.in}
   \item Jack Buckley \email{jack.buckley@e61.in}
 }

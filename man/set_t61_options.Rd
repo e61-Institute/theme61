@@ -9,9 +9,6 @@ set_t61_options(opt = NULL)
 \arguments{
 \item{opt}{A named list of options to set. See Details for available options.}
 }
-\value{
-This function is used for its side effects.
-}
 \description{
 To see the list of available options, just run the function in the console
 with no arguments i.e. \code{set_t61_options()}.

@@ -130,6 +130,10 @@ cramped on the chart.}
 multi-panel. The function sets sensible defaults but this provides you with
 manual control if you need it.}
 
+\item{ncol, nrow}{The dimensions of the grid to create - if both are \code{NULL} it
+will use the same logic as \link[ggplot2:facet_wrap]{facet_wrap()} to set the
+dimensions}
+
 \item{rel_heights}{(multi-panel specific) A numeric vector giving the
 relative proportions of each graph component (title, plots, footer).}
 }
