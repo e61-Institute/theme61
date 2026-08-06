@@ -60,10 +60,6 @@ save_multi <-
     max_panel_asps <- 0
     max_left_axis_width <- 0
     max_right_axis_width <- 0
-    y_lab_max_size <- 0
-    max_break_width <- 0
-    any_neg_break <- FALSE
-    any_dec_break <- FALSE
 
     # track the effective text size used per panel, in case a panel has
     # already customised its own text size away from the theme_e61() default
@@ -126,34 +122,12 @@ save_multi <-
 
       max_panel_asps <- pmax(max_panel_asps, panel_asps[1,1])
 
-      # keep track of the maximum y-axis title size in cm
-      y_font_size <- get_font_size(temp_plot, elem = "axis.text.y", parent = "axis.text")
-
-      y_lab_size <- get_text_width(temp_plot@labels$y, font_size = y_font_size)
-      y_lab_max_size <- pmax(y_lab_size, y_lab_max_size, na.rm = T)
-
-      # keep track of the maximum break size
-      break_width <- get_y_break_width(temp_plot)
-      max_break_width <- pmax(break_width, max_break_width, na.rm = T)
-
-      # track whether any label has a - or . - these are measured poorly in the multi plots for some reason
-
-      break_type <- check_y_break_type(temp_plot)
-
-      any_neg_break <- any(break_type$any_neg, any_neg_break, na.rm = T)
-      any_dec_break <- any(break_type$any_dec, any_dec_break, na.rm = T)
-
       # keep track of the max right axis and left axis widths as all charts are set to have the same dimensions
       right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r"))
       max_right_axis_width <- pmax(max_right_axis_width, right_axis_width)
 
       left_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-l"), get_grob_width(p, grob_name = "axis-l"))
       max_left_axis_width <- pmax(max_left_axis_width, left_axis_width)
-
-      # OLD - keep for testing
-      # widths <- grid::convertWidth(p$widths, "cm", valueOnly = TRUE)
-      # temp_width <- sum(widths)
-      # if(i <= ncol) known_width <- known_width + temp_width
 
       if(is.null(max_left_axis_width) || length(max_left_axis_width) == 0)
         max_left_axis_width <- 0
@@ -195,6 +169,12 @@ save_multi <-
     panel_width <- free_wd / ncol # width of each panel
     panel_height <- panel_width * max_panel_asps # height of the tallest panel (width * aspect ratio)
 
+    # Padding between charts. Needed here (not just below, where it's used
+    # for patchwork) because the per-panel label wrapping below also needs
+    # it: each panel gets this margin applied on its own left/right via
+    # patchwork's `&` operator, so it's part of that panel's true width.
+    chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
+    chart_height_pad <- points_to_mm(5.5) + pad_height * 10
 
     # Update the labels -------------------------------------------------------
 
@@ -207,8 +187,10 @@ save_multi <-
 
         temp_plot <- clean_plotlist[[i]]
 
-        # update labels - for each set the limit as width divided by the number of columns we have
-        temp_plot <- update_labs(temp_plot, panel_width + known_width / ncol)
+        # update labels - the wrap limit is this panel's share of width and
+        # axes, plus its own left/right margin (chart_width_pad), which is
+        # part of its true rendered width
+        temp_plot <- update_labs(temp_plot, panel_width + known_width / ncol + 2 * chart_width_pad / 10)
 
         # update any plot label sizes
         temp_plot <- update_plot_label(temp_plot, chart_type, panel_base_sizes[i])
@@ -234,10 +216,6 @@ save_multi <-
       nrow <- ceiling(length(plots) / ncol)
     }
 
-    # Identify how much padding to put between charts
-    chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
-    chart_height_pad <- points_to_mm(5.5) + pad_height * 10
-
     # Create the main chart
     multi_plot <- patchwork::wrap_plots(
         plots,
@@ -251,9 +229,10 @@ save_multi <-
     tot_width_pad <- ncol * 2 * chart_width_pad / 10
     tot_height_pad <- nrow * 2 * chart_height_pad / 10
 
-    # Get the interior width - not include the spacing on the left and right, for the width padding these will be centered
+    # Interior width available to the title/subtitle/caption text (see the
+    # plot.margin note below for why no further margin needs subtracting).
     tot_width <- width + tot_width_pad
-    internal_width <- tot_width - 2 * points_to_mm(5.5) / 10 - 4 * pad_width
+    internal_width <- tot_width - 4 * pad_width
 
 
     # Prepare titles, subtitles etc. --------------------------------------
@@ -297,7 +276,12 @@ save_multi <-
               hjust = 0,
               vjust = 0.5,
               margin = margin(t = 5.5, b = title_subtitle_spacing, l = 0, r = 0)
-            )
+            ),
+            # patchwork sizes this row with a throwaway ggplot using its own
+            # default plot.margin, adding columns outside where the text is
+            # placed. Zero out l/r (keeping t/b, used by the height
+            # calculations below) so the text can use the full internal_width.
+            plot.margin = margin(t = 5.5, r = 0, b = 5.5, l = 0)
           )
         )
     }
@@ -326,7 +310,8 @@ save_multi <-
               hjust = 0,
               vjust = 0.5,
               margin = margin(t = 0, b = subtitle_charts_spacing, l = 0, r = 0)
-            )
+            ),
+            plot.margin = margin(t = 5.5, r = 0, b = 5.5, l = 0)
           )
         )
     }
@@ -362,7 +347,8 @@ save_multi <-
               hjust = 0,
               vjust = 0.5,
               margin = margin(b = 5.5, t = caption_spacing, l = 0, r = 0)
-            )
+            ),
+            plot.margin = margin(t = 5.5, r = 0, b = 5.5, l = 0)
           )
         )
     }

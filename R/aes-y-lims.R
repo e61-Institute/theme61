@@ -25,8 +25,12 @@ update_scales <- function(plot, auto_scale){
     return(plot)
   }
 
+  # Build once and share it with check_for_y_var()/the sec-axis check/
+  # get_y_minmax() below - plot isn't mutated until update_chart_scales() returns.
+  build <- ggplot_build(plot)
+
   # check if we have a numeric y-variable
-  check_y_var <- check_for_y_var(plot)
+  check_y_var <- check_for_y_var(plot, build)
 
   # if we don't have a numeric y-variable then check whether the plot contains geom_density or geom_histogram (GeomBar without a y-variable)
   if (!check_y_var) {
@@ -48,7 +52,8 @@ update_scales <- function(plot, auto_scale){
   }
 
   # check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
-  grobs <- ggplotGrob(plot)
+  # ggplot_gtable(build) == ggplotGrob(plot), reusing the build above
+  grobs <- ggplot_gtable(build)
 
   test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
 
@@ -57,7 +62,7 @@ update_scales <- function(plot, auto_scale){
   # if the y-variable class is numeric, or the plot is a density or histogram, then update the chart scales
   if (check_y_var){
 
-    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
+    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis, build)})
 
     # if the y-var class is NULL, send a warning message about the auto updating of chart scales
   } else if (!check_y_var & is.null(getOption("warn_y_var"))){
@@ -70,8 +75,9 @@ update_scales <- function(plot, auto_scale){
 }
 
 #' Check whether the dataset has a y-variable that can be used for scaling
+#' build - optional, reuse an existing ggplot_build(plot) instead of rebuilding
 #'@noRd
-check_for_y_var <- function(plot){
+check_for_y_var <- function(plot, build = NULL){
 
   check <- FALSE
 
@@ -85,7 +91,9 @@ check_for_y_var <- function(plot){
   # continue looking for whether there is a y-variable that can be used for scaling
   if(is.null(y_class) || (y_class != "factor" && y_class != "character")){
 
-    chart_data <- ggplot_build(plot)$data
+    if (is.null(build)) build <- ggplot_build(plot)
+
+    chart_data <- build$data
 
     # check whether there are any non-missing values for y, ymax and ymin. Note min will return -Inf if the variable doesn't exist or is all missing
     for (i in seq_along(chart_data)){
@@ -116,8 +124,9 @@ check_for_y_var <- function(plot){
 }
 
 #' Aesthetically update the y-axis scales and labels
+#' build - optional, reuse an existing ggplot_build(plot) instead of rebuilding
 #' @noRd
-update_chart_scales <- function(plot, auto_scale, sec_axis){
+update_chart_scales <- function(plot, auto_scale, sec_axis, build = NULL){
 
   y_scale <- layer_scales(plot)$y
 
@@ -136,7 +145,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   if(is.null(y_scale_lims) && auto_scale){
 
     # get the minimum and maximum y-axis values from the chart data
-    minmax <- get_y_minmax(plot)
+    minmax <- get_y_minmax(plot, build)
 
     min_y <- minmax[[1]]
     max_y <- minmax[[2]]
@@ -169,7 +178,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
 
     # Step 2 - find the maximum y-value in the data - we want to make sure we don't
     # adjust down and chop off some data
-    max_y_data <- get_y_minmax(plot)[[2]]
+    max_y_data <- get_y_minmax(plot, build)[[2]]
 
     # Step 3 - Check that with the new upper limit we have asethetic ticks (this suggests it
     # was overwritten), and check that the new upper limit is greater than the maximum value
@@ -231,12 +240,14 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
 }
 
 #' Get the minimum and maximum y-axis data in the chart data
+#' build - optional, reuse an existing ggplot_build(plot) instead of rebuilding
 #' @noRd
-get_y_minmax <- function(plot){
+get_y_minmax <- function(plot, build = NULL){
 
   min_y <- NA_real_
   max_y <- NA_real_
-  chart_data <- ggplot_build(plot)$data
+  if (is.null(build)) build <- ggplot_build(plot)
+  chart_data <- build$data
 
   for(i in seq_along(chart_data)){
 

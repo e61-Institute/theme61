@@ -50,7 +50,9 @@ save_single <- function(
     }
   }
 
-  plot_build <- ggplot_build(plot)
+  # Update plot background --------------------------------------------------
+
+  plot <- plot + theme(rect = element_rect(fill = bg_colour))
 
   # Update the aspect ratio -------------------------------------------------
 
@@ -76,6 +78,9 @@ save_single <- function(
   # Get facet dimensions if applicable
   if (length(plot@facet$params) != 0) {
 
+    # Only build when actually needed - most theme61 charts are single-panel
+    plot_build <- ggplot_build(plot)
+
     n_panel_cols <- max(plot_build$layout$layout$COL)
     n_panel_rows <- max(plot_build$layout$layout$ROW)
 
@@ -95,7 +100,7 @@ save_single <- function(
   if(is.null(width)) {
 
     # When coord_flip() is used to make a plot horizontal, the default dims are too small
-    if (isTRUE("CoordFlip" %in% class(ggplot_build(plot)$layout$coord))) {
+    if (isTRUE("CoordFlip" %in% class(plot@coordinates))) {
 
       width <- max_width
       max_panel_width <- max_width / 2 # only allow the panel to be at most half the column consistent with other chart types
@@ -137,7 +142,7 @@ save_single <- function(
   # update the width after this check
   width <- tot_panel_width + known_wd
 
-  plot <- update_labs(plot, 0.99 * width)
+  plot <- update_labs(plot, width)
 
   if(!is_spatial_chart){
 

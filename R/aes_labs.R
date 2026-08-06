@@ -453,8 +453,13 @@ get_lines <- function(text, font_size, plot_width, font_face = 1){
   words <- split_text_into_words(text)
   words[, word_width := get_text_width(paste0(word, " "), font_size, font_face)]
 
+  # word_width includes a trailing space, but the last word on a line never
+  # renders one (nothing follows it), so subtract one space width from the
+  # running total below to match what's actually drawn.
+  space_width <- get_text_width(" ", font_size, font_face)
+
   # assign words to different lines based on the cumulative length
-  words[, cumsum_word_width := cumsum(word_width) / plot_width]
+  words[, cumsum_word_width := (cumsum(word_width) - space_width) / plot_width]
 
   check_lines <- T
   i <- 1
@@ -478,7 +483,7 @@ get_lines <- function(text, font_size, plot_width, font_face = 1){
 
     }
 
-    words <- words[, cumsum_word_width := cumsum(word_width) / plot_width]
+    words <- words[, cumsum_word_width := (cumsum(word_width) - space_width) / plot_width]
 
     i <- i + 1
 
@@ -494,31 +499,75 @@ get_lines <- function(text, font_size, plot_width, font_face = 1){
 }
 
 #' Calculate the width of text in ggplot titles, subtitles and footnotes
+#'
+#' Measured on a throwaway svglite device using the real render font, rather
+#' than base R's built-in metric tables, which don't know about "pt-sans"
+#' and measure it inaccurately.
 #' text - String. Text to be measured.
 #' font_size - Numeric. Size of the font of the text.
+#' font_face - Numeric. Face of the font (1 = normal, 2 = bold)
 #' @noRd
 get_text_width <- function(text, font_size = 10, font_face = 1) {
 
-  R.devices::devEval("nulldev", {
-    par(family = "sans", ps = font_size, font = font_face)
-    ret <- graphics::strwidth(text, units = "inches") * 2.54
-  })
+  if (length(text) == 0) return(numeric(0))
 
-  return(ret)
+  family <- if (is_testing()) "sans" else "pt-sans"
+  face <- if (font_face == 2) "bold" else "plain"
+
+  measure_device({
+    grid::pushViewport(grid::viewport(
+      gp = grid::gpar(fontfamily = family, fontsize = font_size, fontface = face)
+    ))
+
+    ret <- grid::convertWidth(grid::stringWidth(text), "cm", valueOnly = TRUE)
+
+    grid::popViewport()
+
+    ret
+  })
 }
 
 #' Calculate the height of text in ggplot titles, subtitles and footnotes
+#'
+#' See [get_text_width] for why this measures using a real graphics device
+#' rather than base R's built-in font metric tables.
 #' text - String. Text to be measured.
 #' font_size - Numeric. Size of the font of the text.
 #' @noRd
 get_text_height <- function(text, font_size = 10) {
 
-  R.devices::devEval("nulldev", {
-    par(family = "sans", ps = font_size)
-    ret <- graphics::strheight(text, units = "inches") * 2.54
-  })
+  if (length(text) == 0) return(numeric(0))
 
-  return(ret)
+  family <- if (is_testing()) "sans" else "pt-sans"
+
+  measure_device({
+    grid::pushViewport(grid::viewport(
+      gp = grid::gpar(fontfamily = family, fontsize = font_size)
+    ))
+
+    ret <- grid::convertHeight(grid::stringHeight(text), "cm", valueOnly = TRUE)
+
+    grid::popViewport()
+
+    ret
+  })
+}
+
+#' Run `expr` with a throwaway svglite device as the active graphics device,
+#' so text can be measured with real font metrics. The device is opened and
+#' closed around `expr`, which restores whatever device (if any) was active
+#' beforehand as a side effect of `dev.off()`, so this never disturbs a
+#' device the user has open.
+#' @noRd
+measure_device <- function(expr) {
+
+  measure_file <- tempfile(fileext = ".svg")
+  on.exit(unlink(measure_file))
+
+  svglite::svglite(measure_file, width = 10, height = 10)
+  on.exit(grDevices::dev.off(), add = TRUE)
+
+  expr
 }
 
 #' Split a character string into its individual words
@@ -536,227 +585,6 @@ split_text_into_words <- function(text) {
   } else {
     data.table::data.table(word = words, text = text)
   }
-}
-
-#' Update y-axis label spacing so that they are aesthetic
-#' plot - Plot object to adjust.
-#' y_lab_max_size - for multi-panels the max size of the y-axis labels
-#' panel_width - width of the panels in the chart
-#' @noRd
-update_y_axis_labels <- function(plot,
-                                 max_break_width = NULL,
-                                 y_lab_max_size = NULL,
-                                 any_neg_break = FALSE,
-                                 any_dec_break = FALSE) {
-
-  # get the difference in the label size
-  y_font_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
-
-  # add the spacing of one character for the other margin
-  spacing <- y_font_size / 5
-
-  # if the y lab max is null, then we have a single panel plot and don't need to worry about the max label size
-  if(is.null(y_lab_max_size)){
-
-    adj_width <- get_y_break_width(plot)
-
-    if(adj_width > 20) spacing <- spacing + 1.2 * y_font_size
-
-    # otherwise we have a multi panel and need to take into account the width of the widest break label
-  } else {
-
-    # This is old code that used to be necessary but it no longer is as the way ggplot calculates margin
-    # spacing has changed
-    # # get the maximum offset and compare to the
-    # y_lab_max_size <- y_lab_max_size * .pt * 10
-
-    # max_offset <- pmax(y_lab_max_size, max_break_width)
-    adj_width <- max_break_width
-
-    # increase the adjustment if there are decimal places and negatives
-    if(any_neg_break) adj_width <- adj_width + 2
-
-    if(any_dec_break) adj_width <- adj_width + 2
-
-    if(max_break_width > 20) adj_width <- adj_width - 4
-
-  }
-
-  plot <- plot +
-    theme(
-      axis.title.y.left = element_text(margin = margin(l = spacing, r = - adj_width), vjust = 1, hjust = 1, angle = 0),
-      axis.title.y.right = element_text(margin = margin(l = - adj_width, r = spacing), vjust = 1, hjust = 0, angle = 0)
-    )
-
-  return(plot)
-}
-
-#' Get the y-axis breaks for a chart
-#' plot - Plot object to adjust.
-#' @noRd
-get_y_breaks <- function(plot){
-
-  # get the break text size
-  p_build <- ggplot_build(plot)
-
-  break_text_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
-
-  # check what the y-axis breaks are - this will show up if the user has specified the breaks
-  breaks <- p_build$layout$panel_scales_y[[1]]$labels
-
-  if(is.null(breaks) || length(breaks) == 0)
-    breaks <- p_build$layout$panel_scales_y[[1]]$breaks
-
-  # if there are no breaks use the scale y-continuous function to find them instead
-  if(is.null(breaks) || length(breaks) == 0 || is.function(breaks)){
-
-    # save the existing limits - if there are any
-    y_scale_lims <- layer_scales(plot)$y$limits
-
-    # check if we already have a proper e61 scale - no need to redo the work and get it wrong
-    if(length(y_scale_lims) == 3){
-
-      aes_lims <- y_scale_lims
-
-      # otherwise we'll need to re calculate what the aesthetic limits will look like
-    } else {
-
-      # check whether the chart is a bar chart or not
-      is_bar <- is_barchart(plot)
-
-      # if there are existing limits - use those first
-      if(!is.null(y_scale_lims)){
-
-        min_y <- y_scale_lims[1]
-        max_y <- y_scale_lims[2]
-
-        # check whether the tick mark with the given limits is null, if it is we'll need to calculate all three from scratch
-        tick <- get_aes_ticks(min_y, max_y)
-
-        if(is.null(tick)){
-          aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
-
-        } else {
-          aes_lims <- c(min_y, max_y, tick)
-        }
-
-        # otherwise have a look at the data
-      } else {
-
-        # this looks at the underlying chart data and returns the min and the max y values
-        minmax <- get_y_minmax(plot)
-
-        min_y <- minmax[[1]]
-        max_y <- minmax[[2]]
-
-        # get aesthetic limits for the y-axis - if it is a bar chart, then include zero
-        aes_lims <- unlist(get_aes_limits(min_y, max_y, from_zero = is_bar))
-      }
-    }
-
-    # check whether the y-title is at the top - then we want the max break to be smaller
-    y_angle <- plot@theme$axis.title.y.left$angle
-    y_vjust <- plot@theme$axis.title.y.left$vjust
-
-    if(length(y_angle) != 0 && length(y_vjust) != 0 && y_angle == 0 && y_vjust == 1) {
-
-      # then define the breaks
-      breaks <- seq(aes_lims[[1]], aes_lims[[2]] - aes_lims[[3]], aes_lims[[3]])
-    } else {
-
-      # then define the breaks
-      breaks <- seq(aes_lims[[1]], aes_lims[[2]], aes_lims[[3]])
-    }
-  }
-
-  return(breaks)
-}
-
-#' Get the width of y-axis break labels
-#' Plot - Plot object to adjust.
-#' @noRd
-get_y_break_width <- function(plot){
-
-  breaks <- get_y_breaks(plot)
-  break_text_size <- get_font_size(plot, elem = "axis.text.y", parent = "axis.text")
-
-  # take the absolute value of the breaks if required
-  neg_breaks <- ifelse(breaks < 0, "-", "")
-
-  breaks <- abs(breaks)
-
-  # get the width of the breaks - find the maximum width
-  break_text_widths <- get_text_width(breaks, font_size = break_text_size)
-
-  # add the minus sign width
-  neg_breaks_width <- get_text_width(neg_breaks, font_size = break_text_size) * 0.5
-
-  break_text_widths <- break_text_widths + neg_breaks_width
-
-  max_break_width <- max(break_text_widths) # this is in cm
-
-  break_width_pt <- .pt * max_break_width * 10 # so convert to points
-
-  return(break_width_pt)
-}
-
-#' Check whether the y-breaks have negatives or decimal places - these break multi facet plots
-#' plot - Plot object to adjust.
-#' @noRd
-check_y_break_type <- function(plot){
-
-  breaks <- get_y_breaks(plot)
-
-  # Check whether there are any negative breaks
-  has_neg <- any(breaks < 0, na.rm = T)
-
-  # Check whether there are any breaks with decimal places in them
-  has_dec <- any(stringr::str_detect(breaks, "\\."), na.rm = T)
-
-  return(list("any_neg" = has_neg, "any_dec" = has_dec))
-}
-
-#' Get the font size of text from a particular aspect of a ggplot
-#' plot - Plot object to adjust.
-#' elem - the element you want to get the size of
-#' parent - the parent element of the element you want to get the size of (used as a fall back option)
-#' @noRd
-get_font_size <- function(plot, elem = "text", parent = "text"){
-
-  # get the text sizes of the elements we're interested in and the main text size of the plot
-  main_text_size <- plot@theme$text$size
-  elem_text_size <- plot@theme[[elem]]$size
-  parent_text_size <- plot@theme[[parent]]$size
-
-  # if the element does not have a text size, look at the parent
-  if(is.null(elem_text_size)){
-
-    # check whether it is a relative text size of numeric
-    if(class(parent_text_size) == "rel"){
-      text_size <- eval(parse(text = paste(parent_text_size, " * ", main_text_size)))
-
-    } else if (class(parent_text_size) == "numeric")(
-      text_size <- parent_text_size
-    )
-
-    # if we have the element text size, then use that
-  } else {
-
-    if(class(elem_text_size) == "rel" && class(parent_text_size) == "rel"){
-      text_size <- eval(parse(text = paste(parent_text_size, " * ", elem_text_size, " * ", main_text_size)))
-
-    } else if (class(elem_text_size) == "numeric")(
-      text_size <- elem_text_size
-
-    ) else if (class(elem_text_size) == "rel" && class(parent_text_size) == "numeric")(
-      text_size <- eval(parse(text = paste(elem_text_size, " * ", parent_text_size)))
-    )
-  }
-
-  if(is.null(text_size) || !is.numeric(text_size) || is.na(text_size))
-    text_size <- main_text_size
-
-  return(text_size)
 }
 
 #' Update the size of plot labels
