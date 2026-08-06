@@ -4,7 +4,7 @@
 #' @noRd
 update_labs <- function(plot, plot_width){
 
-  p <- ggplotGrob(plot)
+  p <- t61_ggplotGrob_quiet_na(plot)
 
   # Title ----
 

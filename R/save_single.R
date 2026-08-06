@@ -148,7 +148,7 @@ save_single <- function(
   # Update labels -----------------------------------------------------------
 
   # Update the size of the text used for titles, footnotes, axes etc.
-  p <- ggplotGrob(plot)
+  p <- t61_ggplotGrob_quiet_na(plot)
 
   # allow charts to be the width of the panels
   right_axis_width <- get_grob_width(p, grob_name = "axis-r")
@@ -179,7 +179,7 @@ save_single <- function(
   if(is.null(height)){
 
     # Step 1 - Get the amount of free height and width we have to play with (what is not already used up by the set elements)
-    p <- ggplotGrob(plot)
+    p <- t61_ggplotGrob_quiet_na(plot)
 
     known_ht <- sum(grid::convertHeight(p$heights, "cm", valueOnly = TRUE))
 
