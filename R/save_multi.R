@@ -68,9 +68,9 @@ save_multi <-
     # points (for the title/subtitle/caption plot_annotation margins below,
     # which - like the rest of ggplot2 - are in points) so neither needs a
     # unit conversion at the point of use.
-    outer_height_mm <- if (is.null(outer_height)) 0 else outer_height
-    outer_height_pt <- if (is.null(outer_height)) 0 else mm_to_points(outer_height)
-    outer_width_mm <- if (is.null(outer_width)) 0 else outer_width
+    outer_height_mm <- if (is.null(outer_height)) 1 else outer_height
+    outer_height_pt <- if (is.null(outer_height)) mm_to_points(1) else mm_to_points(outer_height)
+    outer_width_mm <- if (is.null(outer_width)) 1 else outer_width
 
     # Format each plot in the plotlist and get dimensions ----------------------------------------
 
