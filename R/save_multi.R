@@ -112,7 +112,7 @@ save_multi <-
 
       # Calculate the known width of the chart ----
 
-      p <- ggplotGrob(temp_plot)
+      p <- t61_ggplotGrob_quiet_na(temp_plot)
 
       # get max panel aspect ratio - this is found by looking at the number of null rows and cols (the panels)
       null_rowhts <- as.numeric(p$heights[grid::unitType(p$heights) == "null"])
@@ -200,7 +200,7 @@ save_multi <-
         clean_plotlist[[i]] <- temp_plot
 
         # Calculate the known height of the chart
-        p <- ggplotGrob(temp_plot)
+        p <- t61_ggplotGrob_quiet_na(temp_plot)
 
         temp_height <- sum(grid::convertHeight(p$heights, "cm", valueOnly = TRUE))
 
