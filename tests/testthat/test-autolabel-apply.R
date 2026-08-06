@@ -761,10 +761,10 @@ test_that("t61_apply_autolabel falls back (doesn't crash or misplace) for a geom
 #' `graph` is a patchwork object: the base plot's own layers hold one panel,
 #' and `graph$patches$plots` holds the rest -- but which panel ends up as
 #' the base grob isn't part of patchwork's contract, so a fixed
-#' index-to-panel mapping is unreliable (confirmed empirically: it flips
-#' between runs). Matched instead by comparing each candidate panel's first
-#' (non-label) layer's rendered y-values against the source plot's, which
-#' uniquely identifies the panel regardless of patchwork's internal order.
+#' index-to-panel mapping is unreliable (it can flip between runs). Matched
+#' instead by comparing each candidate panel's first (non-label) layer's
+#' rendered y-values against the source plot's, which uniquely identifies
+#' the panel regardless of patchwork's internal order.
 #' @noRd
 multi_panel_label_data <- function(graph, source_plot) {
   candidates <- c(list(graph), graph$patches$plots)

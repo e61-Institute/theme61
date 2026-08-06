@@ -366,8 +366,8 @@ save_e61 <- function(filename = NULL,
 
     if (out != 0) warning("Graph file could not be opened")
   } else if (interactive()) {
-    # Only run this in interactive mode
-    # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
+    # rstudioapi::viewer only opens temp files in the Viewer pane, not
+    # arbitrary saved paths -- always preview via a temp file, below.
 
     # Always preview an SVG, even if the saved format(s) are not SVG
     preview_svg <- make_preview_svg(
@@ -407,7 +407,7 @@ save_e61 <- function(filename = NULL,
 #' @export
 svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
 
-  res <- res * 4 # res = 1 produces exceedingly small images now apparently
+  res <- res * 4 # res = 1 alone renders too small to be usable
 
   if (!grepl(".*\\.svg$", file_in))
     stop("file_in must be an svg file.")
@@ -426,10 +426,6 @@ svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
     # converting it to PNG. Hence the need for temp files.
     file_temp_svg <- "intermed.svg"
     file_temp_out <- paste0("intermed.", fmt)
-
-    # For some reason this changed at some point and the scaling is fine now.
-    # Keeping this here in case it reverts back in the future.
-    # res <- res / 1.25 # For some reason any res > 1 scales 1:1.25...
 
     rsvg::rsvg_png(svg = file_in, file = file_temp_out)
 
