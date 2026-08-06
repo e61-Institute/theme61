@@ -227,8 +227,12 @@ save_multi <-
         # update labels - the wrap limit is this panel's share of width and
         # axes. Deliberately excludes chart_width_pad: that margin isn't
         # available to this panel's own text (it's outside the panel's
-        # rendered cell)
-        temp_plot <- update_labs(temp_plot, panel_width + known_width / ncol)
+        # rendered cell). 0.9 buffer matches internal_width below - text
+        # width is measured on a throwaway device that doesn't necessarily
+        # use the exact font metrics of the final render, so wrapping against
+        # the full available width leaves no room for that mismatch and can
+        # let a panel's own title/subtitle bleed into the next panel.
+        temp_plot <- update_labs(temp_plot, 0.9 * (panel_width + known_width / ncol))
 
         # update any plot label sizes
         temp_plot <- update_plot_label(temp_plot, chart_type, panel_base_sizes[i])
