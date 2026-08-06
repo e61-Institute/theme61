@@ -1,5 +1,9 @@
 # theme61 (development version)
 
+#### New features
+
+* Added a `return_plot_obj` argument to `save_e61()` for multi-panel graphs (2 or more plots). When `TRUE`, `save_e61()` skips saving entirely and returns the composed multi-panel plot object instead of writing it to disk - e.g. to print it in the Plots pane, or use it in a Shiny app (closes #216). No `filename` is required in this mode. Not supported for single-panel graphs, since you can already just print the ggplot object directly. Note the returned object's layout (text sizes, panel spacing) is computed for a fixed target size (`dim`, or the same defaults `save_e61()` would otherwise use), so it won't reflow if you resize the device afterwards - the same way a saved image wouldn't.
+
 #### Performance
 
 * `save_e61()`/`print()` no longer re-render the same plot from scratch several times over. `update_scales()` now builds the plot once and reuses that build for its internal y-variable, secondary-axis and y-min/max checks (previously up to 3 separate builds), and `save_single()` no longer builds the plot just to check for `coord_flip()` (reads the coord class off the plot object instead) or builds it unconditionally to count facet panels (now only when facets are actually present). No change in output.

@@ -289,6 +289,39 @@ test_that("Does save_data work", {
   })
 })
 
+test_that("return_plot_obj returns the composed multi-panel object without saving", {
+
+  df1 <- data.frame(x = c(0, 1), y = c(0, 1))
+  df2 <- data.frame(x = c(0, 1), y = c(1, 4))
+
+  p1 <- ggplot(df1, aes(x, y)) + geom_point()
+  p2 <- ggplot(df2, aes(x, y)) + geom_point()
+
+  withr::with_tempdir({
+    obj <- save_e61(plotlist = list(p1, p2), title = "Combined", return_plot_obj = TRUE)
+
+    expect_s3_class(obj, "patchwork")
+    expect_length(list.files(), 0)
+  })
+})
+
+test_that("return_plot_obj errors for a single plot", {
+  expect_error(
+    save_e61(plotlist = list(minimal_plot), return_plot_obj = TRUE),
+    "only supported for multi-panel graphs"
+  )
+})
+
+test_that("return_plot_obj doesn't require a filename", {
+  df1 <- data.frame(x = c(0, 1), y = c(0, 1))
+  df2 <- data.frame(x = c(0, 1), y = c(1, 4))
+
+  p1 <- ggplot(df1, aes(x, y)) + geom_point()
+  p2 <- ggplot(df2, aes(x, y)) + geom_point()
+
+  expect_no_error(save_e61(plotlist = list(p1, p2), return_plot_obj = TRUE))
+})
+
 test_that("resolve_aspect_ratio respects user theme customisations", {
 
   p <- minimal_plot # already carries theme_e61()'s default aspect.ratio = 0.75
