@@ -29,8 +29,14 @@ ggplot <- function(data = NULL,
 #' @export
 ggsave <- function(...) {
 
+  # theme61.iterate_mode: don't redirect to save_e61() at all, just pass
+  # straight through to ggplot2::ggsave().
+  if (isTRUE(getOption("theme61.iterate_mode", FALSE))) {
+    return(ggplot2::ggsave(...))
+  }
+
   # Throw warning message (unless testing)
-  if (!isTRUE(getOption("theme61.quiet_mask", FALSE)))
+  if (!isTRUE(getOption("quiet_mask", FALSE)))
     cli::cli_bullets(c("x" = "Your function arguments have been passed to save_e61() automatically. Please use save_e61() instead of ggsave() to ensure your graphs conform to the e61 style correctly. If you still want to use ggplot2's ggsave(), provide the namespace explicitly."))
 
   save_e61(...)
@@ -42,8 +48,14 @@ ggsave <- function(...) {
 #' @export
 labs <- function(...) {
 
+  # theme61.iterate_mode: don't redirect to labs_e61() at all, just pass
+  # straight through to ggplot2::labs().
+  if (isTRUE(getOption("theme61.iterate_mode", FALSE))) {
+    return(ggplot2::labs(...))
+  }
+
   # Throw warning message (unless testing)
-  if (!isTRUE(getOption("theme61.quiet_mask", FALSE)))
+  if (!isTRUE(getOption("quiet_mask", FALSE)))
     cli::cli_bullets(c("x" = "Your function arguments have been passed to labs_e61() automatically. Please use labs_e61() instead of labs() to ensure your graphs conform to the e61 style correctly. If you still want to use ggplot2's labs(), provide the namespace explicitly."))
 
   labs_e61(...)
@@ -55,6 +67,14 @@ labs <- function(...) {
 #' @noRd
 #' @export
 facet_wrap <- function(..., axes = "all") {
+
+  # theme61.iterate_mode: don't force axes = "all", just pass straight
+  # through to ggplot2::facet_wrap() (defaults to axes = "margins"), unless
+  # the user explicitly asked for a specific axes value.
+  if (isTRUE(getOption("theme61.iterate_mode", FALSE))) {
+    if (missing(axes)) return(ggplot2::facet_wrap(...))
+    return(ggplot2::facet_wrap(..., axes = axes))
+  }
 
   f <- ggplot2::facet_wrap(..., axes = axes)
   attr(f, "t61_axes") <- axes
@@ -68,6 +88,14 @@ facet_wrap <- function(..., axes = "all") {
 #' @noRd
 #' @export
 facet_grid <- function(..., axes = "all") {
+
+  # theme61.iterate_mode: don't force axes = "all", just pass straight
+  # through to ggplot2::facet_grid() (defaults to axes = "margins"), unless
+  # the user explicitly asked for a specific axes value.
+  if (isTRUE(getOption("theme61.iterate_mode", FALSE))) {
+    if (missing(axes)) return(ggplot2::facet_grid(...))
+    return(ggplot2::facet_grid(..., axes = axes))
+  }
 
   f <- ggplot2::facet_grid(..., axes = axes)
   attr(f, "t61_axes") <- axes
