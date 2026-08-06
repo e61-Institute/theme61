@@ -369,6 +369,10 @@ points_to_mm <- function(points) {
   as.numeric(grid::convertX(ggplot2::unit(points, "points"), "mm"))[1]
 }
 
+mm_to_points <- function(mm) {
+  as.numeric(grid::convertX(ggplot2::unit(mm, "mm"), "points"))[1]
+}
+
 cm_to_in <- function(cm, round = FALSE) {
   inches <- cm / 2.54
 
