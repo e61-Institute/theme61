@@ -229,11 +229,12 @@ test_that("Headroom below zero is not reserved for single bottom-aligned columns
   expect_equal(range_y[1], 0)
 })
 
-test_that("Headroom is reserved beyond stacked columns at align top/bottom too", {
+test_that("Stacked columns need no headroom at align top/bottom - the outer segment sits inside instead", {
   # The outermost segment's edge coincides with the panel boundary at
-  # align = "top"/"bottom", so it needs the same reserved headroom as a
-  # single column - otherwise the (vjust = 0.5) label glyph is clipped by
-  # the panel edge, since theme61's y scale has no expansion there.
+  # align = "top"/"bottom". Rather than reserving headroom for a label that
+  # straddles it (vjust = 0.5), that one segment's label is pushed fully
+  # inside the column (vjust = 1/0), so the range never needs to extend
+  # past the stack total in either direction.
   data <- data.frame(
     x = rep(c("2023", "2024"), each = 2),
     grp = rep(c("Group 1", "Group 2"), 2),
@@ -248,9 +249,32 @@ test_that("Headroom is reserved beyond stacked columns at align top/bottom too",
   range_bottom <- ggplot_build(p_bottom)$layout$panel_scales_y[[1]]$get_limits()
   range_middle <- ggplot_build(p_middle)$layout$panel_scales_y[[1]]$get_limits()
 
-  expect_gt(range_top[2], 100)
-  expect_lt(range_bottom[1], 0)
+  expect_equal(range_top, c(0, 100))
+  expect_equal(range_bottom, c(0, 100))
   expect_equal(range_middle, c(0, 100))
+})
+
+test_that("Only the outer stacked segment's vjust is pushed inward, not interior boundaries", {
+  # Three-segment stack: the middle segment's own top/bottom are interior
+  # boundaries (between two coloured segments), not the panel edge, so its
+  # vjust should stay centred regardless of align.
+  data <- data.frame(
+    x = "a",
+    grp = c("g1", "g2", "g3"),
+    value = c(20, 30, 50)
+  )
+
+  p_top <- ggplot(data, aes(x, value, fill = grp)) + geom_col() + geom_col_label(align = "top")
+  label_data_top <- get_label_data(ggplot_build(p_top))
+  # outer (topmost, y == 100) is pushed fully inside; the other two stay centred
+  expect_equal(label_data_top$vjust[label_data_top$y == 100], 1)
+  expect_true(all(label_data_top$vjust[label_data_top$y != 100] == 0.5))
+
+  p_bottom <- ggplot(data, aes(x, value, fill = grp)) + geom_col() + geom_col_label(align = "bottom")
+  label_data_bottom <- get_label_data(ggplot_build(p_bottom))
+  # outer (bottommost, y == 0) is pushed fully inside; the other two stay centred
+  expect_equal(label_data_bottom$vjust[label_data_bottom$y == 0], 0)
+  expect_true(all(label_data_bottom$vjust[label_data_bottom$y != 0] == 0.5))
 })
 
 test_that("Reserved headroom respects an explicit scale_y_continuous_e61(limits = ...)", {

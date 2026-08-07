@@ -35,8 +35,11 @@ rounding, e.g. \code{accuracy = 0.1} shows one decimal place. Defaults to \code{
 of the column/segment). Defaults to \code{"top"}. For single (non-stacked)
 columns, \code{"top"} floats the label just above the column, and \code{"bottom"}
 sits it just inside the column above its base - both leave a small gap
-rather than sitting flush against the column; any other value centres
-the label inside the column at that fraction of its height.}
+rather than sitting flush against the column. For stacked columns,
+\code{"top"}/\code{"bottom"} sit just inside the top/bottom segment's outer edge
+(only that outer edge - segment boundaries in between are unaffected).
+Any other value centres the label inside the column/segment at that
+fraction of its height.}
 
 \item{reverse}{Logical. Reverse the stacking order used to position labels
 within stacked columns. Set this to match \code{position_stack(reverse = TRUE)} if you used that for your \code{geom_col()}. Defaults to FALSE.}
@@ -70,23 +73,20 @@ computed in data space (before the flip is applied), so \code{align = "top"}
 still means "furthest from zero", which renders past the end of a
 horizontal column once flipped.
 
-At \code{align = "top"}/\code{"bottom"}, a small amount of headroom is reserved
-automatically beyond the tallest/lowest column (or, for stacked columns,
-beyond the tallest/lowest stack total) so the label isn't clipped by the
-panel edge - this matters because theme61's default
-\code{scale_y_continuous_e61()} has no expansion at the data max/min.
-
-For single (non-stacked) columns specifically, \code{align = "top"}/
-\code{"bottom"} also leaves a small gap between the column and its label -
-\code{"top"} floats just clear of the column, \code{"bottom"} sits just inside it
-above the base - rather than the label sitting flush against the
-column's edge. Both the gap and the reserved headroom scale with the
-data's own range, so they look proportionate whether the y-axis runs
-from 0 to 10 or 0 to 100,000.
+None of the label placements need any extra space beyond the columns
+themselves - important since theme61's default \code{scale_y_continuous_e61()}
+has no expansion at the data max/min - except one: a single
+(non-stacked) column's \code{align = "top"} label genuinely floats outside
+the column, so a small amount of headroom is reserved automatically
+beyond the tallest column for it. \code{"bottom"} on a single column, and
+both ends of a stacked column, sit just inside the column instead of
+straddling its edge, so they need no reserved space. Both the gap and
+the reserved top headroom scale with the data's own range, so they look
+proportionate whether the y-axis runs from 0 to 10 or 0 to 100,000.
 
 An explicit \code{scale_y_continuous_e61(limits = ...)} always takes
-precedence: both the reserved headroom and the gap are capped at the
-supplied limit rather than nudging past it, since
+precedence: the reserved top headroom and the single-column gap are
+capped at the supplied limit rather than nudging past it, since
 \code{scale_y_continuous_e61()} errors if data falls outside a limit you've
 set. If your limit sits exactly at (or inside) the data's own range,
 the label may end up flush against the edge again - widen the limit if

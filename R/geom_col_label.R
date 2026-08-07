@@ -24,8 +24,11 @@
 #'   of the column/segment). Defaults to `"top"`. For single (non-stacked)
 #'   columns, `"top"` floats the label just above the column, and `"bottom"`
 #'   sits it just inside the column above its base - both leave a small gap
-#'   rather than sitting flush against the column; any other value centres
-#'   the label inside the column at that fraction of its height.
+#'   rather than sitting flush against the column. For stacked columns,
+#'   `"top"`/`"bottom"` sit just inside the top/bottom segment's outer edge
+#'   (only that outer edge - segment boundaries in between are unaffected).
+#'   Any other value centres the label inside the column/segment at that
+#'   fraction of its height.
 #' @param reverse Logical. Reverse the stacking order used to position labels
 #'   within stacked columns. Set this to match `position_stack(reverse =
 #'   TRUE)` if you used that for your `geom_col()`. Defaults to FALSE.
@@ -41,23 +44,20 @@
 #'   still means "furthest from zero", which renders past the end of a
 #'   horizontal column once flipped.
 #'
-#'   At `align = "top"`/`"bottom"`, a small amount of headroom is reserved
-#'   automatically beyond the tallest/lowest column (or, for stacked columns,
-#'   beyond the tallest/lowest stack total) so the label isn't clipped by the
-#'   panel edge - this matters because theme61's default
-#'   `scale_y_continuous_e61()` has no expansion at the data max/min.
-#'
-#'   For single (non-stacked) columns specifically, `align = "top"`/
-#'   `"bottom"` also leaves a small gap between the column and its label -
-#'   `"top"` floats just clear of the column, `"bottom"` sits just inside it
-#'   above the base - rather than the label sitting flush against the
-#'   column's edge. Both the gap and the reserved headroom scale with the
-#'   data's own range, so they look proportionate whether the y-axis runs
-#'   from 0 to 10 or 0 to 100,000.
+#'   None of the label placements need any extra space beyond the columns
+#'   themselves - important since theme61's default `scale_y_continuous_e61()`
+#'   has no expansion at the data max/min - except one: a single
+#'   (non-stacked) column's `align = "top"` label genuinely floats outside
+#'   the column, so a small amount of headroom is reserved automatically
+#'   beyond the tallest column for it. `"bottom"` on a single column, and
+#'   both ends of a stacked column, sit just inside the column instead of
+#'   straddling its edge, so they need no reserved space. Both the gap and
+#'   the reserved top headroom scale with the data's own range, so they look
+#'   proportionate whether the y-axis runs from 0 to 10 or 0 to 100,000.
 #'
 #'   An explicit `scale_y_continuous_e61(limits = ...)` always takes
-#'   precedence: both the reserved headroom and the gap are capped at the
-#'   supplied limit rather than nudging past it, since
+#'   precedence: the reserved top headroom and the single-column gap are
+#'   capped at the supplied limit rather than nudging past it, since
 #'   `scale_y_continuous_e61()` errors if data falls outside a limit you've
 #'   set. If your limit sits exactly at (or inside) the data's own range,
 #'   the label may end up flush against the edge again - widen the limit if
@@ -250,6 +250,36 @@ StatColLabel <- ggplot2::ggproto("StatColLabel", ggplot2::Stat,
     }
 
     data
+  },
+
+  # Runs after position_stack() has placed every segment, so data$y here is
+  # each segment's actual rendered anchor. At align = "top"/"bottom", the
+  # one segment per x whose anchor coincides with the overall stack's outer
+  # boundary is the only one that can straddle the panel edge (vjust = 0.5
+  # centres the glyph exactly on its anchor) - push just that segment's
+  # text fully inward (vjust = 1 for the outer top, 0 for the outer bottom)
+  # instead, so it never needs headroom beyond the column to avoid being
+  # clipped. Every other segment keeps the default centred vjust = 0.5,
+  # since its boundary sits between two coloured segments, not the panel
+  # edge.
+  finish_layer = function(self, data, params) {
+
+    align <- params$align
+
+    if (is.null(align) || (align > 0 && align < 1) || nrow(data) == 0) return(data)
+
+    outer_per_x <- if (align >= 1) {
+      tapply(data$y, data$x, max)
+    } else {
+      tapply(data$y, data$x, min)
+    }
+
+    outer_for_row <- as.numeric(outer_per_x[match(data$x, names(outer_per_x))])
+    is_outer <- abs(data$y - outer_for_row) < 1e-9
+
+    data$vjust[is_outer] <- if (align >= 1) 1 else 0
+
+    data
   }
 )
 
@@ -306,49 +336,46 @@ StatColLabelFloat <- ggplot2::ggproto("StatColLabelFloat", ggplot2::Stat,
   }
 )
 
-# Reserves headroom for geom_col_label()'s floating/edge-aligned labels, via
-# an invisible geom_blank() layer whose (x, y) still counts towards the y
-# scale's trained range. Top headroom is needed whenever align = "top",
-# whether columns are single (the label floats just outside the column) or
-# stacked (the topmost segment's label straddles the panel's top edge, since
-# it's drawn with vjust = 0.5 there). Bottom headroom is only needed for
-# stacked columns at align = "bottom" - single columns' "bottom" label now
-# sits inside the column, well clear of the panel's bottom edge. Interior
-# labels (align strictly between 0 and 1) never touch a panel edge, so no
-# room is reserved for those.
+# Reserves headroom for single (non-stacked) columns' floating "top" label,
+# via an invisible geom_blank() layer whose (x, y) still counts towards the
+# y scale's trained range. This is the only remaining case that needs it:
+# the "top" float layer's label genuinely sits outside the column. Every
+# other edge-aligned label (single "bottom", and both ends of a stacked
+# column via StatColLabel's finish_layer) is pushed fully inside its column
+# instead of straddling the boundary, so none of them need extra room.
+# Interior labels (align strictly between 0 and 1) don't touch an edge
+# either way.
 StatColLabelSpacer <- ggplot2::ggproto("StatColLabelSpacer", ggplot2::Stat,
   required_aes = c("x", "y"),
 
   compute_panel = function(data, scales, align = 1) {
 
-    if (align > 0 && align < 1) return(data[0, , drop = FALSE])
+    if (align < 1) return(data[0, , drop = FALSE])
+
+    n_per_x <- tapply(data$y, data$x, length)
+    single <- n_per_x <= 1
+    if (!any(single)) return(data[0, , drop = FALSE])
 
     per_x_total <- tapply(data$y, data$x, sum, na.rm = TRUE)
-    n_per_x <- tapply(data$y, data$x, length)
+    single_totals <- per_x_total[single]
 
     pad <- diff(range(c(0, per_x_total), na.rm = TRUE)) * .COL_LABEL_HEADROOM_FRAC
     if (!is.finite(pad) || pad == 0) pad <- 1
 
-    # Respect explicit user limits (e.g. scale_y_continuous_e61(limits =
-    # ...)) rather than padding past them - scale_y_continuous_e61() errors
-    # if trained data falls outside a user-supplied limit.
+    padded <- max(single_totals, na.rm = TRUE) + pad
+
+    # Respect an explicit user limit (e.g. scale_y_continuous_e61(limits =
+    # ...)) rather than padding past it - scale_y_continuous_e61() errors if
+    # trained data falls outside a user-supplied limit.
     user_limits <- scales$y$limits
-    if (length(user_limits) < 2) user_limits <- c(NA, NA)
+    if (length(user_limits) >= 2 && !is.na(user_limits[2])) {
+      padded <- min(padded, user_limits[2])
+    }
 
     # A single extra point is enough to widen the panel's trained y range;
     # reuse an existing x so no spurious category is introduced.
     spacer <- data[1, , drop = FALSE]
-
-    if (align >= 1) {
-      padded <- max(per_x_total, na.rm = TRUE) + pad
-      if (!is.na(user_limits[2])) padded <- min(padded, user_limits[2])
-      spacer$y <- padded
-    } else {
-      if (!any(n_per_x > 1)) return(data[0, , drop = FALSE])
-      padded <- min(0, min(data$y, na.rm = TRUE)) - pad
-      if (!is.na(user_limits[1])) padded <- max(padded, user_limits[1])
-      spacer$y <- padded
-    }
+    spacer$y <- padded
 
     spacer
   }
