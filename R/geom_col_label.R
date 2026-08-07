@@ -34,6 +34,18 @@
 #' @param ... Other arguments passed on to [ggplot2::geom_text()], e.g.
 #'   `colour` or `size`.
 #'
+#' @details Works the same way with [ggplot2::coord_flip()]: the labels are
+#'   computed in data space (before the flip is applied), so `align = "top"`
+#'   still means "furthest from zero", which renders past the end of a
+#'   horizontal column once flipped.
+#'
+#'   For single (non-stacked) columns at `align = "top"`/`"bottom"`, a small
+#'   amount of headroom is reserved automatically beyond the tallest/lowest
+#'   column so the floating label isn't clipped by the panel edge - this
+#'   matters because theme61's default `scale_y_continuous_e61()` has no
+#'   expansion at the data max/min. If you need more (or less) room, add your
+#'   own `scale_y_continuous_e61(expand_top = ...)`, which takes precedence.
+#'
 #' @return Object to add to a ggplot (via `+`).
 #'
 #' @examples
@@ -57,6 +69,12 @@
 #'   geom_col() +
 #'   geom_col_label(align = "middle", colour = "white")
 #'
+#' # Works the same way flipped
+#' ggplot(df, aes(grp, value)) +
+#'   geom_col() +
+#'   geom_col_label() +
+#'   coord_flip()
+#'
 #' @export
 geom_col_label <- function(mapping = NULL,
                            data = NULL,
@@ -70,7 +88,7 @@ geom_col_label <- function(mapping = NULL,
 
   align_num <- .resolve_col_label_align(align)
 
-  ggplot2::layer(
+  label_layer <- ggplot2::layer(
     data = data,
     mapping = mapping,
     stat = StatColLabel,
@@ -85,6 +103,24 @@ geom_col_label <- function(mapping = NULL,
       ...
     )
   )
+
+  # Invisible layer that reserves headroom beyond single (non-stacked)
+  # columns at align = "top"/"bottom", so the floating label isn't clipped
+  # by the panel edge. Kept as its own geom_blank() layer (rather than extra
+  # rows in the label layer above) so it can't get caught up in that layer's
+  # position_stack() and change the real labels' positions.
+  spacer_layer <- ggplot2::layer(
+    data = data,
+    mapping = mapping,
+    stat = StatColLabelSpacer,
+    geom = ggplot2::GeomBlank,
+    position = "identity",
+    show.legend = FALSE,
+    inherit.aes = inherit.aes,
+    params = list(align = align_num, na.rm = na.rm)
+  )
+
+  list(label_layer, spacer_layer)
 }
 
 # Internal helpers ----
@@ -133,5 +169,33 @@ StatColLabel <- ggplot2::ggproto("StatColLabel", ggplot2::Stat,
                        ifelse(align <= 0, 1, 0.5)))
 
     data
+  }
+)
+
+# Reserves headroom for geom_col_label()'s floating labels on single
+# (non-stacked) columns at align = "top"/"bottom", via an invisible
+# geom_blank() layer whose (x, y) still counts towards the y scale's trained
+# range. Interior labels (stacked columns, or align between 0 and 1) need no
+# extra room, so this returns no rows for those cases.
+StatColLabelSpacer <- ggplot2::ggproto("StatColLabelSpacer", ggplot2::Stat,
+  required_aes = c("x", "y"),
+
+  compute_panel = function(data, scales, align = 1) {
+
+    if (align > 0 && align < 1) return(data[0, , drop = FALSE])
+
+    n_per_x <- tapply(data$y, data$x, length)
+    n_group <- as.numeric(n_per_x[match(data$x, names(n_per_x))])
+
+    single <- n_group <= 1
+    if (!any(single)) return(data[0, , drop = FALSE])
+
+    pad <- diff(range(c(0, data$y), na.rm = TRUE)) * 0.08
+    if (!is.finite(pad) || pad == 0) pad <- 1
+
+    spacer <- data[single, , drop = FALSE]
+    spacer$y <- spacer$y + if (align >= 1) pad else -pad
+
+    spacer
   }
 )

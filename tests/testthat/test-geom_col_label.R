@@ -87,3 +87,43 @@ test_that("... arguments pass through to geom_text", {
   expect_true(all(built$data[[2]]$colour == "white"))
   expect_true(all(built$data[[2]]$size == 5))
 })
+
+test_that("Labels and positions are unaffected by coord_flip()", {
+  data <- data.frame(grp = c("A", "B", "C"), value = c(10, 30, 60))
+
+  p <- ggplot(data, aes(grp, value)) + geom_col() + geom_col_label()
+  p_flipped <- p + coord_flip()
+
+  label_data <- ggplot_build(p)$data[[2]]
+  label_data_flipped <- ggplot_build(p_flipped)$data[[2]]
+
+  expect_equal(label_data$label, label_data_flipped$label)
+  expect_equal(label_data$y, label_data_flipped$y)
+  expect_equal(label_data$vjust, label_data_flipped$vjust)
+})
+
+test_that("Headroom is reserved beyond single top-aligned columns", {
+  data <- data.frame(grp = c("A", "B", "C"), value = c(10, 30, 60))
+
+  p_top <- ggplot(data, aes(grp, value)) + geom_col() + geom_col_label(align = "top")
+  p_middle <- ggplot(data, aes(grp, value)) + geom_col() + geom_col_label(align = "middle")
+
+  range_top <- ggplot_build(p_top)$layout$panel_scales_y[[1]]$range$range
+  range_middle <- ggplot_build(p_middle)$layout$panel_scales_y[[1]]$range$range
+
+  expect_gt(range_top[2], 60)
+  expect_equal(range_middle[2], 60)
+})
+
+test_that("Headroom is not reserved for stacked columns", {
+  data <- data.frame(
+    x = rep(c("2023", "2024"), each = 2),
+    grp = rep(c("Group 1", "Group 2"), 2),
+    value = c(30, 70, 45, 55)
+  )
+
+  p <- ggplot(data, aes(x, value, fill = grp)) + geom_col() + geom_col_label(align = "top")
+
+  range_y <- ggplot_build(p)$layout$panel_scales_y[[1]]$range$range
+  expect_equal(range_y[2], 100)
+})

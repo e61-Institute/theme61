@@ -62,6 +62,19 @@ segment's share of its column's stack.
 column's share of the total across all columns in the panel.
 }
 }
+\details{
+Works the same way with \code{\link[ggplot2:coord_flip]{ggplot2::coord_flip()}}: the labels are
+computed in data space (before the flip is applied), so \code{align = "top"}
+still means "furthest from zero", which renders past the end of a
+horizontal column once flipped.
+
+For single (non-stacked) columns at \code{align = "top"}/\code{"bottom"}, a small
+amount of headroom is reserved automatically beyond the tallest/lowest
+column so the floating label isn't clipped by the panel edge - this
+matters because theme61's default \code{scale_y_continuous_e61()} has no
+expansion at the data max/min. If you need more (or less) room, add your
+own \code{scale_y_continuous_e61(expand_top = ...)}, which takes precedence.
+}
 \examples{
 library(ggplot2)
 
@@ -82,5 +95,11 @@ df2 <- data.frame(
 ggplot(df2, aes(x, value, fill = grp)) +
   geom_col() +
   geom_col_label(align = "middle", colour = "white")
+
+# Works the same way flipped
+ggplot(df, aes(grp, value)) +
+  geom_col() +
+  geom_col_label() +
+  coord_flip()
 
 }
