@@ -51,7 +51,7 @@ function call. Defaults to FALSE to ensure that we only add the extra white
 space above the chart when we are saving it.}
 
 \item{...}{
-  Arguments passed on to \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous}}
+  Arguments passed on to \code{\link[ggplot2:scale_y_continuous]{ggplot2::scale_y_continuous}}
   \describe{
     \item{\code{name}}{The name of the scale. Used as the axis or legend title. If
 \code{waiver()}, the default, the name of the scale is taken from the first
@@ -72,6 +72,8 @@ bounds values with \code{NA}.
 \code{transform}.}
     \item{\code{guide}}{A function used to create a guide or its name. See
 \code{\link[ggplot2:guides]{guides()}} for more information.}
+    \item{\code{position}}{For position scales, The position of the axis.
+\code{left} or \code{right} for y axes, \code{top} or \code{bottom} for x axes.}
   }}
 
 \item{expand_left, expand_right}{Numeric. Add extra space between data points

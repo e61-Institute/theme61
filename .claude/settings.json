@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "Rscript -e 'remotes::install_deps(dependencies = TRUE)'"
+          }
+        ]
+      }
+    ]
+  }
+}
