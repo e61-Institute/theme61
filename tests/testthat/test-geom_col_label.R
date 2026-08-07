@@ -1,3 +1,11 @@
+# Finds the rendered label rows regardless of which internal layer they end
+# up in (geom_col_label() splits "interior" vs "edge-floating" labels across
+# two geom_text() layers - see R/geom_col_label.R for why).
+get_label_data <- function(built) {
+  label_layers <- Filter(function(d) "label" %in% names(d) && nrow(d) > 0, built$data)
+  do.call(rbind, label_layers)
+}
+
 test_that("Single columns show each column's share of the total", {
   data <- data.frame(grp = c("A", "B", "C"), value = c(10, 30, 60))
 
@@ -5,12 +13,55 @@ test_that("Single columns show each column's share of the total", {
     geom_col() +
     geom_col_label()
 
-  built <- ggplot_build(p)
-  label_data <- built$data[[2]]
+  label_data <- get_label_data(ggplot_build(p))
 
-  expect_equal(label_data$label, c("10%", "30%", "60%"))
-  # "top" alignment on single columns nudges the label above the bar
+  expect_setequal(label_data$label, c("10%", "30%", "60%"))
+  # "top" alignment on single columns floats the label above the bar
   expect_equal(label_data$vjust, c(0, 0, 0))
+  # ... with a gap left between the column top and the label, rather than
+  # the label sitting flush against it
+  expect_true(all(label_data$y > data$value))
+})
+
+test_that("Single columns at align = bottom sit inside the column, above its base", {
+  data <- data.frame(grp = c("A", "B", "C"), value = c(10, 30, 60))
+
+  p <- ggplot(data, aes(grp, value)) +
+    geom_col() +
+    geom_col_label(align = "bottom")
+
+  label_data <- get_label_data(ggplot_build(p))
+
+  expect_setequal(label_data$label, c("10%", "30%", "60%"))
+  # sits just inside the column, above its base - not flush at y = 0, and
+  # not floating below it either
+  expect_true(all(label_data$y > 0))
+  expect_true(all(label_data$y < data$value))
+})
+
+test_that("The gap for single columns scales with the data range", {
+  gap_for <- function(value, align) {
+    d <- data.frame(grp = "a", value = value)
+    p <- ggplot(d, aes(grp, value)) + geom_col() + geom_col_label(align = align)
+    label_y <- get_label_data(ggplot_build(p))$y
+    if (align == "top") label_y - value else label_y
+  }
+
+  gap_small_top <- gap_for(2, "top")
+  gap_large_top <- gap_for(2000, "top")
+  gap_small_bottom <- gap_for(2, "bottom")
+  gap_large_bottom <- gap_for(2000, "bottom")
+
+  # positive gap above the column for "top" (label sits above, not flush) ...
+  expect_gt(gap_small_top, 0)
+  expect_gt(gap_large_top, 0)
+  # positive gap above the base for "bottom" (label sits inside, not flush) ...
+  expect_gt(gap_small_bottom, 0)
+  expect_gt(gap_large_bottom, 0)
+  # ... and both proportionately bigger for larger-scale data, not a fixed
+  # constant gap
+  expect_gt(gap_large_top, gap_small_top * 100)
+  expect_gt(gap_large_bottom, gap_small_bottom * 100)
 })
 
 test_that("Stacked columns show each segment's share of its column", {
@@ -24,8 +75,7 @@ test_that("Stacked columns show each segment's share of its column", {
     geom_col() +
     geom_col_label(align = "middle")
 
-  built <- ggplot_build(p)
-  label_data <- built$data[[2]]
+  label_data <- get_label_data(ggplot_build(p))
 
   expect_setequal(label_data$label, c("30%", "70%", "45%", "55%"))
   expect_true(all(label_data$vjust == 0.5))
@@ -38,13 +88,13 @@ test_that("align accepts top/middle/bottom and numeric 0-1", {
     p <- ggplot(data, aes(x, value, fill = grp)) +
       geom_col() +
       geom_col_label(align = align)
-    ggplot_build(p)$data[[2]]$y
+    get_label_data(ggplot_build(p))$y
   }
 
-  expect_equal(build_align("top"), build_align(1))
-  expect_equal(build_align("middle"), build_align(0.5))
-  expect_equal(build_align("bottom"), build_align(0))
-  expect_false(isTRUE(all.equal(build_align("top"), build_align("bottom"))))
+  expect_equal(sort(build_align("top")), sort(build_align(1)))
+  expect_equal(sort(build_align("middle")), sort(build_align(0.5)))
+  expect_equal(sort(build_align("bottom")), sort(build_align(0)))
+  expect_false(isTRUE(all.equal(sort(build_align("top")), sort(build_align("bottom")))))
 })
 
 test_that("Unrecognised align strings raise an error", {
@@ -62,7 +112,10 @@ test_that("Numeric align values outside 0-1 are clamped, not errors", {
     geom_col() +
     geom_col_label(align = 1)
 
-  expect_equal(ggplot_build(p_clamped)$data[[2]]$y, ggplot_build(p_top)$data[[2]]$y)
+  expect_equal(
+    sort(get_label_data(ggplot_build(p_clamped))$y),
+    sort(get_label_data(ggplot_build(p_top))$y)
+  )
 })
 
 test_that("accuracy is passed through to the percentage formatter", {
@@ -72,8 +125,8 @@ test_that("accuracy is passed through to the percentage formatter", {
     geom_col() +
     geom_col_label(accuracy = 0.1)
 
-  built <- ggplot_build(p)
-  expect_setequal(built$data[[2]]$label, c("33.3%", "66.7%"))
+  label_data <- get_label_data(ggplot_build(p))
+  expect_setequal(label_data$label, c("33.3%", "66.7%"))
 })
 
 test_that("... arguments pass through to geom_text", {
@@ -83,9 +136,21 @@ test_that("... arguments pass through to geom_text", {
     geom_col() +
     geom_col_label(colour = "white", size = 5)
 
-  built <- ggplot_build(p)
-  expect_true(all(built$data[[2]]$colour == "white"))
-  expect_true(all(built$data[[2]]$size == 5))
+  label_data <- get_label_data(ggplot_build(p))
+  expect_true(all(label_data$colour == "white"))
+  expect_true(all(label_data$size == 5))
+})
+
+test_that("An explicit vjust passed via ... overrides the default exactly once", {
+  data <- data.frame(grp = c("A", "B"), value = c(1, 2))
+
+  p <- ggplot(data, aes(grp, value)) +
+    geom_col() +
+    geom_col_label(vjust = 0.2)
+
+  expect_no_error(built <- ggplot_build(p))
+  label_data <- get_label_data(built)
+  expect_true(all(label_data$vjust == 0.2))
 })
 
 test_that("Labels and positions are unaffected by coord_flip()", {
@@ -94,11 +159,11 @@ test_that("Labels and positions are unaffected by coord_flip()", {
   p <- ggplot(data, aes(grp, value)) + geom_col() + geom_col_label()
   p_flipped <- p + coord_flip()
 
-  label_data <- ggplot_build(p)$data[[2]]
-  label_data_flipped <- ggplot_build(p_flipped)$data[[2]]
+  label_data <- get_label_data(ggplot_build(p))
+  label_data_flipped <- get_label_data(ggplot_build(p_flipped))
 
-  expect_equal(label_data$label, label_data_flipped$label)
-  expect_equal(label_data$y, label_data_flipped$y)
+  expect_equal(sort(label_data$label), sort(label_data_flipped$label))
+  expect_equal(sort(label_data$y), sort(label_data_flipped$y))
   expect_equal(label_data$vjust, label_data_flipped$vjust)
 })
 
@@ -113,6 +178,17 @@ test_that("Headroom is reserved beyond single top-aligned columns", {
 
   expect_gt(range_top[2], 60)
   expect_equal(range_middle[2], 60)
+})
+
+test_that("Headroom below zero is not reserved for single bottom-aligned columns", {
+  # The label now sits inside the column (above its base), so it no longer
+  # needs headroom below y = 0 the way the old "floats below" design did.
+  data <- data.frame(grp = c("A", "B", "C"), value = c(10, 30, 60))
+
+  p <- ggplot(data, aes(grp, value)) + geom_col() + geom_col_label(align = "bottom")
+
+  range_y <- ggplot_build(p)$layout$panel_scales_y[[1]]$get_limits()
+  expect_equal(range_y[1], 0)
 })
 
 test_that("Headroom is reserved beyond stacked columns at align top/bottom too", {

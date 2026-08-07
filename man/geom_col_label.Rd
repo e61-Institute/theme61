@@ -33,8 +33,10 @@ rounding, e.g. \code{accuracy = 0.1} shows one decimal place. Defaults to \code{
 \item{align}{Where to position the label. One of \code{"top"}, \code{"middle"},
 \code{"bottom"}, or a number from 0 (bottom of the column/segment) to 1 (top
 of the column/segment). Defaults to \code{"top"}. For single (non-stacked)
-columns, \code{"top"} places the label just above the column; any other value
-places it inside the column at that fraction of its height.}
+columns, \code{"top"} floats the label just above the column, and \code{"bottom"}
+sits it just inside the column above its base - both leave a small gap
+rather than sitting flush against the column; any other value centres
+the label inside the column at that fraction of its height.}
 
 \item{reverse}{Logical. Reverse the stacking order used to position labels
 within stacked columns. Set this to match \code{position_stack(reverse = TRUE)} if you used that for your \code{geom_col()}. Defaults to FALSE.}
@@ -75,6 +77,14 @@ panel edge - this matters because theme61's default
 \code{scale_y_continuous_e61()} has no expansion at the data max/min. An
 explicit \code{scale_y_continuous_e61(limits = ...)} takes precedence over
 this reserved headroom.
+
+For single (non-stacked) columns specifically, \code{align = "top"}/
+\code{"bottom"} also leaves a small gap between the column and its label -
+\code{"top"} floats just clear of the column, \code{"bottom"} sits just inside it
+above the base - rather than the label sitting flush against the
+column's edge. Both the gap and the reserved headroom scale with the
+data's own range, so they look proportionate whether the y-axis runs
+from 0 to 10 or 0 to 100,000.
 }
 \examples{
 library(ggplot2)
