@@ -75,6 +75,11 @@
 #'   * a single, ungrouped line or area series: reveals progressively along
 #'   the x-axis instead (see `build_up_n`).
 #'
+#'   [plot_label()] labels are also synced to the reveal sequence, if the
+#'   label's `colour` matches the rendered colour of a category/group (the
+#'   usual way to label a line/bar instead of using a legend) - a label whose
+#'   colour doesn't match any category (e.g. a source note) is left alone.
+#'
 #'   Not supported for multi-panel graphs, faceted graphs, `preview = TRUE` or
 #'   `return_plot_obj = TRUE`. Defaults to FALSE.
 #' @param build_up_n (single-panel specific) Numeric. Only used by `build_up`

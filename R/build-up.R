@@ -101,6 +101,87 @@ resolve_stack_order <- function(plot, layer_index, cats) {
   if (nrow(ref) > 1 && ref$ymin[1] > ref$ymin[nrow(ref)]) rev(cats) else cats
 }
 
+#' Whether a layer looks like one built by plot_label() - a geom_text()/
+#' geom_label() layer with its own data carrying a literal `label` and
+#' `colour` column. plot_label() passes colour as a fixed, row-recycled
+#' *parameter* rather than a mapped aesthetic (so it can be used with
+#' inherit.aes = FALSE and no discrete scale/legend) - which means blanking
+#' `data$colour` has no effect on rendering (see blank_label_layer()), but
+#' `label` is a real aes mapping and blanking it does.
+#' @noRd
+is_plot_label_layer <- function(layer) {
+  if (layer_uses_plot_data(layer)) return(FALSE)
+  if (!any(class(layer$geom) %in% c("GeomText", "GeomLabel"))) return(FALSE)
+
+  d <- layer$data
+  is.data.frame(d) && all(c("label", "colour") %in% names(d))
+}
+
+#' Only meaningful when the layer's fill/colour is mapped to the same
+#' variable being stepped through (step_var) - otherwise a built "group" id
+#' doesn't correspond 1:1 with our categories, and colour-matching a
+#' plot_label() layer to a category wouldn't be reliable.
+#' @noRd
+resolve_colour_aes <- function(plot, ref_layer, step_var) {
+  for (aes_name in c("fill", "colour")) {
+    var <- get_mapped_var(plot, ref_layer, aes_name)
+    if (!is.null(var) && identical(var, step_var)) return(aes_name)
+  }
+  NULL
+}
+
+#' The rendered colour ggplot2 actually draws each category in (in `cats`
+#' order, matching build-assigned group ids 1..length(cats)), read off a
+#' single ggplot_build() of the reference layer. Used to match plot_label()
+#' layers - which store a literal colour per row, not a mapped aesthetic -
+#' back to the category they're labelling.
+#' @noRd
+get_category_colours <- function(plot, ref_idx, colour_aes, cats) {
+  built <- tryCatch(ggplot_build(plot)$data[[ref_idx]], error = function(e) NULL)
+
+  if (is.null(built) || !colour_aes %in% names(built)) return(NULL)
+
+  vals <- vapply(seq_along(cats), function(g) {
+    rows <- built[[colour_aes]][built$group == g]
+    if (length(rows)) rows[1] else NA_character_
+  }, character(1))
+
+  names(vals) <- cats
+  vals
+}
+
+#' Compare two colours by their actual RGB value rather than string identity,
+#' so e.g. "red" and "#FF0000" are recognised as the same colour
+#' @noRd
+colours_equal <- function(a, b) {
+  rgb_a <- tryCatch(grDevices::col2rgb(a), error = function(e) NULL)
+  rgb_b <- tryCatch(grDevices::col2rgb(b), error = function(e) NULL)
+
+  if (is.null(rgb_a) || is.null(rgb_b)) return(identical(a, b))
+
+  identical(as.vector(rgb_a), as.vector(rgb_b))
+}
+
+#' Blank the label text (not the colour - see is_plot_label_layer()) of a
+#' plot_label() layer's rows whose colour matches a category that isn't
+#' revealed yet. A label whose colour doesn't match *any* category (e.g. an
+#' unrelated fixed annotation) is left alone rather than hidden, since it's
+#' clearly not one of the series/category labels build_up is stepping
+#' through.
+#' @noRd
+blank_label_layer <- function(d, category_colours, revealed) {
+  matched <- vapply(d$colour, function(col) {
+    idx <- which(vapply(category_colours, colours_equal, logical(1), b = col))
+    if (length(idx)) names(category_colours)[idx[1]] else NA_character_
+  }, character(1))
+
+  hide <- !is.na(matched) & !(matched %in% revealed)
+
+  d$label[hide] <- ""
+
+  d
+}
+
 #' Every layer that is fed by the same data as the reference layer - these all
 #' get blanked together using the same reveal sequence (e.g. geom_pointbar()'s
 #' point + error bar layers, or a bar chart plus a plot_label() data layer)
@@ -230,6 +311,11 @@ resolve_build_up <- function(plot, build_up_n = NULL) {
   # to the continuous, cumulative build instead
   if (length(cats) < 2) return(build_up_continuous(plot, ref_idx, build_up_n))
 
+  # Group ids from ggplot_build() are assigned in this (pre-reversal) scale
+  # order - keep it around for matching plot_label() colours to categories,
+  # since the reveal order below may get reversed for a stacked chart.
+  original_cats <- cats
+
   # For a stacked reference layer, reveal bottom-to-top rather than in
   # whatever order the scale happens to use
   if (step_aes != "x" && classify_layer_kind(ref_layer) == "zero") {
@@ -238,10 +324,27 @@ resolve_build_up <- function(plot, build_up_n = NULL) {
 
   targets <- find_shared_data_layers(plot, ref_layer)
 
+  # plot_label()'s labels aren't in `targets` above - they carry their own
+  # data with no column in common with the chart's category/group variable,
+  # only a literal colour per row. Match them back to a category by colour
+  # instead, so they can appear/disappear in step with it.
+  colour_aes <- resolve_colour_aes(plot, ref_layer, step_var)
+  category_colours <- if (!is.null(colour_aes)) {
+    get_category_colours(plot, ref_idx, colour_aes, original_cats)
+  }
+
+  label_idx <- if (!is.null(category_colours)) {
+    which(vapply(plot@layers, is_plot_label_layer, logical(1)))
+  } else {
+    integer(0)
+  }
+
+  all_targets <- c(targets, label_idx)
+
   steps <- lapply(seq_along(cats), function(k) {
     revealed <- cats[seq_len(k)]
 
-    lapply(targets, function(i) {
+    main_steps <- lapply(targets, function(i) {
       layer_i <- plot@layers[[i]]
 
       layer_step_var <- get_mapped_var(plot, layer_i, step_aes)
@@ -254,7 +357,16 @@ resolve_build_up <- function(plot, build_up_n = NULL) {
 
       blank_layer_data(plot, layer_i, d, hide)
     })
+
+    label_steps <- lapply(label_idx, function(i) {
+      layer_i <- plot@layers[[i]]
+      d <- data.table::as.data.table(get_layer_data(plot, layer_i))
+
+      blank_label_layer(d, category_colours, revealed)
+    })
+
+    c(main_steps, label_steps)
   })
 
-  list(steps = steps, targets = targets)
+  list(steps = steps, targets = all_targets)
 }

@@ -65,6 +65,56 @@ test_that("resolve_build_up reveals stacked area groups bottom-to-top by zeroing
   expect_equal(res$steps[[2]][[1]]$y, df$y)
 })
 
+test_that("resolve_build_up hides plot_label() labels whose colour matches a hidden group", {
+  df <- data.frame(
+    x = rep(1:5, 2),
+    y = c(1, 2, 3, 4, 5, 5, 4, 3, 2, 1),
+    grp = rep(c("A", "B"), each = 5)
+  )
+  p <- ggplot(df, aes(x, y, colour = grp)) +
+    geom_line() +
+    scale_colour_manual(values = c(A = "red", B = "blue")) +
+    plot_label(c("A", "B"), x = c(5, 5), y = c(5, 1), colour = c("red", "blue"))
+
+  res <- resolve_build_up(p)
+  expect_length(res$targets, 2) # geom_line layer + plot_label layer
+
+  label_idx_within_step <- which(vapply(res$steps[[1]], function(d) all(c("label", "colour") %in% names(d)), logical(1)))
+  expect_length(label_idx_within_step, 1)
+
+  step1_labels <- res$steps[[1]][[label_idx_within_step]]
+  expect_equal(step1_labels$label[step1_labels$colour == "red"], "A")
+  expect_equal(step1_labels$label[step1_labels$colour == "blue"], "")
+
+  step2_labels <- res$steps[[2]][[label_idx_within_step]]
+  expect_equal(step2_labels$label, c("A", "B"))
+
+  # The colour itself is never touched, so it stays correct at every step
+  expect_equal(step1_labels$colour, c("red", "blue"))
+  expect_equal(step2_labels$colour, c("red", "blue"))
+})
+
+test_that("resolve_build_up leaves a plot_label() unrelated to any group untouched", {
+  df <- data.frame(
+    x = rep(1:5, 2),
+    y = c(1, 2, 3, 4, 5, 5, 4, 3, 2, 1),
+    grp = rep(c("A", "B"), each = 5)
+  )
+  p <- ggplot(df, aes(x, y, colour = grp)) +
+    geom_line() +
+    scale_colour_manual(values = c(A = "red", B = "blue")) +
+    plot_label("Source: ABS", x = 1, y = 5, colour = "black")
+
+  res <- resolve_build_up(p)
+
+  label_idx_within_step <- which(vapply(res$steps[[1]], function(d) all(c("label", "colour") %in% names(d)), logical(1)))
+  expect_length(label_idx_within_step, 1)
+
+  # An annotation whose colour matches neither group is shown at every step
+  expect_equal(res$steps[[1]][[label_idx_within_step]]$label, "Source: ABS")
+  expect_equal(res$steps[[2]][[label_idx_within_step]]$label, "Source: ABS")
+})
+
 test_that("resolve_build_up steps through groups for a multi-line chart, blanking to NA", {
   df <- data.frame(
     x = rep(1:5, 2),

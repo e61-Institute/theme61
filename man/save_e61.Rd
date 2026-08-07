@@ -129,6 +129,11 @@ time;
 the x-axis instead (see \code{build_up_n}).
 }
 
+\code{\link[=plot_label]{plot_label()}} labels are also synced to the reveal sequence, if the
+label's \code{colour} matches the rendered colour of a category/group (the
+usual way to label a line/bar instead of using a legend) - a label whose
+colour doesn't match any category (e.g. a source note) is left alone.
+
 Not supported for multi-panel graphs, faceted graphs, \code{preview = TRUE} or
 \code{return_plot_obj = TRUE}. Defaults to FALSE.}
 
