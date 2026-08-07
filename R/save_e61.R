@@ -1,6 +1,6 @@
 #' Save graphs with theme61 styles and defaults
 #'
-#' Saves ggplot2 graphs made with using theme61. Using `save_e61()` is required
+#' Saves ggplot2 graphs made using theme61. Using `save_e61()` is required
 #' to ensure graphs are consistent with the e61 style and formatting.
 #'
 #' Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are

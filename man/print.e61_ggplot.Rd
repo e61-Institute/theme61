@@ -10,7 +10,7 @@
 \itemize{
 \item Always draws a plot in the Plots pane
 \item Also renders a preview in the Viewer (opt-out via option)
-\item Prefers Viewer focus by default (best-effort)
+\item Prefers Plots focus by default
 }
 }
 \keyword{internal}
