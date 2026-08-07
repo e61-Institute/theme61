@@ -86,7 +86,15 @@ resolve_stack_order <- function(plot, layer_index, cats) {
 
   if (is.null(built) || is.null(built$ymin) || nrow(built) < 2) return(cats)
 
-  ref_x <- built$x[1]
+  # geom_area() pads the built data with an extra zero-valued row just
+  # outside the data range on each side (for smooth rendering of the area
+  # edge) - every group is 0 there, which is uninformative for telling top
+  # from bottom. Pick the x-value with the largest total stacked height
+  # instead, to make sure we land on a real data row.
+  ux <- unique(built$x)
+  totals <- vapply(ux, function(xx) sum(built$ymax[built$x == xx], na.rm = TRUE), numeric(1))
+  ref_x <- ux[which.max(totals)]
+
   ref <- built[built$x == ref_x, ]
   ref <- ref[order(ref$group), ]
 

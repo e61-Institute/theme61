@@ -42,10 +42,15 @@ test_that("resolve_build_up reveals stacked area groups bottom-to-top by zeroing
   res <- resolve_build_up(p)
   expect_length(res$steps, 2)
 
-  # Work out which group is empirically on the bottom of the stack
+  # Work out which group is empirically on the bottom of the stack, at a real
+  # data row (x = 3) rather than x = built$x[1] - geom_area() pads the built
+  # data with an extra all-zero row just outside the data range for smooth
+  # rendering of the area edge, which would make every group look tied for
+  # the bottom and silently mask a real ordering bug (see #331 follow-up).
   built <- ggplot_build(p)$data[[1]]
-  ref <- built[built$x == built$x[1], ]
+  ref <- built[built$x == 3, ]
   ref <- ref[order(ref$group), ]
+  expect_true(all(ref$ymax > 0)) # sanity check this is a real, non-padding row
   bottom_is_first_level <- ref$ymin[1] <= ref$ymin[nrow(ref)]
   bottom_level <- if (bottom_is_first_level) levels(df$grp)[1] else levels(df$grp)[2]
 
