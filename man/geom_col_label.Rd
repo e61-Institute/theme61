@@ -68,12 +68,13 @@ computed in data space (before the flip is applied), so \code{align = "top"}
 still means "furthest from zero", which renders past the end of a
 horizontal column once flipped.
 
-For single (non-stacked) columns at \code{align = "top"}/\code{"bottom"}, a small
-amount of headroom is reserved automatically beyond the tallest/lowest
-column so the floating label isn't clipped by the panel edge - this
-matters because theme61's default \code{scale_y_continuous_e61()} has no
-expansion at the data max/min. If you need more (or less) room, add your
-own \code{scale_y_continuous_e61(expand_top = ...)}, which takes precedence.
+At \code{align = "top"}/\code{"bottom"}, a small amount of headroom is reserved
+automatically beyond the tallest/lowest column (or, for stacked columns,
+beyond the tallest/lowest stack total) so the label isn't clipped by the
+panel edge - this matters because theme61's default
+\code{scale_y_continuous_e61()} has no expansion at the data max/min. An
+explicit \code{scale_y_continuous_e61(limits = ...)} takes precedence over
+this reserved headroom.
 }
 \examples{
 library(ggplot2)

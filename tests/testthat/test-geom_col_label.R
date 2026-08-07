@@ -108,22 +108,54 @@ test_that("Headroom is reserved beyond single top-aligned columns", {
   p_top <- ggplot(data, aes(grp, value)) + geom_col() + geom_col_label(align = "top")
   p_middle <- ggplot(data, aes(grp, value)) + geom_col() + geom_col_label(align = "middle")
 
-  range_top <- ggplot_build(p_top)$layout$panel_scales_y[[1]]$range$range
-  range_middle <- ggplot_build(p_middle)$layout$panel_scales_y[[1]]$range$range
+  range_top <- ggplot_build(p_top)$layout$panel_scales_y[[1]]$get_limits()
+  range_middle <- ggplot_build(p_middle)$layout$panel_scales_y[[1]]$get_limits()
 
   expect_gt(range_top[2], 60)
   expect_equal(range_middle[2], 60)
 })
 
-test_that("Headroom is not reserved for stacked columns", {
+test_that("Headroom is reserved beyond stacked columns at align top/bottom too", {
+  # The outermost segment's edge coincides with the panel boundary at
+  # align = "top"/"bottom", so it needs the same reserved headroom as a
+  # single column - otherwise the (vjust = 0.5) label glyph is clipped by
+  # the panel edge, since theme61's y scale has no expansion there.
   data <- data.frame(
     x = rep(c("2023", "2024"), each = 2),
     grp = rep(c("Group 1", "Group 2"), 2),
     value = c(30, 70, 45, 55)
   )
 
-  p <- ggplot(data, aes(x, value, fill = grp)) + geom_col() + geom_col_label(align = "top")
+  p_top <- ggplot(data, aes(x, value, fill = grp)) + geom_col() + geom_col_label(align = "top")
+  p_bottom <- ggplot(data, aes(x, value, fill = grp)) + geom_col() + geom_col_label(align = "bottom")
+  p_middle <- ggplot(data, aes(x, value, fill = grp)) + geom_col() + geom_col_label(align = "middle")
 
-  range_y <- ggplot_build(p)$layout$panel_scales_y[[1]]$range$range
+  range_top <- ggplot_build(p_top)$layout$panel_scales_y[[1]]$get_limits()
+  range_bottom <- ggplot_build(p_bottom)$layout$panel_scales_y[[1]]$get_limits()
+  range_middle <- ggplot_build(p_middle)$layout$panel_scales_y[[1]]$get_limits()
+
+  expect_gt(range_top[2], 100)
+  expect_lt(range_bottom[1], 0)
+  expect_equal(range_middle, c(0, 100))
+})
+
+test_that("Reserved headroom respects an explicit scale_y_continuous_e61(limits = ...)", {
+  # The reserved headroom must never push data outside a user-supplied
+  # limit - scale_y_continuous_e61() errors if it does, so a tight
+  # explicit limit (exactly at the stack total) must not error.
+  data <- data.frame(
+    x = rep(c("2023", "2024"), each = 2),
+    grp = rep(c("Group 1", "Group 2"), 2),
+    value = c(30, 70, 45, 55)
+  )
+
+  p <- ggplot(data, aes(x, value, fill = grp)) +
+    geom_col() +
+    geom_col_label(align = "top") +
+    scale_y_continuous_e61(limits = c(0, 100, 20))
+
+  expect_no_error(built <- ggplot_build(p))
+
+  range_y <- built$layout$panel_scales_y[[1]]$get_limits()
   expect_equal(range_y[2], 100)
 })

@@ -39,12 +39,13 @@
 #'   still means "furthest from zero", which renders past the end of a
 #'   horizontal column once flipped.
 #'
-#'   For single (non-stacked) columns at `align = "top"`/`"bottom"`, a small
-#'   amount of headroom is reserved automatically beyond the tallest/lowest
-#'   column so the floating label isn't clipped by the panel edge - this
-#'   matters because theme61's default `scale_y_continuous_e61()` has no
-#'   expansion at the data max/min. If you need more (or less) room, add your
-#'   own `scale_y_continuous_e61(expand_top = ...)`, which takes precedence.
+#'   At `align = "top"`/`"bottom"`, a small amount of headroom is reserved
+#'   automatically beyond the tallest/lowest column (or, for stacked columns,
+#'   beyond the tallest/lowest stack total) so the label isn't clipped by the
+#'   panel edge - this matters because theme61's default
+#'   `scale_y_continuous_e61()` has no expansion at the data max/min. An
+#'   explicit `scale_y_continuous_e61(limits = ...)` takes precedence over
+#'   this reserved headroom.
 #'
 #' @return Object to add to a ggplot (via `+`).
 #'
@@ -104,11 +105,11 @@ geom_col_label <- function(mapping = NULL,
     )
   )
 
-  # Invisible layer that reserves headroom beyond single (non-stacked)
-  # columns at align = "top"/"bottom", so the floating label isn't clipped
-  # by the panel edge. Kept as its own geom_blank() layer (rather than extra
-  # rows in the label layer above) so it can't get caught up in that layer's
-  # position_stack() and change the real labels' positions.
+  # Invisible layer that reserves headroom at align = "top"/"bottom" so a
+  # label sitting flush with the panel edge isn't clipped. Kept as its own
+  # geom_blank() layer (rather than extra rows in the label layer above) so
+  # it can't get caught up in that layer's position_stack() and change the
+  # real labels' positions.
   spacer_layer <- ggplot2::layer(
     data = data,
     mapping = mapping,
@@ -172,11 +173,15 @@ StatColLabel <- ggplot2::ggproto("StatColLabel", ggplot2::Stat,
   }
 )
 
-# Reserves headroom for geom_col_label()'s floating labels on single
-# (non-stacked) columns at align = "top"/"bottom", via an invisible
-# geom_blank() layer whose (x, y) still counts towards the y scale's trained
-# range. Interior labels (stacked columns, or align between 0 and 1) need no
-# extra room, so this returns no rows for those cases.
+# Reserves headroom for geom_col_label()'s floating labels at align =
+# "top"/"bottom", via an invisible geom_blank() layer whose (x, y) still
+# counts towards the y scale's trained range. This matters for single
+# columns (the label floats outside the bar entirely) and for stacked
+# columns whenever the outermost segment's edge coincides with the panel
+# boundary (vjust = 0.5 centres the label glyph exactly on that boundary,
+# so half of it would otherwise be clipped). Interior labels (align
+# strictly between 0 and 1) never touch a panel edge, so no room is
+# reserved for those.
 StatColLabelSpacer <- ggplot2::ggproto("StatColLabelSpacer", ggplot2::Stat,
   required_aes = c("x", "y"),
 
@@ -184,17 +189,30 @@ StatColLabelSpacer <- ggplot2::ggproto("StatColLabelSpacer", ggplot2::Stat,
 
     if (align > 0 && align < 1) return(data[0, , drop = FALSE])
 
-    n_per_x <- tapply(data$y, data$x, length)
-    n_group <- as.numeric(n_per_x[match(data$x, names(n_per_x))])
+    per_x_total <- tapply(data$y, data$x, sum, na.rm = TRUE)
 
-    single <- n_group <= 1
-    if (!any(single)) return(data[0, , drop = FALSE])
-
-    pad <- diff(range(c(0, data$y), na.rm = TRUE)) * 0.08
+    pad <- diff(range(c(0, per_x_total), na.rm = TRUE)) * 0.08
     if (!is.finite(pad) || pad == 0) pad <- 1
 
-    spacer <- data[single, , drop = FALSE]
-    spacer$y <- spacer$y + if (align >= 1) pad else -pad
+    # Respect explicit user limits (e.g. scale_y_continuous_e61(limits =
+    # ...)) rather than padding past them - scale_y_continuous_e61() errors
+    # if trained data falls outside a user-supplied limit.
+    user_limits <- scales$y$limits
+    if (length(user_limits) < 2) user_limits <- c(NA, NA)
+
+    # A single extra point is enough to widen the panel's trained y range;
+    # reuse an existing x so no spurious category is introduced.
+    spacer <- data[1, , drop = FALSE]
+
+    if (align >= 1) {
+      padded <- max(per_x_total, na.rm = TRUE) + pad
+      if (!is.na(user_limits[2])) padded <- min(padded, user_limits[2])
+      spacer$y <- padded
+    } else {
+      padded <- min(0, min(data$y, na.rm = TRUE)) - pad
+      if (!is.na(user_limits[1])) padded <- max(padded, user_limits[1])
+      spacer$y <- padded
+    }
 
     spacer
   }
