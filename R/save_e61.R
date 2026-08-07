@@ -8,6 +8,30 @@
 #' and down in size without blurring or becoming pixelated. PNG should only be
 #' used when required for compatibility reasons.
 #'
+#' @details `build_up = TRUE` saves a sequence of files (`filename_1`,
+#'   `filename_2`, ..., `filename_N`) that each reveal one more
+#'   category/series than the last, for stepping a chart across several
+#'   PowerPoint slides. Categories not yet revealed are blanked (zeroed, or
+#'   set to missing) rather than removed from the data, so the axes, scales
+#'   and dimensions are identical across every step. Supported chart types:
+#'   * bar/column charts (`geom_col()`/`geom_bar()`): reveals the x-axis
+#'   categories left to right;
+#'   * stacked area/ribbon charts (`geom_area()`/`geom_ribbon()`): reveals the
+#'   stacked groups bottom to top;
+#'   * grouped line/point charts (`geom_line()`/`geom_path()`/`geom_point()`/
+#'   `geom_pointbar()`): reveals one colour/fill group (e.g. one line) at a
+#'   time;
+#'   * a single, ungrouped line or area series: reveals progressively along
+#'   the x-axis instead (see `build_up_n`).
+#'
+#'   [plot_label()] labels are also synced to the reveal sequence, if the
+#'   label's `colour` matches the rendered colour of a category/group (the
+#'   usual way to label a line/bar instead of using a legend) - a label whose
+#'   colour doesn't match any category (e.g. a source note) is left alone.
+#'
+#'   `build_up` is not supported for multi-panel graphs, faceted graphs,
+#'   `preview = TRUE` or `return_plot_obj = TRUE`.
+#'
 #' @param filename File name to create on disk. Providing the file format
 #'   extension (e.g. .svg) is suggested when saving to a single file format. The
 #'   file extension must be lowercase. If you want to save to multiple formats,
@@ -57,31 +81,10 @@
 #' @param bg_colour Set the graph background colour. Accepts a colour name, hex
 #'   code or theme61 colour object name. Defaults to "white". For graphs used in
 #'   research note boxes, set the colour to `e61_boxback`.
-#' @param build_up (single-panel specific) Logical. When TRUE, instead of
-#'   saving one file, saves a sequence of files that each reveal one more
-#'   category/series than the last - for stepping a chart across several
-#'   PowerPoint slides. Files are saved with a `_1`, `_2`, ..., `_N` suffix
-#'   added to `filename`, where `_N` is the fully-revealed chart. Categories
-#'   not yet revealed are blanked (zeroed, or set to missing) rather than
-#'   removed from the data, so the axes, scales and dimensions are identical
-#'   across every step. Supported chart types:
-#'   * bar/column charts (`geom_col()`/`geom_bar()`): reveals the x-axis
-#'   categories left to right;
-#'   * stacked area/ribbon charts (`geom_area()`/`geom_ribbon()`): reveals the
-#'   stacked groups bottom to top;
-#'   * grouped line/point charts (`geom_line()`/`geom_path()`/`geom_point()`/
-#'   `geom_pointbar()`): reveals one colour/fill group (e.g. one line) at a
-#'   time;
-#'   * a single, ungrouped line or area series: reveals progressively along
-#'   the x-axis instead (see `build_up_n`).
-#'
-#'   [plot_label()] labels are also synced to the reveal sequence, if the
-#'   label's `colour` matches the rendered colour of a category/group (the
-#'   usual way to label a line/bar instead of using a legend) - a label whose
-#'   colour doesn't match any category (e.g. a source note) is left alone.
-#'
-#'   Not supported for multi-panel graphs, faceted graphs, `preview = TRUE` or
-#'   `return_plot_obj = TRUE`. Defaults to FALSE.
+#' @param build_up (single-panel specific) Logical. Save a sequence of files
+#'   that each reveal one more category/series than the last, with a `_1`,
+#'   `_2`, ..., `_N` suffix added to `filename`. See Details. Defaults to
+#'   FALSE.
 #' @param build_up_n (single-panel specific) Numeric. Only used by `build_up`
 #'   for a single, ungrouped line or area series, where there's no existing
 #'   category to step through and the x-axis instead needs to be divided into
