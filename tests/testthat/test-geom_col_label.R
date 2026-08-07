@@ -254,10 +254,11 @@ test_that("Stacked columns need no headroom at align top/bottom - the outer segm
   expect_equal(range_middle, c(0, 100))
 })
 
-test_that("Only the outer stacked segment's vjust is pushed inward, not interior boundaries", {
-  # Three-segment stack: the middle segment's own top/bottom are interior
-  # boundaries (between two coloured segments), not the panel edge, so its
-  # vjust should stay centred regardless of align.
+test_that("Every stacked segment's label sits inside its own edge, not just the outer one", {
+  # Three-segment stack: align = "top"/"bottom" means near *each segment's
+  # own* top/bottom, not just the outer edge of the stack as a whole - so
+  # every segment gets pushed inward with a gap, including the two whose
+  # own boundary is an interior one (between two coloured segments).
   data <- data.frame(
     x = "a",
     grp = c("g1", "g2", "g3"),
@@ -265,24 +266,26 @@ test_that("Only the outer stacked segment's vjust is pushed inward, not interior
   )
 
   p_top <- ggplot(data, aes(x, value, fill = grp)) + geom_col() + geom_col_label(align = "top")
-  label_data_top <- get_label_data(ggplot_build(p_top))
-  # outer (topmost, nudged just inside 100) is pushed fully inside; the
-  # other two - genuine interior boundaries - stay centred, un-nudged
-  is_outer_top <- label_data_top$y == max(label_data_top$y)
-  expect_equal(label_data_top$vjust[is_outer_top], 1)
-  expect_true(all(label_data_top$vjust[!is_outer_top] == 0.5))
-  expect_lt(label_data_top$y[is_outer_top], 100)
-  expect_gt(label_data_top$y[is_outer_top], 90)
+  built_top <- ggplot_build(p_top)
+  label_data_top <- get_label_data(built_top)
+  bar_data_top <- built_top$data[[1]]
+
+  # every label sits below its own segment's top edge (ymax), pushed
+  # fully inward (vjust = 1), not centred on it
+  expect_true(all(label_data_top$vjust == 1))
+  expect_true(all(sort(label_data_top$y) < sort(bar_data_top$ymax)))
+  expect_true(all(sort(label_data_top$y) > sort(bar_data_top$ymin)))
 
   p_bottom <- ggplot(data, aes(x, value, fill = grp)) + geom_col() + geom_col_label(align = "bottom")
-  label_data_bottom <- get_label_data(ggplot_build(p_bottom))
-  # outer (bottommost, nudged just above 0) is pushed fully inside; the
-  # other two stay centred, un-nudged
-  is_outer_bottom <- label_data_bottom$y == min(label_data_bottom$y)
-  expect_equal(label_data_bottom$vjust[is_outer_bottom], 0)
-  expect_true(all(label_data_bottom$vjust[!is_outer_bottom] == 0.5))
-  expect_gt(label_data_bottom$y[is_outer_bottom], 0)
-  expect_lt(label_data_bottom$y[is_outer_bottom], 10)
+  built_bottom <- ggplot_build(p_bottom)
+  label_data_bottom <- get_label_data(built_bottom)
+  bar_data_bottom <- built_bottom$data[[1]]
+
+  # every label sits above its own segment's bottom edge (ymin), pushed
+  # fully inward (vjust = 0), not centred on it
+  expect_true(all(label_data_bottom$vjust == 0))
+  expect_true(all(sort(label_data_bottom$y) > sort(bar_data_bottom$ymin)))
+  expect_true(all(sort(label_data_bottom$y) < sort(bar_data_bottom$ymax)))
 })
 
 test_that("Reserved headroom respects an explicit scale_y_continuous_e61(limits = ...)", {

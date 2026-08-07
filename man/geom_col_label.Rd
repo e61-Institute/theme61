@@ -36,10 +36,10 @@ of the column/segment). Defaults to \code{"top"}. For single (non-stacked)
 columns, \code{"top"} floats the label just above the column, and \code{"bottom"}
 sits it just inside the column above its base - both leave a small gap
 rather than sitting flush against the column. For stacked columns,
-\code{"top"}/\code{"bottom"} sit just inside the top/bottom segment's outer edge
-(only that outer edge - segment boundaries in between are unaffected).
-Any other value centres the label inside the column/segment at that
-fraction of its height.}
+\code{"top"}/\code{"bottom"} sit just inside \strong{each segment's own} top/bottom
+edge (not just the outer edge of the stack as a whole) with the same
+gap. Any other value centres the label inside the column/segment at
+that fraction of its height.}
 
 \item{reverse}{Logical. Reverse the stacking order used to position labels
 within stacked columns. Set this to match \code{position_stack(reverse = TRUE)} if you used that for your \code{geom_col()}. Defaults to FALSE.}

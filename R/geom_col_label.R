@@ -25,10 +25,10 @@
 #'   columns, `"top"` floats the label just above the column, and `"bottom"`
 #'   sits it just inside the column above its base - both leave a small gap
 #'   rather than sitting flush against the column. For stacked columns,
-#'   `"top"`/`"bottom"` sit just inside the top/bottom segment's outer edge
-#'   (only that outer edge - segment boundaries in between are unaffected).
-#'   Any other value centres the label inside the column/segment at that
-#'   fraction of its height.
+#'   `"top"`/`"bottom"` sit just inside **each segment's own** top/bottom
+#'   edge (not just the outer edge of the stack as a whole) with the same
+#'   gap. Any other value centres the label inside the column/segment at
+#'   that fraction of its height.
 #' @param reverse Logical. Reverse the stacking order used to position labels
 #'   within stacked columns. Set this to match `position_stack(reverse =
 #'   TRUE)` if you used that for your `geom_col()`. Defaults to FALSE.
@@ -254,43 +254,33 @@ StatColLabel <- ggplot2::ggproto("StatColLabel", ggplot2::Stat,
   },
 
   # Runs after position_stack() has placed every segment, so data$y here is
-  # each segment's actual rendered anchor. At align = "top"/"bottom", the
-  # one segment per x whose anchor coincides with the overall stack's outer
-  # boundary is the only one that can straddle the panel edge (vjust = 0.5
-  # centres the glyph exactly on its anchor) - push just that segment's
-  # text fully inward (vjust = 1 for the outer top, 0 for the outer bottom),
-  # with a scale-relative gap so it doesn't sit flush against the column's
-  # edge either, matching the single-column "float" layer's gap. Nudging
-  # inward (rather than the float layer's outward nudge) can't push data
-  # outside a user-supplied scale_y_continuous_e61(limits = ...), so unlike
-  # that layer this needs no clamping. Every other segment keeps the default
-  # centred vjust = 0.5 with no gap, since its boundary sits between two
-  # coloured segments, not the panel edge.
+  # each segment's own actual rendered anchor (its own top for align =
+  # "top", its own bottom for align = "bottom" - position_stack() already
+  # interpolates per segment, not just for the outer one). Push every
+  # segment's text fully inward from that anchor (vjust = 1 for "top",
+  # 0 for "bottom") with a scale-relative gap, rather than centring it
+  # (vjust = 0.5) flush on the boundary - matching the single-column
+  # "float" layer's gap, and applied uniformly whether or not a given
+  # segment's boundary happens to also be the panel edge. Nudging inward
+  # (rather than the float layer's outward nudge) can't push data outside a
+  # user-supplied scale_y_continuous_e61(limits = ...), so unlike that
+  # layer this needs no clamping.
   finish_layer = function(self, data, params) {
 
     align <- params$align
 
     if (is.null(align) || (align > 0 && align < 1) || nrow(data) == 0) return(data)
 
-    outer_per_x <- if (align >= 1) {
-      tapply(data$y, data$x, max)
-    } else {
-      tapply(data$y, data$x, min)
-    }
-
-    outer_for_row <- as.numeric(outer_per_x[match(data$x, names(outer_per_x))])
-    is_outer <- abs(data$y - outer_for_row) < 1e-9
-
     gap <- diff(range(c(0, data$y), na.rm = TRUE)) * .COL_LABEL_GAP_FRAC
     if (!is.finite(gap)) gap <- 0
 
     if (align >= 1) {
-      data$y[is_outer] <- data$y[is_outer] - gap
+      data$y <- data$y - gap
+      data$vjust <- 1
     } else {
-      data$y[is_outer] <- data$y[is_outer] + gap
+      data$y <- data$y + gap
+      data$vjust <- 0
     }
-
-    data$vjust[is_outer] <- if (align >= 1) 1 else 0
 
     data
   }
