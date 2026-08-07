@@ -22,6 +22,8 @@ save_e61(
   base_size = 10,
   res = 1,
   bg_colour = "white",
+  build_up = FALSE,
+  build_up_n = NULL,
   plotlist = NULL,
   title = NULL,
   subtitle = NULL,
@@ -106,6 +108,34 @@ PNG. E.g. \code{res = 2} doubles the size of the saved graph.}
 \item{bg_colour}{Set the graph background colour. Accepts a colour name, hex
 code or theme61 colour object name. Defaults to "white". For graphs used in
 research note boxes, set the colour to \code{e61_boxback}.}
+
+\item{build_up}{(single-panel specific) Logical. When TRUE, instead of
+saving one file, saves a sequence of files that each reveal one more
+category/series than the last - for stepping a chart across several
+PowerPoint slides. Files are saved with a \verb{_1}, \verb{_2}, ..., \verb{_N} suffix
+added to \code{filename}, where \verb{_N} is the fully-revealed chart. Categories
+not yet revealed are blanked (zeroed, or set to missing) rather than
+removed from the data, so the axes, scales and dimensions are identical
+across every step. Supported chart types:
+\itemize{
+\item bar/column charts (\code{geom_col()}/\code{geom_bar()}): reveals the x-axis
+categories left to right;
+\item stacked area/ribbon charts (\code{geom_area()}/\code{geom_ribbon()}): reveals the
+stacked groups bottom to top;
+\item grouped line/point charts (\code{geom_line()}/\code{geom_path()}/\code{geom_point()}/
+\code{geom_pointbar()}): reveals one colour/fill group (e.g. one line) at a
+time;
+\item a single, ungrouped line or area series: reveals progressively along
+the x-axis instead (see \code{build_up_n}).
+}
+
+Not supported for multi-panel graphs, faceted graphs, \code{preview = TRUE} or
+\code{return_plot_obj = TRUE}. Defaults to FALSE.}
+
+\item{build_up_n}{(single-panel specific) Numeric. Only used by \code{build_up}
+for a single, ungrouped line or area series, where there's no existing
+category to step through and the x-axis instead needs to be divided into
+steps. Defaults to the number of unique x-values, capped at 10.}
 
 \item{plotlist}{(multi-panel specific) List of plots to combine as an
 multi-panel and save. You can also enter the charts individually as
