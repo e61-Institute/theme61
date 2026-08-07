@@ -44,16 +44,17 @@
 #'   still means "furthest from zero", which renders past the end of a
 #'   horizontal column once flipped.
 #'
-#'   None of the label placements need any extra space beyond the columns
-#'   themselves - important since theme61's default `scale_y_continuous_e61()`
-#'   has no expansion at the data max/min - except one: a single
-#'   (non-stacked) column's `align = "top"` label genuinely floats outside
-#'   the column, so a small amount of headroom is reserved automatically
-#'   beyond the tallest column for it. `"bottom"` on a single column, and
-#'   both ends of a stacked column, sit just inside the column instead of
-#'   straddling its edge, so they need no reserved space. Both the gap and
-#'   the reserved top headroom scale with the data's own range, so they look
-#'   proportionate whether the y-axis runs from 0 to 10 or 0 to 100,000.
+#'   Every edge-aligned label leaves a gap between itself and the column -
+#'   scaled to the data's own range, so it looks proportionate whether the
+#'   y-axis runs from 0 to 10 or 0 to 100,000 - and only one of them needs
+#'   any extra space *beyond* the columns to do that: a single (non-stacked)
+#'   column's `align = "top"` label genuinely floats outside the column, so
+#'   a small amount of headroom is reserved automatically beyond the tallest
+#'   column for it (this matters because theme61's default
+#'   `scale_y_continuous_e61()` has no expansion at the data max/min).
+#'   `"bottom"` on a single column, and both ends of a stacked column, sit
+#'   just inside the column with their own gap nudged inward from the edge
+#'   instead, so they need no reserved space beyond the column at all.
 #'
 #'   An explicit `scale_y_continuous_e61(limits = ...)` always takes
 #'   precedence: the reserved top headroom and the single-column gap are
@@ -257,11 +258,14 @@ StatColLabel <- ggplot2::ggproto("StatColLabel", ggplot2::Stat,
   # one segment per x whose anchor coincides with the overall stack's outer
   # boundary is the only one that can straddle the panel edge (vjust = 0.5
   # centres the glyph exactly on its anchor) - push just that segment's
-  # text fully inward (vjust = 1 for the outer top, 0 for the outer bottom)
-  # instead, so it never needs headroom beyond the column to avoid being
-  # clipped. Every other segment keeps the default centred vjust = 0.5,
-  # since its boundary sits between two coloured segments, not the panel
-  # edge.
+  # text fully inward (vjust = 1 for the outer top, 0 for the outer bottom),
+  # with a scale-relative gap so it doesn't sit flush against the column's
+  # edge either, matching the single-column "float" layer's gap. Nudging
+  # inward (rather than the float layer's outward nudge) can't push data
+  # outside a user-supplied scale_y_continuous_e61(limits = ...), so unlike
+  # that layer this needs no clamping. Every other segment keeps the default
+  # centred vjust = 0.5 with no gap, since its boundary sits between two
+  # coloured segments, not the panel edge.
   finish_layer = function(self, data, params) {
 
     align <- params$align
@@ -276,6 +280,15 @@ StatColLabel <- ggplot2::ggproto("StatColLabel", ggplot2::Stat,
 
     outer_for_row <- as.numeric(outer_per_x[match(data$x, names(outer_per_x))])
     is_outer <- abs(data$y - outer_for_row) < 1e-9
+
+    gap <- diff(range(c(0, data$y), na.rm = TRUE)) * .COL_LABEL_GAP_FRAC
+    if (!is.finite(gap)) gap <- 0
+
+    if (align >= 1) {
+      data$y[is_outer] <- data$y[is_outer] - gap
+    } else {
+      data$y[is_outer] <- data$y[is_outer] + gap
+    }
 
     data$vjust[is_outer] <- if (align >= 1) 1 else 0
 

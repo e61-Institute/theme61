@@ -266,15 +266,23 @@ test_that("Only the outer stacked segment's vjust is pushed inward, not interior
 
   p_top <- ggplot(data, aes(x, value, fill = grp)) + geom_col() + geom_col_label(align = "top")
   label_data_top <- get_label_data(ggplot_build(p_top))
-  # outer (topmost, y == 100) is pushed fully inside; the other two stay centred
-  expect_equal(label_data_top$vjust[label_data_top$y == 100], 1)
-  expect_true(all(label_data_top$vjust[label_data_top$y != 100] == 0.5))
+  # outer (topmost, nudged just inside 100) is pushed fully inside; the
+  # other two - genuine interior boundaries - stay centred, un-nudged
+  is_outer_top <- label_data_top$y == max(label_data_top$y)
+  expect_equal(label_data_top$vjust[is_outer_top], 1)
+  expect_true(all(label_data_top$vjust[!is_outer_top] == 0.5))
+  expect_lt(label_data_top$y[is_outer_top], 100)
+  expect_gt(label_data_top$y[is_outer_top], 90)
 
   p_bottom <- ggplot(data, aes(x, value, fill = grp)) + geom_col() + geom_col_label(align = "bottom")
   label_data_bottom <- get_label_data(ggplot_build(p_bottom))
-  # outer (bottommost, y == 0) is pushed fully inside; the other two stay centred
-  expect_equal(label_data_bottom$vjust[label_data_bottom$y == 0], 0)
-  expect_true(all(label_data_bottom$vjust[label_data_bottom$y != 0] == 0.5))
+  # outer (bottommost, nudged just above 0) is pushed fully inside; the
+  # other two stay centred, un-nudged
+  is_outer_bottom <- label_data_bottom$y == min(label_data_bottom$y)
+  expect_equal(label_data_bottom$vjust[is_outer_bottom], 0)
+  expect_true(all(label_data_bottom$vjust[!is_outer_bottom] == 0.5))
+  expect_gt(label_data_bottom$y[is_outer_bottom], 0)
+  expect_lt(label_data_bottom$y[is_outer_bottom], 10)
 })
 
 test_that("Reserved headroom respects an explicit scale_y_continuous_e61(limits = ...)", {

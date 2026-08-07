@@ -73,16 +73,17 @@ computed in data space (before the flip is applied), so \code{align = "top"}
 still means "furthest from zero", which renders past the end of a
 horizontal column once flipped.
 
-None of the label placements need any extra space beyond the columns
-themselves - important since theme61's default \code{scale_y_continuous_e61()}
-has no expansion at the data max/min - except one: a single
-(non-stacked) column's \code{align = "top"} label genuinely floats outside
-the column, so a small amount of headroom is reserved automatically
-beyond the tallest column for it. \code{"bottom"} on a single column, and
-both ends of a stacked column, sit just inside the column instead of
-straddling its edge, so they need no reserved space. Both the gap and
-the reserved top headroom scale with the data's own range, so they look
-proportionate whether the y-axis runs from 0 to 10 or 0 to 100,000.
+Every edge-aligned label leaves a gap between itself and the column -
+scaled to the data's own range, so it looks proportionate whether the
+y-axis runs from 0 to 10 or 0 to 100,000 - and only one of them needs
+any extra space \emph{beyond} the columns to do that: a single (non-stacked)
+column's \code{align = "top"} label genuinely floats outside the column, so
+a small amount of headroom is reserved automatically beyond the tallest
+column for it (this matters because theme61's default
+\code{scale_y_continuous_e61()} has no expansion at the data max/min).
+\code{"bottom"} on a single column, and both ends of a stacked column, sit
+just inside the column with their own gap nudged inward from the edge
+instead, so they need no reserved space beyond the column at all.
 
 An explicit \code{scale_y_continuous_e61(limits = ...)} always takes
 precedence: the reserved top headroom and the single-column gap are
