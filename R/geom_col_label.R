@@ -120,7 +120,7 @@ geom_col_label <- function(mapping = NULL,
     data = data,
     mapping = mapping,
     stat = StatColLabel,
-    geom = ggplot2::GeomText,
+    geom = GeomTextFlipAware,
     position = ggplot2::position_stack(vjust = align_num, reverse = reverse),
     show.legend = show.legend,
     inherit.aes = inherit.aes,
@@ -138,8 +138,12 @@ geom_col_label <- function(mapping = NULL,
       data = data,
       mapping = mapping,
       stat = StatColLabelFloat,
-      geom = ggplot2::GeomText,
-      position = "identity",
+      geom = GeomTextFlipAware,
+      # position_stack(), not "identity": for a lone (unstacked) row it's
+      # trivial (ymin = 0, ymax = the nudged y set by the stat below), but
+      # unlike "identity" it also carries the coord_flip()-aware handling
+      # geom_text() needs to stay correctly positioned once flipped.
+      position = ggplot2::position_stack(vjust = 1, reverse = reverse),
       show.legend = show.legend,
       inherit.aes = inherit.aes,
       params = float_params
@@ -166,6 +170,25 @@ geom_col_label <- function(mapping = NULL,
 }
 
 # Internal helpers ----
+
+# geom_text(), but swaps hjust/vjust under coord_flip(). GeomText's own
+# draw_panel() applies coord$transform() to (x, y) - correctly swapping the
+# rendered position - but then passes hjust/vjust straight through
+# unswapped, so they keep their pre-flip screen meaning (vjust still
+# controls the screen-vertical axis, which post-flip is the *category*
+# axis, not the value axis "top"/"bottom" are meant to move along). Without
+# this, align = "top"/"bottom" on a coord_flip()'d chart renders the label
+# centred on its anchor instead of offset from it.
+GeomTextFlipAware <- ggplot2::ggproto("GeomTextFlipAware", ggplot2::GeomText,
+  draw_panel = function(self, data, panel_params, coord, ...) {
+    if (inherits(coord, "CoordFlip")) {
+      tmp <- data$hjust
+      data$hjust <- data$vjust
+      data$vjust <- tmp
+    }
+    ggplot2::ggproto_parent(ggplot2::GeomText, self)$draw_panel(data, panel_params, coord, ...)
+  }
+)
 
 # Fraction of the data's own (0, max) range used to space a floating label
 # off the column it sits above/below, and to reserve headroom for it. Both
@@ -225,12 +248,16 @@ StatColLabel <- ggplot2::ggproto("StatColLabel", ggplot2::Stat,
 )
 
 # Edge-aligned (align = "top"/"bottom") labels on single (non-stacked)
-# columns. Computed directly rather than via position_stack(), because for a
-# lone row position_stack()'s ymin/ymax collapse to 0/y - there's no vjust
-# that can express "y + a gap" or "a gap above 0" from that alone. Both ends
-# get a symmetric scale-relative gap: "top" floats just outside the column,
-# "bottom" sits just inside it above the base, rather than either sitting
-# flush against the column's edge.
+# columns. For a lone row, position_stack()'s ymin/ymax collapse to 0/y, so
+# the layer's shared vjust = 0/1 alone can't express "y + a gap" or "a gap
+# above 0" - there's no per-row way to vary it. Instead this stat nudges the
+# row's own y to whatever value makes position_stack(vjust = 1) (set by the
+# calling geom_col_label()) land the anchor exactly where it's wanted:
+# y + gap for "top", or a constant gap above the base for "bottom". Both get
+# a scale-relative gap this way, and - because position_stack() is still
+# doing the positioning, unlike a hand-rolled position = "identity" - the
+# usual coord_flip()-aware handling keeps working (position_stack() flips
+# and un-flips the data around its own computation).
 StatColLabelFloat <- ggplot2::ggproto("StatColLabelFloat", ggplot2::Stat,
   required_aes = c("x", "y"),
 

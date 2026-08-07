@@ -167,6 +167,44 @@ test_that("Labels and positions are unaffected by coord_flip()", {
   expect_equal(label_data$vjust, label_data_flipped$vjust)
 })
 
+test_that("GeomTextFlipAware swaps hjust/vjust under coord_flip() but not otherwise", {
+  # GeomText's own draw_panel() correctly transforms (x, y) for coord_flip()
+  # but passes hjust/vjust straight through unswapped, so a label's "float
+  # away from its anchor" direction (encoded in vjust pre-flip) silently
+  # stops applying to the now-flipped value axis. Regression test for that:
+  # geom_col_label()'s labels used to render centred on/straddling the
+  # column's edge under coord_flip() instead of offset from it.
+  data <- data.frame(grp = c("A", "B"), value = c(10, 30))
+
+  p_flip <- ggplot(data, aes(grp, value)) + geom_col() + geom_col_label() + coord_flip()
+  p_normal <- ggplot(data, aes(grp, value)) + geom_col() + geom_col_label()
+
+  built_flip <- ggplot_build(p_flip)
+  built_normal <- ggplot_build(p_normal)
+
+  row_flip <- get_label_data(built_flip)[1, ]
+  row_normal <- get_label_data(built_normal)[1, ]
+
+  # both start from the same input justification (hjust = 0.5, vjust = 0 -
+  # centred on x, floating above y)
+  expect_equal(row_flip$hjust, 0.5)
+  expect_equal(row_flip$vjust, 0)
+
+  g_flip <- GeomTextFlipAware$draw_panel(
+    row_flip, built_flip$layout$panel_params[[1]], ggplot2::coord_flip()
+  )
+  g_normal <- GeomTextFlipAware$draw_panel(
+    row_normal, built_normal$layout$panel_params[[1]], ggplot2::coord_cartesian()
+  )
+
+  # swapped under coord_flip() ...
+  expect_equal(g_flip$hjust, 0)
+  expect_equal(g_flip$vjust, 0.5)
+  # ... but left alone otherwise
+  expect_equal(g_normal$hjust, 0.5)
+  expect_equal(g_normal$vjust, 0)
+})
+
 test_that("Headroom is reserved beyond single top-aligned columns", {
   data <- data.frame(grp = c("A", "B", "C"), value = c(10, 30, 60))
 
