@@ -273,3 +273,29 @@ test_that("Reserved headroom respects an explicit scale_y_continuous_e61(limits 
   range_y <- built$layout$panel_scales_y[[1]]$get_limits()
   expect_equal(range_y[2], 100)
 })
+
+test_that("A single column's own gap respects an explicit tight limit too", {
+  # Regression test: the "float" layer's label position (not just the
+  # spacer's reserved headroom) must also be clamped to a user-supplied
+  # limit. A column whose value sits exactly at the limit, plus the usual
+  # gap, used to push the label's own y outside that limit and error.
+  data <- data.frame(grp = "a", value = 100)
+
+  p_tight <- ggplot(data, aes(grp, value)) +
+    geom_col() +
+    geom_col_label() +
+    scale_y_continuous_e61(limits = c(0, 100, 20))
+
+  expect_no_error(built_tight <- ggplot_build(p_tight))
+  label_data_tight <- get_label_data(built_tight)
+  expect_equal(label_data_tight$y, 100)
+
+  # ... but the gap is preserved in full when the limit leaves room for it
+  p_room <- ggplot(data, aes(grp, value)) +
+    geom_col() +
+    geom_col_label() +
+    scale_y_continuous_e61(limits = c(0, 120, 20))
+
+  label_data_room <- get_label_data(ggplot_build(p_room))
+  expect_gt(label_data_room$y, 100)
+})

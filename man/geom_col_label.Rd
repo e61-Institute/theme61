@@ -74,9 +74,7 @@ At \code{align = "top"}/\code{"bottom"}, a small amount of headroom is reserved
 automatically beyond the tallest/lowest column (or, for stacked columns,
 beyond the tallest/lowest stack total) so the label isn't clipped by the
 panel edge - this matters because theme61's default
-\code{scale_y_continuous_e61()} has no expansion at the data max/min. An
-explicit \code{scale_y_continuous_e61(limits = ...)} takes precedence over
-this reserved headroom.
+\code{scale_y_continuous_e61()} has no expansion at the data max/min.
 
 For single (non-stacked) columns specifically, \code{align = "top"}/
 \code{"bottom"} also leaves a small gap between the column and its label -
@@ -85,6 +83,14 @@ above the base - rather than the label sitting flush against the
 column's edge. Both the gap and the reserved headroom scale with the
 data's own range, so they look proportionate whether the y-axis runs
 from 0 to 10 or 0 to 100,000.
+
+An explicit \code{scale_y_continuous_e61(limits = ...)} always takes
+precedence: both the reserved headroom and the gap are capped at the
+supplied limit rather than nudging past it, since
+\code{scale_y_continuous_e61()} errors if data falls outside a limit you've
+set. If your limit sits exactly at (or inside) the data's own range,
+the label may end up flush against the edge again - widen the limit if
+you want the gap back.
 }
 \examples{
 library(ggplot2)

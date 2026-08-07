@@ -45,9 +45,7 @@
 #'   automatically beyond the tallest/lowest column (or, for stacked columns,
 #'   beyond the tallest/lowest stack total) so the label isn't clipped by the
 #'   panel edge - this matters because theme61's default
-#'   `scale_y_continuous_e61()` has no expansion at the data max/min. An
-#'   explicit `scale_y_continuous_e61(limits = ...)` takes precedence over
-#'   this reserved headroom.
+#'   `scale_y_continuous_e61()` has no expansion at the data max/min.
 #'
 #'   For single (non-stacked) columns specifically, `align = "top"`/
 #'   `"bottom"` also leaves a small gap between the column and its label -
@@ -56,6 +54,14 @@
 #'   column's edge. Both the gap and the reserved headroom scale with the
 #'   data's own range, so they look proportionate whether the y-axis runs
 #'   from 0 to 10 or 0 to 100,000.
+#'
+#'   An explicit `scale_y_continuous_e61(limits = ...)` always takes
+#'   precedence: both the reserved headroom and the gap are capped at the
+#'   supplied limit rather than nudging past it, since
+#'   `scale_y_continuous_e61()` errors if data falls outside a limit you've
+#'   set. If your limit sits exactly at (or inside) the data's own range,
+#'   the label may end up flush against the edge again - widen the limit if
+#'   you want the gap back.
 #'
 #' @return Object to add to a ggplot (via `+`).
 #'
@@ -277,8 +283,24 @@ StatColLabelFloat <- ggplot2::ggproto("StatColLabelFloat", ggplot2::Stat,
     gap <- diff(range(c(0, data$y), na.rm = TRUE)) * .COL_LABEL_GAP_FRAC
     if (!is.finite(gap)) gap <- 0
 
+    # Respect explicit user limits (e.g. scale_y_continuous_e61(limits =
+    # ...)) rather than nudging past them - scale_y_continuous_e61() errors
+    # if trained data falls outside a user-supplied limit, and unlike the
+    # spacer layer, this label's own position is real (rendered) data the
+    # scale gets trained on.
+    user_limits <- scales$y$limits
+    if (length(user_limits) < 2) user_limits <- c(NA, NA)
+
     base <- min(0, min(data$y, na.rm = TRUE))
-    data$y <- if (align >= 1) data$y + gap else base + gap
+
+    if (align >= 1) {
+      new_y <- data$y + gap
+      if (!is.na(user_limits[2])) new_y <- pmin(new_y, user_limits[2])
+    } else {
+      new_y <- base + gap
+      if (!is.na(user_limits[1])) new_y <- pmax(new_y, user_limits[1])
+    }
+    data$y <- new_y
 
     data
   }
