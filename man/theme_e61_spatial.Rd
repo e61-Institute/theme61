@@ -50,9 +50,9 @@ ggplot(data = sydney_map) +
 
 }
 \seealso{
-Other map functions: 
-\code{\link{add_map_e61}()},
-\code{\link{crop_aus_coord}()},
-\code{\link{setup_stadia_maps}()}
+Other map functions:
+\code{\link[=add_map_e61]{add_map_e61()}},
+\code{\link[=crop_aus_coord]{crop_aus_coord()}},
+\code{\link[=setup_stadia_maps]{setup_stadia_maps()}}
 }
 \concept{map functions}

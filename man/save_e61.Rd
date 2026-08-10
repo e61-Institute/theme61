@@ -14,6 +14,8 @@ save_e61(
   dim = list(height = NULL, width = NULL),
   pad_width = 0,
   pad_height = 0,
+  outer_width = NULL,
+  outer_height = NULL,
   max_height = NULL,
   preview = FALSE,
   save_data = FALSE,
@@ -80,6 +82,19 @@ charts. Defaults to no additional padding.}
 graphs. If saving multiple charts this will add the same spacing to all
 charts. Defaults to no additional padding.}
 
+\item{outer_width}{(multi-panel specific) Numeric (mm). Overrides the
+margin between the left/right edges of the figure and the outermost
+panels. Defaults to NULL, which uses the built-in margin (0mm). Set
+higher to add whitespace around the outer edge of the figure; unlike
+\code{pad_width}, this does not affect the gap between panels.}
+
+\item{outer_height}{(multi-panel specific) Numeric (mm). Overrides the
+margin between the top/bottom edges of the figure (i.e. above the title
+and below the footnotes/sources) and the panels. Defaults to NULL, which
+uses the built-in margin (0mm). Set higher to add whitespace around the
+outer edge of the figure; unlike \code{pad_height}, this does not affect the
+gap between panel rows.}
+
 \item{max_height}{Numeric. The maximum height of your plot in cm. This is
 used to constrain the plot resizing algorithm in cases where you want to
 limit the height of your charts. Defaults to NULL which does not restrict
@@ -130,6 +145,10 @@ cramped on the chart.}
 \item{height_adj}{(multi-panel specific) Rescales the height of the
 multi-panel. The function sets sensible defaults but this provides you with
 manual control if you need it.}
+
+\item{ncol, nrow}{The dimensions of the grid to create - if both are \code{NULL} it
+will use the same logic as \link[ggplot2:facet_wrap]{facet_wrap()} to set the
+dimensions}
 
 \item{rel_heights}{(multi-panel specific) A numeric vector giving the
 relative proportions of each graph component (title, plots, footer).}

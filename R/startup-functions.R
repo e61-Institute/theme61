@@ -8,11 +8,12 @@
 #'
 #' @param test Logical. For testing the interactive prompt.
 #' @noRd
+#' @importFrom gh gh
 check_pkg_ver <- function(test = FALSE) {
 
   # Checks Github for latest version of theme61
   releases <- tryCatch({
-    gh::gh("GET /repos/{owner}/{repo}/releases",
+    gh("GET /repos/{owner}/{repo}/releases",
            owner = "e61-institute",
            repo = "theme61",
            .max_wait = 5)
@@ -49,7 +50,7 @@ check_pkg_ver <- function(test = FALSE) {
         "Your version of theme61 is out-of-date. Enter 'Y' to update or 'N' to ignore.",
         wrap = TRUE)
 
-      resp <- readline()
+      resp <- .t61_readline()
     }
 
     if (resp == "Y" && !test)
@@ -117,3 +118,6 @@ check_pkg_ver <- function(test = FALSE) {
     warning = function(w) invisible(NULL)
   )
 }
+
+# Needed to make sure tests work
+.t61_readline <- base::readline

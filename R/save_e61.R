@@ -33,6 +33,17 @@
 #' @param pad_height Numeric (mm). Adds vertical whitespace to the sides of all
 #'   graphs. If saving multiple charts this will add the same spacing to all
 #'   charts. Defaults to no additional padding.
+#' @param outer_width (multi-panel specific) Numeric (mm). Overrides the
+#'   margin between the left/right edges of the figure and the outermost
+#'   panels. Defaults to NULL, which uses the built-in margin (0mm). Set
+#'   higher to add whitespace around the outer edge of the figure; unlike
+#'   `pad_width`, this does not affect the gap between panels.
+#' @param outer_height (multi-panel specific) Numeric (mm). Overrides the
+#'   margin between the top/bottom edges of the figure (i.e. above the title
+#'   and below the footnotes/sources) and the panels. Defaults to NULL, which
+#'   uses the built-in margin (0mm). Set higher to add whitespace around the
+#'   outer edge of the figure; unlike `pad_height`, this does not affect the
+#'   gap between panel rows.
 #' @param max_height Numeric. The maximum height of your plot in cm. This is
 #'   used to constrain the plot resizing algorithm in cases where you want to
 #'   limit the height of your charts. Defaults to NULL which does not restrict
@@ -80,7 +91,7 @@
 #'   would otherwise use) - it won't reflow if you resize the device
 #'   afterwards.
 #' @inheritParams labs_e61
-#' @inheritParams cowplot::plot_grid
+#' @inheritParams patchwork::plot_layout
 #' @return Invisibly returns the file name.
 #' @export
 
@@ -93,6 +104,8 @@ save_e61 <- function(filename = NULL,
                      dim = list(height = NULL, width = NULL),
                      pad_width = 0,
                      pad_height = 0,
+                     outer_width = NULL,
+                     outer_height = NULL,
                      max_height = NULL,
                      preview = FALSE,
                      save_data = FALSE,
@@ -295,6 +308,8 @@ save_e61 <- function(filename = NULL,
       base_size = base_size,
       pad_width = pad_width,
       pad_height = pad_height,
+      outer_width = outer_width,
+      outer_height = outer_height,
       ncol = ncol,
       nrow = nrow,
       align = align,
@@ -364,18 +379,20 @@ save_e61 <- function(filename = NULL,
     }
   }
 
-  # Opens the graph file in the Viewer or browser
+  # Opens the graph file in the Viewer, and also in the browser if requested
 
   # Put filename back together
   file_to_open <- paste0(filename, ".", format[[1]])
 
-  if (isTRUE(getOption("theme61.open_e61_graph", FALSE))) {
-    file_to_open <- shQuote(here::here(file_to_open))
+  if (isTRUE(getOption("theme61.open_in_browser", FALSE))) {
+    file_to_open_browser <- shQuote(here::here(file_to_open))
 
-    out <- try(system2("open", file_to_open))
+    out <- try(system2("open", file_to_open_browser))
 
     if (out != 0) warning("Graph file could not be opened")
-  } else if (interactive()) {
+  }
+
+  if (interactive()) {
     # Only run this in interactive mode
     # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
 
