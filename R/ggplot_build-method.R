@@ -1,6 +1,15 @@
 #' @export
 ggplot_build.e61_ggplot <- function(plot, ...) {
 
+  # theme61.iterate_mode: skip all automatic scale/facet/axis injection so
+  # the plot builds with plain ggplot2 defaults. Explicit theme61 functions
+  # the user already added (e.g. scale_colour_e61()) are unaffected, since
+  # they're already part of the plot's scales/layers.
+  if (isTRUE(getOption("theme61.iterate_mode", FALSE))) {
+    class(plot) <- setdiff(class(plot), "e61_ggplot")
+    return(ggplot2::ggplot_build(plot, ...))
+  }
+
   plot2 <- maybe_add_default_scales(plot)
   plot2 <- maybe_adjust_facet_spacing(plot2)
   plot2 <- maybe_leftalign_discrete_y_text(plot2)

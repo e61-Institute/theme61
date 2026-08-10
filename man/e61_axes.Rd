@@ -72,6 +72,8 @@ bounds values with \code{NA}.
 \code{transform}.}
     \item{\code{guide}}{A function used to create a guide or its name. See
 \code{\link[ggplot2:guides]{guides()}} for more information.}
+    \item{\code{position}}{For position scales, The position of the axis.
+\code{left} or \code{right} for y axes, \code{top} or \code{bottom} for x axes.}
   }}
 
 \item{expand_left, expand_right}{Numeric. Add extra space between data points

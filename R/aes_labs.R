@@ -529,7 +529,7 @@ get_text_width <- function(text, font_size = 10, font_face = 1) {
 
 #' Calculate the height of text in ggplot titles, subtitles and footnotes
 #'
-#' See [get_text_width] for why this measures using a real graphics device
+#' See get_text_width() for why this measures using a real graphics device
 #' rather than base R's built-in font metric tables.
 #' text - String. Text to be measured.
 #' font_size - Numeric. Size of the font of the text.
