@@ -291,7 +291,8 @@ theme_e61_spatial <- function(
 #'   square_legend_symbols()
 #'
 square_legend_symbols <- function(size = 6) {
-  guides(colour = guide_legend(override.aes = list(alpha = 1, size = size, shape = 15)))
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = size, shape = 15)),
+         fill = guide_legend(override.aes = list(alpha = 1, size = size, shape = 15)))
 }
 
 #' Applies changes to the theme for horizontal bar graphs
@@ -366,6 +367,10 @@ set_base_size <- function(base_size) {
 # Dimensioning functions
 points_to_mm <- function(points) {
   as.numeric(grid::convertX(ggplot2::unit(points, "points"), "mm"))[1]
+}
+
+mm_to_points <- function(mm) {
+  as.numeric(grid::convertX(ggplot2::unit(mm, "mm"), "points"))[1]
 }
 
 cm_to_in <- function(cm, round = FALSE) {

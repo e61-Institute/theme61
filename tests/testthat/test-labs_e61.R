@@ -68,6 +68,18 @@ test_that("Other labels (x, y, fill) are passed through correctly", {
   )
 })
 
+test_that("y_top moves y-axis title into the subtitle", {
+  lab <- labs_e61(title = "Test", subtitle = "Sub", y = "Y title", y_top = TRUE)
+
+  expect_null(lab$y)
+  expect_true(grepl("Y title", lab$subtitle, fixed = TRUE))
+})
+
+test_that("Caption is NULL when no footnotes or sources are provided", {
+  lab <- labs_e61(title = "Test", subtitle = "Sub")
+  expect_null(lab$caption)
+})
+
 test_that("Footnote and source text wrapping works sensibly", {
   lab <- labs_e61(
     title = "Test",
