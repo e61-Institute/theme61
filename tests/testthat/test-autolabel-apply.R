@@ -54,6 +54,38 @@ test_that("t61_apply_autolabel finds a good spot near each series when no positi
   expect_lt(abs(d$y[2] - 6), 5)   # series B ranges 2-10
 })
 
+test_that("t61_apply_autolabel is a complete no-op when theme61.auto_label = FALSE", {
+  skip_on_cran()
+  withr::local_options(list(theme61.auto_label = FALSE))
+
+  # x/y given explicitly since plot_label() itself now requires them when
+  # the option is off (see test-plot_label.R) -- a deliberately bad spot,
+  # so any movement at all would mean the engine ran despite the option.
+  data <- data.frame(
+    x = rep(2000:2020, 2),
+    y = c(seq(0, 5, length.out = 21), seq(10, 2, length.out = 21)),
+    series = rep(c("A", "B"), each = 21)
+  )
+  p <- ggplot(data, aes(x, y, colour = series)) +
+    geom_line(linewidth = 1) +
+    scale_colour_manual(values = c(A = "#e57200", B = "#1c3144")) +
+    theme_bw(base_size = 10) +
+    theme(legend.position = "none") +
+    plot_label(
+      c("Series A", "Series B"),
+      x = c(2005, 2005), y = c(1, 1),
+      colour = c("#e57200", "#1c3144")
+    )
+
+  result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
+
+  # Returns the exact same object (the early return happens before any
+  # collection/matching/render work), not just an equivalent copy -- this
+  # is what guarantees the option costs nothing, not merely that it
+  # produces the same visible output.
+  expect_identical(result, p)
+})
+
 test_that("t61_apply_autolabel leaves an explicit position untouched even when auto_position = TRUE", {
   skip_on_cran()
 
@@ -787,7 +819,8 @@ save_multi_test <- function(plots) {
     title = NULL, subtitle = NULL, footnotes = NULL, sources = NULL,
     width = NULL, height = NULL, auto_scale = TRUE,
     title_spacing_adj = 1, subtitle_spacing_adj = 1, base_size = 10,
-    pad_width = 0, pad_height = 0, height_adj = NULL,
+    pad_width = 0, pad_height = 0, outer_width = NULL, outer_height = NULL,
+    height_adj = NULL,
     ncol = 2, nrow = NULL, align = "v", axis = "none", rel_heights = NULL,
     bg_colour = "white"
   )

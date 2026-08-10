@@ -112,6 +112,11 @@ visible rather than vanishing.
 A facetted plot, or rotated text (\code{angle != 0}), has no automatic
 positioning to fall back on, so \code{x}/\code{y} are required in those cases (as
 they are whenever \code{auto_position = FALSE}).
+
+Set \code{theme61.auto_label = FALSE} (see \code{\link[=set_t61_options]{set_t61_options()}}) to turn
+automatic positioning off globally -- \code{x}/\code{y} are then always required,
+the same as \code{auto_position = FALSE}, and no auto-positioning work is
+attempted at all (no performance cost from the feature).
 }
 
 \subsection{Facet targeting}{

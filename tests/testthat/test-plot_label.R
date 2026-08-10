@@ -198,6 +198,27 @@ test_that("x/y are optional when auto_position = TRUE, required otherwise", {
   )
 })
 
+test_that("theme61.auto_label = FALSE restores the old always-required x/y behaviour", {
+  withr::local_options(list(theme61.auto_label = FALSE))
+
+  # auto_position = TRUE (the default) normally allows x/y to be omitted --
+  # with the option off, it no longer does.
+  expect_error(
+    plot_label("a", colour = "red"),
+    "automatic positioning is disabled"
+  )
+
+  # auto_position = FALSE already requires x/y on its own -- turning the
+  # option off doesn't change that error message.
+  expect_error(
+    plot_label("a", colour = "red", auto_position = FALSE),
+    "auto_position = FALSE"
+  )
+
+  # An explicit position is unaffected either way.
+  expect_no_error(plot_label("a", x = 1, y = 1, colour = "red"))
+})
+
 test_that("Rotated text requires x/y (angle != 0 has no automatic positioning to fall back on)", {
   expect_error(
     plot_label("a", colour = "red", angle = 45),
