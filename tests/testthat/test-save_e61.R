@@ -298,7 +298,7 @@ test_that("return_plot_obj returns the composed multi-panel object without savin
   p2 <- ggplot(df2, aes(x, y)) + geom_point()
 
   withr::with_tempdir({
-    obj <- save_e61(plotlist = list(p1, p2), title = "Combined", return_plot_obj = TRUE)
+    obj <- save_e61(plotlist = list(p1, p2), labs = list(title = "Combined"), return_plot_obj = TRUE)
 
     expect_s3_class(obj, "patchwork")
     expect_length(list.files(), 0)
@@ -604,5 +604,35 @@ test_that("Spell checker works", {
     save_e61(withr::local_tempfile(fileext = ".svg"), p)),
     classes = c("messages", "warning"))
 
+})
+
+test_that("Deprecated top-level arguments still work and fold into the new list args", {
+
+  df1 <- data.frame(x = c(0, 1), y = c(0, 1))
+  df2 <- data.frame(x = c(0, 1), y = c(1, 4))
+
+  p1 <- ggplot(df1, aes(x, y)) + geom_point()
+  p2 <- ggplot(df2, aes(x, y)) + geom_point()
+
+  # Old-style top-level args should still work, but warn
+  expect_warning(
+    obj_old <- save_e61(plotlist = list(p1, p2), title = "Combined",
+                        ncol = 1, pad_width = 5, return_plot_obj = TRUE),
+    class = "lifecycle_warning_deprecated"
+  )
+  expect_s3_class(obj_old, "patchwork")
+
+  # The new list-based equivalent shouldn't warn at all
+  expect_no_warning(
+    obj_new <- save_e61(plotlist = list(p1, p2), labs = list(title = "Combined"),
+                        layout = list(ncol = 1), spacing = list(pad_width = 5),
+                        return_plot_obj = TRUE)
+  )
+  expect_s3_class(obj_new, "patchwork")
+
+  # Invalid list elements are still rejected
+  expect_error(save_e61(plotlist = list(p1, p2), labs = list(nope = 1), return_plot_obj = TRUE))
+  expect_error(save_e61(plotlist = list(p1, p2), layout = list(nope = 1), return_plot_obj = TRUE))
+  expect_error(save_e61(plotlist = list(p1, p2), spacing = list(nope = 1), return_plot_obj = TRUE))
 })
 

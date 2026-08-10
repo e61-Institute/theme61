@@ -8,35 +8,39 @@ save_e61(
   filename = NULL,
   ...,
   plot = last_plot(),
+  plotlist = NULL,
+  labs = list(title = NULL, subtitle = NULL, footnotes = NULL, sources = NULL),
+  layout = list(ncol = 2, nrow = NULL, align = "v", axis = "none"),
+  spacing = list(pad_width = 0, pad_height = 0, outer_width = NULL, outer_height =
+    NULL, height_adj = NULL, rel_heights = NULL, title = 1, subtitle = 1),
+  dim = list(height = NULL, width = NULL),
   format = c("svg", "pdf", "eps", "png", "jpg"),
   chart_type = NULL,
   auto_scale = TRUE,
-  dim = list(height = NULL, width = NULL),
-  pad_width = 0,
-  pad_height = 0,
-  outer_width = NULL,
-  outer_height = NULL,
   max_height = NULL,
-  preview = FALSE,
   save_data = FALSE,
   print_info = FALSE,
   spell_check = TRUE,
+  preview = FALSE,
   base_size = 10,
   res = 1,
   bg_colour = "white",
-  plotlist = NULL,
-  title = NULL,
-  subtitle = NULL,
-  footnotes = NULL,
-  sources = NULL,
-  spacing_adj = list(title = 1, subtitle = 1),
-  height_adj = NULL,
-  ncol = 2,
-  nrow = NULL,
-  align = c("v", "none", "h", "hv"),
-  axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-  rel_heights = NULL,
-  return_plot_obj = FALSE
+  return_plot_obj = FALSE,
+  title = lifecycle::deprecated(),
+  subtitle = lifecycle::deprecated(),
+  footnotes = lifecycle::deprecated(),
+  sources = lifecycle::deprecated(),
+  ncol = lifecycle::deprecated(),
+  nrow = lifecycle::deprecated(),
+  align = lifecycle::deprecated(),
+  axis = lifecycle::deprecated(),
+  pad_width = lifecycle::deprecated(),
+  pad_height = lifecycle::deprecated(),
+  outer_width = lifecycle::deprecated(),
+  outer_height = lifecycle::deprecated(),
+  height_adj = lifecycle::deprecated(),
+  rel_heights = lifecycle::deprecated(),
+  spacing_adj = lifecycle::deprecated()
 )
 }
 \arguments{
@@ -50,6 +54,51 @@ do not include the extension, see the \code{format} argument for details.}
 \item{plot}{(single-panel specific) Name of the plot object to save. Defaults
 to the last plot displayed so usually you do not need to provide this
 argument explicitly.}
+
+\item{plotlist}{(multi-panel specific) List of plots to combine as an
+multi-panel and save. You can also enter the charts individually as
+arguments to the function.}
+
+\item{labs}{(multi-panel specific) A named list specifying the shared
+\code{title}, \code{subtitle}, \code{footnotes} and \code{sources} to place around the
+multi-panel figure. Defaults to \code{NULL} for each.}
+
+\item{layout}{(multi-panel specific) A named list specifying the panel
+grid: \code{ncol}, \code{nrow}, \code{align} and \code{axis}. See \code{patchwork::plot_layout()}
+for what \code{align} and \code{axis} do. Defaults to
+\code{list(ncol = 2, nrow = NULL, align = "v", axis = "none")}.}
+
+\item{spacing}{(multi-panel specific) A named list controlling whitespace
+and relative sizing:
+\itemize{
+\item \code{pad_width}, \code{pad_height}: Numeric (mm). Adds horizontal/vertical
+whitespace to the sides of all graphs. If saving multiple charts this
+will add the same spacing to all charts. Defaults to no additional
+padding.
+\item \code{outer_width}: Numeric (mm). Overrides the margin between the
+left/right edges of the figure and the outermost panels. Defaults to
+NULL, which uses the built-in margin (0mm). Set higher to add whitespace
+around the outer edge of the figure; unlike \code{pad_width}, this does not
+affect the gap between panels.
+\item \code{outer_height}: Numeric (mm). Overrides the margin between the
+top/bottom edges of the figure (i.e. above the title and below the
+footnotes/sources) and the panels. Defaults to NULL, which uses the
+built-in margin (0mm). Set higher to add whitespace around the outer
+edge of the figure; unlike \code{pad_height}, this does not affect the gap
+between panel rows.
+\item \code{height_adj}: Rescales the height of the multi-panel. The function
+sets sensible defaults but this provides you with manual control if you
+need it.
+\item \code{rel_heights}: A numeric vector giving the relative proportions of
+each graph component (title, plots, footer).
+\item \code{title}, \code{subtitle}: Rescales the size of the space given to the
+multi-panel title/subtitle. Use if you think the title looks too
+cramped on the chart. Both default to 1.
+}}
+
+\item{dim}{An optional named list specifying the plot height and width.
+Defaults to NULL which means the graph dimensions will be calculated
+automatically.}
 
 \item{format}{A string vector of file formats to save as. Accepts "svg",
 "pdf", "eps", "png", "jpg". For example \code{c("svg", "pdf")} will save 2 files
@@ -70,38 +119,10 @@ plot you are saving. Options are:
 
 \item{auto_scale}{Logical. Scale the y-axis automatically. Default is TRUE.}
 
-\item{dim}{An optional named list specifying the plot height and width.
-Defaults to NULL which means the graph dimensions will be calculated
-automatically.}
-
-\item{pad_width}{Numeric (mm). Adds horizontal whitespace to the sides of all
-graphs. If saving multiple charts this will add the same spacing to all
-charts. Defaults to no additional padding.}
-
-\item{pad_height}{Numeric (mm). Adds vertical whitespace to the sides of all
-graphs. If saving multiple charts this will add the same spacing to all
-charts. Defaults to no additional padding.}
-
-\item{outer_width}{(multi-panel specific) Numeric (mm). Overrides the
-margin between the left/right edges of the figure and the outermost
-panels. Defaults to NULL, which uses the built-in margin (0mm). Set
-higher to add whitespace around the outer edge of the figure; unlike
-\code{pad_width}, this does not affect the gap between panels.}
-
-\item{outer_height}{(multi-panel specific) Numeric (mm). Overrides the
-margin between the top/bottom edges of the figure (i.e. above the title
-and below the footnotes/sources) and the panels. Defaults to NULL, which
-uses the built-in margin (0mm). Set higher to add whitespace around the
-outer edge of the figure; unlike \code{pad_height}, this does not affect the
-gap between panel rows.}
-
 \item{max_height}{Numeric. The maximum height of your plot in cm. This is
 used to constrain the plot resizing algorithm in cases where you want to
 limit the height of your charts. Defaults to NULL which does not restrict
 the height.}
-
-\item{preview}{Logical. Set to TRUE to show a preview of the graph in the
-Viewer pane but not save to disk. Defaults to FALSE.}
 
 \item{save_data}{Logical. Set to TRUE if you want to save a .csv with the
 same name as the graph that contains the data needed to recreate the graph
@@ -113,6 +134,9 @@ information printed to the console. Defaults to FALSE.}
 \item{spell_check}{Logical. Check spelling of words in the title and caption.
 Defaults to TRUE. Set to FALSE to turn off.}
 
+\item{preview}{Logical. Set to TRUE to show a preview of the graph in the
+Viewer pane but not save to disk. Defaults to FALSE.}
+
 \item{base_size}{Numeric. Chart font size. Default is 10.}
 
 \item{res}{Numeric. For saving to PNG only. Rescale the size of the saved
@@ -121,37 +145,6 @@ PNG. E.g. \code{res = 2} doubles the size of the saved graph.}
 \item{bg_colour}{Set the graph background colour. Accepts a colour name, hex
 code or theme61 colour object name. Defaults to "white". For graphs used in
 research note boxes, set the colour to \code{e61_boxback}.}
-
-\item{plotlist}{(multi-panel specific) List of plots to combine as an
-multi-panel and save. You can also enter the charts individually as
-arguments to the function.}
-
-\item{title}{The text for the title.}
-
-\item{subtitle}{The text for the subtitle.}
-
-\item{footnotes}{A vector of footnote text strings. Each new string will be
-prepended with *, **, ***, etc. Note you'll need to include the asterisks
-in the title/subtitle yourself. Please be sensible with the number of
-separate points you include in the graph.}
-
-\item{sources}{String vector providing the names of sources for the graph.}
-
-\item{spacing_adj}{(multi-panel specific) A named list specifying the
-adjustment to the title and subtitle. Rescales the size of the space given
-to the multi-panel title/subtitle. Use if you think the title looks too
-cramped on the chart.}
-
-\item{height_adj}{(multi-panel specific) Rescales the height of the
-multi-panel. The function sets sensible defaults but this provides you with
-manual control if you need it.}
-
-\item{ncol, nrow}{The dimensions of the grid to create - if both are \code{NULL} it
-will use the same logic as \link[ggplot2:facet_wrap]{facet_wrap()} to set the
-dimensions}
-
-\item{rel_heights}{(multi-panel specific) A numeric vector giving the
-relative proportions of each graph component (title, plots, footer).}
 
 \item{return_plot_obj}{(multi-panel specific) Logical. If TRUE, skips
 saving entirely and returns the composed multi-panel plot object instead
@@ -162,6 +155,14 @@ graph, the returned object's layout (text sizes, panel spacing) is
 computed for a fixed target size (\code{dim}, or the same defaults \code{save_e61}
 would otherwise use) - it won't reflow if you resize the device
 afterwards.}
+
+\item{title, subtitle, footnotes, sources}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+Use \code{labs} instead.}
+
+\item{ncol, nrow, align, axis}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{layout}
+instead.}
+
+\item{pad_width, pad_height, outer_width, outer_height, height_adj, rel_heights, spacing_adj}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{spacing} instead.}
 }
 \value{
 Invisibly returns the file name.
