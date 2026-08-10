@@ -16,8 +16,8 @@ To get an API key, you must sign up at
 \url{https://client.stadiamaps.com/signup/}{Stadia Maps sign up}.
 }
 \seealso{
-Other map functions: 
-\code{\link{add_map_e61}()},
-\code{\link{crop_aus_coord}()}
+Other map functions:
+\code{\link[=add_map_e61]{add_map_e61()}},
+\code{\link[=crop_aus_coord]{crop_aus_coord()}}
 }
 \concept{map functions}

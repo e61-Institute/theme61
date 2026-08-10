@@ -16,31 +16,26 @@ test_that("Test the function works in isolation", {
 
 
 test_that("Graphs produced with manipulated secondary axes work", {
-
-  skip("These need to be checked interactively.")
-
-  # Note: Rescaled graphs need to be run twice to save the scale/shift
-
-  # Test rescaling
-  ggplot(data.frame(x = 1, y1 = 10, y2 = 200), aes(x)) +
+  p_scale <- ggplot(data.frame(x = 1, y1 = 10, y2 = 200), aes(x)) +
     geom_point(aes(y = y1), colour = "red") +
     geom_point(aes(y = sec_rescale_inv(y2, scale = 10))) +
-    scale_y_continuous_e61(limits = c(0, 25, 5),
-                           sec_axis = sec_axis(~sec_rescale(.), name = "%"),
-                           rescale_sec = TRUE) +
+    scale_y_continuous_e61(
+      limits = c(0, 25, 5),
+      sec_axis = sec_axis(~sec_rescale(.), name = "%"),
+      rescale_sec = TRUE
+    ) +
     labs_e61(y = "%")
 
-  save_e61(tempfile(fileext = ".svg"))
-
-  # Test shift up and down
-  ggplot(data.frame(x = 1, y1 = 10, y2 = 30), aes(x)) +
+  p_shift <- ggplot(data.frame(x = 1, y1 = 10, y2 = 30), aes(x)) +
     geom_point(aes(y = y1), colour = "red") +
     geom_point(aes(y = sec_rescale_inv(y2, shift = -10))) +
-    scale_y_continuous_e61(limits = c(0, 25, 5),
-                           sec_axis = sec_axis(~sec_rescale(.), name = "%"),
-                           rescale_sec = TRUE) +
+    scale_y_continuous_e61(
+      limits = c(0, 25, 5),
+      sec_axis = sec_axis(~sec_rescale(.), name = "%"),
+      rescale_sec = TRUE
+    ) +
     labs_e61(y = "%")
 
-  save_e61(tempfile(fileext = ".svg"))
-
+  expect_no_error(ggplot_build(p_scale))
+  expect_no_error(ggplot_build(p_shift))
 })

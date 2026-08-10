@@ -7,21 +7,14 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
 
     file_i <- paste0(filename, ".", fmt)
 
-    # Create a temp name for png/jpg
-    if (fmt == "png" | fmt == "jpg") file_temp <- tempfile(fileext = ".svg")
+    # png/jpg/eps/pdf are all produced by rendering an SVG first and then converting it with rsvg
+    needs_temp_svg <- fmt %in% c("png", "jpg", "eps", "pdf")
+    file_name_i <- if (needs_temp_svg) tempfile(fileext = ".svg") else file_i
 
     # add very slight width buffer
     width <- width + 0.1
 
-    switch(
-      fmt,
-      svg = svglite::svglite(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
-      eps = cairo_ps(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
-      pdf = cairo_pdf(filename = file_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
-      # When saving PNG or JPEG we save the SVG first then convert it to PNG or JPEG
-      png = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour),
-      jpg = svglite::svglite(filename = file_temp, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
-    )
+    svglite::svglite(filename = file_name_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
 
     closed <- FALSE
     on.exit({
@@ -36,12 +29,20 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
     grDevices::dev.off()
     closed <- TRUE
 
-    # Save a png/jpg if required
+    # Convert the rendered SVG into the requested format
     if (fmt == "png") {
-      svg_to_bitmap(file_temp, paste0(filename, ".png"), delete = TRUE, res = res)
+      svg_to_bitmap(file_name_i, paste0(filename, ".png"), delete = TRUE, res = res)
 
-    } else if(fmt == "jpg") {
-      svg_to_bitmap(file_temp, paste0(filename, ".jpg"), delete = TRUE, res = res)
+    } else if (fmt == "jpg") {
+      svg_to_bitmap(file_name_i, paste0(filename, ".jpg"), delete = TRUE, res = res)
+
+    } else if (fmt == "pdf") {
+      rsvg::rsvg_pdf(svg = file_name_i, file = file_i)
+      unlink(file_name_i)
+
+    } else if (fmt == "eps") {
+      rsvg::rsvg_eps(svg = file_name_i, file = file_i)
+      unlink(file_name_i)
     }
   })
 }

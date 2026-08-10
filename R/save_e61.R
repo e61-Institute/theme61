@@ -33,6 +33,17 @@
 #' @param pad_height Numeric (mm). Adds vertical whitespace to the sides of all
 #'   graphs. If saving multiple charts this will add the same spacing to all
 #'   charts. Defaults to no additional padding.
+#' @param outer_width (multi-panel specific) Numeric (mm). Overrides the
+#'   margin between the left/right edges of the figure and the outermost
+#'   panels. Defaults to NULL, which uses the built-in margin (0mm). Set
+#'   higher to add whitespace around the outer edge of the figure; unlike
+#'   `pad_width`, this does not affect the gap between panels.
+#' @param outer_height (multi-panel specific) Numeric (mm). Overrides the
+#'   margin between the top/bottom edges of the figure (i.e. above the title
+#'   and below the footnotes/sources) and the panels. Defaults to NULL, which
+#'   uses the built-in margin (0mm). Set higher to add whitespace around the
+#'   outer edge of the figure; unlike `pad_height`, this does not affect the
+#'   gap between panel rows.
 #' @param max_height Numeric. The maximum height of your plot in cm. This is
 #'   used to constrain the plot resizing algorithm in cases where you want to
 #'   limit the height of your charts. Defaults to NULL which does not restrict
@@ -80,7 +91,7 @@
 #'   would otherwise use) - it won't reflow if you resize the device
 #'   afterwards.
 #' @inheritParams labs_e61
-#' @inheritParams cowplot::plot_grid
+#' @inheritParams patchwork::plot_layout
 #' @return Invisibly returns the file name.
 #' @export
 
@@ -93,6 +104,8 @@ save_e61 <- function(filename = NULL,
                      dim = list(height = NULL, width = NULL),
                      pad_width = 0,
                      pad_height = 0,
+                     outer_width = NULL,
+                     outer_height = NULL,
                      max_height = NULL,
                      preview = FALSE,
                      save_data = FALSE,
@@ -273,6 +286,8 @@ save_e61 <- function(filename = NULL,
       base_size = base_size,
       pad_width = pad_width,
       pad_height = pad_height,
+      outer_width = outer_width,
+      outer_height = outer_height,
       ncol = ncol,
       nrow = nrow,
       align = align,
@@ -340,18 +355,20 @@ save_e61 <- function(filename = NULL,
     }
   }
 
-  # Opens the graph file in the Viewer or browser
+  # Opens the graph file in the Viewer, and also in the browser if requested
 
   # Put filename back together
   file_to_open <- paste0(filename, ".", format[[1]])
 
-  if (isTRUE(getOption("theme61.open_e61_graph", FALSE))) {
-    file_to_open <- shQuote(here::here(file_to_open))
+  if (isTRUE(getOption("theme61.open_in_browser", FALSE))) {
+    file_to_open_browser <- shQuote(here::here(file_to_open))
 
-    out <- try(system2("open", file_to_open))
+    out <- try(system2("open", file_to_open_browser))
 
     if (out != 0) warning("Graph file could not be opened")
-  } else if (interactive()) {
+  }
+
+  if (interactive()) {
     # Only run this in interactive mode
     # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
 
@@ -376,82 +393,4 @@ save_e61 <- function(filename = NULL,
   retval <- paste(filename, format, sep = ".")
 
   invisible(retval)
-}
-
-#' Converts SVG to a bitmap file
-#'
-#' Converts an SVG file to a bitmap file, currently supports JPEG and PNG.
-#'
-#' @param file_in File path to the SVG image to convert.
-#' @param file_out File path to the PNG or JPEG. image to save. Default saves a
-#'   file with the same name and location (except for the file extension).
-#' @param delete Logical. Delete the original SVG file? (defaults to FALSE).
-#' @param res Numeric. Increase the dimensions of the saved PNG or JPEG. E.g.
-#'   `res = 2` doubles the dimensions of the saved graph.
-#' @return Invisibly returns the file path to the PNG image
-#' @keywords internal
-#' @export
-svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
-
-  res <- res * 4 # res = 1 produces exceedingly small images now apparently
-
-  if (!grepl(".*\\.svg$", file_in))
-    stop("file_in must be an svg file.")
-
-  # If file_out is null, then save to a PNG by default
-  if (is.null(file_out)) {
-    file_out <- gsub("(.*)\\.svg$", "\\1.png", file_in)
-  } else if (!grepl(".*\\.png$", file_out) & !grepl(".*\\.jpg$", file_out)) {
-    stop("file_out must be a png or jpg file.")
-  }
-
-  if(grepl(".*\\.png$", file_out)) fmt <- "png" else fmt <- "jpg"
-
-  if (res != 1) {
-    # This approach to rescaling starts by saving a rescaled SVG before
-    # converting it to PNG. Hence the need for temp files.
-    file_temp_svg <- "intermed.svg"
-    file_temp_out <- paste0("intermed.", fmt)
-
-    # For some reason this changed at some point and the scaling is fine now.
-    # Keeping this here in case it reverts back in the future.
-    # res <- res / 1.25 # For some reason any res > 1 scales 1:1.25...
-
-    rsvg::rsvg_png(svg = file_in, file = file_temp_out)
-
-    g_info <- magick::image_info(magick::image_read(file_temp_out))
-
-    rsvg::rsvg_svg(svg = file_in,
-                   file = file_temp_svg,
-                   width = g_info$width * res,
-                   height = g_info$height * res
-                   )
-
-    if(fmt == "png"){
-      rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
-
-    } else if(fmt == "jpg"){
-      image_temp <- magick::image_read_svg(file_temp_svg)
-
-      magick::image_write(image = image_temp, path = file_out, format = "jpg")
-    }
-
-    unlink(file_temp_svg)
-    unlink(file_temp_out)
-
-  } else {
-
-    if(fmt == "png"){
-      rsvg::rsvg_png(svg = file_in, file = file_out)
-
-    } else if(fmt == "jpg"){
-      image_temp <- magick::image_read_svg(file_in)
-
-      magick::image_write(image = image_temp, path = file_out, format = "jpg")
-    }
-  }
-
-  if (delete) unlink(file_in)
-
-  invisible(file_out)
 }

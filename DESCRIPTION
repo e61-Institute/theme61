@@ -39,46 +39,16 @@ Imports:
     svglite (>= 2.1.0),
     sysfonts (>= 0.8.8),
     tools
-Suggests: 
+Suggests:
     testthat (>= 3.1.10),
     withr (>= 2.5.0),
-    later
+    later,
+    sf
 Config/testthat/edition: 3
 URL: https://github.com/e61-institute/theme61,
      https://e61-institute.github.io/theme61/
 BugReports: https://github.com/e61-institute/theme61/issues
-RoxygenNote: 7.3.3
 Depends:
     R (>= 4.5.0)
 Roxygen: list(markdown = TRUE)
-Collate: 
-    'add_baseline.R'
-    'add_e61_logo.R'
-    'aes-y-lims.R'
-    'aes_labs.R'
-    'axes.R'
-    'classify-plots.R'
-    'colours.R'
-    'crop_aus_coord.R'
-    'e61_chart_maker.R'
-    'e61_map.R'
-    'geom_pointbar.R'
-    'ggplot2-wrappers.R'
-    'ggplot_build-method.R'
-    'labs_e61.R'
-    'palette_e61.R'
-    'plot_label.R'
-    'print-e61-ggplot.R'
-    'retired-functions.R'
-    'save-helpers.R'
-    'save_e61.R'
-    'save_multi.R'
-    'save_single.R'
-    'scales.R'
-    'sec_axes_rescale.R'
-    'startup-functions.R'
-    'theme61-options.R'
-    'theme61-package.R'
-    'theme_e61.R'
-    'utils-plot-dims.R'
-    'zzz.R'
+Config/roxygen2/version: 8.1.0
