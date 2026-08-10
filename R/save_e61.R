@@ -92,7 +92,7 @@
 #'   would otherwise use) - it won't reflow if you resize the device
 #'   afterwards.
 #' @inheritParams labs_e61
-#' @inheritParams cowplot::plot_grid
+#' @inheritParams patchwork::plot_layout
 #' @return Invisibly returns the file name.
 #' @export
 
@@ -394,18 +394,20 @@ save_e61 <- function(filename = NULL,
     }
   }
 
-  # Opens the graph file in the Viewer or browser
+  # Opens the graph file in the Viewer, and also in the browser if requested
 
   # Put filename back together
   file_to_open <- paste0(filename, ".", format[[1]])
 
-  if (isTRUE(getOption("theme61.open_e61_graph", FALSE))) {
-    file_to_open <- shQuote(here::here(file_to_open))
+  if (isTRUE(getOption("theme61.open_in_browser", FALSE))) {
+    file_to_open_browser <- shQuote(here::here(file_to_open))
 
-    out <- try(system2("open", file_to_open))
+    out <- try(system2("open", file_to_open_browser))
 
     if (out != 0) warning("Graph file could not be opened")
-  } else if (interactive()) {
+  }
+
+  if (interactive()) {
     # rstudioapi::viewer only opens temp files in the Viewer pane, not
     # arbitrary saved paths -- always preview via a temp file, below.
 

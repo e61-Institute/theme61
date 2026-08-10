@@ -3,7 +3,7 @@
 \name{set_open_graph_browser}
 \alias{set_open_graph_browser}
 \alias{unset_open_graph_browser}
-\title{Set option to open graphs in the browser instead of the Viewer pane}
+\title{Set option to also open graphs in the browser}
 \usage{
 set_open_graph_browser()
 
@@ -15,5 +15,6 @@ This function is used for its side effects.
 \description{
 Previous versions of theme61 opened graphs in the browser instead of the
 Viewer pane. You can bring back this functionality by running this function,
-which sets a session-wide option.
+which sets a session-wide option. Graphs will still appear in the Viewer
+pane as normal.
 }

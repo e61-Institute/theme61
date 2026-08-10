@@ -2,11 +2,23 @@
 #'
 #' - Always draws a plot in the Plots pane
 #' - Also renders a preview in the Viewer (opt-out via option)
-#' - Prefers Plots focus by default
+#' - Prefers Viewer focus by default (best-effort)
+#' - All of the above is skipped in `theme61.iterate_mode`
 #'
 #' @keywords internal
 #' @export
 print.e61_ggplot <- function(x, ...) {
+
+  # theme61.iterate_mode: skip the Viewer preview and all automatic
+  # theme61 styling (theme, scales, facet spacing, etc.) for fast
+  # iteration. Dropping the class means the plot builds and prints with
+  # plain ggplot2 defaults; any theme61 functions the user called
+  # explicitly (e.g. scale_colour_e61()) are already part of the plot
+  # object and still apply.
+  if (isTRUE(getOption("theme61.iterate_mode", FALSE))) {
+    class(x) <- setdiff(class(x), "e61_ggplot")
+    return(print(x))
+  }
 
   # opt-out (default ON)
   if (isFALSE(getOption("theme61.preview_on_print", TRUE))) {
@@ -47,9 +59,6 @@ print.e61_ggplot <- function(x, ...) {
     }
   }
 
-  # opt-in (default OFF): focus Viewer after printing
-  focus_viewer <- isTRUE(getOption("theme61.focus_viewer_on_print", FALSE))
-
   # Viewer preview (render in background). Auto-positioned plot_label()
   # text without an explicit x/y uses the cheap, render-free fast
   # placement here (see t61_place_label_fast()) rather than the full
@@ -67,8 +76,9 @@ print.e61_ggplot <- function(x, ...) {
   class(x_plot) <- setdiff(class(x_plot), "e61_ggplot")
   print(x_plot)
 
-  # Optional Viewer focus (off by default)
-  if (in_rstudio && focus_viewer) {
+  # Prefer Viewer focus by default (best-effort). Users who don't want any
+  # of this can use theme61.iterate_mode instead.
+  if (in_rstudio) {
     activate_viewer_after_plot()
   }
 
