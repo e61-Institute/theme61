@@ -10,7 +10,6 @@ test_that("ggplot2 functions are masked by theme61", {
 
 test_that("Automatic secondary y-axis scales work", {
 
-  # Use a dataset with clearly different ranges so axis behaviour is visible
   data <- data.frame(
     v1 = 1:10,
     v2 = seq(10, 100, length.out = 10),
@@ -29,8 +28,7 @@ test_that("Automatic secondary y-axis scales work", {
   p3 <- ggplot() +
     geom_point(data = data, aes(x = v1, y = v2))
 
-  # 4) two geoms with two different y mappings
-  #    (ensure we still get the default y scale behaviour, and plot renders cleanly)
+  # 4) two geoms with two different y mappings (should still render cleanly)
   p4 <- ggplot(data) +
     geom_point(aes(x = v1, y = v2)) +
     geom_point(aes(x = v1, y = v3), shape = 1)
@@ -39,26 +37,27 @@ test_that("Automatic secondary y-axis scales work", {
   p5 <- ggplot(data, aes(x = v1, y = v2 + v1)) +
     geom_point()
 
-  withr::with_tempdir({
-    expect_snapshot_file(
-      suppressWarnings(save_e61("auto-sec-axis-1-mapping-in-ggplot.svg", p1))
-    )
-    expect_snapshot_file(
-      suppressWarnings(save_e61("auto-sec-axis-2-mapping-in-geom.svg", p2))
-    )
-    expect_snapshot_file(
-      suppressWarnings(save_e61("auto-sec-axis-3-data-and-mapping-in-geom.svg", p3))
-    )
-    expect_snapshot_file(
-      suppressWarnings(save_e61("auto-sec-axis-4-two-y-series.svg", p4))
-    )
-    expect_snapshot_file(
-      suppressWarnings(save_e61("auto-sec-axis-5-transformed-y.svg", p5))
-    )
-  })
+  plots <- list(p1 = p1, p2 = p2, p3 = p3, p4 = p4, p5 = p5)
+
+  for (nm in names(plots)) {
+    expect_no_error(b <- ggplot_build(plots[[nm]]))
+
+    # theme61 should have added a y scale when none is present
+    ysc <- b@plot@scales$get_scales("y")
+    expect_false(is.null(ysc), info = paste("Missing y scale for", nm))
+
+    # default behaviour should include a duplicated secondary axis (not waiver())
+    expect_false(inherits(ysc$secondary.axis, "waiver") || is.null(ysc$secondary.axis),
+                 info = paste("Expected secondary axis for", nm))
+
+    # and it should actually manifest as a right axis grob with non-zero width
+    g <- ggplotGrob(b@plot)
+    axis_r_w <- theme61:::get_grob_width(g, grob_name = "axis-r")
+    expect_false(is.null(axis_r_w) || axis_r_w == 0, info = paste("No right axis grob for", nm))
+  }
 })
 
-test_that("Auto y-axis functionality does not apply if you override with ggplot2 scale functions", {
+test_that("Auto y-axis does not apply if you override with ggplot2 scale functions", {
 
   data <- data.frame(
     v1 = 1:10,
@@ -69,8 +68,7 @@ test_that("Auto y-axis functionality does not apply if you override with ggplot2
   p_auto <- ggplot(data) +
     geom_point(aes(x = v1, y = v2))
 
-  # Override with ggplot2 scale: should *not* show duplicated secondary axis
-  # (and should not have theme61 forcibly re-adding scale_y_continuous_e61)
+  # Override with ggplot2 scale: should not show duplicated secondary axis
   p_override <- ggplot(data) +
     geom_point(aes(x = v1, y = v2)) +
     scale_y_continuous(
@@ -78,7 +76,7 @@ test_that("Auto y-axis functionality does not apply if you override with ggplot2
       limits = c(0, 110)
     )
 
-  # Also test an override added *before* the geom
+  # Also test an override added before the geom
   p_override2 <- ggplot(data) +
     scale_y_continuous(
       breaks = c(0, 50, 100),
@@ -86,18 +84,31 @@ test_that("Auto y-axis functionality does not apply if you override with ggplot2
     ) +
     geom_point(aes(x = v1, y = v2))
 
-  withr::with_tempdir({
-    expect_snapshot_file(
-      suppressWarnings(save_e61("override-y-scale-1-auto.svg", p_auto))
-    )
-    expect_snapshot_file(
-      suppressWarnings(save_e61("override-y-scale-2-ggplot2-scale-after.svg", p_override))
-    )
-    expect_snapshot_file(
-      suppressWarnings(save_e61("override-y-scale-3-ggplot2-scale-before.svg", p_override2))
-    )
-  })
+  # ---- Baseline: theme61 should inject its y scale with a dup secondary axis
+  expect_no_error(b_auto <- ggplot_build(p_auto))
+  y_auto <- b_auto@plot@scales$get_scales("y")
+  expect_false(is.null(y_auto))
+  expect_false(inherits(y_auto$secondary.axis, "waiver") || is.null(y_auto$secondary.axis))
+
+  g_auto <- ggplotGrob(b_auto@plot)
+  axis_r_w_auto <- theme61:::get_grob_width(g_auto, grob_name = "axis-r")
+  expect_false(is.null(axis_r_w_auto) || axis_r_w_auto == 0)
+
+  # ---- Overrides: should keep the user ggplot2 scale (secondary axis should be waiver / absent)
+  for (p in list(p_override, p_override2)) {
+    expect_no_error(b <- ggplot_build(p))
+    ysc <- b@plot@scales$get_scales("y")
+    expect_false(is.null(ysc))
+
+    # ggplot2::scale_y_continuous default secondary axis is waiver()
+    expect_true(inherits(ysc$secondary.axis, "waiver") || is.null(ysc$secondary.axis))
+
+    g <- ggplotGrob(b@plot)
+    axis_r_w <- theme61:::get_grob_width(g, grob_name = "axis-r")
+    expect_true(is.null(axis_r_w) || axis_r_w == 0)
+  }
 })
+
 
 test_that("User-supplied colour/fill scales are not overridden by defaults", {
 
