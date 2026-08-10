@@ -131,18 +131,38 @@ finalise_e61_plot <- function(plot) {
 
   # A user can build a map with plain theme_e61() instead of
   # theme_e61_spatial() (an easy mistake - nothing about geom_sf() forces the
-  # choice). Unconditionally blanking the axis/gridline chrome a map should
-  # never show corrects that regardless of which one was actually called,
-  # without needing to know or track which theme function was used.
+  # choice). Blanking the axis/gridline chrome a map should never show
+  # corrects that regardless of which one was actually called, but only for
+  # elements still at their theme_e61() default - an element the user set
+  # explicitly (including via theme_e61_spatial(), which already blanks all
+  # of these) is left alone rather than silently overridden.
   if (inherits(plot, "e61_map")) {
-    plot <- plot + theme(
-      axis.text = element_blank(),
-      axis.ticks.x = element_blank(),
-      axis.line.x = element_blank(),
-      panel.grid.major = element_blank(),
-      panel.grid.minor = element_blank()
-    )
+    plot <- plot + map_axis_correction(plot)
   }
 
   plot
+}
+
+# Elements a map should never show, matching the exact keys build_theme_e61_plot()
+# sets (panel.grid.major.x/.y specifically, not the parent panel.grid.major -
+# ggplot2's theme element hierarchy makes an explicitly-set child element like
+# panel.grid.major.y win over a later parent-level override regardless of
+# merge order, so targeting the parent key here would silently do nothing).
+map_axis_correction <- function(plot) {
+  map_args <- list(
+    axis.text = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+  baseline <- theme_e61()
+
+  unchanged <- vapply(names(map_args), function(el) {
+    identical(plot@theme[[el]], baseline[[el]])
+  }, logical(1))
+
+  do.call(theme, map_args[unchanged])
 }

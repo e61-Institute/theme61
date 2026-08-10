@@ -24,23 +24,49 @@ test_that("finalise_e61_plot() classifies maps and corrects their axis chrome", 
   expect_true(inherits(out, "e61_map"))
   # The map correction blanks axis chrome and gridlines...
   expect_true(inherits(out@theme$axis.text, "element_blank"))
-  expect_true(inherits(out@theme$panel.grid.major, "element_blank"))
+  expect_true(inherits(out@theme$panel.grid.major.y, "element_blank"))
   # ...but leaves the user's own theme_e61() choices (e.g. legend position)
   # untouched - this is the regression the old deferred-spec design got wrong.
   expect_identical(out@theme$legend.position, "bottom")
+})
+
+test_that("finalise_e61_plot() respects gridlines the user set explicitly", {
+
+  # Regression test: the map correction targets panel.grid.major.x/.y
+  # specifically, not the parent panel.grid.major - ggplot2's theme element
+  # hierarchy makes an explicitly-set child element win over a later
+  # parent-level override regardless of merge order, so a naive
+  # theme(panel.grid.major = element_blank()) correction would silently do
+  # nothing to theme_e61()'s own default gridline (also a child element),
+  # while a per-element "skip if already customised" check done at the wrong
+  # (parent) level could otherwise still clobber a user's explicit choice.
+  p <- ggplot(data.frame(x = 1, y = 1), aes(x, y)) +
+    geom_point() +
+    theme_e61(legend = "bottom") +
+    theme(panel.grid.major.y = element_line(colour = "red"))
+  p$layers <- c(p$layers, list(list(geom = structure(list(), class = "GeomSf"))))
+
+  out <- finalise_e61_plot(p)
+
+  expect_true(inherits(out, "e61_map"))
+  expect_identical(out@theme$panel.grid.major.y$colour, "red")
+  # Unrelated elements the user didn't touch are still corrected.
+  expect_true(inherits(out@theme$axis.text, "element_blank"))
 })
 
 test_that("finalise_e61_plot() is idempotent on maps", {
 
   p <- ggplot(data.frame(x = 1, y = 1), aes(x, y)) +
     geom_point() +
-    theme_e61(legend = "bottom")
+    theme_e61(legend = "bottom") +
+    theme(panel.grid.major.y = element_line(colour = "red"))
   p$layers <- c(p$layers, list(list(geom = structure(list(), class = "GeomSf"))))
 
   out <- finalise_e61_plot(p)
   out2 <- finalise_e61_plot(out)
 
   expect_true(inherits(out2@theme$axis.text, "element_blank"))
+  expect_identical(out2@theme$panel.grid.major.y$colour, "red")
   expect_identical(out2@theme$legend.position, "bottom")
 })
 
