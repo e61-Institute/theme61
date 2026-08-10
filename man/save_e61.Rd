@@ -14,6 +14,8 @@ save_e61(
   dim = list(height = NULL, width = NULL),
   pad_width = 0,
   pad_height = 0,
+  outer_width = NULL,
+  outer_height = NULL,
   max_height = NULL,
   preview = FALSE,
   save_data = FALSE,
@@ -79,6 +81,19 @@ charts. Defaults to no additional padding.}
 \item{pad_height}{Numeric (mm). Adds vertical whitespace to the sides of all
 graphs. If saving multiple charts this will add the same spacing to all
 charts. Defaults to no additional padding.}
+
+\item{outer_width}{(multi-panel specific) Numeric (mm). Overrides the
+margin between the left/right edges of the figure and the outermost
+panels. Defaults to NULL, which uses the built-in margin (0mm). Set
+higher to add whitespace around the outer edge of the figure; unlike
+\code{pad_width}, this does not affect the gap between panels.}
+
+\item{outer_height}{(multi-panel specific) Numeric (mm). Overrides the
+margin between the top/bottom edges of the figure (i.e. above the title
+and below the footnotes/sources) and the panels. Defaults to NULL, which
+uses the built-in margin (0mm). Set higher to add whitespace around the
+outer edge of the figure; unlike \code{pad_height}, this does not affect the
+gap between panel rows.}
 
 \item{max_height}{Numeric. The maximum height of your plot in cm. This is
 used to constrain the plot resizing algorithm in cases where you want to

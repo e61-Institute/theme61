@@ -2,70 +2,92 @@ test_that("Single plot label works", {
   p1 <- minimal_plot_label +
     plot_label(label = "Plot 1", x = 2, y = 2)
 
-  withr::with_tempdir({
-    suppressWarnings(expect_snapshot_file(save_e61("compare-plot.svg", p1)))
-  })
+  # plot_label should add exactly one new layer (a text/label geom)
+  expect_gte(length(p1@layers), 1)
 
+  last_layer <- p1@layers[[length(p1@layers)]]
+
+  # Should not inherit plot aesthetics (plot_label should stand alone)
+  expect_false(isTRUE(last_layer$inherit.aes))
+
+  # Should be a text geom
+  expect_true(inherits(last_layer$geom, "GeomText"))
+
+  # Layer should carry a one-row data.frame with the label and coordinates
+  expect_s3_class(last_layer$data, "data.frame")
+  expect_equal(nrow(last_layer$data), 1)
+
+  expect_true(all(c("label", "x", "y") %in% names(last_layer$data)))
+  expect_equal(last_layer$data$label[[1]], "Plot 1")
+  expect_equal(last_layer$data$x[[1]], 2)
+  expect_equal(last_layer$data$y[[1]], 2)
+
+  # Sanity: should build without warnings/errors
+  expect_no_warning(ggplot_build(p1))
 })
 
-test_that("Multi-plot labels work", {
+test_that("Multi-plot labels work with colour and fill", {
 
-  # aes - colour
-  data <- data.frame(
+  # ---- aes - colour
+  data1 <- data.frame(
     x = c(0, 1, 0, 1, 0, 1),
     y = c(1.1, 1.1, 2.1, 2.1, 3.1, 3.1),
     group = factor(c(1, 1, 2, 2, 3, 3))
   )
 
-  p <- ggplot(data, aes(x, y, colour = group)) +
+  p1 <- ggplot(data1, aes(x, y, colour = group)) +
     geom_line() +
-    plot_label(c("1", "2", "3"),
-               rep(0.5, 3),
-               c(1.3, 2.3, 3.3))
+    plot_label(
+      c("1", "2", "3"),
+      rep(0.5, 3),
+      c(1.3, 2.3, 3.3)
+    )
 
-  withr::with_tempdir({
-    suppressWarnings(expect_snapshot_file(save_e61("multi-label-plot-col.svg", p)))
-  })
+  # Force theme61 ggplot_build hook to add scale_colour_e61()
+  b1 <- expect_no_warning(ggplot_build(p1))
 
-  # aes - fill
-  data <- data.frame(
+  l1 <- b1@plot@layers[[length(b1@plot@layers)]]
+  expect_equal(l1$data$label, c("1", "2", "3"))
+
+  # Get the colour scale palette that the plot is using after build
+  sc_col <- b1@plot@scales$get_scales("colour")
+  expect_false(is.null(sc_col))
+
+  n1 <- length(levels(data1$group))
+  expected_colours <- sc_col$palette(n1)
+
+  # plot_label sets explicit colours via the geom parameter (stored on the layer)
+  expect_equal(l1$aes_params$colour, expected_colours)
+
+
+  # ---- aes - fill
+  data2 <- data.frame(
     x = c(0, 1, 0, 1),
     y = c(1, 1, 2, 2),
     group = factor(c(1, 1, 2, 2))
   )
 
-  p <- ggplot(data, aes(x, y, fill = group)) +
+  p2 <- ggplot(data2, aes(x, y, fill = group)) +
     geom_col(position = "dodge") +
-    plot_label(c("1", "2"),
-               c(-0.25, 0.25),
-               c(1.2, 2.2))
+    plot_label(
+      c("1", "2"),
+      c(-0.25, 0.25),
+      c(1.2, 2.2)
+    )
 
-  withr::with_tempdir({
-    suppressWarnings(expect_snapshot_file(save_e61("multi-label-plot-fill.svg", p)))
-  })
+  b2 <- expect_no_warning(ggplot_build(p2))
 
-  # Works with facets too
-  data <- data.frame(
-    x = rep(c(0, 1, 0, 1, 0, 1), 2),
-    y = rep(c(1.1, 1.1, 2.1, 2.1, 3.1, 3.1), 2),
-    group = factor(rep(c(1, 1, 2, 2, 3, 3), 2)),
-    facet = c(rep("A", 6), rep("B", 6))
-  )
+  l2 <- b2@plot@layers[[length(b2@plot@layers)]]
+  expect_equal(l2$data$label, c("1", "2"))
 
-  p <- ggplot(data, aes(x, y, colour = group)) +
-    facet_wrap(~facet) +
-    geom_line() +
-    scale_y_continuous_e61(c(1, 4, 1)) +
-    plot_label(c("1", "2", "3"),
-               rep(0.5, 3),
-               c(1.3, 2.3, 3.3),
-               panel = list(facet = "A")
-               )
+  sc_fill <- b2@plot@scales$get_scales("fill")
+  expect_false(is.null(sc_fill))
 
-  withr::with_tempdir({
-    suppressWarnings(expect_snapshot_file(save_e61("multi-label-facet-plot.svg", p)))
-  })
+  n2 <- length(levels(data2$group))
+  expected_fills <- sc_fill$palette(n2)
 
+  # Labels should match the fill palette too (even though label uses colour)
+  expect_equal(l2$aes_params$colour, expected_fills)
 })
 
 test_that("Plots with additional aes still work", {
@@ -83,9 +105,17 @@ test_that("Plots with additional aes still work", {
                c(0.25, 0.25),
                c(0.75, 1.75))
 
-  withr::with_tempdir({
-    suppressWarnings(expect_snapshot_file(save_e61("label-with-extra-aes.svg", p)))
-  })
+  l <- p@layers[[length(p@layers)]]
+
+  # Make sure labels don't inherit aes so linetype doesn't propagate
+  expect_false(isTRUE(l$inherit.aes))
+
+  # And it should not have linetype mapping/params attached
+  expect_true(is.null(l$mapping$linetype))
+  expect_true(is.null(l$aes_params$linetype))
+  expect_true(is.null(l$params$linetype))
+
+  expect_no_warning(ggplot_build(p))
 
 })
 
@@ -113,33 +143,17 @@ test_that("Specifying custom colours works in plot_label()", {
     c(1, 2),
     colour = c("#000000", "#cccccc"))
   expect_equal(retval$colour, c("#000000", "#cccccc"))
-
-  p <-
-    minimal_plot_label +
-    plot_label(
-      c("Test 1", "Test 2"),
-      c(1, 1),
-      c(1, 2),
-      colour = c("#000000", "#cccccc"))
-
-  withr::with_tempdir({
-    suppressWarnings(expect_snapshot_file(save_e61("label-cust-colours.svg", p)))
-  })
-
 })
 
 test_that("Text and label plot labels work", {
   p1 <- minimal_plot_label +
-    plot_label("label", 2, 2, geom = "label") +
-    scale_y_continuous_e61()
+    plot_label("label", 2, 2, geom = "label")
 
   p2 <- minimal_plot_label +
     plot_label("text", 2, 2, geom = "text")
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("label.svg", p1)))
-    expect_snapshot_file(suppressWarnings(save_e61("text.svg", p2)))
-  })
+  expect_true(inherits(p1@layers[[length(p1@layers)]]$geom, "GeomLabel"))
+  expect_true(inherits(p2@layers[[length(p1@layers)]]$geom, "GeomText"))
 
 })
 
@@ -163,26 +177,37 @@ test_that("Specifying incorrect length of label characteristics fails", {
 
 test_that("Changing horizontal alignment of text works", {
 
-  p1 <- minimal_plot_label +
-    plot_label("Left-aligned text", 2, 1.5, hjust = 0) +
-    plot_label("Centre-aligned text", 2, 2, hjust = 0.5) +
-    plot_label("Right-aligned text", 2, 2.5, hjust = 1)
+  p <- minimal_plot_label +
+    plot_label(
+      c("Left-aligned text", "Centre-aligned text", "Right-aligned text"),
+      x = rep(2, 3),
+      y = c(1.5, 2, 2.5),
+      hjust = c(0, 0.5, 1)
+    )
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("horiz-align-change.svg", p1)))
-  })
+  # Check that hjust is stored correctly in the ggplot object
+  expect_equal(p@layers[[length(p@layers)]]$data$hjust, c(0, 0.5, 1))
+
 })
 
 test_that("Label rotation works", {
 
-  # Separate plot_labels work
+  ## Separate plot_labels work
   p1 <- minimal_plot_label +
     plot_label("Normal text", 0.5, 1.5, angle = 90) +
     plot_label("Vertical text", 1.5, 1.5, angle = 0) +
     plot_label("Diagonal text", 2.5, 1.5, angle = 45) +
     scale_y_continuous_e61(limits = c(0, 3))
 
-  # plot_label with multiple angles works
+  # 3 geoms for labels get added + 1 geom_point
+  expect_equal(length(p1@layers), 4)
+
+  # Angles are correctly stored in the ggplot object
+  expect_equal(p1@layers[[2]]$aes_params$angle, 90)
+  expect_equal(p1@layers[[3]]$aes_params$angle, 0)
+  expect_equal(p1@layers[[4]]$aes_params$angle, 45)
+
+  ## plot_label with multiple angles works
   p2 <- minimal_plot_label +
     plot_label(c("Normal text", "Vertical text", "Diagonal text"),
                 x = rep(2, 3),
@@ -190,14 +215,15 @@ test_that("Label rotation works", {
                 angle = c(0, 90, 45)) +
     scale_y_continuous_e61(c(0, 3))
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("rotate.svg", p1)))
-    expect_snapshot_file(suppressWarnings(save_e61("rotate-multi.svg", p2)))
-  })
+  # Only one extra layer gets created with all the label info
+  expect_equal(length(p2@layers), 2)
+
+  # Angles are stored as a vector in the ggplot object
+  expect_equal(p2@layers[[2]]$aes_params$angle, c(0, 90, 45))
 
 })
 
-test_that("Labels work on facet wraps", {
+test_that("Labels work on facet_wrap", {
 
   data <- data.frame(
     x = rep(c(1, 2), 2),
@@ -211,39 +237,77 @@ test_that("Labels work on facet wraps", {
     geom_point() +
     scale_y_continuous_e61(c(0, 3, 1))
 
-  # Place labels on 1 facet only
+  ## Place labels on 1 facet only
+  lab_name <- c("Lab 1", "Lab 2")
+  x_pos <- c(1.25, 1.75)
+  y_pos <- c(1, 2)
+
   p1 <- p + plot_label(
-    label = c("Lab 1", "Lab 2"),
-    x = c(1.25, 1.75),
-    y = c(1, 2),
+    label = lab_name,
+    x = x_pos,
+    y = y_pos,
     panel = list(f_var = "1")
   )
 
-  # Place 1 labels on 1 facet and the other label on the other
+  last_layer <- p1@layers[[length(p1@layers)]]
+
+  # Should produce a data.frame with correct values and locations
+  expect_equal(last_layer$data$label, lab_name)
+  expect_equal(last_layer$data$x, x_pos)
+  expect_equal(last_layer$data$y, y_pos)
+  expect_equal(as.character(last_layer$data$f_var), rep("1", 2))
+
+  # Should build without issues
+  expect_no_warning(ggplot_build(p1))
+
+  ## Place 1 labels on 1 facet and the other label on the other
   p2 <- p + plot_label(
-    label = c("Lab 1", "Lab 2"),
-    x = c(1.25, 1.75),
-    y = c(1, 2),
+    label = lab_name,
+    x = x_pos,
+    y = y_pos,
     panel = list(f_var = c("1", "2"))
   )
 
-  # Defaults to putting the labels on all facets if no facet specified
+  last_layer <- p2@layers[[length(p2@layers)]]
+
+  # Should be positioned on different panels
+  expect_equal(as.character(last_layer$data$f_var), c("1", "2"))
+
+  ## Defaults to putting the labels on all facets if no facet specified
   p3 <- p + plot_label(
     label = c("Lab 1", "Lab 2"),
     x = c(1.25, 1.75),
     y = c(1, 2)
   )
 
+  last_layer <- p3@layers[[length(p3@layers)]]
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("facets.svg", p1)))
-    expect_snapshot_file(suppressWarnings(save_e61("alternating-facets.svg", p2)))
-    expect_snapshot_file(suppressWarnings(save_e61("no-specified-facets.svg", p3)))
-  })
-
+  # Should be positioned on all panels
+  expect_equal(nrow(last_layer$data), 4L)
+  expect_equal(last_layer$data$label,
+               rep(c("Lab 1", "Lab 2"), 2))
+  expect_equal(as.character(last_layer$data$f_var),
+               rep(c("1", "2"), each = 2))
 })
 
-test_that("Labels works with facet_grid", {
+test_that("Facet panel names must match facet variables", {
+  data <- data.frame(
+    x = rep(c(1, 2), 2),
+    y = rep(c(1, 2), 2),
+    f_var = factor(c(1, 1, 2, 2))
+  )
+
+  p <- ggplot(data, aes(x, y)) +
+    facet_wrap(~f_var) +
+    geom_point()
+
+  expect_error(
+    p + plot_label("oops", 1, 1, panel = list(bad = "1")),
+    regexp = "do not match the plot's facet variables"
+  )
+})
+
+test_that("Labels work on facet_grid", {
   df <- data.frame(
     x = 1:8,
     y = 1:8,

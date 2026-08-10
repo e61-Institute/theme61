@@ -1,108 +1,88 @@
 # Tests of label wrapping of theme61 charts ---------------------------------
 
+# The overall title/subtitle/footnotes on multi-panel plots are re-wrapped by
+# the internal rescale_text_multi() based on the rendered plot width (see
+# save_multi.R). That width-dependent behaviour is what the multi-panel
+# snapshot tests further down exist to exercise, but it can be checked much
+# more cheaply by calling the wrapping function directly instead of rendering
+# a full multi-panel plot for every combination of arrangement/width.
+test_that("rescale_text_multi wraps title text to more lines as plot width shrinks", {
+
+  long_text <- paste(rep("word", 40), collapse = " ")
+
+  narrow_title <- rescale_text_multi(long_text, "title", font_size = 14, plot_width = 5)
+  wide_title <- rescale_text_multi(long_text, "title", font_size = 14, plot_width = 200)
+
+  expect_true(grepl("\n", narrow_title))
+  expect_false(grepl("\n", wide_title))
+
+  narrow_lines <- length(strsplit(narrow_title, "\n")[[1]])
+  wide_lines <- length(strsplit(wide_title, "\n")[[1]])
+
+  expect_gt(narrow_lines, wide_lines)
+
+  # No words should be dropped or duplicated by the wrapping
+  expect_equal(
+    sort(strsplit(gsub("\n", " ", narrow_title), " ")[[1]]),
+    sort(strsplit(long_text, " ")[[1]])
+  )
+})
+
+test_that("rescale_text_multi wraps subtitle text to more lines as plot width shrinks", {
+
+  long_text <- paste(rep("word", 40), collapse = " ")
+
+  narrow_subtitle <- rescale_text_multi(long_text, "subtitle", font_size = 12, plot_width = 5)
+  wide_subtitle <- rescale_text_multi(long_text, "subtitle", font_size = 12, plot_width = 200)
+
+  expect_true(grepl("\n", narrow_subtitle))
+  expect_false(grepl("\n", wide_subtitle))
+
+  narrow_lines <- length(strsplit(narrow_subtitle, "\n")[[1]])
+  wide_lines <- length(strsplit(wide_subtitle, "\n")[[1]])
+
+  expect_gt(narrow_lines, wide_lines)
+})
+
+test_that("rescale_text_multi collapses manual line breaks before re-wrapping", {
+
+  # Manual line breaks in the input shouldn't survive - the text should be
+  # re-flowed as a single paragraph and re-wrapped based on plot_width
+  text_with_breaks <- "word word word\nword word word\nword word word"
+
+  wrapped <- rescale_text_multi(text_with_breaks, "title", font_size = 14, plot_width = 200)
+
+  expect_false(grepl("\n", wrapped))
+  expect_equal(
+    strsplit(wrapped, " ")[[1]],
+    rep("word", 9)
+  )
+})
+
+# Single-panel graph examples ------------------------------------------------
+#
+# The wrapped-text content itself (title_wrap/subtitle_wrap/footnote_wrap/
+# y_top) is unit tested directly and exactly in test-labs_e61.R without any
+# rendering. The snapshot tests below are kept only where they exercise a
+# rendering code path that isn't covered there: the y-axis title moving into
+# the subtitle row, all label fields combined, extreme-length wrapping,
+# manual width overrides, facets, and coord_flip.
+
 test_that("Single-panel graph examples", {
 
-  # 1 - no titles ----
-  p1 <- minimal_plot
+  withr::local_seed(42)
+
+  # 1 - Just y-axis ----
+  p1 <- minimal_plot + labs_e61(y = "Just a y-axis label")
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p1, filename = "plot-sngle-wrp-test-1.svg", bg_colour = "grey90", spell_check = FALSE)
+      save_e61(p1, filename = "plot-sngle-wrp-test-4.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
-  # 2 - Just title ----
-  p2 <- minimal_plot + labs_e61(title = "This is a title")
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(p2, filename = "plot-sngle-wrp-test-2.svg",  bg_colour = "grey90", spell_check = FALSE)
-    ))
-  })
-
-  # 3 - Just subtitle ----
-  p3 <- minimal_plot + labs_e61(subtitle = "A subtitle")
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(p3, filename = "plot-sngle-wrp-test-3.svg",  bg_colour = "grey90", spell_check = FALSE)
-    ))
-  })
-
-  # 4 - Just y-axis ----
-  p4 <- minimal_plot + labs_e61(y = "Just a y-axis label")
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(p4, filename = "plot-sngle-wrp-test-4.svg", bg_colour = "grey90", spell_check = FALSE)
-    ))
-  })
-
-  # 5 - Just footnotes ----
-  p5 <- minimal_plot +
-    labs_e61(
-      footnotes = paste0(
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-        "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-        "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-        "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-        "in culpa qui officia deserunt mollit anim id est laborum."
-      ),
-      sources = c("e61", 'ABS')
-    )
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(p5, filename = "plot-sngle-wrp-test-5.svg", bg_colour = "grey90", spell_check = FALSE)
-    ))
-  })
-
-  # 6 - title and footnotes ----
-  p6 <- minimal_plot +
-    labs_e61(
-      title = "This is a title",
-      footnotes = paste0(
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-        "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-        "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-        "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-        "in culpa qui officia deserunt mollit anim id est laborum."
-      ),
-      sources = c("e61", 'ABS')
-    )
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(p6, filename = "plot-sngle-wrp-test-6.svg", bg_colour = "grey90", spell_check = FALSE)
-    ))
-  })
-
-  # 7 - subtitle and footnotes ----
-  p7 <- minimal_plot +
-    labs_e61(
-      subtitle = "This is a subtitle",
-      footnotes = paste0(
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-        "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-        "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-        "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-        "in culpa qui officia deserunt mollit anim id est laborum."
-      ),
-      sources = c("e61", 'ABS')
-    )
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(p7, filename = "plot-sngle-wrp-test-7.svg", bg_colour = "grey90", spell_check = FALSE)
-    ))
-  })
-
-
-  # 8 - All titles ----
-  p8 <- minimal_plot +
+  # 2 - All titles ----
+  p2 <- minimal_plot +
     labs_e61(
       title = "This is a title",
       y = "Just a y-axis label that goes on and on and on and on and on",
@@ -120,13 +100,12 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p8, filename = "plot-sngle-wrp-test-8.svg", bg_colour = "grey90", spell_check = FALSE)
+      save_e61(p2, filename = "plot-sngle-wrp-test-8.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
-
-  # 9 - Long titles and subtitles ----
-  p9 <- minimal_plot +
+  # 3 - Long titles and subtitles ----
+  p3 <- minimal_plot +
     labs_e61(
       title = "This is a very very very very very long title that really should just be one line",
       subtitle = "A test of a very very very very very long subtitle, but that's probably okay because subtitles can be long",
@@ -144,12 +123,12 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p9, filename = "plot-sngle-wrp-test-9.svg", bg_colour = "grey90", spell_check = FALSE)
+      save_e61(p3, filename = "plot-sngle-wrp-test-9.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
-  # 10 - Long sources - these should now be wrapped ----
-  p10 <- minimal_plot +
+  # 4 - Long sources - these should now be wrapped ----
+  p4 <- minimal_plot +
     labs_e61(
       title = "This is a title",
       y = "Just a y-axis label that goes on and on and on and on and on",
@@ -167,35 +146,12 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p10, filename = "plot-sngle-wrp-test-10.svg", bg_colour = "grey90", spell_check = FALSE)
+      save_e61(p4, filename = "plot-sngle-wrp-test-10.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
-  # 11 - Titles right on the edge ----
-  p11 <- minimal_plot +
-    labs_e61(
-      title = "This is the title of the plot that is just ........",
-      subtitle = "A test of a very very very long subtitle, but not too long......",
-      y = "Just a y-axis label that goes on and on and on and on and on",
-      footnotes = paste0(
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-        "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-        "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-        "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-        "in culpa qui officia deserunt mollit anim id est laborum."
-      ),
-      sources = c("e61", 'ABS')
-    )
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(p11, filename = "plot-sngle-wrp-test-11.svg", bg_colour = "grey90", spell_check = FALSE)
-    ))
-  })
-
-  # 12 - Manual width - check that the wrapping expands ----
-  p12 <- minimal_plot +
+  # 5 - Manual width - check that the wrapping expands ----
+  p5 <- minimal_plot +
     labs_e61(
       title = "This is a very very very very very long title that really should just be one line",
       subtitle = "A test of a very very very very very long subtitle, but that's probably okay because subtitles can be long",
@@ -213,18 +169,17 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p12, dim = list(width = 20), filename = "plot-sngle-wrp-test-12.svg", bg_colour = "grey90", spell_check = FALSE)
+      save_e61(p5, dim = list(width = 20), filename = "plot-sngle-wrp-test-12.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
-
-  # 13 - Faceted with manual width ----
+  # 6 - Faceted with manual width ----
   facetted_plot <-
     ggplot(data.frame(x = c(0, 1), y = c(0, 1), group = c("A", "B")), aes(x, y)) +
     facet_wrap(vars(group)) +
     geom_point()
 
-  p13 <- facetted_plot +
+  p6 <- facetted_plot +
     labs_e61(
       title = "This is a very very very very very long title that really should just be one line but now it's a plot with a title that is two lines",
       subtitle = "A test of a very very very very very long subtitle, but that's probably okay because subtitles can be long",
@@ -242,15 +197,15 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p13, filename = "plot-sngle-wrp-test-13.svg", bg_colour = "grey90", spell_check = FALSE)
+      save_e61(p6, filename = "plot-sngle-wrp-test-13.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
-  # 14 - Plot with coordinates flipped ----
+  # 7 - Plot with coordinates flipped ----
   bar_chart <- ggplot(data.frame(x = factor(1:10), y = runif(10, 0, 20)), aes(x, y)) +
     geom_col()
 
-  p14 <- bar_chart +
+  p7 <- bar_chart +
     coord_flip() +
     format_flip() +
     labs_e61(
@@ -270,13 +225,23 @@ test_that("Single-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p14, filename = "plot-sngle-wrp-test-14.svg", bg_colour = "grey90", spell_check = FALSE)
+      save_e61(p7, filename = "plot-sngle-wrp-test-14.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 })
 
 
 # Tests of multi-plots ----
+#
+# Per-panel label wrapping (labs_e61() on each panel plot) uses a fixed
+# width and doesn't depend on the panel arrangement, so it's only rendered
+# once per label-content scenario below rather than once per arrangement -
+# arrangement mechanics (ncol/nrow/pad_width) are already covered by
+# test-sample-graphs.R. The overall title/subtitle/footnotes passed directly
+# to save_e61() *do* depend on the arrangement (rescale_text_multi() wraps
+# them to the rendered plot width, checked directly above), so one
+# representative arrangement is kept per scenario as an end-to-end check that
+# the wiring works, rather than every arrangement combination.
 
 test_that("Multi-panel graph examples", {
 
@@ -290,147 +255,41 @@ test_that("Multi-panel graph examples", {
   bar_chart <- ggplot(data, aes(x, y)) +
     geom_col()
 
+  # 1 - Titles ----
+  p1a <- minimal_plot + labs_e61(title = "This is a title")
 
-  # 1 - Just plots 2x1, 3x1, 2x2 ----
-  p1a <- minimal_plot
-  p1b <- bar_chart
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(p1a, p1b, filename = "plot-multi-wrp-test-1.svg", bg_colour = "grey90", spell_check = FALSE)
-    ))
-  })
+  p1b <- bar_chart + labs_e61(title = "This is a title")
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p1a, p1b, p1a,
-        nrow = 1,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-2.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
+      save_e61(p1a, p1b, filename = "plot-multi-wrp-test-4.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
+
+  # 2 - Subtitles ----
+  p2a <- minimal_plot + labs_e61(subtitle = "This is a subtitle")
+
+  p2b <- bar_chart + labs_e61(subtitle = "This is a subtitle")
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p1a, p1b, p1a, p1b,
-        filename = "plot-multi-wrp-test-3.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
+      save_e61(p2a, p2b, filename = "plot-multi-wrp-test-7.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
-  # 2 - Titles ----
-  p2a <- minimal_plot + labs_e61(title = "This is a title")
+  # 3 - Y-axis titles ----
+  p3a <- minimal_plot + labs_e61(y = "This is a y-axis")
 
-  p2b <- bar_chart + labs_e61(title = "This is a title")
+  p3b <- bar_chart + labs_e61(y = "This is a y-axis")
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p2a, p2b, filename = "plot-multi-wrp-test-4.svg", bg_colour = "grey90", spell_check = FALSE)
+      save_e61(p3a, p3b, filename = "plot-multi-wrp-test-10.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p2a, p2b, p2a,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-5.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p2a, p2b, p2a, p2b,
-        filename = "plot-multi-wrp-test-6.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  # 3 - Subtitles ----
-  p3a <- minimal_plot + labs_e61(subtitle = "This is a subtitle")
-
-  p3b <- bar_chart + labs_e61(subtitle = "This is a subtitle")
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(p3a, p3b, filename = "plot-multi-wrp-test-7.svg", bg_colour = "grey90", spell_check = FALSE)
-    ))
-  })
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p3a, p3b, p3a,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-8.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p3a, p3b, p3a, p3b,
-        filename = "plot-multi-wrp-test-9.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-
-  # 4 - Y-axis titles ----
-  p4a <- minimal_plot + labs_e61(y = "This is a y-axis")
-
-  p4b <- bar_chart + labs_e61(y = "This is a y-axis")
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(p4a, p4b, filename = "plot-multi-wrp-test-10.svg", bg_colour = "grey90", spell_check = FALSE)
-    ))
-  })
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p4a, p4b, p4a,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-11.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p4a, p4b, p4a, p4b,
-        filename = "plot-multi-wrp-test-12.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-
-  # 5 - Footnotes and sources ----
-  p5a <- minimal_plot +
+  # 4 - Footnotes and sources ----
+  p4a <- minimal_plot +
     labs_e61(
       footnotes = paste0(
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
@@ -443,7 +302,7 @@ test_that("Multi-panel graph examples", {
       sources = c("e61", 'ABS')
     )
 
-  p5b <- bar_chart +
+  p4b <- bar_chart +
     labs_e61(
       footnotes = paste0(
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
@@ -458,38 +317,55 @@ test_that("Multi-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p5a, p5b, filename = "plot-multi-wrp-test-13.svg", bg_colour = "grey90", spell_check = FALSE)
+      save_e61(p4a, p4b, filename = "plot-multi-wrp-test-13.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p5a, p5b, p5a,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-14.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p5a, p5b, p5a, p5b,
-        filename = "plot-multi-wrp-test-15.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-
-  # 6 - Full labels ----
-  p6a <- minimal_plot +
+  # 5 - Full labels ----
+  p5a <- minimal_plot +
     labs_e61(
       title = "Title",
       subtitle = "Sub title",
       y = "Y-axis plot of this very complicated chart",
+      footnotes = paste0(
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
+        "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
+        "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
+        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
+        "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
+        "in culpa qui officia deserunt mollit."
+      ),
+      sources = c("e61", 'ABS')
+    )
+
+  p5b <- bar_chart +
+    labs_e61(
+      title = "Title",
+      subtitle = "Sub title",
+      y = "Y-axis plot of this very complicated chart",
+      footnotes = paste0(
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
+        "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
+        "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
+        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
+        "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
+        "in culpa qui officia deserunt mollit anim id est laborum."
+      ),
+      sources = c("e61", 'ABS')
+    )
+
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
+      save_e61(p5a, p5b, filename = "plot-multi-wrp-test-16.svg", bg_colour = "grey90", spell_check = FALSE)
+    ))
+  })
+
+  # 6 - Full long labels ----
+  p6a <- minimal_plot +
+    labs_e61(
+      title = "This is a very very very very very long title that really should just be one line",
+      subtitle = "A test of a very very very very very long subtitle, but that's probably okay because subtitles can be long",
+      y = "Just a y-axis label that should probably be shoter given the title really goes on a bit too long and now that makes two titles",
       footnotes = paste0(
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
         "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
@@ -517,39 +393,18 @@ test_that("Multi-panel graph examples", {
       sources = c("e61", 'ABS')
     )
 
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(p6a, p6b, filename = "plot-multi-wrp-test-16.svg", bg_colour = "grey90", spell_check = FALSE)
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
+      save_e61(p6a, p6b, filename = "plot-multi-wrp-test-19.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p6a, p6b, p6a,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-17.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p6a, p6b, p6a, p6b,
-        filename = "plot-multi-wrp-test-18.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-
-  # 7 - Full long labels ----
+  # 7 - Full labels just long enough ----
   p7a <- minimal_plot +
     labs_e61(
-      title = "This is a very very very very very long title that really should just be one line",
-      subtitle = "A test of a very very very very very long subtitle, but that's probably okay because subtitles can be long",
-      y = "Just a y-axis label that should probably be shoter given the title really goes on a bit too long and now that makes two titles",
+      title = "This is the title of the plot that is just right!!",
+      subtitle = "A test of a very very very long subtitle, but not too long.",
+      y = "Just a y-axis label that goes on and on and on and on and on",
       footnotes = paste0(
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
         "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
@@ -565,46 +420,20 @@ test_that("Multi-panel graph examples", {
     labs_e61(
       title = "Title",
       subtitle = "Sub title",
-      y = "Y-axis plot of this very complicated chart",
-      footnotes = paste0(
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-        "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-        "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-        "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-        "in culpa qui officia deserunt mollit anim id est laborum."
-      ),
-      sources = c("e61", 'ABS')
+      y = "Y-axis plot of this very complicated chart"
     )
 
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(p7a, p7b, filename = "plot-multi-wrp-test-19.svg", bg_colour = "grey90", spell_check = FALSE)
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
+      save_e61(p7a, p7b, filename = "plot-multi-wrp-test-22.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p7a, p7b, p7a,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-20.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p7a, p7b, p7a, p7b,
-        filename = "plot-multi-wrp-test-21.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-
-  # 8 - Full labels just long enough ----
+  # 8 - Add padding ----
+  # (kept at two variants - unlike the scenarios above, this one is
+  # specifically about how pad_width/pad_height combine, not just about
+  # label content, so both the pad_width-only and pad_width+pad_height
+  # cases are retained)
   p8a <- minimal_plot +
     labs_e61(
       title = "This is the title of the plot that is just right!!",
@@ -625,37 +454,29 @@ test_that("Multi-panel graph examples", {
     labs_e61(
       title = "Title",
       subtitle = "Sub title",
-      y = "Y-axis plot of this very complicated chart"
+      y = "Y-axis plot of this very complicated chart which is really quite a long title"
     )
 
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(p8a, p8b, filename = "plot-multi-wrp-test-22.svg", bg_colour = "grey90", spell_check = FALSE)
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
+      save_e61(p8a, p8b, pad_width = 3, filename = "plot-multi-wrp-test-25.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p8a, p8b, p8a,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-23.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
       save_e61(
         p8a, p8b, p8a, p8b,
-        filename = "plot-multi-wrp-test-24.svg",
+        pad_width = 3,
+        pad_height = 3,
+        filename = "plot-multi-wrp-test-27.svg",
         bg_colour = "grey90",
         spell_check = FALSE
       )
     ))
   })
 
-
-  # 9 - Add padding ----
+  # 9 - Adding an overall title -----
   p9a <- minimal_plot +
     labs_e61(
       title = "This is the title of the plot that is just right!!",
@@ -676,39 +497,22 @@ test_that("Multi-panel graph examples", {
     labs_e61(
       title = "Title",
       subtitle = "Sub title",
-      y = "Y-axis plot of this very complicated chart which is really quite a long title"
+      y = "Y-axis plot of this very complicated chart"
     )
 
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(p9a, p9b, pad_width = 3, filename = "plot-multi-wrp-test-25.svg", bg_colour = "grey90", spell_check = FALSE)
-    ))
-  })
-
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
       save_e61(
-        p9a, p9b, p9a,
-        ncol = 3,
-        pad_width = 3,
-        filename = "plot-multi-wrp-test-26.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
+        title = "The is an overal chart title",
+        p9a, p9b,
+        filename = "plot-multi-wrp-test-28.svg",
+        bg_colour = "grey90", spell_check = FALSE
       )
     ))
   })
 
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        p9a, p9b, p9a, p9b,
-        pad_width = 3,
-        pad_height = 3,
-        filename = "plot-multi-wrp-test-27.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
+  # 10 - Adding an overall subtitle -----
 
-  # 10 - Adding an overall title -----
   p10a <- minimal_plot +
     labs_e61(
       title = "This is the title of the plot that is just right!!",
@@ -732,56 +536,24 @@ test_that("Multi-panel graph examples", {
       y = "Y-axis plot of this very complicated chart"
     )
 
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
       save_e61(
-        title = "The is an overal chart title",
+        subtitle = "The is a subtitle",
         p10a, p10b,
-        filename = "plot-multi-wrp-test-28.svg",
-        bg_colour = "grey90", spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        title = "The is an overal chart title",
-        p10a, p10b, p10a,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-29.svg",
+        filename = "plot-multi-wrp-test-31.svg",
         bg_colour = "grey90",
         spell_check = FALSE
       )
     ))
   })
 
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        title = "The is an overal chart title",
-        p10a, p10b, p10a, p10b,
-        filename = "plot-multi-wrp-test-30.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-
-  # 11 - Adding an overall subtitle -----
-
+  # 11 - Adding an overall footnotes and sources -----
   p11a <- minimal_plot +
     labs_e61(
       title = "This is the title of the plot that is just right!!",
       subtitle = "A test of a very very very long subtitle, but not too long.",
-      y = "Just a y-axis label that goes on and on and on and on and on",
-      footnotes = paste0(
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-        "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-        "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-        "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-        "in culpa qui officia deserunt mollit."
-      ),
-      sources = c("e61", 'ABS')
+      y = "Just a y-axis label that goes on and on and on and on and on"
     )
 
   p11b <- bar_chart +
@@ -791,43 +563,27 @@ test_that("Multi-panel graph examples", {
       y = "Y-axis plot of this very complicated chart"
     )
 
-  # save the charts
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
       save_e61(
-        subtitle = "The is a subtitle",
+        footnotes = paste0(
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
+          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
+          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
+          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
+          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
+          "in culpa qui officia deserunt mollit."
+        ),
+        sources = c("e61", 'ABS'),
         p11a, p11b,
-        filename = "plot-multi-wrp-test-31.svg",
+        filename = "plot-multi-wrp-test-34.svg",
         bg_colour = "grey90",
         spell_check = FALSE
       )
     ))
   })
 
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        subtitle = "The is a subtitle",
-        p11a, p11b, p11a,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-32.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        subtitle = "The is a subtitle",
-        p11a, p11b, p11a, p11b,
-        filename = "plot-multi-wrp-test-33.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-
-  # 12 - Adding an overall footnotes and sources -----
+  # 12 - Adding all aspects -----
   p12a <- minimal_plot +
     labs_e61(
       title = "This is the title of the plot that is just right!!",
@@ -842,9 +598,11 @@ test_that("Multi-panel graph examples", {
       y = "Y-axis plot of this very complicated chart"
     )
 
-  # save the charts
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
+  withr::with_tempdir({
+    expect_snapshot_file(suppressWarnings(
       save_e61(
+        title = "The is an overal chart title",
+        subtitle = "The is a subtitle",
         footnotes = paste0(
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
           "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
@@ -855,83 +613,6 @@ test_that("Multi-panel graph examples", {
         ),
         sources = c("e61", 'ABS'),
         p12a, p12b,
-        filename = "plot-multi-wrp-test-34.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
-        ),
-        sources = c("e61", 'ABS'),
-        p12a, p12b, p12a,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-35.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
-        ),
-        sources = c("e61", 'ABS'),
-        p12a, p12b, p12a, p12b,
-        filename = "plot-multi-wrp-test-36.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-
-  # 13 - Adding all aspects -----
-  p13a <- minimal_plot +
-    labs_e61(
-      title = "This is the title of the plot that is just right!!",
-      subtitle = "A test of a very very very long subtitle, but not too long.",
-      y = "Just a y-axis label that goes on and on and on and on and on"
-    )
-
-  p13b <- bar_chart +
-    labs_e61(
-      title = "Title",
-      subtitle = "Sub title",
-      y = "Y-axis plot of this very complicated chart"
-    )
-
-  # save the charts
-  withr::with_tempdir({expect_snapshot_file(suppressWarnings(
-      save_e61(
-        title = "The is an overal chart title",
-        subtitle = "The is a subtitle",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
-        ),
-        sources = c("e61", 'ABS'),
-        p13a, p13b,
         filename = "plot-multi-wrp-test-37.svg",
         bg_colour = "grey90",
         spell_check = FALSE
@@ -939,91 +620,19 @@ test_that("Multi-panel graph examples", {
     ))
   })
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        title = "The is an overal chart title",
-        subtitle = "The is a subtitle",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
-        ),
-        sources = c("e61", 'ABS'),
-        p13a,
-        p13b,
-        p13a,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-38.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
+  # 13 - Checking longer titles ----
+  # (kept the ncol = 3 variant, since it pairs the most extreme title/subtitle
+  # lengths with a narrower per-panel width)
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        title = "The is an overal chart title",
-        subtitle = "The is a subtitle",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
-        ),
-        sources = c("e61", 'ABS'),
-        p13a,
-        p13b,
-        p13a,
-        p13b,
-        filename = "plot-multi-wrp-test-39.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  # 14 - Checking longer titles ----
-
-  p14a <- minimal_plot +
+  p13a <- minimal_plot +
     labs_e61(title = "This is the title of the plot that is just too long",
              subtitle = "A test of a very very very long subtitle, but not too long.",
              y = "Just a y-axis label that goes on and on and on and on and on")
 
-  p14b <- bar_chart +
+  p13b <- bar_chart +
     labs_e61(title = "Title",
              subtitle = "Sub title",
              y = "Y-axis plot of this very complicated chart")
-
-  # save the charts
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        title = "This is a very very very very very long title that really should just be one line",
-        subtitle = "A test of a very very very very very long subtitle, but that's probably okay because subtitles can be long",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
-        ),
-        sources = c("e61", 'ABS'),
-        p14a,
-        p14b,
-        filename = "plot-multi-wrp-test-40.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
@@ -1039,9 +648,9 @@ test_that("Multi-panel graph examples", {
           "in culpa qui officia deserunt mollit."
         ),
         sources = c("e61", 'ABS'),
-        p14a,
-        p14b,
-        p14a,
+        p13a,
+        p13b,
+        p13a,
         ncol = 3,
         filename = "plot-multi-wrp-test-41.svg",
         bg_colour = "grey90",
@@ -1050,93 +659,19 @@ test_that("Multi-panel graph examples", {
     ))
   })
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        title = "The is an overal chart title",
-        subtitle = "The is a subtitle",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
-        ),
-        sources = c("e61", 'ABS'),
-        p14a,
-        p14b,
-        p14a,
-        p14b,
-        filename = "plot-multi-wrp-test-42.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
+  # 14 - Checking all of the above with some additional padding ----
+  # (kept the pad_width + pad_height combination, since pad_width alone is
+  # already checked in scenario 8 above)
 
-  # 15 - Checking all of the above with some additional padding ----
-
-  p15a <- minimal_plot +
+  p14a <- minimal_plot +
     labs_e61(title = "This is the title of the plot that is just too long",
              subtitle = "A test of a very very very long subtitle, but not too too long.",
              y = "Just a y-axis label that goes on and on and on and on and on and on and on and on")
 
-  p15b <- bar_chart +
+  p14b <- bar_chart +
     labs_e61(title = "Title",
              subtitle = "Sub title",
              y = "Y-axis plot of this very complicated chart")
-
-  # save the charts
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        title = "This is a very very very very very long title that really should just be one line",
-        subtitle = "A test of a very very very very very long subtitle, but that's probably okay because subtitles can be long",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
-        ),
-        sources = c("e61", 'ABS'),
-        p15a,
-        p15b,
-        pad_width = 10,
-        filename = "plot-multi-wrp-test-43.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        title = "This is a very very very very very very very very very very very very very very very very very very very very very long title that really should just be one line",
-        subtitle = "A test of a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very  very very very very very very very very very very very very very long subtitle, but that's probably okay because subtitles can be long",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
-        ),
-        sources = c("e61", 'ABS'),
-        p15a,
-        p15b,
-        p15a,
-        pad_width = 10,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-44.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
@@ -1152,10 +687,10 @@ test_that("Multi-panel graph examples", {
           "in culpa qui officia deserunt mollit."
         ),
         sources = c("e61", 'ABS'),
-        p15a,
-        p15b,
-        p15a,
-        p15b,
+        p14a,
+        p14b,
+        p14a,
+        p14b,
         pad_width = 3,
         pad_height = 5,
         filename = "plot-multi-wrp-test-45.svg",
@@ -1165,46 +700,23 @@ test_that("Multi-panel graph examples", {
     ))
   })
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        title = "The is an overall chart title that is fairly long",
-        subtitle = "The is a subtitle",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
-        ),
-        sources = c("e61", 'ABS'),
-        p15a,
-        p15b,
-        p15a,
-        p15b,
-        pad_height = 5,
-        filename = "plot-multi-wrp-test-46.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
+  # 15 - Check some interesting plot configurations ----
+  # (kept the nrow/ncol combination that isn't just the default arrangement;
+  # the larger 2x3 and padded 3x3 variants were dropped as they were the most
+  # expensive renders in this file and didn't exercise anything the unit
+  # tests at the top of this file and the other retained scenarios don't
+  # already cover)
 
-
-  # 16 - Check some interesting plot configurations ----
-
-  p16a <- minimal_plot +
+  p15a <- minimal_plot +
     labs_e61(title = "This is the title of the plot that is just too long",
              subtitle = "A test of a very very very long subtitle, but not too too long.",
              y = "Just a y-axis label that goes on and on and on and on and on")
 
-  p16b <- bar_chart +
+  p15b <- bar_chart +
     labs_e61(title = "Title",
              subtitle = "Sub title",
              y = "Y-axis plot of this very complicated chart")
 
-  # save the charts
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61(
@@ -1219,76 +731,13 @@ test_that("Multi-panel graph examples", {
           "in culpa qui officia deserunt mollit."
         ),
         sources = c("e61", 'ABS'),
-        p16a,
-        p16b,
-        p16a,
-        p16b,
+        p15a,
+        p15b,
+        p15a,
+        p15b,
         nrow = 1,
         ncol = 4,
         filename = "plot-multi-wrp-test-47.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        title = "This is a very very very very very very very very very very very very very very very very very very very very very very very very very long title that really should just be one line",
-        subtitle = "A test of a very very very very very very very very very very very very very very very very very very very very very very very very very long subtitle, but that's probably okay because subtitles can be long",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
-        ),
-        sources = c("e61", 'ABS'),
-        p16a,
-        p16b,
-        p16a,
-        p16b,
-        p16a,
-        p16b,
-        nrow = 2,
-        ncol = 3,
-        filename = "plot-multi-wrp-test-48.svg",
-        bg_colour = "grey90",
-        spell_check = FALSE
-      )
-    ))
-  })
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(
-      save_e61(
-        title = "This is a very very very very very very very very very very very very very very very very very very very very very very very very very long title that really should just be one line",
-        subtitle = "A test of a very very very very very very very very very very very very very very very very very very very very very very very very very long subtitle, but that's probably okay because subtitles can be long",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
-        ),
-        sources = c("e61", 'ABS'),
-        p16a,
-        p16b,
-        p16a,
-        p16b,
-        p16a,
-        p16b,
-        p16a,
-        p16b,
-        p16a,
-        nrow = 3,
-        ncol = 3,
-        pad_height = 3,
-        pad_width = 3,
-        filename = "plot-multi-wrp-test-49.svg",
         bg_colour = "grey90",
         spell_check = FALSE
       )

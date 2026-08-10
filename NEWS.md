@@ -15,6 +15,8 @@
 
 #### Bug fixes
 
+* Fixed multi-panel charts (`save_e61()` with more than one plot) rendering with overlapping panel titles and extra whitespace on the left. The panel margin used to measure title/subtitle/caption wrap widths no longer disagreed with the (much smaller) margin theme_e61() actually applies, which was throwing off the wrapping calculations.
+* Fixed the shared title/subtitle/footnote text on multi-panel charts sometimes clipping past the right edge of the graph. These weren't rendered in the chart's font family, so their wrap width was measured against the wrong font.
 * Renamed the undocumented `quiet_wrap` option to `quiet_mask` (it controls the messages shown when the masked `ggsave()`/`labs()` pass your call through to `save_e61()`/`labs_e61()`). It's intentionally not part of `set_t61_options()`/the `theme61.*` namespace - it only suppresses a message rather than controlling real functionality, so it stays a plain `options(quiet_mask = TRUE)` setting rather than cluttering the documented options list.
 * Fixed an issue where `labs_e61` would leave whitespace above the subtitle when a plot had a subtitle but no title (the empty title was still reserving vertical space).
 * Fixed the same issue for a y-axis title with no subtitle (`labs_e61(y = ...)` with `y_top = TRUE`, the default) - it was being prefixed with an empty, invisible subtitle line that still reserved space above it.
