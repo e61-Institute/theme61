@@ -353,8 +353,7 @@ test_that("Map examples", {
   ## Simple map with title and subtitle ----
   p <- ggplot(data = sydney_map) +
     geom_sf(colour = "black") +
-    labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA4s") +
-    theme_e61_spatial()
+    labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA4s")
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-simple-map.svg", p)))
@@ -365,7 +364,7 @@ test_that("Map examples", {
     geom_sf(aes(fill = sa4_code), colour = "black") +
     labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA4s",
              fill = "SA4 code") +
-    theme_e61_spatial(legend = "right", legend_title = T)
+    theme_e61(legend = "right", legend_title = T)
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-legend-map.svg", p)))

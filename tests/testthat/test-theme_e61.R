@@ -100,8 +100,7 @@ test_that("Spatial plots preserve aspect ratios", {
 
   p_base <- ggplot(plotdata) +
     geom_sf(fill = "grey90", colour = "grey40", linewidth = 0.1) +
-    facet_wrap(~ property_type) +
-    theme_e61_spatial()
+    facet_wrap(~ property_type)
 
   # inland VIC windows (avoid ocean cropping)
   xlim1 <- c(143.55, 144.15)
