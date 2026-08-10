@@ -321,12 +321,34 @@ test_that("Multi-panel graph examples", {
 test_that("Map examples", {
 
   skip_if_not_installed("sf")
-  skip_if_not_installed("strayr")
-  library(sf)
 
-  sa4_shp <- strayr::read_absmap("sa42016")
+  # A small synthetic grid of adjacent polygons stands in for real ABS SA4
+  # boundaries - geom_sf()/theme_e61_spatial() only care that the data is a
+  # valid multi-polygon sf object with a fill column, not that the shapes
+  # are real geography, so there's no need for strayr here.
+  sydney_map <- {
+    xs <- seq(150.5, 151.3, length.out = 4)
+    ys <- seq(-34.2, -33.6, length.out = 3)
 
-  sydney_map <- dplyr::filter(sa4_shp, gcc_code_2016 == "1GSYD")
+    polys <- list()
+    for (i in seq_len(length(xs) - 1)) {
+      for (j in seq_len(length(ys) - 1)) {
+        polys[[length(polys) + 1]] <- sf::st_polygon(list(matrix(
+          c(xs[i],     ys[j],
+            xs[i + 1], ys[j],
+            xs[i + 1], ys[j + 1],
+            xs[i],     ys[j + 1],
+            xs[i],     ys[j]),
+          ncol = 2, byrow = TRUE
+        )))
+      }
+    }
+
+    sf::st_sf(
+      sa4_code = seq_along(polys),
+      geometry = sf::st_sfc(polys, crs = 4326)
+    )
+  }
 
   ## Simple map with title and subtitle ----
   p <- ggplot(data = sydney_map) +
@@ -340,7 +362,7 @@ test_that("Map examples", {
 
   ## Map with legends ----
   p <- ggplot(data = sydney_map) +
-    geom_sf(aes(fill = as.numeric(sa4_code_2016)), colour = "black") +
+    geom_sf(aes(fill = sa4_code), colour = "black") +
     labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA4s",
              fill = "SA4 code") +
     theme_e61_spatial(legend = "right", legend_title = T)

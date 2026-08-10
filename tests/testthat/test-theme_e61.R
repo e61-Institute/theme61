@@ -73,16 +73,25 @@ test_that("Aspect ratio can be changed", {
 
 test_that("Spatial plots preserve aspect ratios", {
 
-  skip_if_not_installed("strayr")
   skip_if_not_installed("sf")
 
-  sa4 <- strayr::read_absmap("sa42021")
-
-  bbox <- sf::st_bbox(
-    c(xmin = 141.0, xmax = 150.0, ymin = -39.5, ymax = -33.5),
-    crs = sf::st_crs(4326)
+  # A single rectangle spanning both windows tested below (inland VIC-sized
+  # extent) is enough to exercise coord_sf()'s aspect calculation - it only
+  # depends on the requested xlim/ylim and CRS, not the drawn geometry, so
+  # there's no need for real ABS boundaries here.
+  sa4_vic <- sf::st_sf(
+    geometry = sf::st_sfc(
+      sf::st_polygon(list(matrix(
+        c(142.0, -38.0,
+          145.0, -38.0,
+          145.0, -37.0,
+          142.0, -37.0,
+          142.0, -38.0),
+        ncol = 2, byrow = TRUE
+      ))),
+      crs = 4326
+    )
   )
-  sa4_vic <- suppressWarnings(sf::st_crop(sa4, bbox))
 
   plotdata <- rbind(
     transform(sa4_vic, property_type = "House"),
