@@ -2,7 +2,7 @@
 % Please edit documentation in R/theme_e61.R
 \name{theme_e61_spatial}
 \alias{theme_e61_spatial}
-\title{e61 theme for spatial maps (forced)}
+\title{e61 theme for spatial maps}
 \usage{
 theme_e61_spatial(
   legend = c("none", "bottom", "top", "left", "right", "inside"),
@@ -37,5 +37,10 @@ argument in \code{save_e61}, not here.}
 \item{base_rect_size}{Numeric. Default rect width.}
 }
 \description{
-e61 theme for spatial maps (forced)
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+}
+\details{
+Map-specific axis/gridline styling is now applied automatically on
+save/print based on whether a plot contains a spatial layer - use
+\code{\link[=theme_e61]{theme_e61()}} for both regular and spatial plots.
 }

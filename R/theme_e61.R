@@ -34,9 +34,11 @@
 #'
 #' sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
 #'
+#' # Spatial styling (blank axes/gridlines) is applied automatically on
+#' # save/print, so theme_e61() alone is enough here too.
 #' ggplot(data = sydney_map) +
 #'   geom_sf(aes(fill = sa3_code_2016), colour = "black") +
-#'   theme_e61_spatial()
+#'   theme_e61()
 #' }
 #'
 theme_e61 <- function(
@@ -55,75 +57,18 @@ theme_e61 <- function(
     choices = c("none", "bottom", "top", "left", "right", "inside")
   )
 
-  args <- list(
-    legend = legend,
-    legend_position = legend_position,
-    legend_title = legend_title,
-    aspect_ratio = aspect_ratio,
-    background = background,
-    base_family = base_family,
-    base_line_size = base_line_size,
-    base_rect_size = base_rect_size
-  )
-
-  build_theme_e61_plot(args)
-}
-
-#' e61 theme for spatial maps (forced)
-#'
-#' @inheritParams theme_e61
-#' @export
-theme_e61_spatial <- function(
-    legend = c("none", "bottom", "top", "left", "right", "inside"),
-    legend_position = NULL,
-    legend_title = FALSE,
-    base_family = "pt-sans",
-    aspect_ratio = NULL,
-    background = "white",
-    base_line_size = points_to_mm(0.75),
-    base_rect_size = points_to_mm(1)
-) {
-  legend <- match.arg(
-    legend,
-    choices = c("none", "bottom", "top", "left", "right", "inside")
-  )
-
-  args <- list(
-    legend = legend,
-    legend_position = legend_position,
-    legend_title = legend_title,
-    aspect_ratio = if (is.null(aspect_ratio)) 0.75 else aspect_ratio,
-    background = background,
-    base_family = base_family,
-    base_line_size = base_line_size,
-    base_rect_size = base_rect_size
-  )
-
-  build_theme_e61_map(args)
-}
-
-#' e61 themed graph options
-#'
-#' Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
-#' appearance. If you are looking to change the appearance of titles or labels,
-#' check the arguments in [labs_e61], which are probably what you are looking
-#' for.
-#'
-#' @export
-build_theme_e61_plot <- function(args) {
-
-  if (args$legend == "inside") {
-    if (!is.numeric(args$legend_position) || length(args$legend_position) != 2)
+  if (legend == "inside") {
+    if (!is.numeric(legend_position) || length(legend_position) != 2)
       stop("legend_position needs to be a length two numeric vector.")
 
-    if (!(data.table::between(args$legend_position[[1]], 0, 1) |
-          data.table::between(args$legend_position[[2]], 0, 1)))
+    if (!(data.table::between(legend_position[[1]], 0, 1) |
+          data.table::between(legend_position[[2]], 0, 1)))
       stop("Both legend_position values must be between 0 and 1.")
   }
 
   # This deals with an issue where the test environment can't install pt-sans
   # and pollutes the test rig with a lot of unhelpful errors
-  base_family <- if (is_testing()) "sans" else args$base_family
+  base_family <- if (is_testing()) "sans" else base_family
 
   base_size <- getOption("theme61.base_size", default = 10)
 
@@ -132,9 +77,9 @@ build_theme_e61_plot <- function(args) {
   ret <-
     theme(
       line = element_line(colour = "black", linewidth = points_to_mm(0.5)),
-      rect = element_rect(fill = args$background, colour = NA),
+      rect = element_rect(fill = background, colour = NA),
       text = element_text(colour = "black", family = base_family, size = base_size),
-      aspect.ratio = args$aspect_ratio,
+      aspect.ratio = aspect_ratio,
 
       # Axes and grid
       axis.line.x = element_line(colour = "black", linewidth = points_to_mm(0.4)),
@@ -187,57 +132,84 @@ build_theme_e61_plot <- function(args) {
     )
 
   # set legend position
-  ret <- ret + theme(legend.position = args$legend)
+  ret <- ret + theme(legend.position = legend)
 
   # set legend title existence
-  if (args$legend_title) {
+  if (legend_title) {
     ret <- ret + theme(legend.title = element_text(size = rel(0.9)))
   } else {
     ret <- ret + theme(legend.title = element_blank())
   }
 
   # add legend position if inside
-  if (args$legend == "inside") {
+  if (legend == "inside") {
     ret <- ret +
       theme(
-        legend.position.inside = args$legend_position
+        legend.position.inside = legend_position
       )
   }
 
   # adjust legend direction based on legend position
-  if (data.table::like(args$legend, "bottom|top", ignore.case = TRUE)) {
+  if (data.table::like(legend, "bottom|top", ignore.case = TRUE)) {
     ret <- ret + theme(legend.direction = "horizontal")
   }
 
   # Adds a grey background option
-  if (args$background == "grey" |  args$background == "box") {
+  if (background == "grey" |  background == "box") {
     ret <- ret + theme(rect = element_rect(fill = e61_greylight6))
   }
 
-  return(ret)
+  ret
 }
 
-#' e61 themed spatial maps options
+#' e61 theme for spatial maps
 #'
+#' `r lifecycle::badge("deprecated")`
+#'
+#' Map-specific axis/gridline styling is now applied automatically on
+#' save/print based on whether a plot contains a spatial layer - use
+#' [theme_e61()] for both regular and spatial plots.
+#'
+#' @inheritParams theme_e61
 #' @export
-build_theme_e61_map <- function(args) {
+theme_e61_spatial <- function(
+    legend = c("none", "bottom", "top", "left", "right", "inside"),
+    legend_position = NULL,
+    legend_title = FALSE,
+    base_family = "pt-sans",
+    aspect_ratio = NULL,
+    background = "white",
+    base_line_size = points_to_mm(0.75),
+    base_rect_size = points_to_mm(1)
+) {
+  lifecycle::deprecate_warn(
+    "0.8.0", "theme_e61_spatial()", "theme_e61()",
+    details = "Spatial styling is now applied automatically on save/print."
+  )
 
-  if (args$legend == "inside") {
-    if (!is.numeric(args$legend_position) || length(args$legend_position) != 2)
+  legend <- match.arg(
+    legend,
+    choices = c("none", "bottom", "top", "left", "right", "inside")
+  )
+
+  aspect_ratio <- if (is.null(aspect_ratio)) 0.75 else aspect_ratio
+
+  if (legend == "inside") {
+    if (!is.numeric(legend_position) || length(legend_position) != 2)
       stop("legend_position needs to be a length two numeric vector.")
 
-    if (!(data.table::between(args$legend_position[[1]], 0, 1) |
-          data.table::between(args$legend_position[[2]], 0, 1)))
+    if (!(data.table::between(legend_position[[1]], 0, 1) |
+          data.table::between(legend_position[[2]], 0, 1)))
       stop("Both legend_position values must be between 0 and 1.")
   }
 
-  base_family <- if (is_testing()) "sans" else args$base_family
+  base_family <- if (is_testing()) "sans" else base_family
   base_size <- getOption("theme61.base_size", default = 10)
   half_line <- base_size / 2
 
   ret <-
     theme(
-      aspect.ratio = args$aspect_ratio,
+      aspect.ratio = aspect_ratio,
       # base text
       text = element_text(
         colour = "black",
@@ -277,21 +249,21 @@ build_theme_e61_map <- function(args) {
       panel.grid.minor = element_blank(),
 
       # legend
-      legend.position = args$legend,
-      legend.direction = if (grepl("bottom|top", args$legend)) "horizontal" else "vertical",
+      legend.position = legend,
+      legend.direction = if (grepl("bottom|top", legend)) "horizontal" else "vertical",
       legend.background = element_blank(),
       legend.key = element_blank(),
       legend.text = element_text(size = rel(0.9))
     )
 
-  if (args$legend_title) {
+  if (legend_title) {
     ret <- ret + theme(legend.title = element_text(size = rel(0.9)))
   } else {
     ret <- ret + theme(legend.title = element_blank())
   }
 
-  if (args$legend == "inside") {
-    ret <- ret + theme(legend.position.inside = args$legend_position)
+  if (legend == "inside") {
+    ret <- ret + theme(legend.position.inside = legend_position)
   }
 
   # facet spacing if used
@@ -302,9 +274,8 @@ build_theme_e61_map <- function(args) {
     )
   }
 
-  return(ret)
+  ret
 }
-
 
 #' Converts all legend colours to squares
 #'

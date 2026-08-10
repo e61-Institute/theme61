@@ -16,7 +16,8 @@ ggplot <- function(data = NULL,
 
   p <- as_e61_plot(p)
 
-  # TODO: think about whether we want to keep this here or attach it on preview?
+  # Applied eagerly (not deferred to save/preview) so a plot is fully themed
+  # the moment it's created, for any code that touches it directly.
   if (isTRUE(getOption("theme61.auto_theme", TRUE))) {
     p <- p + theme_e61()
   }

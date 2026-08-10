@@ -114,28 +114,14 @@ classify_e61_map.default <- function(x, ...) {
 
 # finalise_e61_plot ----
 
-#' Classify a single plot as map/non-map and, for maps, correct any axis
-#' chrome that a non-spatial theme would have left on.
-#'
-#' This is the shared step that save_e61() runs (for every panel, single or
-#' multi) before handing plots to save_single()/save_multi(), and that
-#' print.e61_plot() runs before rendering to the Plots pane.
-#'
-#' classify_e61_map() is idempotent by construction (an already-classified
-#' e61_map plot is returned unchanged), and the map correction is idempotent
-#' too - blanking an already-blank element is a no-op - so this is safe to
-#' call more than once on the same plot without side effects.
+#' Classify a plot as map/non-map, correcting axis chrome for maps.
+#' Idempotent - safe to call repeatedly on the same plot.
 #' @noRd
 finalise_e61_plot <- function(plot) {
   plot <- classify_e61_map(plot)
 
-  # A user can build a map with plain theme_e61() instead of
-  # theme_e61_spatial() (an easy mistake - nothing about geom_sf() forces the
-  # choice). Blanking the axis/gridline chrome a map should never show
-  # corrects that regardless of which one was actually called, but only for
-  # elements still at their theme_e61() default - an element the user set
-  # explicitly (including via theme_e61_spatial(), which already blanks all
-  # of these) is left alone rather than silently overridden.
+  # Corrects a map built with plain theme_e61() instead of theme_e61_spatial(),
+  # without overriding elements the user set explicitly.
   if (inherits(plot, "e61_map")) {
     plot <- plot + map_axis_correction(plot)
   }
@@ -143,11 +129,9 @@ finalise_e61_plot <- function(plot) {
   plot
 }
 
-# Elements a map should never show, matching the exact keys build_theme_e61_plot()
-# sets (panel.grid.major.x/.y specifically, not the parent panel.grid.major -
-# ggplot2's theme element hierarchy makes an explicitly-set child element like
-# panel.grid.major.y win over a later parent-level override regardless of
-# merge order, so targeting the parent key here would silently do nothing).
+# panel.grid.major.x/.y specifically, not the parent panel.grid.major - a
+# child element theme_e61() sets wins over a later parent-level override
+# regardless of merge order, so the parent key alone would do nothing.
 map_axis_correction <- function(plot) {
   map_args <- list(
     axis.text = element_blank(),

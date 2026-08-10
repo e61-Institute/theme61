@@ -67,9 +67,11 @@ sa3_shp <- strayr::read_absmap("sa32016")
 
 sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
 
+# Spatial styling (blank axes/gridlines) is applied automatically on
+# save/print, so theme_e61() alone is enough here too.
 ggplot(data = sydney_map) +
   geom_sf(aes(fill = sa3_code_2016), colour = "black") +
-  theme_e61_spatial()
+  theme_e61()
 }
 
 }
