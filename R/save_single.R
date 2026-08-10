@@ -30,12 +30,10 @@ save_single <- function(
   legendTitle <- plot@theme$legend.title
   legendPosition <- plot@theme$legend.position
 
-  if (is_spatial_chart && !attr(plot, "t61_obj")){
-    plot <- plot + theme_e61_spatial()
-
-  } else if (is_spatial_chart && attr(plot, "t61_obj")) {
-    plot
-  } else {
+  # Maps already have their axis chrome/gridlines corrected by
+  # finalise_e61_plot() (see classify-plots.R), so there's nothing left to
+  # do here - the text sizing/margin logic below is for non-map plots only.
+  if (!is_spatial_chart) {
 
     resolved_size <- resolve_text_size(plot, base_size)
     plot <- resolved_size$plot
