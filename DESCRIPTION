@@ -48,7 +48,7 @@ URL: https://github.com/e61-institute/theme61,
      https://e61-institute.github.io/theme61/
 BugReports: https://github.com/e61-institute/theme61/issues
 RoxygenNote: 7.3.3
-Depends: 
+Depends:
     R (>= 4.5.0)
 Roxygen: list(markdown = TRUE)
 Collate: 
@@ -57,7 +57,6 @@ Collate:
     'aes-y-lims.R'
     'aes_labs.R'
     'axes.R'
-    'build-plots.R'
     'classify-plots.R'
     'colours.R'
     'crop_aus_coord.R'
@@ -69,10 +68,8 @@ Collate:
     'labs_e61.R'
     'palette_e61.R'
     'plot_label.R'
-    'prepare_plot.R'
     'print-e61-ggplot.R'
     'retired-functions.R'
-    's7_classes.R'
     'save-helpers.R'
     'save_e61.R'
     'save_multi.R'
@@ -83,6 +80,5 @@ Collate:
     'theme61-options.R'
     'theme61-package.R'
     'theme_e61.R'
-    'theme_spec_update_ggplot.R'
     'utils-plot-dims.R'
     'zzz.R'

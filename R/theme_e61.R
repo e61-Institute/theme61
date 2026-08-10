@@ -1,8 +1,6 @@
-#' theme61 theme spec object
+#' theme61 theme
 #'
-#' This function returns a lightweight "theme spec" object that records user
-#' preferences. The spec is realised into a concrete ggplot2 theme during plot
-#' preview or saving.
+#' Returns a ggplot2 theme with e61 Institute styling applied.
 #'
 #' @param legend Character. Legend position, "none" (default) hides the legend.
 #' @param legend_position A numeric vector of length two setting the placement
@@ -57,18 +55,6 @@ theme_e61 <- function(
     choices = c("none", "bottom", "top", "left", "right", "inside")
   )
 
-  # Validate legend_position eagerly, at spec-construction time, rather than
-  # only when the spec is realised into a theme - otherwise invalid input
-  # only surfaces much later, deep inside save_e61()/print().
-  if (legend == "inside") {
-    if (!is.numeric(legend_position) || length(legend_position) != 2)
-      stop("legend_position needs to be a length two numeric vector.")
-
-    if (!(data.table::between(legend_position[[1]], 0, 1) |
-          data.table::between(legend_position[[2]], 0, 1)))
-      stop("Both legend_position values must be between 0 and 1.")
-  }
-
   args <- list(
     legend = legend,
     legend_position = legend_position,
@@ -80,11 +66,7 @@ theme_e61 <- function(
     base_rect_size = base_rect_size
   )
 
-  e61_theme_spec_class(
-    args = args,
-    variant = "auto",
-    version = 1L
-  )
+  build_theme_e61_plot(args)
 }
 
 #' e61 theme for spatial maps (forced)
@@ -101,7 +83,12 @@ theme_e61_spatial <- function(
     base_line_size = points_to_mm(0.75),
     base_rect_size = points_to_mm(1)
 ) {
-  spec <- theme_e61(
+  legend <- match.arg(
+    legend,
+    choices = c("none", "bottom", "top", "left", "right", "inside")
+  )
+
+  args <- list(
     legend = legend,
     legend_position = legend_position,
     legend_title = legend_title,
@@ -111,8 +98,8 @@ theme_e61_spatial <- function(
     base_line_size = base_line_size,
     base_rect_size = base_rect_size
   )
-  spec@variant <- "map"
-  spec
+
+  build_theme_e61_map(args)
 }
 
 #' e61 themed graph options
@@ -377,10 +364,9 @@ format_flip <- function(x_adj = 0, current_theme = NULL) {
 
   # When called internally by save_e61(), skip any element the user has
   # already customised away from the theme_e61() default, rather than
-  # silently overriding it. theme_e61() itself only returns a deferred spec
-  # (not subsettable), so realise it into an actual theme first.
+  # silently overriding it.
   if (!is.null(current_theme)) {
-    baseline <- build_theme_e61_plot(theme_e61()@args)
+    baseline <- theme_e61()
 
     unchanged <- vapply(names(flip_args), function(el) {
       identical(current_theme[[el]], baseline[[el]])
@@ -409,33 +395,6 @@ set_base_size <- function(base_size) {
 
   options(theme61.base_size = base_size)
   invisible()
-}
-
-# Spec helper functions ----
-realise_e61_theme <- function(plot) {
-  spec <- attr(plot, "e61_theme_spec", exact = TRUE)
-  if (is.null(spec)) return(plot)
-
-  variant <- spec@variant
-  if (is.null(variant) || !nzchar(variant)) variant <- "auto"
-
-  is_map <- inherits(plot, "e61_map")
-  use_map <- if (identical(variant, "auto")) is_map else identical(variant, "map")
-
-  th <- if (use_map) {
-    build_theme_e61_map(spec@args)
-  } else {
-    build_theme_e61_plot(spec@args)
-  }
-
-  plot <- plot + th
-
-  # Prevent double application if prepare_plot is called multiple times, and
-  # mark the plot as realised so finalise_e61_plot() knows not to re-inject a
-  # default spec on a later call (see finalise_e61_plot()).
-  attr(plot, "e61_theme_spec") <- NULL
-  attr(plot, "e61_theme_realised") <- TRUE
-  plot
 }
 
 # Internal helper functions ----

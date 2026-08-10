@@ -118,24 +118,23 @@ save_e61 <- function(filename = NULL,
   # Ensure plots are e61 plots
   plots <- as_e61_plot(plots)
 
-  # Classify each plot as map/non-map and realise its theme_e61() spec into
-  # an actual ggplot2 theme. This has to happen for every panel (not just
-  # single-panel saves) since save_multi() reads the realised theme (e.g.
-  # legend position/title) straight off each plot.
+  # Classify each plot as map/non-map (and correct map-only axis chrome).
+  # This has to happen for every panel (not just single-panel saves) since
+  # save_multi() reads the theme (e.g. legend position/title) straight off
+  # each plot.
   plots <- lapply(plots, finalise_e61_plot)
 
   if (length(plots) == 1) {
-    prep <- prepare_plot(
-      plots[[1]],
-      chart_type = chart_type,
-      auto_scale = auto_scale,
-      base_size = base_size,
-      bg_colour = bg_colour
-    )
+    is_map <- inherits(plots[[1]], "e61_map")
 
-    plots[[1]] <- prep$plot
-    chart_type <- prep$chart_type
-    auto_scale <- prep$auto_scale
+    if (is_map) {
+      auto_scale <- FALSE
+      chart_type <- "custom"
+    } else if (is.null(chart_type)) {
+      chart_type <- "normal"
+    }
+
+    plots[[1]] <- plots[[1]] + ggplot2::theme(rect = ggplot2::element_rect(fill = bg_colour))
   }
 
   # Check whether the plots are ggplot2 objects

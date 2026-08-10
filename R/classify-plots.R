@@ -114,30 +114,35 @@ classify_e61_map.default <- function(x, ...) {
 
 # finalise_e61_plot ----
 
-#' Classify a single plot as map/non-map and resolve its theme_e61() spec
-#' into a real ggplot2 theme.
+#' Classify a single plot as map/non-map and, for maps, correct any axis
+#' chrome that a non-spatial theme would have left on.
 #'
 #' This is the shared step that save_e61() runs (for every panel, single or
 #' multi) before handing plots to save_single()/save_multi(), and that
-#' print.e61_plot() runs before rendering to the Plots pane. Both
-#' classify_e61_map() and realise_e61_theme() are safe to call more than
-#' once on the same plot, so this can be re-run defensively without risk of
-#' double-applying a theme.
+#' print.e61_plot() runs before rendering to the Plots pane.
+#'
+#' classify_e61_map() is idempotent by construction (an already-classified
+#' e61_map plot is returned unchanged), and the map correction is idempotent
+#' too - blanking an already-blank element is a no-op - so this is safe to
+#' call more than once on the same plot without side effects.
 #' @noRd
 finalise_e61_plot <- function(plot) {
   plot <- classify_e61_map(plot)
 
-  # Auto-inject default theme spec only if the user didn't add one AND the
-  # plot hasn't already been realised. Without the second check, calling
-  # finalise_e61_plot() again after realise_e61_theme() has already cleared
-  # the spec would re-inject a *default* theme_e61() and silently clobber
-  # whatever theme_e61() options the user actually asked for.
-  if (isTRUE(getOption("theme61.auto_theme", TRUE))) {
-    if (is.null(attr(plot, "e61_theme_spec", exact = TRUE)) &&
-        !isTRUE(attr(plot, "e61_theme_realised", exact = TRUE))) {
-      attr(plot, "e61_theme_spec") <- theme_e61()
-    }
+  # A user can build a map with plain theme_e61() instead of
+  # theme_e61_spatial() (an easy mistake - nothing about geom_sf() forces the
+  # choice). Unconditionally blanking the axis/gridline chrome a map should
+  # never show corrects that regardless of which one was actually called,
+  # without needing to know or track which theme function was used.
+  if (inherits(plot, "e61_map")) {
+    plot <- plot + theme(
+      axis.text = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.line.x = element_blank(),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank()
+    )
   }
 
-  realise_e61_theme(plot)
+  plot
 }

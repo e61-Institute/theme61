@@ -1,26 +1,16 @@
-test_that("finalise_e61_plot() realises a plot's theme_e61() spec into a real theme", {
+test_that("theme_e61() is an immediately usable, realised theme (not deferred)", {
 
-  p <- ggplot(data.frame(x = 1, y = 1), aes(x, y)) +
-    geom_point() +
-    theme_e61(legend = "bottom")
+  th <- theme_e61(legend = "bottom")
 
-  # Before realisation the spec is just stashed as an attribute - the
-  # underlying ggplot2 theme hasn't actually been touched yet.
-  expect_false(is.null(attr(p, "e61_theme_spec", exact = TRUE)))
-  expect_null(p@theme$legend.position)
+  expect_true(inherits(th, "theme"))
+  expect_identical(th$legend.position, "bottom")
 
-  out <- finalise_e61_plot(p)
-
-  expect_true(inherits(out, "e61_plot"))
-  expect_identical(out@theme$legend.position, "bottom")
-
-  # Spec attribute is cleared once realised, so re-running is a no-op
-  expect_null(attr(out, "e61_theme_spec", exact = TRUE))
-  out2 <- finalise_e61_plot(out)
-  expect_identical(out2@theme$legend.position, "bottom")
+  # Invalid input errors immediately at the call site, not later at save/print time.
+  expect_error(theme_e61(legend = "inside"))
+  expect_error(theme_e61(legend = "inside", legend_position = 20))
 })
 
-test_that("finalise_e61_plot() classifies maps before realising, so the spatial theme is used", {
+test_that("finalise_e61_plot() classifies maps and corrects their axis chrome", {
 
   p <- ggplot(data.frame(x = 1, y = 1), aes(x, y)) +
     geom_point() +
@@ -32,18 +22,43 @@ test_that("finalise_e61_plot() classifies maps before realising, so the spatial 
   out <- finalise_e61_plot(p)
 
   expect_true(inherits(out, "e61_map"))
-  # theme_e61_spatial()'s legend.direction rule differs from the non-map theme
-  # for "bottom"/"top", but the legend position itself should still come
-  # through from the spec.
+  # The map correction blanks axis chrome and gridlines...
+  expect_true(inherits(out@theme$axis.text, "element_blank"))
+  expect_true(inherits(out@theme$panel.grid.major, "element_blank"))
+  # ...but leaves the user's own theme_e61() choices (e.g. legend position)
+  # untouched - this is the regression the old deferred-spec design got wrong.
   expect_identical(out@theme$legend.position, "bottom")
 })
 
-test_that("save_e61() realises the theme for every panel in a multi-panel save, not just single panels", {
+test_that("finalise_e61_plot() is idempotent on maps", {
 
-  # This is a regression test: previously theme_e61() was only realised for
-  # the length(plots) == 1 branch of save_e61(), so multi-panel saves quietly
-  # kept ggplot2's default theme (e.g. legend shown on the right) instead of
-  # the theme_e61() spec attached to each panel.
+  p <- ggplot(data.frame(x = 1, y = 1), aes(x, y)) +
+    geom_point() +
+    theme_e61(legend = "bottom")
+  p$layers <- c(p$layers, list(list(geom = structure(list(), class = "GeomSf"))))
+
+  out <- finalise_e61_plot(p)
+  out2 <- finalise_e61_plot(out)
+
+  expect_true(inherits(out2@theme$axis.text, "element_blank"))
+  expect_identical(out2@theme$legend.position, "bottom")
+})
+
+test_that("finalise_e61_plot() leaves non-map plots untouched", {
+
+  p <- ggplot(data.frame(x = 1, y = 1), aes(x, y)) +
+    geom_point() +
+    theme_e61(legend = "bottom")
+
+  out <- finalise_e61_plot(p)
+
+  expect_false(inherits(out, "e61_map"))
+  expect_identical(out@theme$axis.text, p@theme$axis.text)
+  expect_identical(out@theme$legend.position, "bottom")
+})
+
+test_that("save_e61() applies the map correction for every panel in a multi-panel save", {
+
   p1 <- ggplot(data.frame(x = 1:3, y = 1:3), aes(x, y)) +
     geom_point() +
     theme_e61(legend = "bottom")

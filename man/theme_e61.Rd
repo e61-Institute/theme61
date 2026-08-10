@@ -3,7 +3,7 @@
 \name{theme_e61}
 \alias{theme_e61}
 \alias{set_base_size}
-\title{theme61 theme spec object}
+\title{theme61 theme}
 \usage{
 theme_e61(
   legend = c("none", "bottom", "top", "left", "right", "inside"),
@@ -47,9 +47,7 @@ Sans.}
 \code{set_base_size} is used for its side effects.
 }
 \description{
-This function returns a lightweight "theme spec" object that records user
-preferences. The spec is realised into a concrete ggplot2 theme during plot
-preview or saving.
+Returns a ggplot2 theme with e61 Institute styling applied.
 
 \code{set_base_size} sets the base size for the theme to be used in
 \code{theme_e61()}. This needs to be set outside of the function because it

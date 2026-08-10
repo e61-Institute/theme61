@@ -16,7 +16,7 @@ save_single <- function(
 ) {
 
 
-  # Plot is assumed pre-classified + prepared by save_e61() via prepare_plot()
+  # Plot is assumed pre-classified and prepared by save_e61()
   is_spatial_chart <- inherits(plot, "e61_map")
 
   # Discrete y-axis (e.g. ridgeline)
