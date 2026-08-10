@@ -70,6 +70,15 @@
 #'   cramped on the chart.
 #' @param rel_heights (multi-panel specific) A numeric vector giving the
 #'   relative proportions of each graph component (title, plots, footer).
+#' @param return_plot_obj (multi-panel specific) Logical. If TRUE, skips
+#'   saving entirely and returns the composed multi-panel plot object instead
+#'   (e.g. to print it in the Plots pane, or use it in a Shiny app). Only
+#'   supported for multi-panel graphs (2 or more plots) - for a single plot,
+#'   just print the ggplot object directly. Defaults to FALSE. Like a saved
+#'   graph, the returned object's layout (text sizes, panel spacing) is
+#'   computed for a fixed target size (`dim`, or the same defaults `save_e61`
+#'   would otherwise use) - it won't reflow if you resize the device
+#'   afterwards.
 #' @inheritParams labs_e61
 #' @inheritParams cowplot::plot_grid
 #' @return Invisibly returns the file name.
@@ -104,7 +113,8 @@ save_e61 <- function(filename = NULL,
                      nrow = NULL,
                      align = c("v", "none", "h", "hv"),
                      axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-                     rel_heights = NULL
+                     rel_heights = NULL,
+                     return_plot_obj = FALSE
                      ) {
 
   # Coerce plot classes and prep --------------------------------------------
@@ -141,6 +151,9 @@ save_e61 <- function(filename = NULL,
   plots <- check_plots(plots)
 
   # Guard clauses -----------------------------------------------------------
+  if (return_plot_obj && length(plots) <= 1) {
+    stop("return_plot_obj is only supported for multi-panel graphs (2 or more plots). For a single plot, just print the ggplot object directly.")
+  }
 
   # Enforce chart type
   if(is.null(chart_type)){
@@ -159,37 +172,46 @@ save_e61 <- function(filename = NULL,
     }
   }
 
-  # Check if filename has been provided when preview mode is FALSE
-  if (!preview && is.null(filename)) stop("You must provide a file path to save the graph.")
+  # Check if filename has been provided when preview/return_plot_obj mode is FALSE
+  if (!preview && !return_plot_obj && is.null(filename)) stop("You must provide a file path to save the graph.")
 
   # Override save directory with temp file if preview mode is TRUE
-  if (preview) {
+  if (preview && !return_plot_obj) {
     cli::cli_alert_info("Preview mode is activated, file will not be saved to disk.")
     filename <- tempfile(fileext = ".svg")
   }
 
-  # Check if the save directory exists
-  dir_provided <- grepl("^(.*)\\/.*\\..{3}$", filename)
-  dir_name <- gsub("^(.*)\\/.*\\..{3}$", "\\1", filename)
+  # Check if the save directory exists (not applicable if we're just
+  # returning the plot object - nothing gets written to disk)
+  if (!return_plot_obj) {
+    dir_provided <- grepl("^(.*)\\/.*\\..{3}$", filename)
+    dir_name <- gsub("^(.*)\\/.*\\..{3}$", "\\1", filename)
 
-  if (dir_provided && !dir.exists(dir_name))
-    stop("The directory you are trying to save to does not exist.")
-
-  # Enforce file format requirements if a file extension is provided
-  if (grepl("\\..{3}$", filename) && !grepl("\\.(svg|pdf|eps|png|jpg)$", filename)) {
-    stop("You must provide a valid file extension. The following file formats are supported: svg, pdf, eps, png, jpg.")
+    if (dir_provided && !dir.exists(dir_name))
+      stop("The directory you are trying to save to does not exist.")
   }
 
-  # Determine which file formats to save
-  if (grepl("\\..{3}$", filename)) {
-    format <- gsub("^.*\\.(.{3})$", "\\1", filename)
+  # Skip file format resolution entirely if we're just returning the plot
+  # object - nothing gets written to disk, so filename/format are unused
+  # (and filename may be NULL, which the checks below can't handle).
+  if (!return_plot_obj) {
 
-    # Strip file extension from filename
-    filename <- gsub("^(.*)\\..{3}$", "\\1", filename)
-  } else if (is.null(format) && !is.null(getOption("theme61.default_save_format"))) {
-    format <- getOption("theme61.default_save_format")
-  } else {
-    format <- match.arg(format, several.ok = TRUE)
+    # Enforce file format requirements if a file extension is provided
+    if (grepl("\\..{3}$", filename) && !grepl("\\.(svg|pdf|eps|png|jpg)$", filename)) {
+      stop("You must provide a valid file extension. The following file formats are supported: svg, pdf, eps, png, jpg.")
+    }
+
+    # Determine which file formats to save
+    if (grepl("\\..{3}$", filename)) {
+      format <- gsub("^.*\\.(.{3})$", "\\1", filename)
+
+      # Strip file extension from filename
+      filename <- gsub("^(.*)\\..{3}$", "\\1", filename)
+    } else if (is.null(format) && !is.null(getOption("theme61.default_save_format"))) {
+      format <- getOption("theme61.default_save_format")
+    } else {
+      format <- match.arg(format, several.ok = TRUE)
+    }
   }
 
   # Check if the data frame(s) can be written - every panel needs its own
@@ -258,6 +280,10 @@ save_e61 <- function(filename = NULL,
       rel_heights = rel_heights,
       bg_colour = bg_colour
     )
+
+    # Short-circuit: return the composed plot object instead of saving it
+    if (return_plot_obj) return(save_input$graph)
+
   } else {
 
     save_input <- save_single(
