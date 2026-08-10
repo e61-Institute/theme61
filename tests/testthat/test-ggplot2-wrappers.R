@@ -1,5 +1,5 @@
 test_that("ggplot2 functions are masked by theme61", {
-  withr::local_options(list(quiet_wrap = FALSE))
+  withr::local_options(list(quiet_mask = FALSE))
 
   # Check if labs() throws a msg
   suppressWarnings(expect_message(save_e61(withr::local_tempfile(fileext = ".svg"), minimal_plot + labs()), "Your function.*"))
@@ -212,7 +212,7 @@ test_that("Inference works when plot-level data is NULL and mapping comes from l
 
 test_that("facet spacing depends on theme61 facet axes setting", {
 
-  old <- options(quiet_wrap = TRUE)
+  old <- options(quiet_mask = TRUE)
   on.exit(options(old), add = TRUE)
 
   df <- data.frame(
@@ -248,7 +248,7 @@ test_that("facet spacing depends on theme61 facet axes setting", {
 
 test_that("user-specified panel.spacing is not overridden", {
 
-  old <- options(quiet_wrap = TRUE)
+  old <- options(quiet_mask = TRUE)
   on.exit(options(old), add = TRUE)
 
   df <- data.frame(
@@ -322,7 +322,7 @@ test_that("user-specified y-axis text alignment is not overridden (#298)", {
 
 testthat::test_that("ggplot2::facet_wrap is not auto-adjusted (facet not tagged)", {
 
-  old <- options(quiet_wrap = TRUE)
+  old <- options(quiet_mask = TRUE)
   on.exit(options(old), add = TRUE)
 
   df <- data.frame(
@@ -357,4 +357,55 @@ test_that("theme61::facet_wrap tags facet with t61_axes", {
     facet_wrap(~gcc, axes = "margins")
 
   expect_equal(attr(p@facet, "t61_axes", exact = TRUE), "margins")
+})
+
+test_that("quiet_mask suppresses the ggsave()/labs() masking messages", {
+  withr::local_options(list(quiet_mask = TRUE))
+
+  expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), minimal_plot + labs()))
+  expect_no_message(ggsave(withr::local_tempfile(fileext = ".svg"), minimal_plot))
+})
+
+test_that("theme61.iterate_mode makes ggsave() pass through to ggplot2::ggsave()", {
+  withr::local_options(list(theme61.iterate_mode = TRUE, quiet_mask = FALSE))
+
+  # No masking message, even though quiet_mask is off. Explicit width/height
+  # avoids ggplot2::ggsave()'s own unrelated "Saving WxH in image" message.
+  expect_no_message(
+    ggsave(withr::local_tempfile(fileext = ".png"), minimal_plot, width = 5, height = 5),
+    message = "Your function.*"
+  )
+})
+
+test_that("theme61.iterate_mode makes labs() pass through to ggplot2::labs()", {
+  withr::local_options(list(theme61.iterate_mode = TRUE, quiet_mask = FALSE))
+
+  # No masking message, even though quiet_mask is off
+  expect_no_message(l <- labs(title = "A title", x = "x-axis"))
+
+  # Identical output to calling ggplot2::labs() directly - no labs_e61()
+  # formatting/wrapping applied
+  expect_identical(l, ggplot2::labs(title = "A title", x = "x-axis"))
+})
+
+test_that("theme61.iterate_mode makes facet_wrap()/facet_grid() pass through to ggplot2 defaults", {
+  withr::local_options(list(theme61.iterate_mode = TRUE))
+
+  df <- data.frame(gcc = rep(c("A", "B"), each = 2), x = 1:4, y = 1:4)
+
+  # No axes supplied: should use ggplot2's own default (margins), not
+  # theme61's "all" default, and should not be tagged with t61_axes
+  p_wrap <- ggplot(df, ggplot2::aes(x, y)) + geom_point() + facet_wrap(~gcc)
+  expect_null(attr(p_wrap@facet, "t61_axes", exact = TRUE))
+
+  p_grid <- ggplot(df, ggplot2::aes(x, y)) + geom_point() + facet_grid(~gcc)
+  expect_null(attr(p_grid@facet, "t61_axes", exact = TRUE))
+
+  # Explicit axes is still honoured, just without the t61_axes tag
+  p_explicit <- ggplot(df, ggplot2::aes(x, y)) + geom_point() + facet_wrap(~gcc, axes = "all")
+  expect_null(attr(p_explicit@facet, "t61_axes", exact = TRUE))
+})
+
+test_that("set_t61_options rejects the unnamespaced quiet_mask option", {
+  expect_error(set_t61_options(list(quiet_mask = TRUE)), "Invalid options supplied")
 })

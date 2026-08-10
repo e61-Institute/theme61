@@ -27,9 +27,7 @@
 #'   only. It is recommended that as a user you do not include it in your
 #'   function call. Defaults to FALSE to ensure that we only add the extra white
 #'   space above the chart when we are saving it.
-#' @inheritDotParams ggplot2::scale_y_continuous name oob na.value trans guide
-#'   position
-#'
+#' @inheritDotParams ggplot2::scale_y_continuous name oob na.value trans guide position
 #' @rdname e61_axes
 #' @export
 

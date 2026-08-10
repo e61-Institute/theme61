@@ -11,6 +11,7 @@
 \item Always draws a plot in the Plots pane
 \item Also renders a preview in the Viewer (opt-out via option)
 \item Prefers Viewer focus by default (best-effort)
+\item All of the above is skipped in \code{theme61.iterate_mode}
 }
 }
 \keyword{internal}
