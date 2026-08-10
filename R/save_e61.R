@@ -361,11 +361,11 @@ save_e61 <- function(filename = NULL,
   file_to_open <- paste0(filename, ".", format[[1]])
 
   if (isTRUE(getOption("theme61.open_in_browser", FALSE))) {
-    file_to_open_browser <- shQuote(here::here(file_to_open))
+    # browseURL() is cross-platform (unlike system2("open", ...), which is
+    # macOS-only) and picks the right opener for the current OS itself.
+    out <- try(utils::browseURL(here::here(file_to_open)))
 
-    out <- try(system2("open", file_to_open_browser))
-
-    if (out != 0) warning("Graph file could not be opened")
+    if (inherits(out, "try-error")) warning("Graph file could not be opened")
   }
 
   if (interactive()) {

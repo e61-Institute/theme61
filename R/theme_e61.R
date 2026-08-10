@@ -244,8 +244,11 @@ theme_e61_spatial <- function(
       axis.ticks.x = element_blank(),
       axis.line.x = element_blank(),
 
-      # grid
-      panel.grid.major = element_blank(),
+      # grid (child keys, not the parent panel.grid.major - a child element
+      # set elsewhere, e.g. by theme_e61(), always wins over a parent-level
+      # override regardless of add order)
+      panel.grid.major.x = element_blank(),
+      panel.grid.major.y = element_blank(),
       panel.grid.minor = element_blank(),
 
       # legend

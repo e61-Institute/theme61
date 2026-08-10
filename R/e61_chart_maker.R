@@ -1,7 +1,10 @@
 #' An add-in to easily create plots with ggplot2
 #'
+#' `r lifecycle::badge("deprecated")`
+#'
 #' Select data to be used and map variables to aesthetics to produce a chart,
-#' customise common elements and get code to reproduce the chart.
+#' customise common elements and get code to reproduce the chart. This is a
+#' thin wrapper around `esquisse::esquisser()` - call that directly instead.
 #'
 #' @param data A data.frame, you can pass a data.frame explicitly to the
 #'   function, or choose one in global environment after loading.
@@ -28,6 +31,11 @@ e61_chart_maker <-
     controls = c("labs", "parameters", "appearance", "filters", "code"),
     viewer = getOption(x = "esquisse.viewer", default = "dialog")
     ){
+
+    lifecycle::deprecate_warn(
+      "0.8.0", "e61_chart_maker()",
+      details = "This gadget is a thin wrapper around the `esquisse` package - call `esquisse::esquisser()` directly instead. e61_chart_maker() will be removed in a future release."
+    )
 
     # check whether the package has been installed, otherwise prompt users to
     # install it

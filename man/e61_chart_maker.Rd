@@ -25,8 +25,12 @@ You can view code used to produce the chart, copy it or insert it in
 current script.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+}
+\details{
 Select data to be used and map variables to aesthetics to produce a chart,
-customise common elements and get code to reproduce the chart.
+customise common elements and get code to reproduce the chart. This is a
+thin wrapper around \code{esquisse::esquisser()} - call that directly instead.
 }
 \examples{
 \dontrun{

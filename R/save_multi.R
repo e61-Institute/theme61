@@ -268,20 +268,22 @@ save_multi <-
 
     plots <- clean_plotlist
 
-    # Still needed unconditionally (not just when auto_scale is TRUE, unlike
-    # the loop above) so every panel gets its margin even when auto_scale is
-    # off. A no-op for panels the loop above already covered.
-    for (i in seq_along(plots)) {
-      row_i <- ceiling(i / ncol)
-      col_i <- ((i - 1) %% ncol) + 1
+    # Only needed when auto_scale is FALSE: the loop above already applied
+    # this exact margin to every panel when auto_scale is TRUE, so re-running
+    # it here would just repeat the same theme merge for no visual effect.
+    if (!auto_scale) {
+      for (i in seq_along(plots)) {
+        row_i <- ceiling(i / ncol)
+        col_i <- ((i - 1) %% ncol) + 1
 
-      top_i <- if (row_i == 1) base_margin_h else chart_height_pad
-      bottom_i <- if (row_i == nrow) base_margin_h else chart_height_pad
-      left_i <- if (col_i == 1) base_margin_w else chart_width_pad
-      right_i <- if (col_i == ncol) base_margin_w else chart_width_pad
+        top_i <- if (row_i == 1) base_margin_h else chart_height_pad
+        bottom_i <- if (row_i == nrow) base_margin_h else chart_height_pad
+        left_i <- if (col_i == 1) base_margin_w else chart_width_pad
+        right_i <- if (col_i == ncol) base_margin_w else chart_width_pad
 
-      plots[[i]] <- plots[[i]] +
-        theme(plot.margin = margin(t = top_i, b = bottom_i, r = right_i, l = left_i, unit = "mm"))
+        plots[[i]] <- plots[[i]] +
+          theme(plot.margin = margin(t = top_i, b = bottom_i, r = right_i, l = left_i, unit = "mm"))
+      }
     }
 
     # Create the main chart
