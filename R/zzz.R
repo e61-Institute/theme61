@@ -55,7 +55,8 @@ t61_env <- NULL
     theme61.disable_spellcheck = FALSE,
     theme61.iterate_mode = FALSE,
     theme61.open_in_browser = FALSE,
-    theme61.preview_on_print = TRUE
+    theme61.preview_on_print = TRUE,
+    theme61.sec_axis_msg = TRUE
   )
 
   to_set <- !(names(op.theme61) %in% names(op))
