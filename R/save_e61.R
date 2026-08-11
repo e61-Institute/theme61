@@ -59,7 +59,9 @@
 #' @param print_info Logical. Set to TRUE if you want graph dimensions and other
 #'   information printed to the console. Defaults to FALSE.
 #' @param spell_check Logical. Check spelling of words in the title and caption.
-#'   Defaults to TRUE. Set to FALSE to turn off.
+#'   Defaults to TRUE. Set to FALSE to turn off, or set the
+#'   `theme61.disable_spellcheck` option to skip it session-wide regardless of
+#'   this argument (see [set_t61_options]).
 #' @param preview Logical. Set to TRUE to show a preview of the graph in the
 #'   Viewer pane but not save to disk. Defaults to FALSE.
 #' @param base_size Numeric. Chart font size. Default is 10.
@@ -242,7 +244,7 @@ save_e61 <- function(filename = NULL,
 
   # Spell checker -------------------------------------------------------
 
-  if (spell_check) {
+  if (spell_check && !isTRUE(getOption("theme61.disable_spellcheck", FALSE))) {
     # Loop through the plots. unlist() (not c()) so that plots with no typos
     # (check_plot_spelling() returns NULL) are dropped rather than counted as
     # an empty message.

@@ -52,6 +52,7 @@ t61_env <- NULL
     theme61.auto_theme = TRUE,
     theme61.base_size = 10,
     theme61.default_save_format = "svg",
+    theme61.disable_spellcheck = FALSE,
     theme61.iterate_mode = FALSE,
     theme61.open_in_browser = FALSE,
     theme61.preview_on_print = TRUE

@@ -111,7 +111,9 @@ same name as the graph that contains the data needed to recreate the graph
 information printed to the console. Defaults to FALSE.}
 
 \item{spell_check}{Logical. Check spelling of words in the title and caption.
-Defaults to TRUE. Set to FALSE to turn off.}
+Defaults to TRUE. Set to FALSE to turn off, or set the
+\code{theme61.disable_spellcheck} option to skip it session-wide regardless of
+this argument (see \link{set_t61_options}).}
 
 \item{base_size}{Numeric. Chart font size. Default is 10.}
 
