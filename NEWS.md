@@ -43,6 +43,10 @@
 * Fixed `save_e61(plot1, plot2, ..., preview = TRUE)` (multi-panel, no `filename`) silently dropping the first plot from the saved/previewed graph. `filename` is `save_e61()`'s first argument, so passing plots positionally without also naming `filename` matched the first plot to it instead of to the plot list.
 * `add_e61_logo()` no longer downloads the logo from the web on every call -- it's now bundled with the package and read locally, so it also works offline. Also fixed `y` being ignored (the logo's vertical position was always set from `x` instead).
 
+#### Breaking changes
+
+* `e61_chart_maker()` is now defunct and always errors -- use the theme61 Claude skill for assistance in making graphs instead.
+
 # theme61 0.7.1
 
 09 Jan 2026

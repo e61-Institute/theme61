@@ -54,6 +54,18 @@ mpanel_e61 <- function(...) {
     )
 }
 
+# Remove entirely from v1.0 --------------------------------------------------
+
+#' Defunct
+#' @export
+#' @noRd
+e61_chart_maker <- function(...) {
+  lifecycle::deprecate_stop(
+    when = "0.8.0", what = "e61_chart_maker()",
+    details = "Please use the theme61 Claude skill for assistance in making graphs instead."
+  )
+}
+
 # Deprecate indefinitely ----------------------------------------------
 
 #' Defunct
