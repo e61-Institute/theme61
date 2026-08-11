@@ -3,14 +3,17 @@
 #' @description Add text labels for lines, columns or other elements directly
 #'   onto the graph plot. This is preferred over using legends.
 #'
-#' @param label String vector. Label text to be displayed.
+#' @param label (optional, see Details) String vector. Label text to be
+#'   displayed. If omitted, derived from a `scale_colour_manual()`/
+#'   `scale_fill_manual()` on the plot, if there is one.
 #' @param x (optional, see Details) Numeric or string vector. X-axis
 #'   positions of the label text. If supplied, this exact position is
 #'   always used.
 #' @param y (optional, see Details) Numeric or string vector. Y-axis
 #'   positions of the label text. See `x`.
-#' @param colour (optional) Vector of colour names or strings. Default uses the
-#'   e61 palette.
+#' @param colour (optional, see Details) Vector of colour names or strings.
+#'   Defaults to a `scale_colour_manual()`/`scale_fill_manual()` on the plot,
+#'   if there is one, else the e61 palette.
 #' @param size (optional) Integer. Size of the text, the default size should be
 #'   appropriate in most cases.
 #' @param hjust (optional) A numeric value from 0-1. Adjusts the alignment of
@@ -36,6 +39,27 @@
 #' @param facet_name,facet_value `r lifecycle::badge("deprecated")`
 #'
 #' @details
+#' ## Default label text and colour
+#' If the plot has a `scale_colour_manual()`/`scale_fill_manual()` (checked
+#' in that order; a theme61 wrapper that constructs one, e.g.
+#' `scale_colour_e61_aus()`, counts too), `label` and `colour` can be
+#' derived from it instead of the e61 palette:
+#' * If you omit `label` entirely, it defaults to that scale's own levels
+#'   (i.e. what a legend would show), in their resolved order -- so
+#'   `plot_label()` with no arguments at all labels every series using its
+#'   exact data value and assigned colour.
+#' * If you supply `label` but omit `colour`, each label's colour is taken
+#'   from the scale in the same order -- this assumes `label` is written in
+#'   the same order as the scale's levels. If `label` has more entries than
+#'   the scale has levels for, this is skipped and the e61 palette is used
+#'   instead (rather than guessing a partial match).
+#' * An explicit `colour` always wins outright over any of the above.
+#'
+#' Only a scale with fixed, explicit values (`scale_colour_manual()`/
+#' `scale_fill_manual()`) is used this way -- an algorithmic discrete scale
+#' (e.g. `scale_colour_e61()`, `scale_colour_brewer()`) doesn't count, since
+#' it has no fixed "colours the user chose" to read.
+#'
 #' ## Automatic positioning
 #' When `auto_position = TRUE` (the default), `save_e61()` tries to move the
 #' label to a nearby, non-overlapping spot -- but only for single-panel
@@ -84,7 +108,7 @@
 #' @return Object to add to a ggplot (via `+`).
 #' @export
 plot_label <-
-  function(label,
+  function(label = NULL,
            x = NULL,
            y = NULL,
            colour = NA,
@@ -131,18 +155,23 @@ plot_label <-
         "doesn't apply to rotated text -- see `?plot_label`)."
       )
     }
-    if (!is.null(x) && !all.equal(length(label), length(x), length(y))) {
+    # `label` is optional (see ?plot_label -- derived from a
+    # scale_colour_manual()/scale_fill_manual() on the plot if omitted), so
+    # its length isn't known here yet. Checked again in
+    # .build_plot_label_layer() once label is resolved, alongside the same
+    # check for a colour vector.
+    if (!is.null(x) && !is.null(label) && !all.equal(length(label), length(x), length(y))) {
       stop("The number of x and y positions must equal the number of labels.")
     }
 
     geom <- match.arg(geom)
 
-    # Set up colours
-    if (length(colour) == 1 && is.na(colour)) {
-      colour <- palette_e61(length(label))
-    } else if (length(colour) == 1 && !is.na(colour)) {
-      colour <- rep(colour, length(label))
-    } else if (length(colour) != length(label)) {
+    # Colour defaulting (to the e61 palette, or to a scale_colour_manual()/
+    # scale_fill_manual() on the plot -- see ?plot_label) needs `plot`,
+    # which isn't available until .build_plot_label_layer() -- so an
+    # explicit colour is length-checked there too, once label is resolved
+    # and its length is actually known.
+    if (length(colour) != 1 && !is.null(label) && length(colour) != length(label)) {
       stop("The number of colours must equal the number of labels.")
     }
 
@@ -190,6 +219,53 @@ plot_label <-
   if (length(vec) == len) return(vec)
   if (length(vec) != 1) stop(deparse(substitute(vec)), " must be length ", len, " or 1.")
   rep(vec, len)
+}
+
+#' Detect a user-supplied scale_colour_manual()/scale_fill_manual() on
+#' `plot` (or a theme61 wrapper built on one, e.g. scale_colour_e61()) and
+#' return its levels and their assigned colours, in the plot's own
+#' resolved order -- i.e. exactly the (level, colour) pairing a legend
+#' would show, correctly reflecting `reverse = TRUE`, a `values` vector
+#' with more entries than actually appear in the data, etc.
+#'
+#' colour is checked before fill (matches which aesthetic
+#' t61_match_label_series() treats as primary for most geoms -- see
+#' autolabel-apply.R). Returns NULL if neither aesthetic has an explicit
+#' scale: an algorithmic discrete scale (scale_colour_brewer(),
+#' scale_colour_hue(), ...) doesn't count, since there's no fixed "colours
+#' the user chose" to detect -- only a palette function to sample from.
+#'
+#' A scale's breaks/mapping aren't trained against the data until the plot
+#' is actually built, so this needs a real ggplot2::ggplot_build() to
+#' resolve correctly -- gated behind a cheap, build-free check first (the
+#' scale's own constructor call), so that cost is only paid when a manual
+#' scale is actually present.
+#' @return list(breaks = <chr>, colours = <chr>), same length and order, or
+#'   NULL if no manual colour/fill scale was found.
+#' @noRd
+.detect_manual_scale <- function(plot) {
+  for (aes_name in c("colour", "fill")) {
+    sc <- plot@scales$get_scales(aes_name)
+    if (is.null(sc) || is.null(sc$call)) next
+
+    is_manual <- identical(rlang::call_name(sc$call), paste0("scale_", aes_name, "_manual"))
+    if (!is_manual) next
+
+    built <- tryCatch(ggplot2::ggplot_build(plot), error = function(e) NULL)
+    if (is.null(built)) next
+
+    trained <- built$plot@scales$get_scales(aes_name)
+    breaks <- tryCatch(trained$get_breaks(), error = function(e) NULL)
+    breaks <- breaks[!is.na(breaks)]
+    if (length(breaks) == 0) next
+
+    colours <- tryCatch(trained$map(breaks), error = function(e) NULL)
+    if (is.null(colours) || length(colours) != length(breaks)) next
+
+    return(list(breaks = as.character(breaks), colours = as.character(colours)))
+  }
+
+  NULL
 }
 
 .find_facet_proto <- function(plot, facet_name) {
@@ -258,7 +334,6 @@ plot_label <-
 }
 
 .build_plot_label_layer <- function(object, plot) {
-  n <- length(object$label)
 
   facet_vars_chk <- .get_facet_vars(plot)
   if (is.null(object$x) && length(facet_vars_chk)) {
@@ -268,15 +343,60 @@ plot_label <-
     )
   }
 
+  # label and/or colour left unresolved by plot_label() (it has no access
+  # to `plot`) when either should be derived from a scale_colour_manual()/
+  # scale_fill_manual() on the plot -- see ?plot_label. Detected at most
+  # once, and only when actually needed (a real ggplot_build(), so not
+  # free -- see .detect_manual_scale()).
+  colour_is_default <- length(object$colour) == 1 && is.na(object$colour)
+  scale_info <- if (is.null(object$label) || colour_is_default) {
+    .detect_manual_scale(plot)
+  } else {
+    NULL
+  }
+
+  label <- object$label
+  if (is.null(label)) {
+    if (is.null(scale_info)) {
+      stop(
+        "`label` is required -- the plot has no scale_colour_manual()/",
+        "scale_fill_manual() to derive default labels from. See `?plot_label`."
+      )
+    }
+    label <- scale_info$breaks
+  }
+  n <- length(label)
+
+  if (!is.null(object$x) && !all.equal(n, length(object$x), length(object$y))) {
+    stop("The number of x and y positions must equal the number of labels.")
+  }
+
+  colour <- object$colour
+  if (colour_is_default) {
+    if (!is.null(scale_info) && n <= length(scale_info$colours)) {
+      # Assumes label is in the same order as the scale's own levels --
+      # exactly true when label itself just came from scale_info$breaks
+      # above; otherwise it's on the caller to match the order themselves
+      # (see ?plot_label).
+      colour <- scale_info$colours[seq_len(n)]
+    } else {
+      colour <- palette_e61(n)
+    }
+  } else if (length(colour) == 1) {
+    colour <- rep(colour, n)
+  } else if (length(colour) != n) {
+    stop("The number of colours must equal the number of labels.")
+  }
+
   # x/y are optional when auto_position = TRUE (see ?plot_label); NA
   # placeholders keep the layer's data well-formed until t61_apply_autolabel()
   # resolves a real position at save time. A facetted plot without x/y is
   # rejected above rather than silently rendering invisible (NA-position) text.
   plot_lab_data <- data.table::data.table(
-    label  = object$label,
+    label  = label,
     x      = if (is.null(object$x)) rep(NA_real_, n) else object$x,
     y      = if (is.null(object$y)) rep(NA_real_, n) else object$y,
-    colour = object$colour,
+    colour = colour,
     size   = .plab_len_chk(object$size, n),
     hjust  = .plab_len_chk(object$hjust, n),
     angle  = .plab_len_chk(object$angle, n),

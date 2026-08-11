@@ -88,6 +88,82 @@ test_that("Multi-plot labels work with colour and fill", {
   expect_equal(l2$aes_params$colour, expected_fills)
 })
 
+test_that("plot_label() derives label/colour from a manual colour/fill scale", {
+
+  data <- data.frame(
+    x = c(0, 1, 0, 1),
+    y = c(0, 0, 1, 1),
+    grp = factor(c("Alpha", "Alpha", "Beta", "Beta"))
+  )
+  cols <- c(Alpha = "#7b3294", Beta = "#008837")
+
+  base <- ggplot(data, aes(x, y, colour = grp)) +
+    geom_line() +
+    scale_colour_manual(values = cols)
+
+  # label omitted entirely: derived from the scale's own levels, in order
+  p1 <- base + plot_label()
+  d1 <- p1@layers[[length(p1@layers)]]$data
+  expect_equal(d1$label, c("Alpha", "Beta"))
+  expect_equal(d1$colour, unname(cols[c("Alpha", "Beta")]))
+
+  # label supplied, colour omitted: matched positionally against the
+  # scale's levels (assumes label is given in the same order)
+  p2 <- base + plot_label(c("Group Alpha", "Group Beta"))
+  d2 <- p2@layers[[length(p2@layers)]]$data
+  expect_equal(d2$label, c("Group Alpha", "Group Beta"))
+  expect_equal(d2$colour, unname(cols[c("Alpha", "Beta")]))
+
+  # colour explicitly supplied: always wins, scale ignored
+  p3 <- base + plot_label(c("Alpha", "Beta"), colour = c("red", "blue"))
+  d3 <- p3@layers[[length(p3@layers)]]$data
+  expect_equal(d3$colour, c("red", "blue"))
+
+  # values= order in the scale_colour_manual() call is irrelevant -- the
+  # scale's own (trained) level order wins, same as a legend would show
+  base_shuffled <- ggplot(data, aes(x, y, colour = grp)) +
+    geom_line() +
+    scale_colour_manual(values = c(Beta = "#008837", Alpha = "#7b3294"))
+  p4 <- base_shuffled + plot_label()
+  d4 <- p4@layers[[length(p4@layers)]]$data
+  expect_equal(d4$label, c("Alpha", "Beta"))
+  expect_equal(d4$colour, unname(cols[c("Alpha", "Beta")]))
+
+  # fill works the same way as colour
+  data_fill <- data.frame(x = c("a", "b"), y = c(1, 2))
+  fill_cols <- c(a = "#111111", b = "#222222")
+  p5 <- ggplot(data_fill, aes(x, y, fill = x)) +
+    geom_col() +
+    scale_fill_manual(values = fill_cols) +
+    plot_label()
+  d5 <- p5@layers[[length(p5@layers)]]$data
+  expect_equal(d5$label, c("a", "b"))
+  expect_equal(d5$colour, unname(fill_cols))
+
+  # More labels than the scale has levels for: falls back to the e61
+  # palette entirely, rather than partially matching
+  p6 <- base + plot_label(c("Alpha", "Beta", "Gamma"))
+  d6 <- p6@layers[[length(p6@layers)]]$data
+  expect_equal(d6$colour, palette_e61(3))
+
+  # No manual scale, colour supplied but label omitted: no scale to
+  # derive a default label from, so this still errors
+  no_scale <- ggplot(data, aes(x, y, colour = grp)) + geom_line()
+  expect_error(
+    no_scale + plot_label(),
+    "no scale_colour_manual"
+  )
+
+  # An algorithmic discrete scale (not "manual") doesn't count -- colour
+  # still falls back to the e61 palette, and label is still required
+  algo_scale <- ggplot(data, aes(x, y, colour = grp)) + geom_line() + scale_colour_e61()
+  expect_error(algo_scale + plot_label(), "no scale_colour_manual")
+
+  p7 <- algo_scale + plot_label(c("Alpha", "Beta"))
+  d7 <- p7@layers[[length(p7@layers)]]$data
+  expect_equal(d7$colour, palette_e61(2))
+})
+
 test_that("Plots with additional aes still work", {
 
   data <- data.frame(
@@ -128,9 +204,15 @@ test_that("String dates get converted to date dates properly", {
 
 test_that("Specifying custom colours works in plot_label()", {
 
-  # Default colours
+  # Default colours -- unresolved on the raw plot_label() object (it has
+  # no access to the plot yet, see .build_plot_label_layer()), resolved
+  # to the e61 palette once actually added to a plot with no manual scale
+  # to derive colours from instead.
   retval <- plot_label("Test", 1, 1)
-  expect_equal(retval$colour, palette_e61(1))
+  expect_true(is.na(retval$colour))
+
+  built <- minimal_plot_label + retval
+  expect_equal(built@layers[[length(built@layers)]]$data$colour, palette_e61(1))
 
   # Custom colours
   retval <- plot_label("Test", 1, 1, colour = "#000000")

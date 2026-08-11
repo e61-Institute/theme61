@@ -6,7 +6,7 @@
 \title{Add on-graph labels to graphs}
 \usage{
 plot_label(
-  label,
+  label = NULL,
   x = NULL,
   y = NULL,
   colour = NA,
@@ -22,7 +22,7 @@ plot_label(
 )
 
 plab(
-  label,
+  label = NULL,
   x = NULL,
   y = NULL,
   colour = NA,
@@ -38,7 +38,9 @@ plab(
 )
 }
 \arguments{
-\item{label}{String vector. Label text to be displayed.}
+\item{label}{(optional, see Details) String vector. Label text to be
+displayed. If omitted, derived from a \code{scale_colour_manual()}/
+\code{scale_fill_manual()} on the plot, if there is one.}
 
 \item{x}{(optional, see Details) Numeric or string vector. X-axis
 positions of the label text. If supplied, this exact position is
@@ -47,8 +49,9 @@ always used.}
 \item{y}{(optional, see Details) Numeric or string vector. Y-axis
 positions of the label text. See \code{x}.}
 
-\item{colour}{(optional) Vector of colour names or strings. Default uses the
-e61 palette.}
+\item{colour}{(optional, see Details) Vector of colour names or strings.
+Defaults to a \code{scale_colour_manual()}/\code{scale_fill_manual()} on the plot,
+if there is one, else the e61 palette.}
 
 \item{size}{(optional) Integer. Size of the text, the default size should be
 appropriate in most cases.}
@@ -89,6 +92,31 @@ Add text labels for lines, columns or other elements directly
 onto the graph plot. This is preferred over using legends.
 }
 \details{
+\subsection{Default label text and colour}{
+
+If the plot has a \code{scale_colour_manual()}/\code{scale_fill_manual()} (checked
+in that order; a theme61 wrapper that constructs one, e.g.
+\code{scale_colour_e61_aus()}, counts too), \code{label} and \code{colour} can be
+derived from it instead of the e61 palette:
+\itemize{
+\item If you omit \code{label} entirely, it defaults to that scale's own levels
+(i.e. what a legend would show), in their resolved order -- so
+\code{plot_label()} with no arguments at all labels every series using its
+exact data value and assigned colour.
+\item If you supply \code{label} but omit \code{colour}, each label's colour is taken
+from the scale in the same order -- this assumes \code{label} is written in
+the same order as the scale's levels. If \code{label} has more entries than
+the scale has levels for, this is skipped and the e61 palette is used
+instead (rather than guessing a partial match).
+\item An explicit \code{colour} always wins outright over any of the above.
+}
+
+Only a scale with fixed, explicit values (\code{scale_colour_manual()}/
+\code{scale_fill_manual()}) is used this way -- an algorithmic discrete scale
+(e.g. \code{scale_colour_e61()}, \code{scale_colour_brewer()}) doesn't count, since
+it has no fixed "colours the user chose" to read.
+}
+
 \subsection{Automatic positioning}{
 
 When \code{auto_position = TRUE} (the default), \code{save_e61()} tries to move the
