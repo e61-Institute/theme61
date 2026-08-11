@@ -233,7 +233,7 @@ test_that("geom_pointbar visual test", {
 
   # Snapshot: keep as SVG so diffs are stable and file size stays smaller than PNG.
   withr::with_tempdir({
-    suppressWarnings(save_e61("geom-pointbar-kitchen-sink.svg", p))
+    suppressWarnings(save_e61("geom-pointbar-kitchen-sink.svg", p, spell_check = FALSE))
     expect_snapshot_file("geom-pointbar-kitchen-sink.svg")
   })
 })
