@@ -245,10 +245,9 @@ g <- ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
               c(1.8, 2.2),
               c(15, 50)) +
   labs_e61(
-    title = "1940 to 1960 Change", 
+    title = "1940 to 1960 Change",
     y = "US$ billions"
-  ) +
-  format_flip()
+  )
 
 save_e61("../man/figures/g-flip.svg")
 ```

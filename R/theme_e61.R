@@ -308,16 +308,19 @@ square_legend_symbols <- function(size = 6) {
 #' Applies changes to the theme for horizontal bar graphs
 #'
 #' Horizontal bar graphs made with `coord_flip()` require some changes to
-#' the `theme()` in order to look proper. This function wraps those changes
-#' up in a convenient function that should be appended at the end of the graph
-#' code, after theming functions such as `theme_e61()` have been called.
+#' the `theme()` in order to look proper. theme61 detects `coord_flip()`
+#' automatically and applies these changes for you (without overriding any
+#' element you've customised away from the `theme_e61()` default), so in
+#' most cases you don't need to call this function yourself. It's still
+#' exported for the one thing auto-detection can't do: adjusting `x_adj`,
+#' or for manual use outside the normal save/print pipeline.
 #'
 #' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
 #' the default works for most graphs. A negative value moves the
 #' title up, a positive value moves the title down.
-#' @param current_theme The plot's current theme, used internally by
-#' `save_e61()` to skip any element the user has already customised away
-#' from the `theme_e61()` default. Leave as `NULL` for normal manual use.
+#' @param current_theme The plot's current theme, used internally to skip
+#' any element the user has already customised away from the `theme_e61()`
+#' default. Leave as `NULL` for normal manual use.
 #'
 #' @return ggplot object
 #' @export
@@ -333,7 +336,7 @@ format_flip <- function(x_adj = 0, current_theme = NULL) {
     plot.title.position = "plot",
     plot.caption.position = "plot",
     axis.title.x.bottom = element_text(
-      margin = margin(t = 0, b = 5),
+      margin = margin(t = x_adj, b = 5),
       hjust = 0.5, angle = 0)
   )
 

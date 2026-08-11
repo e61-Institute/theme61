@@ -114,7 +114,8 @@ classify_e61_map.default <- function(x, ...) {
 
 # finalise_e61_plot ----
 
-#' Classify a plot as map/non-map, correcting axis chrome for maps.
+#' Classify a plot as map/non-map, correcting axis chrome for maps, and
+#' apply format_flip()'s theme changes to coord_flip() plots.
 #' Idempotent - safe to call repeatedly on the same plot.
 #' @noRd
 finalise_e61_plot <- function(plot) {
@@ -124,6 +125,13 @@ finalise_e61_plot <- function(plot) {
   # without overriding elements the user set explicitly.
   if (inherits(plot, "e61_map")) {
     plot <- plot + map_axis_correction(plot)
+  }
+
+  # Horizontal bar graphs made with coord_flip() need axis/gridline changes
+  # to look right - format_flip() already skips any element the user has
+  # customised away from the theme_e61() default via current_theme.
+  if (inherits(plot@coordinates, "CoordFlip")) {
+    plot <- plot + format_flip(current_theme = plot@theme)
   }
 
   plot

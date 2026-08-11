@@ -97,14 +97,13 @@ save_single <- function(
   # check whether the user has supplied a given width first (i.e. different to the default 8.5cm)
   if(is.null(width)) {
 
-    # When coord_flip() is used to make a plot horizontal, the default dims are too small
+    # When coord_flip() is used to make a plot horizontal, the default dims
+    # are too small. (The flipped-coord theme changes themselves are already
+    # applied by finalise_e61_plot() before save_single() is ever called.)
     if (isTRUE("CoordFlip" %in% class(plot@coordinates))) {
 
       width <- max_width
       max_panel_width <- max_width / 2 # only allow the panel to be at most half the column consistent with other chart types
-
-      # Format the flipped coords axes
-      plot <- plot + format_flip(current_theme = plot@theme)
 
       # If it's only one panel, set the chart width to 1/2 of the max-width
     } else if(n_panel_cols == 1){
