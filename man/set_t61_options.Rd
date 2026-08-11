@@ -16,13 +16,13 @@ with no arguments i.e. \code{set_t61_options()}.
 \details{
 The following options are available to set:
 \itemize{
-\item \code{theme61.open_in_browser}: If TRUE, graphs will also open in the browser in addition to the Viewer pane. This is FALSE by default.
-\item \code{theme61.default_save_format}: The default file save format if format is not specified in \link{save_e61} and the file extension is not provided in \code{filename}. This is "svg" by default.
-\item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
-\item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
 \item \code{theme61.auto_theme}: If TRUE (default), \code{theme_e61()} is automatically applied whenever you call \code{ggplot()}. Set to FALSE to turn this off and apply your own theme instead.
-\item \code{theme61.iterate_mode}: If TRUE, all of theme61's automatic styling and Viewer pane preview rendering is skipped, so graphs print to the Plots pane with plain ggplot2 defaults as fast as possible. This is FALSE by default. Masked functions (\code{ggsave()}, \code{labs()}, \code{facet_wrap()}, \code{facet_grid()}) also stop redirecting to their theme61 equivalents and pass straight through to the underlying ggplot2 function instead. Any theme61 functions you call explicitly (e.g. \code{scale_colour_e61()}, \code{theme_e61()}, \code{labs_e61()}) still apply as normal, since they become part of the plot object regardless of this option.
+\item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
+\item \code{theme61.default_save_format}: The default file save format if format is not specified in \link{save_e61} and the file extension is not provided in \code{filename}. This is "svg" by default.
 \item \code{theme61.disable_spellcheck}: If TRUE, \link{save_e61}'s spell-checker is skipped entirely, regardless of its \code{spell_check} argument. This is FALSE by default.
+\item \code{theme61.iterate_mode}: If TRUE, all of theme61's automatic styling and Viewer pane preview rendering is skipped, so graphs print to the Plots pane with plain ggplot2 defaults as fast as possible. This is FALSE by default. Masked functions (\code{ggsave()}, \code{labs()}, \code{facet_wrap()}, \code{facet_grid()}) also stop redirecting to their theme61 equivalents and pass straight through to the underlying ggplot2 function instead. Any theme61 functions you call explicitly (e.g. \code{scale_colour_e61()}, \code{theme_e61()}, \code{labs_e61()}) still apply as normal, since they become part of the plot object regardless of this option.
+\item \code{theme61.open_in_browser}: If TRUE, graphs will also open in the browser in addition to the Viewer pane. This is FALSE by default.
+\item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
 }
 }
 \section{Environment variables}{
