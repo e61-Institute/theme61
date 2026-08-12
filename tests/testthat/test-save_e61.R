@@ -614,11 +614,14 @@ test_that("Deprecated top-level arguments still work and fold into the new list 
   p1 <- ggplot(df1, aes(x, y)) + geom_point()
   p2 <- ggplot(df2, aes(x, y)) + geom_point()
 
-  # Old-style top-level args should still work, but warn
-  expect_warning(
+  # Old-style top-level args should still work, but warn. Use
+  # lifecycle::expect_deprecated() rather than testthat::expect_warning() -
+  # it's the lifecycle package's own helper for testing deprecate_warn(),
+  # which correctly matches its condition class/verbosity so the warning is
+  # actually captured instead of leaking to the console.
+  lifecycle::expect_deprecated(
     obj_old <- save_e61(plotlist = list(p1, p2), title = "Combined",
-                        ncol = 1, pad_width = 5, return_plot_obj = TRUE),
-    class = "lifecycle_warning_deprecated"
+                        ncol = 1, pad_width = 5, return_plot_obj = TRUE)
   )
   expect_s3_class(obj_old, "patchwork")
 
