@@ -15,6 +15,41 @@
 #' @param plot (single-panel specific) Name of the plot object to save. Defaults
 #'   to the last plot displayed so usually you do not need to provide this
 #'   argument explicitly.
+#' @param plotlist (multi-panel specific) List of plots to combine as an
+#'   multi-panel and save. You can also enter the charts individually as
+#'   arguments to the function.
+#' @param labs (multi-panel specific) A named list specifying the shared
+#'   `title`, `subtitle`, `footnotes` and `sources` to place around the
+#'   multi-panel figure. Defaults to `NULL` for each.
+#' @param layout (multi-panel specific) A named list specifying the panel
+#'   grid: `ncol`, `nrow`, `align` and `axis`. See `patchwork::plot_layout()`
+#'   for what `align` and `axis` do. Defaults to
+#'   `list(ncol = 2, nrow = NULL, align = "v", axis = "none")`.
+#' @param spacing (multi-panel specific) A named list controlling whitespace
+#'   and relative sizing:
+#'   * `pad_width`, `pad_height`: Numeric (mm). Adds horizontal/vertical
+#'   whitespace to the sides of all graphs. If saving multiple charts this
+#'   will add the same spacing to all charts. Defaults to no additional
+#'   padding.
+#'   * `outer_width`: Numeric (mm). Overrides the margin between the
+#'   left/right edges of the figure and the outermost panels. Defaults to
+#'   NULL, which uses the built-in margin (0mm). Set higher to add whitespace
+#'   around the outer edge of the figure; unlike `pad_width`, this does not
+#'   affect the gap between panels.
+#'   * `outer_height`: Numeric (mm). Overrides the margin between the
+#'   top/bottom edges of the figure (i.e. above the title and below the
+#'   footnotes/sources) and the panels. Defaults to NULL, which uses the
+#'   built-in margin (0mm). Set higher to add whitespace around the outer
+#'   edge of the figure; unlike `pad_height`, this does not affect the gap
+#'   between panel rows.
+#'   * `height_adj`: Rescales the height of the multi-panel. The function
+#'   sets sensible defaults but this provides you with manual control if you
+#'   need it.
+#'   * `rel_heights`: A numeric vector giving the relative proportions of
+#'   each graph component (title, plots, footer).
+#'   * `title`, `subtitle`: Rescales the size of the space given to the
+#'   multi-panel title/subtitle. Use if you think the title looks too
+#'   cramped on the chart. Both default to 1.
 #' @param chart_type String, or vector of strings if saving multiple plots. Type
 #'   of chart. This is used to set sensible chart widths based on the type of
 #'   plot you are saving. Options are:
@@ -27,23 +62,6 @@
 #' @param dim An optional named list specifying the plot height and width.
 #'   Defaults to NULL which means the graph dimensions will be calculated
 #'   automatically.
-#' @param pad_width Numeric (mm). Adds horizontal whitespace to the sides of all
-#'   graphs. If saving multiple charts this will add the same spacing to all
-#'   charts. Defaults to no additional padding.
-#' @param pad_height Numeric (mm). Adds vertical whitespace to the sides of all
-#'   graphs. If saving multiple charts this will add the same spacing to all
-#'   charts. Defaults to no additional padding.
-#' @param outer_width (multi-panel specific) Numeric (mm). Overrides the
-#'   margin between the left/right edges of the figure and the outermost
-#'   panels. Defaults to NULL, which uses the built-in margin (0mm). Set
-#'   higher to add whitespace around the outer edge of the figure; unlike
-#'   `pad_width`, this does not affect the gap between panels.
-#' @param outer_height (multi-panel specific) Numeric (mm). Overrides the
-#'   margin between the top/bottom edges of the figure (i.e. above the title
-#'   and below the footnotes/sources) and the panels. Defaults to NULL, which
-#'   uses the built-in margin (0mm). Set higher to add whitespace around the
-#'   outer edge of the figure; unlike `pad_height`, this does not affect the
-#'   gap between panel rows.
 #' @param max_height Numeric. The maximum height of your plot in cm. This is
 #'   used to constrain the plot resizing algorithm in cases where you want to
 #'   limit the height of your charts. Defaults to NULL which does not restrict
@@ -80,19 +98,6 @@
 #' @param bg_colour Set the graph background colour. Accepts a colour name, hex
 #'   code or theme61 colour object name. Defaults to "white". For graphs used in
 #'   research note boxes, set the colour to `e61_boxback`.
-#' @param ... (multi-panel specific) Plot objects to put on the panel.
-#' @param plotlist (multi-panel specific) List of plots to combine as an
-#'   multi-panel and save. You can also enter the charts individually as
-#'   arguments to the function.
-#' @param height_adj (multi-panel specific) Rescales the height of the
-#'   multi-panel. The function sets sensible defaults but this provides you with
-#'   manual control if you need it.
-#' @param spacing_adj (multi-panel specific) A named list specifying the
-#'   adjustment to the title and subtitle. Rescales the size of the space given
-#'   to the multi-panel title/subtitle. Use if you think the title looks too
-#'   cramped on the chart.
-#' @param rel_heights (multi-panel specific) A numeric vector giving the
-#'   relative proportions of each graph component (title, plots, footer).
 #' @param return_plot_obj (multi-panel specific) Logical. If TRUE, skips
 #'   saving entirely and returns the composed multi-panel plot object instead
 #'   (e.g. to print it in the Plots pane, or use it in a Shiny app). Only
@@ -102,46 +107,58 @@
 #'   computed for a fixed target size (`dim`, or the same defaults `save_e61`
 #'   would otherwise use) - it won't reflow if you resize the device
 #'   afterwards.
-#' @inheritParams labs_e61
-#' @inheritParams patchwork::plot_layout
+#' @param ... (multi-panel specific) Plot objects to put on the panel.
+#' @param title,subtitle,footnotes,sources `r lifecycle::badge("deprecated")`
+#'   Use `labs` instead.
+#' @param ncol,nrow,align,axis `r lifecycle::badge("deprecated")` Use `layout`
+#'   instead.
+#' @param pad_width,pad_height,outer_width,outer_height,height_adj,rel_heights,spacing_adj
+#'   `r lifecycle::badge("deprecated")` Use `spacing` instead.
 #' @return Invisibly returns the file name.
 #' @export
 
 save_e61 <- function(filename = NULL,
                      ...,
                      plot = last_plot(),
+                     plotlist = NULL,
+                     labs = list(title = NULL, subtitle = NULL, footnotes = NULL, sources = NULL),
+                     layout = list(ncol = 2, nrow = NULL, align = "v", axis = "none"),
+                     spacing = list(pad_width = 0, pad_height = 0, outer_width = NULL,
+                                    outer_height = NULL, height_adj = NULL, rel_heights = NULL,
+                                    title = 1, subtitle = 1),
+                     dim = list(height = NULL, width = NULL),
                      format = c("svg", "pdf", "eps", "png", "jpg"),
                      chart_type = NULL,
                      auto_scale = TRUE,
-                     dim = list(height = NULL, width = NULL),
-                     pad_width = 0,
-                     pad_height = 0,
-                     outer_width = NULL,
-                     outer_height = NULL,
                      max_height = NULL,
-                     preview = FALSE,
                      save_data = FALSE,
                      print_info = FALSE,
                      print_label_positions = FALSE,
                      fast_labels = FALSE,
                      spell_check = TRUE,
+                     preview = FALSE,
                      base_size = 10,
                      res = 1,
                      bg_colour = "white",
-                     # multi-panel specific arguments
-                     plotlist = NULL,
-                     title = NULL,
-                     subtitle = NULL,
-                     footnotes = NULL,
-                     sources = NULL,
-                     spacing_adj = list(title = 1, subtitle = 1),
-                     height_adj = NULL,
-                     ncol = 2,
-                     nrow = NULL,
-                     align = c("v", "none", "h", "hv"),
-                     axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-                     rel_heights = NULL,
-                     return_plot_obj = FALSE
+                     return_plot_obj = FALSE,
+                     # Deprecated - use `labs` instead
+                     title = lifecycle::deprecated(),
+                     subtitle = lifecycle::deprecated(),
+                     footnotes = lifecycle::deprecated(),
+                     sources = lifecycle::deprecated(),
+                     # Deprecated - use `layout` instead
+                     ncol = lifecycle::deprecated(),
+                     nrow = lifecycle::deprecated(),
+                     align = lifecycle::deprecated(),
+                     axis = lifecycle::deprecated(),
+                     # Deprecated - use `spacing` instead
+                     pad_width = lifecycle::deprecated(),
+                     pad_height = lifecycle::deprecated(),
+                     outer_width = lifecycle::deprecated(),
+                     outer_height = lifecycle::deprecated(),
+                     height_adj = lifecycle::deprecated(),
+                     rel_heights = lifecycle::deprecated(),
+                     spacing_adj = lifecycle::deprecated()
                      ) {
 
   # `filename` is the first formal, ahead of `...` -- so a multi-panel call
@@ -159,6 +176,65 @@ save_e61 <- function(filename = NULL,
     # Compile plots
     plots <- c(list(...), plotlist)
   }
+
+  # Fold deprecated top-level arguments into their replacement list args ----
+  # (mirrors the pattern used for plot_label()'s deprecated facet_name/facet_value)
+
+  .save_e61_deprecate_into <- function(list_arg, list_name, element, value, arg_name) {
+    if (lifecycle::is_present(value)) {
+      lifecycle::deprecate_warn(
+        when = "0.8.0",
+        what = paste0("save_e61(", arg_name, " = )"),
+        with = paste0("save_e61(", list_name, " = )"),
+        details = paste0(
+          "Set `", element, "` inside the `", list_name, "` list instead: ",
+          list_name, " = list(", element, " = ...)"
+        )
+      )
+      list_arg[[element]] <- value
+    }
+    list_arg
+  }
+
+  labs   <- .save_e61_deprecate_into(labs, "labs", "title", title, "title")
+  labs   <- .save_e61_deprecate_into(labs, "labs", "subtitle", subtitle, "subtitle")
+  labs   <- .save_e61_deprecate_into(labs, "labs", "footnotes", footnotes, "footnotes")
+  labs   <- .save_e61_deprecate_into(labs, "labs", "sources", sources, "sources")
+
+  layout <- .save_e61_deprecate_into(layout, "layout", "ncol", ncol, "ncol")
+  layout <- .save_e61_deprecate_into(layout, "layout", "nrow", nrow, "nrow")
+  layout <- .save_e61_deprecate_into(layout, "layout", "align", align, "align")
+  layout <- .save_e61_deprecate_into(layout, "layout", "axis", axis, "axis")
+
+  spacing <- .save_e61_deprecate_into(spacing, "spacing", "pad_width", pad_width, "pad_width")
+  spacing <- .save_e61_deprecate_into(spacing, "spacing", "pad_height", pad_height, "pad_height")
+  spacing <- .save_e61_deprecate_into(spacing, "spacing", "outer_width", outer_width, "outer_width")
+  spacing <- .save_e61_deprecate_into(spacing, "spacing", "outer_height", outer_height, "outer_height")
+  spacing <- .save_e61_deprecate_into(spacing, "spacing", "height_adj", height_adj, "height_adj")
+  spacing <- .save_e61_deprecate_into(spacing, "spacing", "rel_heights", rel_heights, "rel_heights")
+
+  if (lifecycle::is_present(spacing_adj)) {
+    lifecycle::deprecate_warn(
+      when = "0.8.0",
+      what = "save_e61(spacing_adj = )",
+      with = "save_e61(spacing = )",
+      details = "Set `title`/`subtitle` inside the `spacing` list instead: spacing = list(title = ..., subtitle = ...)"
+    )
+    if (!is.null(spacing_adj$title)) spacing$title <- spacing_adj$title
+    if (!is.null(spacing_adj$subtitle)) spacing$subtitle <- spacing_adj$subtitle
+  }
+
+  # Fill in defaults for any list elements the caller didn't supply
+  spacing$pad_width  <- spacing$pad_width  %||% 0
+  spacing$pad_height <- spacing$pad_height %||% 0
+  spacing$title      <- spacing$title      %||% 1
+  spacing$subtitle   <- spacing$subtitle   %||% 1
+  layout$ncol  <- layout$ncol  %||% 2
+  layout$align <- layout$align %||% "v"
+  layout$axis  <- layout$axis  %||% "none"
+
+  # Compile plots
+  plots <- c(list(...), plotlist)
 
   # For single-panel graphs
   if (length(plots) == 0) plots <- list(plot)
@@ -241,8 +317,15 @@ save_e61 <- function(filename = NULL,
   if (!all(names(dim) %in% c("height", "width")))
     stop("You have specified invalid list elements in 'dim'.")
 
-  if (!all(names(spacing_adj) %in% c("title", "subtitle")))
-    stop("You have specified invalid list elements in 'spacing_adj'.")
+  if (!all(names(labs) %in% c("title", "subtitle", "footnotes", "sources")))
+    stop("You have specified invalid list elements in 'labs'.")
+
+  if (!all(names(layout) %in% c("ncol", "nrow", "align", "axis")))
+    stop("You have specified invalid list elements in 'layout'.")
+
+  if (!all(names(spacing) %in% c("pad_width", "pad_height", "outer_width", "outer_height",
+                                  "height_adj", "rel_heights", "title", "subtitle")))
+    stop("You have specified invalid list elements in 'spacing'.")
 
   # Advisory messages -------------------------------------------------------
 
@@ -322,28 +405,28 @@ save_e61 <- function(filename = NULL,
       format = format,
       plots = plots,
       chart_type = chart_type,
-      title = title,
-      subtitle = subtitle,
-      footnotes = footnotes,
-      sources = sources,
+      title = labs$title,
+      subtitle = labs$subtitle,
+      footnotes = labs$footnotes,
+      sources = labs$sources,
       width = dim$width, # control width of the chart
       height = dim$height, # control height of the chart
       auto_scale = auto_scale,
-      title_spacing_adj = spacing_adj$title, # adjust the amount of space given to the title
-      subtitle_spacing_adj = spacing_adj$subtitle, # adjust the amount of space given to the subtitle
-      height_adj = height_adj, # adjust the vertical spacing of the mpanel charts
+      title_spacing_adj = spacing$title, # adjust the amount of space given to the title
+      subtitle_spacing_adj = spacing$subtitle, # adjust the amount of space given to the subtitle
+      height_adj = spacing$height_adj, # adjust the vertical spacing of the mpanel charts
       base_size = base_size,
-      pad_width = pad_width,
-      pad_height = pad_height,
-      outer_width = outer_width,
-      outer_height = outer_height,
-      ncol = ncol,
-      nrow = nrow,
-      align = align,
-      axis = axis,
-      rel_heights = rel_heights,
-      bg_colour = bg_colour,
-      print_label_positions = print_label_positions
+      print_label_positions = print_label_positions,
+      pad_width = spacing$pad_width,
+      pad_height = spacing$pad_height,
+      outer_width = spacing$outer_width,
+      outer_height = spacing$outer_height,
+      ncol = layout$ncol,
+      nrow = layout$nrow,
+      align = layout$align,
+      axis = layout$axis,
+      rel_heights = spacing$rel_heights,
+      bg_colour = bg_colour
     )
 
     # Short-circuit: return the composed plot object instead of saving it
@@ -363,11 +446,11 @@ save_e61 <- function(filename = NULL,
       max_height = max_height, # control max height
       format = format,
       base_size = base_size,
-      pad_width = pad_width,
-      pad_height = pad_height,
-      bg_colour = bg_colour,
       print_label_positions = print_label_positions,
-      fast_labels = fast_labels
+      fast_labels = fast_labels,
+      pad_width = spacing$pad_width,
+      pad_height = spacing$pad_height,
+      bg_colour = bg_colour
     )
   }
 

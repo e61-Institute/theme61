@@ -416,9 +416,11 @@ Then we use `save_e61()` to put the graphs together.
 save_e61(
     g1, g2, g3, g4,
     filename = "../man/figures/g-multi.svg",
-    title = "US Personal Expenditures*",
-    footnotes = "Data comes from the built-in USPersonalExpenditure dataset.",
-    sources = c("e61 Institute", "'datasets' package")
+    labs = list(
+      title = "US Personal Expenditures*",
+      footnotes = "Data comes from the built-in USPersonalExpenditure dataset.",
+      sources = c("e61 Institute", "'datasets' package")
+    )
 )
 ```
 
