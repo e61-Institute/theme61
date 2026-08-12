@@ -133,7 +133,7 @@ t61_strip_chrome <- function(plot) {
 #' @param width_cm,height_cm Physical size the real chart will be saved at.
 #' @param px_width Pixel width of the low-res mask raster. Height is derived
 #'   from the aspect ratio of width_cm/height_cm.
-#' @return A list with: occupancy (logical matrix, TRUE = ink, [row, col],
+#' @return A list with: occupancy (logical matrix, TRUE = ink, \[row, col\],
 #'   row 1 = top), panel (list of left/top/width/height in px),
 #'   px_per_cm_x, px_per_cm_y, x_range, y_range (panel data ranges). Returns
 #'   NULL if the plot's layout isn't v1 scope (e.g. facets).

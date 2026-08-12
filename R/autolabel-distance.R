@@ -87,7 +87,7 @@ t61_distance_to_series <- function(x, y, series_x, series_y, geom_type, units) {
 }
 
 #' Shortest distance from point P to the axis-aligned rectangle
-#' [xmin,xmax] x [ymin,ymax], all in a common physical unit (e.g. cm). 0 if
+#' \[xmin,xmax\] x \[ymin,ymax\], all in a common physical unit (e.g. cm). 0 if
 #' P is inside (or on the boundary of) the rectangle.
 #' @noRd
 t61_point_rect_distance <- function(px, py, xmin, xmax, ymin, ymax) {

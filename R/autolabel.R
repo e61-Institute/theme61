@@ -155,7 +155,7 @@ t61_place_label_fallback <- function(mask, label_cm, hjust = 0, vjust = 0.5, n_s
 #' already in the same aesthetic space plot_label() writes to regardless
 #' of coord_flip().
 #'
-#' The y offset is clamped to the series' own actual [min, max] -- by the
+#' The y offset is clamped to the series' own actual \[min, max\] -- by the
 #' time this runs, the y-axis scale's limits are usually already fixed
 #' (see update_scales(), called earlier in save_single()'s pipeline), sized
 #' to comfortably contain the real data but not by a guaranteed or

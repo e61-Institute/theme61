@@ -40,8 +40,8 @@ t61_area_interpolate <- function(series, x) {
   )
 }
 
-#' The tightest [ymin, ymax] band that holds across the whole x interval
-#' [x_left, x_right] -- i.e. max(ymin) and min(ymax) over that interval.
+#' The tightest \[ymin, ymax\] band that holds across the whole x interval
+#' \[x_left, x_right\] -- i.e. max(ymin) and min(ymax) over that interval.
 #' Since ymin(x)/ymax(x) are piecewise-linear, their extrema over any
 #' sub-interval are always attained at that sub-interval's own endpoints or
 #' at one of the series' own breakpoints strictly inside it (a linear
