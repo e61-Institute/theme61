@@ -223,7 +223,7 @@ test_that("Multi-panel graph examples", {
 
   ## 2x1 graph ----
   withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x1.svg", p1, p2, ncol = 1)))
+    expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x1.svg", p1, p2, layout = list(ncol = 1))))
   })
 
   ## 2x2 graph ----
@@ -233,32 +233,36 @@ test_that("Multi-panel graph examples", {
 
   ## 2x3 graph ----
   withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x3.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, ncol = 3)))
+    expect_snapshot_file(suppressWarnings(save_e61("plot-multi-2x3.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, layout = list(ncol = 3))))
   })
 
   ## 3x2 graph ----
   withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("plot-multi-3x2.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, ncol = 2)))
+    expect_snapshot_file(suppressWarnings(save_e61("plot-multi-3x2.svg", p1_t, p2_t, p3_t, p4_t, p1_t, p2_t, layout = list(ncol = 2))))
   })
 
   ## 1x2 graph with long common footnotes + sources ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61("plot-multi-1x2-long-footer.svg", p1, p2,
-               title = "Multi-panel graph title text",
-               subtitle = "Multi-panel graph subtitle text",
-               footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
-               sources = c("Sources", "Sauces"))))
+               labs = list(
+                 title = "Multi-panel graph title text",
+                 subtitle = "Multi-panel graph subtitle text",
+                 footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+                 sources = c("Sources", "Sauces")
+               ))))
   })
 
   ## 1x2 graph with long title ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61("plot-multi-1x2-long-title.svg", p1, p2,
-               title = "Multi-panel graph title text that goes on and on and on and on and on and on and on and on and on and on and on",
-               subtitle = "Multi-panel graph subtitle text",
-               footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
-               sources = c("Sources", "Sauces"))))
+               labs = list(
+                 title = "Multi-panel graph title text that goes on and on and on and on and on and on and on and on and on and on and on",
+                 subtitle = "Multi-panel graph subtitle text",
+                 footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+                 sources = c("Sources", "Sauces")
+               ))))
   })
 
   ## 1x2 graph with long panel titles and subtitles ----
@@ -273,30 +277,36 @@ test_that("Multi-panel graph examples", {
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61("plot-multi-1x2-long-panel-title.svg", p1_lt, p2_lt,
-               title = "Multi-panel graph title text",
-               subtitle = "Multi-panel graph subtitle text",
-               footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
-               sources = c("Sources", "Sauces"))))
+               labs = list(
+                 title = "Multi-panel graph title text",
+                 subtitle = "Multi-panel graph subtitle text",
+                 footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+                 sources = c("Sources", "Sauces")
+               ))))
   })
 
   ## 1x2 graph with 1 long panel title and subtitles ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61("plot-multi-1x2-1-long-panel-title.svg", p1_lt, p2_t,
-               title = "Multi-panel graph title text",
-               subtitle = "Multi-panel graph subtitle text",
-               footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
-               sources = c("Sources", "Sauces"))))
+               labs = list(
+                 title = "Multi-panel graph title text",
+                 subtitle = "Multi-panel graph subtitle text",
+                 footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+                 sources = c("Sources", "Sauces")
+               ))))
   })
 
   ## Test pad_width > 0 values ----
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61("plot-multi-1x2-1-long-panel-title-padwidth.svg", p1_t, p2_t, pad_width = 3,
-               title = "Multi-panel graph title text",
-               subtitle = "Multi-panel graph subtitle text",
-               footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
-               sources = c("Sources", "Sauces"))))
+      save_e61("plot-multi-1x2-1-long-panel-title-padwidth.svg", p1_t, p2_t, spacing = list(pad_width = 3),
+               labs = list(
+                 title = "Multi-panel graph title text",
+                 subtitle = "Multi-panel graph subtitle text",
+                 footnotes = "Long sentence about footnotes that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on...",
+                 sources = c("Sources", "Sauces")
+               ))))
   })
 
   ## Check spacing with multi-panel title, no subtitle, and panel subtitles ----
@@ -313,7 +323,7 @@ test_that("Multi-panel graph examples", {
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61("plot-multi-1x2-1-title-no subtitle.svg", p1_t, p2_t,
-               title = "Multi-panel graph title text")))
+               labs = list(title = "Multi-panel graph title text"))))
   })
 
 })
