@@ -2,7 +2,7 @@
 
 #### New features
 
-* New function to set session-wide options for the package: `set_t61_options()`. This allows you to turn off various functionality in theme61, see the documentation for all your options ([set_t61_options()](https://e61-institute.github.io/theme61/reference/set_t61_options.html) or `?set_t61_options()`). Some of the key new options include: `theme61.auto_theme` controls whether `ggplot()` automatically applies `theme_e61()`; and `theme61.iterate_mode`, when `TRUE`, `ggplot()`/`print()` skip all of theme61's automatic styling and rendering, printing graphs with plain ggplot2 defaults as quickly as possible.
+* New function to set session-wide options for the package: `set_t61_options()`. This allows you to turn off various functionality in theme61, see the documentation for all your options ([set_t61_options()](https://e61-institute.github.io/theme61/reference/set_t61_options.html) or `?set_t61_options()`). Some of the key new options include: `theme61.auto_theme` controls whether `ggplot()` automatically applies `theme_e61()`; and `theme61.iterate_mode`, which skips all of theme61's automatic styling and rendering, printing graphs with plain ggplot2 defaults.
 * Multi-panel graphs can be returned as a plot object using a new `return_plot_obj` argument to `save_e61()`. This is useful to print it in the Plots pane, or use it in a Shiny app.
 * The arguments available in `save_e61()` have grown increasingly cluttered and complicated due to new features being added. So ~30 top-level arguments have been grouped into four named lists to make it easier to use.
 
