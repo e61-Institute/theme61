@@ -155,7 +155,11 @@ save_e61 <- function(filename = NULL,
       lifecycle::deprecate_warn(
         when = "0.8.0",
         what = paste0("save_e61(", arg_name, " = )"),
-        with = paste0("save_e61(", list_name, " = list(", element, " = ))")
+        with = paste0("save_e61(", list_name, " = )"),
+        details = paste0(
+          "Set `", element, "` inside the `", list_name, "` list instead: ",
+          list_name, " = list(", element, " = ...)"
+        )
       )
       list_arg[[element]] <- value
     }
@@ -183,7 +187,8 @@ save_e61 <- function(filename = NULL,
     lifecycle::deprecate_warn(
       when = "0.8.0",
       what = "save_e61(spacing_adj = )",
-      with = "save_e61(spacing = list(title = , subtitle = ))"
+      with = "save_e61(spacing = )",
+      details = "Set `title`/`subtitle` inside the `spacing` list instead: spacing = list(title = ..., subtitle = ...)"
     )
     if (!is.null(spacing_adj$title)) spacing$title <- spacing_adj$title
     if (!is.null(spacing_adj$subtitle)) spacing$subtitle <- spacing_adj$subtitle
