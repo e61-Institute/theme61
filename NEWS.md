@@ -1,4 +1,4 @@
-# theme61 (development version)
+# theme61 0.8.0
 
 #### New features
 
