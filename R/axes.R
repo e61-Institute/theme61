@@ -68,12 +68,17 @@ scale_y_continuous_e61 <- function(limits = NULL,
   }
 
   if(!is.null(limits) && add_space){
-    # Put it all together
+
+    # Add 3% to the supplied limits to create a bit of white space at the
+    # top of the chart. applied_limits (not the original limits) is what
+    # actually gets passed to the scale, so it's also what the data-range
+    # check below must validate against.
+    applied_limits <- c(limits[1], limits[2] + (limits[2] - limits[1]) * 0.03)
+
     retval <- ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
       sec.axis = sec_axis,
-      # Add 3% to the supplied limits to create a bit of white space at the top of the chart
-      limits = c(limits[1], limits[2] + (limits[2] - limits[1]) * 0.03),
+      limits = applied_limits,
       breaks = breaks,
       ...
     )
@@ -82,17 +87,19 @@ scale_y_continuous_e61 <- function(limits = NULL,
 
     # Make sure limits are only the min and max values (i.e. strictly length = 2)
     limits <- limits[1:2]
+    applied_limits <- limits
 
     # Put it all together
     retval <- ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
       sec.axis = sec_axis,
-      limits = limits,
+      limits = applied_limits,
       breaks = breaks,
       ...
     )
 
   } else {
+    applied_limits <- NULL
     retval <- ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
       sec.axis = sec_axis,
@@ -125,9 +132,13 @@ scale_y_continuous_e61 <- function(limits = NULL,
       # x now contains the data values (possibly transformed) used to train the scale
       data_range <- range(x_ok, na.rm = TRUE)
 
-      # Stop if actual data range fall outside the provided limits
-      if (limits[1] > data_range[1] || limits[2] < data_range[2]) {
-        cli::cli_abort("Supplied limits are outside the data's range. Data range: [{data_range[1]}, {data_range[2]}]; Supplied limits: [{limits[1]}, {limits[2]}]. Change your limits so they contain the full range of the data.",
+      # Stop if actual data range fall outside the limits actually applied
+      # to the scale (applied_limits, not the original limits argument -
+      # with add_space = TRUE those differ by the 3% top padding, and
+      # checking against the pre-padding value here would reject data that
+      # the scale itself comfortably has room for).
+      if (applied_limits[1] > data_range[1] || applied_limits[2] < data_range[2]) {
+        cli::cli_abort("Supplied limits are outside the data's range. Data range: [{data_range[1]}, {data_range[2]}]; Supplied limits: [{applied_limits[1]}, {applied_limits[2]}]. Change your limits so they contain the full range of the data.",
                        call = expr(scale_y_continuous_e61()),
                        class = "error"
                        )
