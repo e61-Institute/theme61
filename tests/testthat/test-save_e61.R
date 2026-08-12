@@ -618,12 +618,24 @@ test_that("Deprecated top-level arguments still work and fold into the new list 
   # lifecycle::expect_deprecated() rather than testthat::expect_warning() -
   # it's the lifecycle package's own helper for testing deprecate_warn(),
   # which correctly matches its condition class/verbosity so the warning is
-  # actually captured instead of leaking to the console.
+  # actually captured instead of leaking to the console. Test one deprecated
+  # argument per call: save_e61() emits a separate deprecate_warn() for each
+  # deprecated argument supplied, and expect_deprecated()/expect_warning()
+  # only capture and muffle the first matching warning in an expression, so
+  # passing several deprecated args at once would leave the later ones
+  # unmuffled and leaking to the console.
   lifecycle::expect_deprecated(
-    obj_old <- save_e61(plotlist = list(p1, p2), title = "Combined",
-                        ncol = 1, pad_width = 5, return_plot_obj = TRUE)
+    obj_old <- save_e61(plotlist = list(p1, p2), title = "Combined", return_plot_obj = TRUE)
   )
   expect_s3_class(obj_old, "patchwork")
+
+  lifecycle::expect_deprecated(
+    save_e61(plotlist = list(p1, p2), ncol = 1, return_plot_obj = TRUE)
+  )
+
+  lifecycle::expect_deprecated(
+    save_e61(plotlist = list(p1, p2), pad_width = 5, return_plot_obj = TRUE)
+  )
 
   # The new list-based equivalent shouldn't warn at all
   expect_no_warning(
