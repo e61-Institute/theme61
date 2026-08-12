@@ -459,7 +459,7 @@ test_that("Multi-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61(p8a, p8b, pad_width = 3, filename = "plot-multi-wrp-test-25.svg", bg_colour = "grey90", spell_check = FALSE)
+      save_e61(p8a, p8b, spacing = list(pad_width = 3), filename = "plot-multi-wrp-test-25.svg", bg_colour = "grey90", spell_check = FALSE)
     ))
   })
 
@@ -467,8 +467,7 @@ test_that("Multi-panel graph examples", {
     expect_snapshot_file(suppressWarnings(
       save_e61(
         p8a, p8b, p8a, p8b,
-        pad_width = 3,
-        pad_height = 3,
+        spacing = list(pad_width = 3, pad_height = 3),
         filename = "plot-multi-wrp-test-27.svg",
         bg_colour = "grey90",
         spell_check = FALSE
@@ -503,7 +502,7 @@ test_that("Multi-panel graph examples", {
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61(
-        title = "The is an overal chart title",
+        labs = list(title = "The is an overal chart title"),
         p9a, p9b,
         filename = "plot-multi-wrp-test-28.svg",
         bg_colour = "grey90", spell_check = FALSE
@@ -539,7 +538,7 @@ test_that("Multi-panel graph examples", {
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61(
-        subtitle = "The is a subtitle",
+        labs = list(subtitle = "The is a subtitle"),
         p10a, p10b,
         filename = "plot-multi-wrp-test-31.svg",
         bg_colour = "grey90",
@@ -566,15 +565,17 @@ test_that("Multi-panel graph examples", {
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61(
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
+        labs = list(
+          footnotes = paste0(
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
+            "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
+            "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
+            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
+            "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
+            "in culpa qui officia deserunt mollit."
+          ),
+          sources = c("e61", 'ABS')
         ),
-        sources = c("e61", 'ABS'),
         p11a, p11b,
         filename = "plot-multi-wrp-test-34.svg",
         bg_colour = "grey90",
@@ -601,17 +602,19 @@ test_that("Multi-panel graph examples", {
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61(
-        title = "The is an overal chart title",
-        subtitle = "The is a subtitle",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
+        labs = list(
+          title = "The is an overal chart title",
+          subtitle = "The is a subtitle",
+          footnotes = paste0(
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
+            "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
+            "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
+            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
+            "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
+            "in culpa qui officia deserunt mollit."
+          ),
+          sources = c("e61", 'ABS')
         ),
-        sources = c("e61", 'ABS'),
         p12a, p12b,
         filename = "plot-multi-wrp-test-37.svg",
         bg_colour = "grey90",
@@ -637,21 +640,23 @@ test_that("Multi-panel graph examples", {
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61(
-        title = "This is a very very very very very very very very very very very very very very very very very very very very very long title that really should just be one line",
-        subtitle = "A test of a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very  very very very very very very very very very very very very very long subtitle, but that's probably okay because subtitles can be long",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
+        labs = list(
+          title = "This is a very very very very very very very very very very very very very very very very very very very very very long title that really should just be one line",
+          subtitle = "A test of a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very  very very very very very very very very very very very very very long subtitle, but that's probably okay because subtitles can be long",
+          footnotes = paste0(
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
+            "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
+            "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
+            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
+            "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
+            "in culpa qui officia deserunt mollit."
+          ),
+          sources = c("e61", 'ABS')
         ),
-        sources = c("e61", 'ABS'),
         p13a,
         p13b,
         p13a,
-        ncol = 3,
+        layout = list(ncol = 3),
         filename = "plot-multi-wrp-test-41.svg",
         bg_colour = "grey90",
         spell_check = FALSE
@@ -676,23 +681,24 @@ test_that("Multi-panel graph examples", {
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61(
-        title = "The is an overall chart title that is fairly long",
-        subtitle = "The is a subtitle",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
+        labs = list(
+          title = "The is an overall chart title that is fairly long",
+          subtitle = "The is a subtitle",
+          footnotes = paste0(
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
+            "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
+            "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
+            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
+            "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
+            "in culpa qui officia deserunt mollit."
+          ),
+          sources = c("e61", 'ABS')
         ),
-        sources = c("e61", 'ABS'),
         p14a,
         p14b,
         p14a,
         p14b,
-        pad_width = 3,
-        pad_height = 5,
+        spacing = list(pad_width = 3, pad_height = 5),
         filename = "plot-multi-wrp-test-45.svg",
         bg_colour = "grey90",
         spell_check = FALSE
@@ -720,23 +726,24 @@ test_that("Multi-panel graph examples", {
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
       save_e61(
-        title = "This is a very very very very very very very very very very very very very very very very very very very very very very very very very long title that really should just be one line",
-        subtitle = "A test of a very very very very very very very very very very very very very very very very very very very very very very very very very long subtitle, but that's probably okay because subtitles can be long",
-        footnotes = paste0(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
-          "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
-          "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-          "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
-          "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
-          "in culpa qui officia deserunt mollit."
+        labs = list(
+          title = "This is a very very very very very very very very very very very very very very very very very very very very very very very very very long title that really should just be one line",
+          subtitle = "A test of a very very very very very very very very very very very very very very very very very very very very very very very very very long subtitle, but that's probably okay because subtitles can be long",
+          footnotes = paste0(
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor ",
+            "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis ",
+            "nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
+            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
+            "eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt ",
+            "in culpa qui officia deserunt mollit."
+          ),
+          sources = c("e61", 'ABS')
         ),
-        sources = c("e61", 'ABS'),
         p15a,
         p15b,
         p15a,
         p15b,
-        nrow = 1,
-        ncol = 4,
+        layout = list(nrow = 1, ncol = 4),
         filename = "plot-multi-wrp-test-47.svg",
         bg_colour = "grey90",
         spell_check = FALSE
