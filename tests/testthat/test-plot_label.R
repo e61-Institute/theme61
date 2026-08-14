@@ -1,6 +1,6 @@
 test_that("Single plot label works", {
   p1 <- minimal_plot_label +
-    plot_label(label = "Plot 1", x = 2, y = 2)
+    plot_label(label = "Plot 1", x = 2, y = 2, auto_position = FALSE)
 
   # plot_label should add exactly one new layer (a text/label geom)
   expect_gte(length(p1@layers), 1)
@@ -37,11 +37,10 @@ test_that("Multi-plot labels work with colour and fill", {
 
   p1 <- ggplot(data1, aes(x, y, colour = group)) +
     geom_line() +
-    plot_label(
-      c("1", "2", "3"),
-      rep(0.5, 3),
-      c(1.3, 2.3, 3.3)
-    )
+    plot_label(c("1", "2", "3"),
+               rep(0.5, 3),
+               c(1.3, 2.3, 3.3),
+               auto_position = FALSE)
 
   # Force theme61 ggplot_build hook to add scale_colour_e61()
   b1 <- expect_no_warning(ggplot_build(p1))
@@ -69,11 +68,10 @@ test_that("Multi-plot labels work with colour and fill", {
 
   p2 <- ggplot(data2, aes(x, y, fill = group)) +
     geom_col(position = "dodge") +
-    plot_label(
-      c("1", "2"),
-      c(-0.25, 0.25),
-      c(1.2, 2.2)
-    )
+    plot_label(c("1", "2"),
+               c(-0.25, 0.25),
+               c(1.2, 2.2),
+               auto_position = FALSE)
 
   b2 <- expect_no_warning(ggplot_build(p2))
 
@@ -90,6 +88,82 @@ test_that("Multi-plot labels work with colour and fill", {
   expect_equal(l2$aes_params$colour, expected_fills)
 })
 
+test_that("plot_label() derives label/colour from a manual colour/fill scale", {
+
+  data <- data.frame(
+    x = c(0, 1, 0, 1),
+    y = c(0, 0, 1, 1),
+    grp = factor(c("Alpha", "Alpha", "Beta", "Beta"))
+  )
+  cols <- c(Alpha = "#7b3294", Beta = "#008837")
+
+  base <- ggplot(data, aes(x, y, colour = grp)) +
+    geom_line() +
+    scale_colour_manual(values = cols)
+
+  # label omitted entirely: derived from the scale's own levels, in order
+  p1 <- base + plot_label()
+  d1 <- p1@layers[[length(p1@layers)]]$data
+  expect_equal(d1$label, c("Alpha", "Beta"))
+  expect_equal(d1$colour, unname(cols[c("Alpha", "Beta")]))
+
+  # label supplied, colour omitted: matched positionally against the
+  # scale's levels (assumes label is given in the same order)
+  p2 <- base + plot_label(c("Group Alpha", "Group Beta"))
+  d2 <- p2@layers[[length(p2@layers)]]$data
+  expect_equal(d2$label, c("Group Alpha", "Group Beta"))
+  expect_equal(d2$colour, unname(cols[c("Alpha", "Beta")]))
+
+  # colour explicitly supplied: always wins, scale ignored
+  p3 <- base + plot_label(c("Alpha", "Beta"), colour = c("red", "blue"))
+  d3 <- p3@layers[[length(p3@layers)]]$data
+  expect_equal(d3$colour, c("red", "blue"))
+
+  # values= order in the scale_colour_manual() call is irrelevant -- the
+  # scale's own (trained) level order wins, same as a legend would show
+  base_shuffled <- ggplot(data, aes(x, y, colour = grp)) +
+    geom_line() +
+    scale_colour_manual(values = c(Beta = "#008837", Alpha = "#7b3294"))
+  p4 <- base_shuffled + plot_label()
+  d4 <- p4@layers[[length(p4@layers)]]$data
+  expect_equal(d4$label, c("Alpha", "Beta"))
+  expect_equal(d4$colour, unname(cols[c("Alpha", "Beta")]))
+
+  # fill works the same way as colour
+  data_fill <- data.frame(x = c("a", "b"), y = c(1, 2))
+  fill_cols <- c(a = "#111111", b = "#222222")
+  p5 <- ggplot(data_fill, aes(x, y, fill = x)) +
+    geom_col() +
+    scale_fill_manual(values = fill_cols) +
+    plot_label()
+  d5 <- p5@layers[[length(p5@layers)]]$data
+  expect_equal(d5$label, c("a", "b"))
+  expect_equal(d5$colour, unname(fill_cols))
+
+  # More labels than the scale has levels for: falls back to the e61
+  # palette entirely, rather than partially matching
+  p6 <- base + plot_label(c("Alpha", "Beta", "Gamma"))
+  d6 <- p6@layers[[length(p6@layers)]]$data
+  expect_equal(d6$colour, palette_e61(3))
+
+  # No manual scale, colour supplied but label omitted: no scale to
+  # derive a default label from, so this still errors
+  no_scale <- ggplot(data, aes(x, y, colour = grp)) + geom_line()
+  expect_error(
+    no_scale + plot_label(),
+    "no scale_colour_manual"
+  )
+
+  # An algorithmic discrete scale (not "manual") doesn't count -- colour
+  # still falls back to the e61 palette, and label is still required
+  algo_scale <- ggplot(data, aes(x, y, colour = grp)) + geom_line() + scale_colour_e61()
+  expect_error(algo_scale + plot_label(), "no scale_colour_manual")
+
+  p7 <- algo_scale + plot_label(c("Alpha", "Beta"))
+  d7 <- p7@layers[[length(p7@layers)]]$data
+  expect_equal(d7$colour, palette_e61(2))
+})
+
 test_that("Plots with additional aes still work", {
 
   data <- data.frame(
@@ -103,7 +177,8 @@ test_that("Plots with additional aes still work", {
     scale_y_continuous_e61(c(0, 2, 1)) +
     plot_label(c("Solid", "Dotted"),
                c(0.25, 0.25),
-               c(0.75, 1.75))
+               c(0.75, 1.75),
+               auto_position = FALSE)
 
   l <- p@layers[[length(p@layers)]]
 
@@ -129,9 +204,15 @@ test_that("String dates get converted to date dates properly", {
 
 test_that("Specifying custom colours works in plot_label()", {
 
-  # Default colours
+  # Default colours -- unresolved on the raw plot_label() object (it has
+  # no access to the plot yet, see .build_plot_label_layer()), resolved
+  # to the e61 palette once actually added to a plot with no manual scale
+  # to derive colours from instead.
   retval <- plot_label("Test", 1, 1)
-  expect_equal(retval$colour, palette_e61(1))
+  expect_true(is.na(retval$colour))
+
+  built <- minimal_plot_label + retval
+  expect_equal(built@layers[[length(built@layers)]]$data$colour, palette_e61(1))
 
   # Custom colours
   retval <- plot_label("Test", 1, 1, colour = "#000000")
@@ -147,10 +228,11 @@ test_that("Specifying custom colours works in plot_label()", {
 
 test_that("Text and label plot labels work", {
   p1 <- minimal_plot_label +
-    plot_label("label", 2, 2, geom = "label")
+    plot_label("label", 2, 2, geom = "label", auto_position = FALSE) +
+    scale_y_continuous_e61()
 
   p2 <- minimal_plot_label +
-    plot_label("text", 2, 2, geom = "text")
+    plot_label("text", 2, 2, geom = "text", auto_position = FALSE)
 
   expect_true(inherits(p1@layers[[length(p1@layers)]]$geom, "GeomLabel"))
   expect_true(inherits(p2@layers[[length(p1@layers)]]$geom, "GeomText"))
@@ -175,6 +257,74 @@ test_that("Specifying incorrect length of label characteristics fails", {
 
 })
 
+test_that("x/y are optional when auto_position = TRUE, required otherwise", {
+  # auto_position = FALSE has no algorithm to fall back on, so x/y stay required
+  expect_error(
+    plot_label("a", colour = "red", auto_position = FALSE),
+    "required when `auto_position = FALSE`"
+  )
+
+  # x and y must be supplied together, or not at all
+  expect_error(plot_label("a", x = 1, colour = "red"), "supplied together")
+  expect_error(plot_label("a", y = 1, colour = "red"), "supplied together")
+
+  # Both omitted, auto_position = TRUE (the default): no error
+  expect_no_error(plot_label("a", colour = "red"))
+
+  # A facetted plot has no automatic positioning to fall back on either
+  data <- data.frame(x = 1:10, y = 1:10, grp = rep(c("A", "B"), 5))
+  p <- ggplot(data, aes(x, y)) + geom_line(colour = "red") + facet_wrap(~grp)
+  expect_error(
+    p + plot_label("a", colour = "red"),
+    "facetted"
+  )
+})
+
+test_that("theme61.auto_label = FALSE restores the old always-required x/y behaviour", {
+  withr::local_options(list(theme61.auto_label = FALSE))
+
+  # auto_position = TRUE (the default) normally allows x/y to be omitted --
+  # with the option off, it no longer does.
+  expect_error(
+    plot_label("a", colour = "red"),
+    "automatic positioning is disabled"
+  )
+
+  # auto_position = FALSE already requires x/y on its own -- turning the
+  # option off doesn't change that error message.
+  expect_error(
+    plot_label("a", colour = "red", auto_position = FALSE),
+    "auto_position = FALSE"
+  )
+
+  # An explicit position is unaffected either way.
+  expect_no_error(plot_label("a", x = 1, y = 1, colour = "red"))
+})
+
+test_that("Rotated text requires x/y (angle != 0 has no automatic positioning to fall back on)", {
+  expect_error(
+    plot_label("a", colour = "red", angle = 45),
+    "angle != 0"
+  )
+
+  # A mix of rotated and unrotated labels still requires x/y for all of
+  # them, since they're one auto_position call, not resolved individually.
+  expect_error(
+    plot_label(c("a", "b"), colour = c("red", "blue"), angle = c(0, 45)),
+    "angle != 0"
+  )
+
+  # An explicit position is fine regardless of rotation.
+  expect_no_error(plot_label("a", x = 1, y = 1, colour = "red", angle = 45))
+
+  # auto_position = FALSE already requires x/y on its own -- rotation
+  # doesn't change that error.
+  expect_error(
+    plot_label("a", colour = "red", angle = 45, auto_position = FALSE),
+    "auto_position = FALSE"
+  )
+})
+
 test_that("Changing horizontal alignment of text works", {
 
   p <- minimal_plot_label +
@@ -187,16 +337,15 @@ test_that("Changing horizontal alignment of text works", {
 
   # Check that hjust is stored correctly in the ggplot object
   expect_equal(p@layers[[length(p@layers)]]$data$hjust, c(0, 0.5, 1))
-
 })
 
 test_that("Label rotation works", {
 
   ## Separate plot_labels work
   p1 <- minimal_plot_label +
-    plot_label("Normal text", 0.5, 1.5, angle = 90) +
-    plot_label("Vertical text", 1.5, 1.5, angle = 0) +
-    plot_label("Diagonal text", 2.5, 1.5, angle = 45) +
+    plot_label("Normal text", 0.5, 1.5, angle = 90, auto_position = FALSE) +
+    plot_label("Vertical text", 1.5, 1.5, angle = 0, auto_position = FALSE) +
+    plot_label("Diagonal text", 2.5, 1.5, angle = 45, auto_position = FALSE) +
     scale_y_continuous_e61(limits = c(0, 3))
 
   # 3 geoms for labels get added + 1 geom_point
@@ -212,7 +361,8 @@ test_that("Label rotation works", {
     plot_label(c("Normal text", "Vertical text", "Diagonal text"),
                 x = rep(2, 3),
                 y = c(2.1, 2.3, 2.15),
-                angle = c(0, 90, 45)) +
+                angle = c(0, 90, 45),
+                auto_position = FALSE) +
     scale_y_continuous_e61(c(0, 3))
 
   # Only one extra layer gets created with all the label info
