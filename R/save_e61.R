@@ -79,7 +79,10 @@
 #' @param spell_check Logical. Check spelling of words in the title and caption.
 #'   Defaults to TRUE. Set to FALSE to turn off, or set the
 #'   `theme61.disable_spellcheck` option to skip it session-wide regardless of
-#'   this argument (see [set_t61_options]).
+#'   this argument (see [set_t61_options]). Words listed in
+#'   `inst/extdata/custom_dictionary.txt` (e.g. "e61") are never flagged - add
+#'   a legitimate word to that file (one per line) if the spell-checker keeps
+#'   flagging it as a typo.
 #' @param preview Logical. Set to TRUE to show a preview of the graph in the
 #'   Viewer pane but not save to disk. Defaults to FALSE.
 #' @param base_size Numeric. Chart font size. Default is 10.

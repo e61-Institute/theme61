@@ -1,0 +1,6 @@
+# Words that save_e61()'s spell-checker should always treat as correctly
+# spelled, regardless of what the en_AU hunspell dictionary knows. One word
+# per line. Lines starting with # (like this one) and blank lines are
+# ignored. Add to this list whenever the spell-checker flags a legitimate
+# word (e.g. an acronym or e61-specific term) as a typo.
+e61

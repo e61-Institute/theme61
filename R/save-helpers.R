@@ -187,8 +187,10 @@ check_spelling <- function(vector) {
     stop("The vector supplied to check_spelling must be a character vector.")
   }
 
-  # Check spelling of each element in the vector
-  retval <- hunspell::hunspell(vector, dict = hunspell::dictionary("en_AU"))
+  # Check spelling of each element in the vector, treating words in
+  # custom_dictionary.txt (e.g. "e61") as correctly spelled
+  dict <- hunspell::dictionary("en_AU", add_words = t61_custom_dictionary())
+  retval <- hunspell::hunspell(vector, dict = dict)
   retval <- unlist(retval)
 
   # Boolean to test whether there were any errors picked up
@@ -196,6 +198,27 @@ check_spelling <- function(vector) {
 
   if (length_chk > 0) return(retval) else return(invisible(NULL))
 
+}
+
+#' Fetch (and cache for the session) the custom dictionary of words that
+#' save_e61()'s spell-checker should never flag as typos. Cached in `t61_env`
+#' so repeated calls - e.g. across several plots in a multi-panel save -
+#' don't re-read the file from disk every time.
+#' @noRd
+t61_custom_dictionary <- function() {
+  if (!is.null(t61_env$custom_dictionary)) {
+    return(t61_env$custom_dictionary)
+  }
+
+  path <- system.file("extdata", "custom_dictionary.txt", package = "theme61")
+
+  words <- if (nzchar(path)) readLines(path, warn = FALSE) else character(0)
+  words <- trimws(words)
+  words <- words[nzchar(words) & !startsWith(words, "#")]
+
+  t61_env$custom_dictionary <- words
+
+  words
 }
 
 #' Helper function that runs the spell checker through each plot
