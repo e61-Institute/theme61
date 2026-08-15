@@ -6,3 +6,30 @@
 e61
 ABS
 ppt
+
+# Regulators/institutions
+RBA
+ATO
+APRA
+ASIC
+ACCC
+AER
+FWC
+PBO
+
+# Programs/payments
+JobSeeker
+NDIS
+HECS
+PAYG
+GST
+CGT
+
+# Economics jargon
+deadweight
+microdata
+macroprudential
+decile
+quintile
+tercile
+quartile
