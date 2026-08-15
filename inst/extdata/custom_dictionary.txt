@@ -4,3 +4,5 @@
 # ignored. Add to this list whenever the spell-checker flags a legitimate
 # word (e.g. an acronym or e61-specific term) as a typo.
 e61
+ABS
+ppt
