@@ -3,7 +3,7 @@
 \name{theme_e61}
 \alias{theme_e61}
 \alias{set_base_size}
-\title{e61 themed graph options}
+\title{theme61 theme}
 \usage{
 theme_e61(
   legend = c("none", "bottom", "top", "left", "right", "inside"),
@@ -47,10 +47,7 @@ Sans.}
 \code{set_base_size} is used for its side effects.
 }
 \description{
-Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
-appearance. If you are looking to change the appearance of titles or labels,
-check the arguments in \link{labs_e61}, which are probably what you are looking
-for.
+Returns a ggplot2 theme with e61 Institute styling applied.
 
 \code{set_base_size} sets the base size for the theme to be used in
 \code{theme_e61()}. This needs to be set outside of the function because it
@@ -60,6 +57,20 @@ is called by other functions as part of the graph rendering process.
 \dontrun{
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
   geom_point() +
+  theme_e61()
+}
+
+\dontrun{
+library(sf)
+
+sa3_shp <- strayr::read_absmap("sa32016")
+
+sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
+
+# Spatial styling (blank axes/gridlines) is applied automatically on
+# save/print, so theme_e61() alone is enough here too.
+ggplot(data = sydney_map) +
+  geom_sf(aes(fill = sa3_code_2016), colour = "black") +
   theme_e61()
 }
 

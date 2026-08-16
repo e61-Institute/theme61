@@ -28,6 +28,12 @@ palette_e61 <- function(n, reverse = FALSE) {
 
 #' Get colours for palette functions
 #'
+#' Validates `n` itself (rather than relying on callers to pre-check it) so
+#' that every caller - including scale_colour_e61()/scale_fill_e61(), which
+#' pass this function straight into ggplot2::discrete_scale() without any
+#' validation of their own - gets a clear error for an out-of-range `n`,
+#' rather than a cryptic "object not found" from an unmatched branch.
+#'
 #' @param n Numeric.
 #'
 #' @return Vector of hex codes of the colour palette
@@ -35,100 +41,95 @@ palette_e61 <- function(n, reverse = FALSE) {
 #'
 
 get_palette <- function(n) {
-  if (n == 1) {
-    palette <- e61_tealdark1
-  } else if (n == 2) {
-    palette <- c(e61_skylight1,
-                 e61_tealdark1)
-  } else if (n == 3) {
-    palette <- c(e61_skylight1,
-                 e61_tealdark1,
-                 e61_orangedark1)
-  } else if (n == 4) {
-    palette <- c(e61_skylight1,
-                 e61_tealdark1,
-                 e61_orangedark1,
-                 e61_maroonlight1)
-  } else if (n == 5) {
-    palette <- c(e61_skylight1,
-                 e61_tealdark1,
-                 e61_orangelight1,
-                 e61_orangedark1,
-                 e61_maroonlight1)
-  } else if (n == 6) {
-    palette <- c(e61_skylight1,
-                 e61_tealdark1,
-                 e61_bluedark1,
-                 e61_orangelight1,
-                 e61_orangedark1,
-                 e61_maroonlight1)
-  } else if (n == 7) {
-    palette <- c(e61_skylight1,
-                 e61_tealdark1,
-                 e61_bluedark1,
-                 e61_orangelight1,
-                 e61_orangedark1,
-                 e61_coraldark1,
-                 e61_maroonlight1)
-  } else if (n == 8) {
-    palette <- c(e61_skylight1,
-                 e61_tealdark1,
-                 e61_bluedark1,
-                 e61_greylight1,
-                 e61_orangelight1,
-                 e61_orangedark1,
-                 e61_coraldark1,
-                 e61_maroonlight1)
-  } else if (n == 9) {
-    palette <- c(e61_skylight1,
-                 e61_tealdark1,
-                 e61_bluedark1,
-                 e61_greylight1,
-                 e61_orangelight1,
-                 e61_orangedark1,
-                 e61_coraldark1,
-                 e61_maroonlight1,
-                 e61_maroondark1)
-  } else if (n == 10) {
-    palette <- c(e61_skylight1,
-                 e61_teallight1,
-                 e61_tealdark1,
-                 e61_bluedark1,
-                 e61_greylight1,
-                 e61_orangelight1,
-                 e61_orangedark1,
-                 e61_coraldark1,
-                 e61_maroonlight1,
-                 e61_maroondark1)
-  } else if (n == 11) {
-    palette <- c(e61_skylight1,
-                 e61_teallight1,
-                 e61_tealdark1,
-                 e61_bluedark1,
-                 e61_greylight1,
-                 e61_greydark1,
-                 e61_orangelight1,
-                 e61_orangedark1,
-                 e61_coraldark1,
-                 e61_maroonlight1,
-                 e61_maroondark1)
-  } else if (n == 12) {
-    palette <- c(e61_skylight1,
-                 e61_teallight1,
-                 e61_tealdark1,
-                 e61_bluedark1,
-                 e61_greylight4,
-                 e61_greylight1,
-                 e61_greydark1,
-                 e61_orangelight1,
-                 e61_orangedark1,
-                 e61_coraldark1,
-                 e61_maroonlight1,
-                 e61_maroondark1)
+
+  if (!is.numeric(n) || length(n) != 1 || n != round(n) || n < 1 || n > 12) {
+    cli::cli_abort(
+      "theme61 does not support more than 12 discrete colours/fills automatically ({n} requested). Please supply your own scale (e.g. scale_colour_manual()/scale_fill_manual())."
+    )
   }
 
-  return(palette)
+  palettes <- list(
+    `1` = e61_tealdark1,
+    `2` = c(e61_skylight1,
+            e61_tealdark1),
+    `3` = c(e61_skylight1,
+            e61_tealdark1,
+            e61_orangedark1),
+    `4` = c(e61_skylight1,
+            e61_tealdark1,
+            e61_orangedark1,
+            e61_maroonlight1),
+    `5` = c(e61_skylight1,
+            e61_tealdark1,
+            e61_orangelight1,
+            e61_orangedark1,
+            e61_maroonlight1),
+    `6` = c(e61_skylight1,
+            e61_tealdark1,
+            e61_bluedark1,
+            e61_orangelight1,
+            e61_orangedark1,
+            e61_maroonlight1),
+    `7` = c(e61_skylight1,
+            e61_tealdark1,
+            e61_bluedark1,
+            e61_orangelight1,
+            e61_orangedark1,
+            e61_coraldark1,
+            e61_maroonlight1),
+    `8` = c(e61_skylight1,
+            e61_tealdark1,
+            e61_bluedark1,
+            e61_greylight1,
+            e61_orangelight1,
+            e61_orangedark1,
+            e61_coraldark1,
+            e61_maroonlight1),
+    `9` = c(e61_skylight1,
+            e61_tealdark1,
+            e61_bluedark1,
+            e61_greylight1,
+            e61_orangelight1,
+            e61_orangedark1,
+            e61_coraldark1,
+            e61_maroonlight1,
+            e61_maroondark1),
+    `10` = c(e61_skylight1,
+             e61_teallight1,
+             e61_tealdark1,
+             e61_bluedark1,
+             e61_greylight1,
+             e61_orangelight1,
+             e61_orangedark1,
+             e61_coraldark1,
+             e61_maroonlight1,
+             e61_maroondark1),
+    `11` = c(e61_skylight1,
+             e61_teallight1,
+             e61_tealdark1,
+             e61_bluedark1,
+             e61_greylight1,
+             e61_greydark1,
+             e61_orangelight1,
+             e61_orangedark1,
+             e61_coraldark1,
+             e61_maroonlight1,
+             e61_maroondark1),
+    `12` = c(e61_skylight1,
+             e61_teallight1,
+             e61_tealdark1,
+             e61_bluedark1,
+             e61_greylight4,
+             e61_greylight1,
+             e61_greydark1,
+             e61_orangelight1,
+             e61_orangedark1,
+             e61_coraldark1,
+             e61_maroonlight1,
+             e61_maroondark1)
+  )
 
+  palettes[[as.character(n)]]
 }
 
 

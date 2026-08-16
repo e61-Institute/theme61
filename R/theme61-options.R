@@ -7,21 +7,23 @@
 #'
 #' @details The following options are available to set:
 #'  \itemize{
-#'    \item \code{theme61.open_in_browser}: If TRUE, graphs will also open in the browser in addition to the Viewer pane. This is FALSE by default.
-#'    \item \code{theme61.default_save_format}: The default file save format if format is not specified in [save_e61] and the file extension is not provided in \code{filename}. This is "svg" by default.
-#'    \item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
-#'    \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
-#'    \item \code{theme61.auto_theme}: If TRUE (default), \code{theme_e61()} is automatically applied whenever you call \code{ggplot()}. Set to FALSE to turn this off and apply your own theme instead.
-#'    \item \code{theme61.iterate_mode}: If TRUE, all of theme61's automatic styling and Viewer pane preview rendering is skipped, so graphs print to the Plots pane with plain ggplot2 defaults as fast as possible. This is FALSE by default. Masked functions (\code{ggsave()}, \code{labs()}, \code{facet_wrap()}, \code{facet_grid()}) also stop redirecting to their theme61 equivalents and pass straight through to the underlying ggplot2 function instead. Any theme61 functions you call explicitly (e.g. \code{scale_colour_e61()}, \code{theme_e61()}, \code{labs_e61()}) still apply as normal, since they become part of the plot object regardless of this option.
 #'    \item \code{theme61.auto_label}: If TRUE (default), \code{plot_label()} text without an explicit `x`/`y` gets automatically positioned by \code{save_e61()} (see \code{?plot_label}). Set to FALSE to turn automatic positioning off entirely and restore the previous behaviour, where \code{x}/\code{y} are always required (\code{plot_label()} errors immediately if you omit them, regardless of \code{auto_position}) -- no auto-positioning work is attempted, so there's no performance cost from the feature at all.
+#'    \item \code{theme61.auto_theme}: If TRUE (default), \code{theme_e61()} is automatically applied whenever you call \code{ggplot()}. Set to FALSE to turn this off and apply your own theme instead.
+#'    \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
+#'    \item \code{theme61.default_save_format}: The default file save format if format is not specified in [save_e61] and the file extension is not provided in \code{filename}. This is "svg" by default.
+#'    \item \code{theme61.disable_spellcheck}: If TRUE, [save_e61]'s spell-checker is skipped entirely, regardless of its \code{spell_check} argument. This is FALSE by default.
+#'    \item \code{theme61.iterate_mode}: If TRUE, all of theme61's automatic styling and Viewer pane preview rendering is skipped, so graphs print to the Plots pane with plain ggplot2 defaults as fast as possible. This is FALSE by default. Masked functions (\code{ggsave()}, \code{labs()}, \code{facet_wrap()}, \code{facet_grid()}) also stop redirecting to their theme61 equivalents and pass straight through to the underlying ggplot2 function instead. Any theme61 functions you call explicitly (e.g. \code{scale_colour_e61()}, \code{theme_e61()}, \code{labs_e61()}) still apply as normal, since they become part of the plot object regardless of this option.
+#'    \item \code{theme61.open_in_browser}: If TRUE, graphs will also open in the browser in addition to the Viewer pane. This is FALSE by default.
+#'    \item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
+#'    \item \code{theme61.sec_axis_msg}: If TRUE (default), [sec_rescale_inv] shows a one-off reminder that rescaled secondary axis changes need the graph code run twice to take effect. Turns itself off after showing once; set back to TRUE to see it again.
 #'  }
 #'
-#' @section Environment variables:
-#' A few behaviours run once, when theme61 is loaded (e.g. by \code{library(theme61)}),
-#' before any \code{options()} call in your script would take effect. These
-#' can't be controlled by \code{set_t61_options()} - instead, set the
-#' corresponding environment variable to \code{"1"} \emph{before} theme61 is
-#' loaded, e.g. in your \code{.Renviron} file or CI configuration:
+#' @section Environment variables: A few behaviours run once, when theme61 is
+#'   loaded (e.g. by \code{library(theme61)}), before any \code{options()} call
+#'   in your script would take effect. These can't be controlled by
+#'   \code{set_t61_options()} - instead, set the corresponding environment
+#'   variable to \code{"1"} \emph{before} theme61 is loaded, e.g. in your
+#'   \code{.Renviron} file or CI configuration:
 #' \itemize{
 #'   \item \code{THEME61_DISABLE_FONT_DOWNLOAD}: Skips downloading/registering the PT Sans font. Useful on CI or airgapped machines with no internet access. Enabled (font download happens) by default.
 #'   \item \code{THEME61_DISABLE_GEOM_DEFAULTS}: Skips overwriting ggplot2's session-wide geom colour/fill defaults (e.g. \code{geom_point()}'s default colour). Enabled (defaults are overwritten) by default.

@@ -1,5 +1,5 @@
 test_that("Test the function works in isolation", {
-  withr::local_options(list(sec_axis_msg = FALSE))
+  withr::local_options(list(theme61.sec_axis_msg = FALSE))
 
   expect_equal(sec_rescale_inv(c(10, 20, 30), scale = 0.1),
                c(100, 200, 300))

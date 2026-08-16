@@ -23,7 +23,6 @@ in a map.
 \seealso{
 Other map functions:
 \code{\link[=add_map_e61]{add_map_e61()}},
-\code{\link[=setup_stadia_maps]{setup_stadia_maps()}},
-\code{\link[=theme_e61_spatial]{theme_e61_spatial()}}
+\code{\link[=setup_stadia_maps]{setup_stadia_maps()}}
 }
 \concept{map functions}

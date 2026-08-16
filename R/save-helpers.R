@@ -52,7 +52,8 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
     }, add = TRUE)
 
     graph_i <- maybe_add_default_scales(graph)
-    class(graph_i) <- setdiff(class(graph_i), "e61_ggplot")
+    class(graph_i) <- setdiff(class(graph_i), "e61_plot")
+
     print(graph_i)
 
     grDevices::dev.off()
@@ -216,8 +217,10 @@ check_spelling <- function(vector) {
     stop("The vector supplied to check_spelling must be a character vector.")
   }
 
-  # Check spelling of each element in the vector
-  retval <- hunspell::hunspell(vector, dict = hunspell::dictionary("en_AU"))
+  # Check spelling of each element in the vector, treating words in
+  # custom_dictionary.txt (e.g. "e61") as correctly spelled
+  dict <- hunspell::dictionary("en_AU", add_words = t61_custom_dictionary())
+  retval <- hunspell::hunspell(vector, dict = dict)
   retval <- unlist(retval)
 
   # Boolean to test whether there were any errors picked up
@@ -225,4 +228,143 @@ check_spelling <- function(vector) {
 
   if (length_chk > 0) return(retval) else return(invisible(NULL))
 
+}
+
+#' Fetch (and cache for the session) the custom dictionary of words that
+#' save_e61()'s spell-checker should never flag as typos. Cached in `t61_env`
+#' so repeated calls - e.g. across several plots in a multi-panel save -
+#' don't re-read the file from disk every time.
+#' @noRd
+t61_custom_dictionary <- function() {
+  if (!is.null(t61_env$custom_dictionary)) {
+    return(t61_env$custom_dictionary)
+  }
+
+  path <- system.file("extdata", "custom_dictionary.txt", package = "theme61")
+
+  words <- if (nzchar(path)) readLines(path, warn = FALSE) else character(0)
+  words <- trimws(words)
+  words <- words[nzchar(words) & !startsWith(words, "#")]
+
+  t61_env$custom_dictionary <- words
+
+  words
+}
+
+#' Helper function that runs the spell checker through each plot
+#'
+#' Returns the mispelled words
+#' @noRd
+check_plot_spelling <- function(plot) {
+
+  # Spell checks
+  fields <- c("title", "subtitle", "caption")
+
+  spell_chk_i <- lapply(fields, function(field) {
+    val <- plot@labels[[field]]
+    if (!is.null(val)) {
+      # replace html line breaks with a space and remove other elements before
+      # spell checking
+      val <- gsub("<br>", " ", val)
+      val <- gsub("<[^>]+>", "", val)
+
+      res <- check_spelling(val)
+      if (length(res) > 0) return(res)
+    }
+    return(NULL)
+  })
+
+  # Assign names and remove NULLs (i.e. no typos)
+  names(spell_chk_i) <- fields
+  spell_chk_i <- Filter(Negate(is.null), spell_chk_i)
+
+  # Format nicely
+  spell_chk_i <- lapply(names(spell_chk_i), function(x) {
+
+    paste0("There may be a typo in the ", x, ": ",
+           paste(spell_chk_i[[x]], collapse = ", "))
+  })
+
+  spell_chk <- unlist(spell_chk_i)
+
+  return(spell_chk)
+
+  }
+
+#' Converts SVG to a bitmap file
+#'
+#' Converts an SVG file to a bitmap file, currently supports JPEG and PNG.
+#'
+#' @param file_in File path to the SVG image to convert.
+#' @param file_out File path to the PNG or JPEG. image to save. Default saves a
+#'   file with the same name and location (except for the file extension).
+#' @param delete Logical. Delete the original SVG file? (defaults to FALSE).
+#' @param res Numeric. Increase the dimensions of the saved PNG or JPEG. E.g.
+#'   `res = 2` doubles the dimensions of the saved graph.
+#' @return Invisibly returns the file path to the PNG image
+#' @keywords internal
+#' @export
+svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
+
+  res <- res * 4 # res = 1 produces exceedingly small images now apparently
+
+  if (!grepl(".*\\.svg$", file_in))
+    stop("file_in must be an svg file.")
+
+  # If file_out is null, then save to a PNG by default
+  if (is.null(file_out)) {
+    file_out <- gsub("(.*)\\.svg$", "\\1.png", file_in)
+  } else if (!grepl(".*\\.png$", file_out) & !grepl(".*\\.jpg$", file_out)) {
+    stop("file_out must be a png or jpg file.")
+  }
+
+  if(grepl(".*\\.png$", file_out)) fmt <- "png" else fmt <- "jpg"
+
+  if (res != 1) {
+    # This approach to rescaling starts by saving a rescaled SVG before
+    # converting it to PNG. Hence the need for temp files.
+    file_temp_svg <- "intermed.svg"
+    file_temp_out <- paste0("intermed.", fmt)
+
+    # For some reason this changed at some point and the scaling is fine now.
+    # Keeping this here in case it reverts back in the future.
+    # res <- res / 1.25 # For some reason any res > 1 scales 1:1.25...
+
+    rsvg::rsvg_png(svg = file_in, file = file_temp_out)
+
+    g_info <- magick::image_info(magick::image_read(file_temp_out))
+
+    rsvg::rsvg_svg(svg = file_in,
+                   file = file_temp_svg,
+                   width = g_info$width * res,
+                   height = g_info$height * res
+    )
+
+    if(fmt == "png"){
+      rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
+
+    } else if(fmt == "jpg"){
+      image_temp <- magick::image_read_svg(file_temp_svg)
+
+      magick::image_write(image = image_temp, path = file_out, format = "jpg")
+    }
+
+    unlink(file_temp_svg)
+    unlink(file_temp_out)
+
+  } else {
+
+    if(fmt == "png"){
+      rsvg::rsvg_png(svg = file_in, file = file_out)
+
+    } else if(fmt == "jpg"){
+      image_temp <- magick::image_read_svg(file_in)
+
+      magick::image_write(image = image_temp, path = file_out, format = "jpg")
+    }
+  }
+
+  if (delete) unlink(file_in)
+
+  invisible(file_out)
 }

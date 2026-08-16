@@ -78,6 +78,29 @@ test_that("labs_e61() skips HTML/markdown subtitle styling in iterate_mode", {
   expect_identical(l_iter$subtitle, "hi")
 })
 
+test_that("theme61.disable_spellcheck suppresses save_e61()'s spell-checker", {
+  withr::local_options(list(theme61.disable_spellcheck = FALSE))
+
+  p <- minimal_plot + labs_e61(title = "Thsi has a typo")
+
+  withr::with_tempdir({
+    expect_message(save_e61("spell-on.svg", p), "typo")
+  })
+
+  withr::local_options(list(theme61.disable_spellcheck = TRUE))
+
+  withr::with_tempdir({
+    expect_no_message(save_e61("spell-off.svg", p))
+  })
+})
+
+test_that("set_t61_options accepts theme61.disable_spellcheck as a valid option", {
+  withr::defer(options(theme61.disable_spellcheck = FALSE))
+
+  set_t61_options(list(theme61.disable_spellcheck = TRUE))
+  expect_true(getOption("theme61.disable_spellcheck"))
+})
+
 test_that("labs_e61() leaves the y-axis title as a normal axis title in iterate_mode", {
   withr::local_options(list(theme61.iterate_mode = TRUE))
 

@@ -18,46 +18,24 @@ save_single <- function(
 ) {
 
 
-  # Check for special graph types -------------------------------------------
+  # Plot is assumed pre-classified and prepared by save_e61()
+  is_spatial_chart <- inherits(plot, "e61_map")
 
-  ## Check if we have a spatial chart, if we do save without editing ----
-
-  is_spatial_chart <- FALSE
-
-  for(i in seq_along(plot@layers)){
-
-    layer_class <- class(plot@layers[[i]]$geom)
-
-    if(any(data.table::like(layer_class, "*Sf"))) {
-      is_spatial_chart <- TRUE
-
-      break
-    }
-  }
-
-  # if it's a spatial plot, turn of autoscaling
-  if(is_spatial_chart) auto_scale <- FALSE
-
-  ## Check if discrete y-axis (e.g. ridgeline) ----
-
+  # Discrete y-axis (e.g. ridgeline)
   discrete_y <- has_discrete_y_scale(plot)
 
-  # Set maximum width based on output type ----------------------------------
-
-  if(is.null(chart_type)) chart_type <- "normal"
-
+  # Set maximum width based on output type
+  if (is.null(chart_type)) chart_type <- "normal"
   max_width <- 18.59
 
   # update the base size without removing the legend
   legendTitle <- plot@theme$legend.title
   legendPosition <- plot@theme$legend.position
 
-  if (is_spatial_chart && !attr(plot, "t61_obj")){
-    plot <- plot + theme_e61_spatial()
-
-  } else if (is_spatial_chart && attr(plot, "t61_obj")) {
-    plot
-  } else {
+  # Maps already have their axis chrome/gridlines corrected by
+  # finalise_e61_plot() (see classify-plots.R), so there's nothing left to
+  # do here - the text sizing/margin logic below is for non-map plots only.
+  if (!is_spatial_chart) {
 
     resolved_size <- resolve_text_size(plot, base_size)
     plot <- resolved_size$plot
@@ -121,14 +99,13 @@ save_single <- function(
   # check whether the user has supplied a given width first (i.e. different to the default 8.5cm)
   if(is.null(width)) {
 
-    # When coord_flip() is used to make a plot horizontal, the default dims are too small
+    # When coord_flip() is used to make a plot horizontal, the default dims
+    # are too small. (The flipped-coord theme changes themselves are already
+    # applied by finalise_e61_plot() before save_single() is ever called.)
     if (isTRUE("CoordFlip" %in% class(plot@coordinates))) {
 
       width <- max_width
       max_panel_width <- max_width / 2 # only allow the panel to be at most half the column consistent with other chart types
-
-      # Format the flipped coords axes
-      plot <- plot + format_flip(current_theme = plot@theme)
 
       # If it's only one panel, set the chart width to 1/2 of the max-width
     } else if(n_panel_cols == 1){
