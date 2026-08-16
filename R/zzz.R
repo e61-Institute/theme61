@@ -49,6 +49,7 @@ t61_env <- NULL
 .onAttach <- function(libname, pkgname) {
   op <- options()
   op.theme61 <- list(
+    theme61.auto_label = TRUE,
     theme61.auto_theme = TRUE,
     theme61.base_size = 10,
     theme61.default_save_format = "svg",

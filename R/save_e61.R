@@ -75,6 +75,18 @@
 #'   (defaults to FALSE).
 #' @param print_info Logical. Set to TRUE if you want graph dimensions and other
 #'   information printed to the console. Defaults to FALSE.
+#' @param print_label_positions (single-panel specific) Logical. Set to TRUE to
+#'   print the final `label`/`x`/`y` of any auto-positioned `plot_label()` text
+#'   to the console as copy-pasteable arguments, so you can pin the chosen
+#'   positions (or hand-tweak just one or two) instead of leaving them to
+#'   auto-position again next time. Defaults to FALSE.
+#' @param fast_labels (single-panel specific) Logical. Set to TRUE to skip the
+#'   auto-positioning search for any `plot_label()` without an explicit `x`/`y`
+#'   and use a cheap, render-free approximate position instead (near the
+#'   label's own series, not collision-checked against other content). Much
+#'   faster, at the cost of placement quality -- intended for quick previews
+#'   while iterating, not the version you'd actually publish. Explicit `x`/`y`
+#'   positions are unaffected either way. Defaults to FALSE.
 #' @param spell_check Logical. Check spelling of words in the title and caption.
 #'   Defaults to TRUE. Set to FALSE to turn off, or set the
 #'   `theme61.disable_spellcheck` option to skip it session-wide (see
@@ -123,6 +135,8 @@ save_e61 <- function(filename = NULL,
                      max_height = NULL,
                      save_data = FALSE,
                      print_info = FALSE,
+                     print_label_positions = FALSE,
+                     fast_labels = FALSE,
                      spell_check = TRUE,
                      preview = FALSE,
                      base_size = 10,
@@ -148,6 +162,22 @@ save_e61 <- function(filename = NULL,
                      rel_heights = lifecycle::deprecated(),
                      spacing_adj = lifecycle::deprecated()
                      ) {
+
+  # `filename` is the first formal, ahead of `...` -- so a multi-panel call
+  # that passes its plots positionally without naming filename (the natural
+  # shape for preview = TRUE, which has no path to give -- e.g.
+  # save_e61(p1, p2, preview = TRUE)) silently matches the first plot to
+  # `filename` instead of `...`, dropping it from the graph. Reclaim it as
+  # the first plot instead: `filename` staying NULL then falls through to
+  # the ordinary "no path supplied" error below when one is actually needed
+  # (i.e. preview = FALSE).
+  if (!is.null(filename) && ggplot2::is_ggplot(filename)) {
+    plots <- c(list(filename), list(...), plotlist)
+    filename <- NULL
+  } else {
+    # Compile plots
+    plots <- c(list(...), plotlist)
+  }
 
   # Fold deprecated top-level arguments into their replacement list args ----
   # (mirrors the pattern used for plot_label()'s deprecated facet_name/facet_value)
@@ -366,6 +396,7 @@ save_e61 <- function(filename = NULL,
       subtitle_spacing_adj = spacing$subtitle, # adjust the amount of space given to the subtitle
       height_adj = spacing$height_adj, # adjust the vertical spacing of the mpanel charts
       base_size = base_size,
+      print_label_positions = print_label_positions,
       pad_width = spacing$pad_width,
       pad_height = spacing$pad_height,
       outer_width = spacing$outer_width,
@@ -393,6 +424,8 @@ save_e61 <- function(filename = NULL,
       max_height = max_height, # control max height
       format = format,
       base_size = base_size,
+      print_label_positions = print_label_positions,
+      fast_labels = fast_labels,
       pad_width = spacing$pad_width,
       pad_height = spacing$pad_height,
       bg_colour = bg_colour
@@ -451,8 +484,8 @@ save_e61 <- function(filename = NULL,
   }
 
   if (interactive()) {
-    # Only run this in interactive mode
-    # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
+    # rstudioapi::viewer only opens temp files in the Viewer pane, not
+    # arbitrary saved paths -- always preview via a temp file, below.
 
     # Always preview an SVG, even if the saved format(s) are not SVG
     preview_svg <- make_preview_svg(

@@ -34,7 +34,7 @@ resolve_label_text <- function(plot, grobs, layout_names, text_type, plot_width)
 #' @noRd
 update_labs <- function(plot, plot_width){
 
-  p <- ggplotGrob(plot)
+  p <- t61_ggplotGrob_quiet_na(plot)
 
   title_text <- resolve_label_text(plot, p$grobs, p$layout$name, "title", plot_width)
 

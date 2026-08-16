@@ -25,7 +25,8 @@ save_multi <-
            align,
            axis,
            rel_heights,
-           bg_colour
+           bg_colour,
+           print_label_positions = FALSE
   ) {
 
     # Set width -------------------------------------------------------------
@@ -140,7 +141,7 @@ save_multi <-
 
       # Calculate the known width of the chart ----
 
-      p <- ggplotGrob(temp_plot)
+      p <- t61_ggplotGrob_quiet_na(temp_plot)
 
       # get max panel aspect ratio - this is found by looking at the number of null rows and cols (the panels)
       null_rowhts <- as.numeric(p$heights[grid::unitType(p$heights) == "null"])
@@ -255,12 +256,54 @@ save_multi <-
         clean_plotlist[[i]] <- temp_plot
 
         # Calculate the known height of the chart
-        p <- ggplotGrob(temp_plot)
+        p <- t61_ggplotGrob_quiet_na(temp_plot)
 
         temp_height <- sum(grid::convertHeight(p$heights, "cm", valueOnly = TRUE))
 
         known_height <- pmax(known_height, temp_height)
       }
+    }
+
+    # Padding between charts, computed here (rather than only applied to
+    # the combined multi_plot further down) so each panel already carries
+    # its real, final plot.margin before t61_apply_autolabel() measures it
+    # just below.
+    chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
+    chart_height_pad <- points_to_mm(5.5) + pad_height * 10
+
+    # Auto-position eligible plot_label() text on each panel now that its
+    # final size within the grid is known. Every panel shares the same
+    # panel_width/panel_height (the flexible "null" cell computed above)
+    # and the same aggregated axis/title overhead, matching the uniform
+    # per-panel sizing the rest of this function already assumes rather
+    # than each panel's own exact geometry post-combination.
+    #
+    # Each panel's own plot.margin (theme_e61()'s larger default) is
+    # overridden here with the smaller, uniform margin the combined chart
+    # actually ends up using -- placing labels against the old, bigger
+    # margin would assume a smaller panel than the real one, letting a
+    # label sitting just outside that assumed edge land on real content
+    # once the real (larger) panel renders. No-ops on a panel with no
+    # eligible labels.
+    #
+    # The width/height passed to t61_apply_autolabel() has to be each
+    # panel's own total footprint, including that margin -- not just
+    # panel_width + axis. This matches what tot_width/ncol and (p_h)/nrow
+    # end up being further below, once title/subtitle/caption and the
+    # rest of the top-level padding are worked out, but those aren't
+    # available yet at this point in the function, so it's reconstructed
+    # directly here from the same pieces instead.
+    panel_total_width  <- panel_width + max_left_axis_width + max_right_axis_width + 2 * chart_width_pad / 10
+    panel_total_height <- panel_height + known_height + 2 * chart_height_pad / 10
+
+    for (i in seq_along(clean_plotlist)) {
+      clean_plotlist[[i]] <- clean_plotlist[[i]] +
+        theme(plot.margin = margin(t = chart_height_pad, b = chart_height_pad,
+                                   r = chart_width_pad, l = chart_width_pad, unit = "mm"))
+      clean_plotlist[[i]] <- t61_apply_autolabel(
+        clean_plotlist[[i]], width_cm = panel_total_width, height_cm = panel_total_height,
+        print_positions = print_label_positions
+      )
     }
 
 

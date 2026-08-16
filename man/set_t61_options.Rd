@@ -16,6 +16,7 @@ with no arguments i.e. \code{set_t61_options()}.
 \details{
 The following options are available to set:
 \itemize{
+\item \code{theme61.auto_label}: If TRUE (default), \code{plot_label()} text without an explicit \code{x}/\code{y} gets automatically positioned by \code{save_e61()} (see \code{?plot_label}). Set to FALSE to turn automatic positioning off entirely and restore the previous behaviour, where \code{x}/\code{y} are always required (\code{plot_label()} errors immediately if you omit them, regardless of \code{auto_position}) -- no auto-positioning work is attempted, so there's no performance cost from the feature at all.
 \item \code{theme61.auto_theme}: If TRUE (default), \code{theme_e61()} is automatically applied whenever you call \code{ggplot()}. Set to FALSE to turn this off and apply your own theme instead.
 \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
 \item \code{theme61.default_save_format}: The default file save format if format is not specified in \link{save_e61} and the file extension is not provided in \code{filename}. This is "svg" by default.
@@ -27,12 +28,12 @@ The following options are available to set:
 }
 }
 \section{Environment variables}{
-
-A few behaviours run once, when theme61 is loaded (e.g. by \code{library(theme61)}),
-before any \code{options()} call in your script would take effect. These
-can't be controlled by \code{set_t61_options()} - instead, set the
-corresponding environment variable to \code{"1"} \emph{before} theme61 is
-loaded, e.g. in your \code{.Renviron} file or CI configuration:
+ A few behaviours run once, when theme61 is
+loaded (e.g. by \code{library(theme61)}), before any \code{options()} call
+in your script would take effect. These can't be controlled by
+\code{set_t61_options()} - instead, set the corresponding environment
+variable to \code{"1"} \emph{before} theme61 is loaded, e.g. in your
+\code{.Renviron} file or CI configuration:
 \itemize{
 \item \code{THEME61_DISABLE_FONT_DOWNLOAD}: Skips downloading/registering the PT Sans font. Useful on CI or airgapped machines with no internet access. Enabled (font download happens) by default.
 \item \code{THEME61_DISABLE_GEOM_DEFAULTS}: Skips overwriting ggplot2's session-wide geom colour/fill defaults (e.g. \code{geom_point()}'s default colour). Enabled (defaults are overwritten) by default.
