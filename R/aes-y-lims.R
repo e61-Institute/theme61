@@ -53,7 +53,7 @@ update_scales <- function(plot, auto_scale){
 
   # check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
   # ggplot_gtable(build) == ggplotGrob(plot), reusing the build above
-  grobs <- ggplot_gtable(build)
+  grobs <- t61_ggplot_gtable_quiet_na(build)
 
   test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
 

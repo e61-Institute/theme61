@@ -1,5 +1,35 @@
 # Helper functions that are used across save_single, save_multi or save_e61
 
+#' Muffle only the "removed N rows containing missing values" warning geom
+#' layers raise when drawn, from evaluating `expr`; any other warning still
+#' propagates normally. save_single()/save_multi() build a gtable (via
+#' ggplotGrob()/ggplot_gtable(), directly or through update_labs()/
+#' update_scales()) purely to measure layout -- axis widths, aspect ratio,
+#' title/axis heights -- while the plot still has auto-positioned
+#' plot_label() text sitting at NA x/y (real positions are only resolved
+#' later, by t61_apply_autolabel()), so building the gtable to read off its
+#' dimensions always trips this warning even though nothing is wrong.
+#' Matched on message text since ggplot2 gives it no distinct condition
+#' class, so a real data/scale issue still surfaces, both here and
+#' (unsuppressed) on the final real render.
+#' @noRd
+t61_quiet_na_removal <- function(expr) {
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      if (grepl("missing values or values outside the scale range", conditionMessage(w), fixed = TRUE)) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
+}
+
+#' @noRd
+t61_ggplotGrob_quiet_na <- function(plot) t61_quiet_na_removal(ggplot2::ggplotGrob(plot))
+
+#' @noRd
+t61_ggplot_gtable_quiet_na <- function(build) t61_quiet_na_removal(ggplot2::ggplot_gtable(build))
+
 #' Helper function to actually perform the saving functionality
 #' @noRd
 save_graph <- function(graph, format, filename, width, height, bg_colour, res) {

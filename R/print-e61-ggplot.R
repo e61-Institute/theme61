@@ -59,10 +59,15 @@ print.e61_ggplot <- function(x, ...) {
     }
   }
 
-  # Viewer preview (render in background)
+  # Viewer preview (render in background). Auto-positioned plot_label()
+  # text without an explicit x/y uses the cheap, render-free fast
+  # placement here (see t61_place_label_fast()) rather than the full
+  # search -- this runs on every print(), so it needs to stay fast for
+  # quick iteration. save_e61() itself (without preview = TRUE) always
+  # resolves the real, optimised position regardless.
   if (in_rstudio) {
     suppressWarnings(
-      suppressMessages(save_e61(plot = x, preview = TRUE, format = "svg", auto_scale = auto_scale_preview))
+      suppressMessages(save_e61(plot = x, preview = TRUE, format = "svg", auto_scale = auto_scale_preview, fast_labels = TRUE))
       )
   }
 
@@ -75,6 +80,23 @@ print.e61_ggplot <- function(x, ...) {
   # of this can use theme61.iterate_mode instead.
   if (in_rstudio) {
     activate_viewer_after_plot()
+  }
+
+  # Print copy-pasteable auto-positioned label code (see autolabel-apply.R),
+  # if any plot_label() layer asked for it via print_position = TRUE. Uses
+  # save_single() directly, which resolves the chart's final size and
+  # applies auto-positioning but never writes a file, so this works without
+  # the user having to call save_e61() first.
+  if (t61_has_print_position_labels(x)) {
+    try(
+      suppressWarnings(
+        save_single(filename = NULL, plot = x, chart_type = NULL, auto_scale = auto_scale_preview,
+                    width = NULL, height = NULL, max_height = NULL, format = "svg",
+                    base_size = 10, pad_width = 0, pad_height = 0, bg_colour = "white",
+                    print_label_positions = TRUE)
+      ),
+      silent = TRUE
+    )
   }
 
   invisible(x)

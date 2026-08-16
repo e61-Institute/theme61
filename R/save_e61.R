@@ -100,6 +100,18 @@
 #'   (defaults to FALSE).
 #' @param print_info Logical. Set to TRUE if you want graph dimensions and other
 #'   information printed to the console. Defaults to FALSE.
+#' @param print_label_positions (single-panel specific) Logical. Set to TRUE to
+#'   print the final `label`/`x`/`y` of any auto-positioned `plot_label()` text
+#'   to the console as copy-pasteable arguments, so you can pin the chosen
+#'   positions (or hand-tweak just one or two) instead of leaving them to
+#'   auto-position again next time. Defaults to FALSE.
+#' @param fast_labels (single-panel specific) Logical. Set to TRUE to skip the
+#'   auto-positioning search for any `plot_label()` without an explicit `x`/`y`
+#'   and use a cheap, render-free approximate position instead (near the
+#'   label's own series, not collision-checked against other content). Much
+#'   faster, at the cost of placement quality -- intended for quick previews
+#'   while iterating, not the version you'd actually publish. Explicit `x`/`y`
+#'   positions are unaffected either way. Defaults to FALSE.
 #' @param spell_check Logical. Check spelling of words in the title and caption.
 #'   Defaults to TRUE. Set to FALSE to turn off.
 #' @param preview Logical. Set to TRUE to show a preview of the graph in the
@@ -153,6 +165,8 @@ save_e61 <- function(filename = NULL,
                      max_height = NULL,
                      save_data = FALSE,
                      print_info = FALSE,
+                     print_label_positions = FALSE,
+                     fast_labels = FALSE,
                      spell_check = TRUE,
                      preview = FALSE,
                      base_size = 10,
@@ -180,6 +194,22 @@ save_e61 <- function(filename = NULL,
                      rel_heights = lifecycle::deprecated(),
                      spacing_adj = lifecycle::deprecated()
                      ) {
+
+  # `filename` is the first formal, ahead of `...` -- so a multi-panel call
+  # that passes its plots positionally without naming filename (the natural
+  # shape for preview = TRUE, which has no path to give -- e.g.
+  # save_e61(p1, p2, preview = TRUE)) silently matches the first plot to
+  # `filename` instead of `...`, dropping it from the graph. Reclaim it as
+  # the first plot instead: `filename` staying NULL then falls through to
+  # the ordinary "no path supplied" error below when one is actually needed
+  # (i.e. preview = FALSE).
+  if (!is.null(filename) && ggplot2::is_ggplot(filename)) {
+    plots <- c(list(filename), list(...), plotlist)
+    filename <- NULL
+  } else {
+    # Compile plots
+    plots <- c(list(...), plotlist)
+  }
 
   # Fold deprecated top-level arguments into their replacement list args ----
   # (mirrors the pattern used for plot_label()'s deprecated facet_name/facet_value)
@@ -434,6 +464,7 @@ save_e61 <- function(filename = NULL,
       subtitle_spacing_adj = spacing$subtitle, # adjust the amount of space given to the subtitle
       height_adj = spacing$height_adj, # adjust the vertical spacing of the mpanel charts
       base_size = base_size,
+      print_label_positions = print_label_positions,
       pad_width = spacing$pad_width,
       pad_height = spacing$pad_height,
       outer_width = spacing$outer_width,
@@ -463,6 +494,8 @@ save_e61 <- function(filename = NULL,
       max_height = max_height, # control max height
       format = format,
       base_size = base_size,
+      print_label_positions = print_label_positions,
+      fast_labels = fast_labels,
       pad_width = spacing$pad_width,
       pad_height = spacing$pad_height,
       bg_colour = bg_colour
@@ -616,7 +649,7 @@ save_e61 <- function(filename = NULL,
 #' @export
 svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
 
-  res <- res * 4 # res = 1 produces exceedingly small images now apparently
+  res <- res * 4 # res = 1 alone renders too small to be usable
 
   if (!grepl(".*\\.svg$", file_in))
     stop("file_in must be an svg file.")
@@ -635,10 +668,6 @@ svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
     # converting it to PNG. Hence the need for temp files.
     file_temp_svg <- "intermed.svg"
     file_temp_out <- paste0("intermed.", fmt)
-
-    # For some reason this changed at some point and the scaling is fine now.
-    # Keeping this here in case it reverts back in the future.
-    # res <- res / 1.25 # For some reason any res > 1 scales 1:1.25...
 
     rsvg::rsvg_png(svg = file_in, file = file_temp_out)
 

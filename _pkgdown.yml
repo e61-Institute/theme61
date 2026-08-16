@@ -29,7 +29,6 @@ reference:
 
 - title: Miscellaneous
   contents:
-  - e61_chart_maker
   - set_open_graph_browser
   - unset_open_graph_browser
   - set_format

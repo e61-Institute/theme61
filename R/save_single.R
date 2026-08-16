@@ -12,7 +12,9 @@ save_single <- function(
     base_size,
     pad_width,
     pad_height,
-    bg_colour
+    bg_colour,
+    print_label_positions = FALSE,
+    fast_labels = FALSE
 ) {
 
 
@@ -146,7 +148,7 @@ save_single <- function(
   # Update labels -----------------------------------------------------------
 
   # Update the size of the text used for titles, footnotes, axes etc.
-  p <- ggplotGrob(plot)
+  p <- t61_ggplotGrob_quiet_na(plot)
 
   # allow charts to be the width of the panels
   right_axis_width <- get_grob_width(p, grob_name = "axis-r")
@@ -177,7 +179,7 @@ save_single <- function(
   if(is.null(height)){
 
     # Step 1 - Get the amount of free height and width we have to play with (what is not already used up by the set elements)
-    p <- ggplotGrob(plot)
+    p <- t61_ggplotGrob_quiet_na(plot)
 
     known_ht <- sum(grid::convertHeight(p$heights, "cm", valueOnly = TRUE))
 
@@ -220,6 +222,12 @@ save_single <- function(
   # Add width padding - note it comes in mm and we will want to convert to cm
   width <- width + pad_width / 10
   height <- height + pad_height / 10
+
+  # Auto-position eligible plot_label() text now that the final chart size
+  # is known (see autolabel-apply.R). No-ops when there are no eligible
+  # labels.
+  plot <- t61_apply_autolabel(plot, width_cm = width, height_cm = height,
+                              print_positions = print_label_positions, fast = fast_labels)
 
   # Return objects needed to save the graph ----
   retval <- list(graph = plot,
