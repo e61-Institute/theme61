@@ -11,8 +11,8 @@ save_e61(
   plotlist = NULL,
   labs = list(title = NULL, subtitle = NULL, footnotes = NULL, sources = NULL),
   layout = list(ncol = 2, nrow = NULL, align = "v", axis = "none"),
-  spacing = list(pad_width = 0, pad_height = 0, outer_width = NULL, outer_height =
-    NULL, height_adj = NULL, rel_heights = NULL, title = 1, subtitle = 1),
+  spacing = list(pad_width = 0, pad_height = 0, outer_width = NULL, outer_height = NULL,
+    height_adj = NULL, rel_heights = NULL, title = 1, subtitle = 1),
   dim = list(height = NULL, width = NULL),
   format = c("svg", "pdf", "eps", "png", "jpg"),
   chart_type = NULL,
@@ -20,6 +20,8 @@ save_e61(
   max_height = NULL,
   save_data = FALSE,
   print_info = FALSE,
+  print_label_positions = FALSE,
+  fast_labels = FALSE,
   spell_check = TRUE,
   preview = FALSE,
   base_size = 10,
@@ -130,6 +132,20 @@ same name as the graph that contains the data needed to recreate the graph
 
 \item{print_info}{Logical. Set to TRUE if you want graph dimensions and other
 information printed to the console. Defaults to FALSE.}
+
+\item{print_label_positions}{(single-panel specific) Logical. Set to TRUE to
+print the final \code{label}/\code{x}/\code{y} of any auto-positioned \code{plot_label()} text
+to the console as copy-pasteable arguments, so you can pin the chosen
+positions (or hand-tweak just one or two) instead of leaving them to
+auto-position again next time. Defaults to FALSE.}
+
+\item{fast_labels}{(single-panel specific) Logical. Set to TRUE to skip the
+auto-positioning search for any \code{plot_label()} without an explicit \code{x}/\code{y}
+and use a cheap, render-free approximate position instead (near the
+label's own series, not collision-checked against other content). Much
+faster, at the cost of placement quality -- intended for quick previews
+while iterating, not the version you'd actually publish. Explicit \code{x}/\code{y}
+positions are unaffected either way. Defaults to FALSE.}
 
 \item{spell_check}{Logical. Check spelling of words in the title and caption.
 Defaults to TRUE. Set to FALSE to turn off.}
