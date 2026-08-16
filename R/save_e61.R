@@ -21,35 +21,34 @@
 #' @param labs (multi-panel specific) A named list specifying the shared
 #'   `title`, `subtitle`, `footnotes` and `sources` to place around the
 #'   multi-panel figure. Defaults to `NULL` for each.
-#' @param layout (multi-panel specific) A named list specifying the panel
-#'   grid: `ncol`, `nrow`, `align` and `axis`. See `patchwork::plot_layout()`
-#'   for what `align` and `axis` do. Defaults to
-#'   `list(ncol = 2, nrow = NULL, align = "v", axis = "none")`.
-#' @param spacing (multi-panel specific) A named list controlling whitespace
-#'   and relative sizing:
+#' @param layout (multi-panel specific) A named list specifying the panel grid:
+#'   `ncol`, `nrow`, `align` and `axis`. See `patchwork::plot_layout()` for what
+#'   `align` and `axis` do. Defaults to `list(ncol = 2, nrow = NULL, align =
+#'   "v", axis = "none")`.
+#' @param spacing (multi-panel specific) A named list controlling whitespace and
+#'   relative sizing:
 #'   * `pad_width`, `pad_height`: Numeric (mm). Adds horizontal/vertical
-#'   whitespace to the sides of all graphs. If saving multiple charts this
-#'   will add the same spacing to all charts. Defaults to no additional
-#'   padding.
+#'   whitespace to the sides of all graphs. If saving multiple charts this will
+#'   add the same spacing to all charts. Defaults to no additional padding.
 #'   * `outer_width`: Numeric (mm). Overrides the margin between the
-#'   left/right edges of the figure and the outermost panels. Defaults to
-#'   NULL, which uses the built-in margin (0mm). Set higher to add whitespace
-#'   around the outer edge of the figure; unlike `pad_width`, this does not
-#'   affect the gap between panels.
+#'   left/right edges of the figure and the outermost panels. Defaults to NULL,
+#'   which uses the built-in margin (0mm). Set higher to add whitespace around
+#'   the outer edge of the figure; unlike `pad_width`, this does not affect the
+#'   gap between panels.
 #'   * `outer_height`: Numeric (mm). Overrides the margin between the
 #'   top/bottom edges of the figure (i.e. above the title and below the
 #'   footnotes/sources) and the panels. Defaults to NULL, which uses the
-#'   built-in margin (0mm). Set higher to add whitespace around the outer
-#'   edge of the figure; unlike `pad_height`, this does not affect the gap
-#'   between panel rows.
+#'   built-in margin (0mm). Set higher to add whitespace around the outer edge
+#'   of the figure; unlike `pad_height`, this does not affect the gap between
+#'   panel rows.
 #'   * `height_adj`: Rescales the height of the multi-panel. The function
 #'   sets sensible defaults but this provides you with manual control if you
 #'   need it.
 #'   * `rel_heights`: A numeric vector giving the relative proportions of
 #'   each graph component (title, plots, footer).
 #'   * `title`, `subtitle`: Rescales the size of the space given to the
-#'   multi-panel title/subtitle. Use if you think the title looks too
-#'   cramped on the chart. Both default to 1.
+#'   multi-panel title/subtitle. Use if you think the title looks too cramped on
+#'   the chart. Both default to 1.
 #' @param chart_type String, or vector of strings if saving multiple plots. Type
 #'   of chart. This is used to set sensible chart widths based on the type of
 #'   plot you are saving. Options are:
@@ -78,11 +77,9 @@
 #'   information printed to the console. Defaults to FALSE.
 #' @param spell_check Logical. Check spelling of words in the title and caption.
 #'   Defaults to TRUE. Set to FALSE to turn off, or set the
-#'   `theme61.disable_spellcheck` option to skip it session-wide regardless of
-#'   this argument (see [set_t61_options]). Words listed in
-#'   `inst/extdata/custom_dictionary.txt` (e.g. "e61") are never flagged - add
-#'   a legitimate word to that file (one per line) if the spell-checker keeps
-#'   flagging it as a typo.
+#'   `theme61.disable_spellcheck` option to skip it session-wide (see
+#'   [set_t61_options]). Words listed in `inst/extdata/custom_dictionary.txt`
+#'   are skipped - add words to that file if they should not be flagged.
 #' @param preview Logical. Set to TRUE to show a preview of the graph in the
 #'   Viewer pane but not save to disk. Defaults to FALSE.
 #' @param base_size Numeric. Chart font size. Default is 10.
@@ -91,22 +88,22 @@
 #' @param bg_colour Set the graph background colour. Accepts a colour name, hex
 #'   code or theme61 colour object name. Defaults to "white". For graphs used in
 #'   research note boxes, set the colour to `e61_boxback`.
-#' @param return_plot_obj (multi-panel specific) Logical. If TRUE, skips
-#'   saving entirely and returns the composed multi-panel plot object instead
-#'   (e.g. to print it in the Plots pane, or use it in a Shiny app). Only
-#'   supported for multi-panel graphs (2 or more plots) - for a single plot,
-#'   just print the ggplot object directly. Defaults to FALSE. Like a saved
-#'   graph, the returned object's layout (text sizes, panel spacing) is
-#'   computed for a fixed target size (`dim`, or the same defaults `save_e61`
-#'   would otherwise use) - it won't reflow if you resize the device
-#'   afterwards.
+#' @param return_plot_obj (multi-panel specific) Logical. If TRUE, skips saving
+#'   entirely and returns the composed multi-panel plot object instead (e.g. to
+#'   print it in the Plots pane, or use it in a Shiny app). Only supported for
+#'   multi-panel graphs - for a single plot, just print the ggplot object
+#'   directly. Defaults to FALSE. Note that the returned object's layout (text
+#'   sizes, panel spacing) is computed for a fixed target size (`dim`, or the
+#'   same defaults `save_e61` would otherwise use) - it won't reflow if you
+#'   resize the device afterwards.
 #' @param ... (multi-panel specific) Plot objects to put on the panel.
 #' @param title,subtitle,footnotes,sources `r lifecycle::badge("deprecated")`
 #'   Use `labs` instead.
 #' @param ncol,nrow,align,axis `r lifecycle::badge("deprecated")` Use `layout`
 #'   instead.
-#' @param pad_width,pad_height,outer_width,outer_height,height_adj,rel_heights,spacing_adj
-#'   `r lifecycle::badge("deprecated")` Use `spacing` instead.
+#' @param
+#' pad_width,pad_height,outer_width,outer_height,height_adj,rel_heights,spacing_adj
+#' `r lifecycle::badge("deprecated")` Use `spacing` instead.
 #' @return Invisibly returns the file name.
 #' @export
 
