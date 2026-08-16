@@ -11,16 +11,19 @@ format_flip(x_adj = 0, current_theme = NULL)
 the default works for most graphs. A negative value moves the
 title up, a positive value moves the title down.}
 
-\item{current_theme}{The plot's current theme, used internally by
-\code{save_e61()} to skip any element the user has already customised away
-from the \code{theme_e61()} default. Leave as \code{NULL} for normal manual use.}
+\item{current_theme}{The plot's current theme, used internally to skip
+any element the user has already customised away from the \code{theme_e61()}
+default. Leave as \code{NULL} for normal manual use.}
 }
 \value{
 ggplot object
 }
 \description{
 Horizontal bar graphs made with \code{coord_flip()} require some changes to
-the \code{theme()} in order to look proper. This function wraps those changes
-up in a convenient function that should be appended at the end of the graph
-code, after theming functions such as \code{theme_e61()} have been called.
+the \code{theme()} in order to look proper. theme61 detects \code{coord_flip()}
+automatically and applies these changes for you (without overriding any
+element you've customised away from the \code{theme_e61()} default), so in
+most cases you don't need to call this function yourself. It's still
+exported for the one thing auto-detection can't do: adjusting \code{x_adj},
+or for manual use outside the normal save/print pipeline.
 }

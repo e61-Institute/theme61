@@ -1,6 +1,7 @@
 test_that("Single-panel graph examples", {
 
   withr::local_seed(42)
+  withr::local_options(list(theme61.disable_spellcheck = TRUE))
 
   ## Cont-y var with values from 0-20 ----
   data <- data.frame(x = factor(1:10), y = runif(10, 0, 20))
@@ -160,6 +161,7 @@ test_that("Single-panel graph examples", {
 test_that("Multi-panel graph examples", {
 
   withr::local_seed(42)
+  withr::local_options(list(theme61.disable_spellcheck = TRUE))
 
   # Graphs to use in the panels
 
@@ -331,6 +333,7 @@ test_that("Multi-panel graph examples", {
 test_that("Map examples", {
 
   skip_if_not_installed("sf")
+  withr::local_options(list(theme61.disable_spellcheck = TRUE))
 
   # A small synthetic grid of adjacent polygons stands in for real ABS SA4
   # boundaries - geom_sf()/theme_e61_spatial() only care that the data is a
@@ -363,8 +366,7 @@ test_that("Map examples", {
   ## Simple map with title and subtitle ----
   p <- ggplot(data = sydney_map) +
     geom_sf(colour = "black") +
-    labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA4s") +
-    theme_e61_spatial()
+    labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA4s")
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-simple-map.svg", p)))
@@ -375,7 +377,7 @@ test_that("Map examples", {
     geom_sf(aes(fill = sa4_code), colour = "black") +
     labs_e61(title = "Map of Greater Sydney", subtitle = "Sydney SA4s",
              fill = "SA4 code") +
-    theme_e61_spatial(legend = "right", legend_title = T)
+    theme_e61(legend = "right", legend_title = T)
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(save_e61("plot-legend-map.svg", p)))

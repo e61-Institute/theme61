@@ -1,3 +1,8 @@
+test_that("check_spelling() treats words in the custom dictionary as correctly spelled", {
+  expect_null(check_spelling("e61"))
+  expect_match(check_spelling("Thsi has a typo"), "Thsi")
+})
+
 test_that("make_preview_svg copies the saved svg when svg was one of the saved formats", {
   g <- minimal_plot
 

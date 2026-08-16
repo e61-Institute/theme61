@@ -1,6 +1,9 @@
 # Required for data.table to work
 .datatable.aware = TRUE
 
+# helper
+`%||%` <- function(x, y) if (is.null(x)) y else x
+
 # Required to setup an empty environment with this name
 t61_env <- NULL
 
@@ -50,9 +53,11 @@ t61_env <- NULL
     theme61.auto_theme = TRUE,
     theme61.base_size = 10,
     theme61.default_save_format = "svg",
+    theme61.disable_spellcheck = FALSE,
     theme61.iterate_mode = FALSE,
     theme61.open_in_browser = FALSE,
-    theme61.preview_on_print = TRUE
+    theme61.preview_on_print = TRUE,
+    theme61.sec_axis_msg = TRUE
   )
 
   to_set <- !(names(op.theme61) %in% names(op))

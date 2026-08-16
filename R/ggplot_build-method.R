@@ -1,21 +1,26 @@
+#' Method for theme61 plots to add default scales at build time
 #' @export
-ggplot_build.e61_ggplot <- function(plot, ...) {
+ggplot_build.e61_plot <- function(plot, ...) {
 
-  # theme61.iterate_mode: skip all automatic scale/facet/axis injection so
-  # the plot builds with plain ggplot2 defaults. Explicit theme61 functions
-  # the user already added (e.g. scale_colour_e61()) are unaffected, since
-  # they're already part of the plot's scales/layers.
+  # theme61.iterate_mode: skip all automatic scale/facet/axis/theme
+  # injection so the plot builds with plain ggplot2 defaults. Explicit
+  # theme61 functions the user already added (e.g. scale_colour_e61()) are
+  # unaffected, since they're already part of the plot's scales/layers.
   if (isTRUE(getOption("theme61.iterate_mode", FALSE))) {
-    class(plot) <- setdiff(class(plot), "e61_ggplot")
+    class(plot) <- setdiff(class(plot), c("e61_map", "e61_plot"))
     return(ggplot2::ggplot_build(plot, ...))
   }
 
-  plot2 <- maybe_add_default_scales(plot)
+  # Classify + correct defensively, in case ggplot_build() is reached
+  # without going through print.e61_plot() or save_e61() first (e.g. a
+  # direct ggplot_build()/ggplotGrob() call). Idempotent either way.
+  plot2 <- finalise_e61_plot(plot)
+  plot2 <- maybe_add_default_scales(plot2)
   plot2 <- maybe_adjust_facet_spacing(plot2)
   plot2 <- maybe_leftalign_discrete_y_text(plot2)
 
   # prevent recursion: drop our class before calling ggplot2 build
-  class(plot2) <- setdiff(class(plot2), "e61_ggplot")
+  class(plot2) <- setdiff(class(plot2), c("e61_map", "e61_plot"))
 
   ggplot2::ggplot_build(plot2, ...)
 }
@@ -73,6 +78,7 @@ infer_aes_type <- function(plot, aes_name) {
       quos <- c(quos, list(ly$mapping[[aes_name]]))
     }
   }
+
   if (length(quos) == 0) return(NA_character_)
 
   # Skip computed aesthetics
@@ -185,7 +191,6 @@ infer_discrete_nlevels <- function(plot, aes_name) {
   length(unique(as.character(val)))
 }
 
-
 #' @noRd
 abort_too_many_discrete_levels <- function(aes_name, n, max_n) {
   rlang::abort(
@@ -245,13 +250,12 @@ maybe_add_default_scales <- function(plot) {
   # ---- Colour scale ----
   if (is.null(plot@scales$get_scales("colour")) && !is.null(find_aes(plot, "colour"))) {
 
-    typ <- infer_aes_type(plot, "colour")  # or whatever you called it
+    typ <- infer_aes_type(plot, "colour")
 
     if (identical(typ, "discrete")) {
       max_n <- getOption("theme61.max_discrete_colours", 12L)
 
-      # infer number of discrete levels safely
-      lev_n <- infer_discrete_nlevels(plot, "colour")  # see helper below
+      lev_n <- infer_discrete_nlevels(plot, "colour")
       if (!is.na(lev_n) && lev_n > max_n) {
         abort_too_many_discrete_levels("colour", lev_n, max_n)
       }
@@ -261,7 +265,6 @@ maybe_add_default_scales <- function(plot) {
       plot <- plot + scale_colour_e61(discrete = FALSE)
     }
   }
-
 
   # ---- Fill scale ----
   if (is.null(plot@scales$get_scales("fill")) && !is.null(find_aes(plot, "fill"))) {
@@ -281,7 +284,6 @@ maybe_add_default_scales <- function(plot) {
       plot <- plot + scale_fill_e61(discrete = FALSE)
     }
   }
-
 
   plot
 }

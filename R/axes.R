@@ -43,20 +43,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
   if (isFALSE(sec_axis)) sec_axis <- ggplot2::waiver()
 
   # Prepares limits and breaks
-  if (!is.null(limits) && is.numeric(limits)) {
-
-    if (length(limits) == 3) {
-      breaks <- round(seq(limits[[1]], limits[[2]], limits[[3]]), 10)
-
-    } else {
-      breaks <- function(x) {
-        x <- scales::breaks_extended()(x)
-        return(x)
-      }
-    }
-  } else {
-    breaks <- ggplot2::waiver()
-  }
+  breaks <- resolve_breaks_e61(limits)
 
   # Prepares breaks for the rescaled secondary axis if used
   if (isTRUE(rescale_sec)) {
@@ -162,32 +149,7 @@ scale_x_continuous_e61 <- function(limits = NULL,
                                    ...) {
 
   # Prepares limits and breaks
-  if (!is.null(limits) && is.numeric(limits)) {
-
-    if (length(limits) == 3) {
-      breaks <- round(seq(limits[[1]], limits[[2]], limits[[3]]), 10)
-
-      # Hides the first and last break
-      if (hide_first_last) {
-        breaks[breaks == min(breaks, na.rm = TRUE)] <- NA
-        breaks[breaks == max(breaks, na.rm = TRUE)] <- NA
-      }
-
-
-    } else {
-      breaks <- function(x) {
-        x <- scales::breaks_extended()(x)
-        # Hides the first and last break
-        if (hide_first_last) {
-          x[x == min(x, na.rm = TRUE)] <- NA
-          x[x == max(x, na.rm = TRUE)] <- NA
-        }
-        return(x)
-      }
-    }
-  } else {
-    breaks <- ggplot2::waiver()
-  }
+  breaks <- resolve_breaks_e61(limits, hide_first_last)
 
   # Make sure limits are only the min and max values (i.e. strictly length = 2)
   limits <- limits[1:2]
@@ -204,4 +166,31 @@ scale_x_continuous_e61 <- function(limits = NULL,
 
   return(retval)
 
+}
+
+#' Resolve the `breaks` argument for scale_x/y_continuous_e61() from a
+#' `limits` argument: a length-3 c(min, max, increment) becomes an explicit
+#' break sequence, any other numeric limits fall back to
+#' scales::breaks_extended(), and NULL/non-numeric limits use the default
+#' waiver(). Shared by scale_x_continuous_e61() and scale_y_continuous_e61().
+#' @noRd
+resolve_breaks_e61 <- function(limits, hide_first_last = FALSE) {
+
+  if (is.null(limits) || !is.numeric(limits)) {
+    return(ggplot2::waiver())
+  }
+
+  drop_ends <- function(x) {
+    if (hide_first_last) {
+      x[x == min(x, na.rm = TRUE)] <- NA
+      x[x == max(x, na.rm = TRUE)] <- NA
+    }
+    x
+  }
+
+  if (length(limits) == 3) {
+    drop_ends(round(seq(limits[[1]], limits[[2]], limits[[3]]), 10))
+  } else {
+    function(x) drop_ends(scales::breaks_extended()(x))
+  }
 }

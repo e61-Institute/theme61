@@ -1,3 +1,8 @@
+#' "Nice" numbers used to pick aesthetically-spaced axis break increments.
+#' Shared by get_aes_num() and get_aes_pair().
+#' @noRd
+t61_nice_breaks <- c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100)
+
 #' Name of the transformation applied to the plot's y-scale, or "identity"
 #' @noRd
 get_y_transform_name <- function(plot){
@@ -141,6 +146,10 @@ update_chart_scales <- function(plot, auto_scale, sec_axis, build = NULL){
     custom_breaks <- y_scale$breaks
   }
 
+  # Only assigned below if one of the auto_scale branches runs; falls back to
+  # y_scale_lims via the is.null() check further down otherwise.
+  aes_lims <- NULL
+
   # If no y-axis scale is present and y is numeric, then add a default aesthetic scale
   if(is.null(y_scale_lims) && auto_scale){
 
@@ -220,7 +229,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis, build = NULL){
 
   lims <- if (!is.null(custom_lims)) {
     custom_lims
-  } else if (exists("aes_lims")) {
+  } else if (!is.null(aes_lims)) {
     aes_lims
   } else {
     y_scale_lims
@@ -358,7 +367,7 @@ get_aes_num <- function(y_val, diff, type = c("next_largest", "next_smallest")) 
   # set the adjustment factor based on whether we are looking at a value above or below 1
   adj <- if (y_val > 0) 1 else -1
 
-  aes_y_points <- data.table::data.table(points = c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100))
+  aes_y_points <- data.table::data.table(points = t61_nice_breaks)
   aes_y_points[, points_adj := adj * points]
 
   order_mag <- ceiling(log10(adj * y_val))
@@ -642,7 +651,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
   while(keep_going == T){
 
     # 2 - Then find all the aesthetic pairs
-    aes_y_points <- c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100)
+    aes_y_points <- t61_nice_breaks
 
     # adjust to the right order of magnitude for the second value
     order_mag_first <- ceiling(log10(abs(aes_first_value)))

@@ -21,35 +21,34 @@
 #' @param labs (multi-panel specific) A named list specifying the shared
 #'   `title`, `subtitle`, `footnotes` and `sources` to place around the
 #'   multi-panel figure. Defaults to `NULL` for each.
-#' @param layout (multi-panel specific) A named list specifying the panel
-#'   grid: `ncol`, `nrow`, `align` and `axis`. See `patchwork::plot_layout()`
-#'   for what `align` and `axis` do. Defaults to
-#'   `list(ncol = 2, nrow = NULL, align = "v", axis = "none")`.
-#' @param spacing (multi-panel specific) A named list controlling whitespace
-#'   and relative sizing:
+#' @param layout (multi-panel specific) A named list specifying the panel grid:
+#'   `ncol`, `nrow`, `align` and `axis`. See `patchwork::plot_layout()` for what
+#'   `align` and `axis` do. Defaults to `list(ncol = 2, nrow = NULL, align =
+#'   "v", axis = "none")`.
+#' @param spacing (multi-panel specific) A named list controlling whitespace and
+#'   relative sizing:
 #'   * `pad_width`, `pad_height`: Numeric (mm). Adds horizontal/vertical
-#'   whitespace to the sides of all graphs. If saving multiple charts this
-#'   will add the same spacing to all charts. Defaults to no additional
-#'   padding.
+#'   whitespace to the sides of all graphs. If saving multiple charts this will
+#'   add the same spacing to all charts. Defaults to no additional padding.
 #'   * `outer_width`: Numeric (mm). Overrides the margin between the
-#'   left/right edges of the figure and the outermost panels. Defaults to
-#'   NULL, which uses the built-in margin (0mm). Set higher to add whitespace
-#'   around the outer edge of the figure; unlike `pad_width`, this does not
-#'   affect the gap between panels.
+#'   left/right edges of the figure and the outermost panels. Defaults to NULL,
+#'   which uses the built-in margin (0mm). Set higher to add whitespace around
+#'   the outer edge of the figure; unlike `pad_width`, this does not affect the
+#'   gap between panels.
 #'   * `outer_height`: Numeric (mm). Overrides the margin between the
 #'   top/bottom edges of the figure (i.e. above the title and below the
 #'   footnotes/sources) and the panels. Defaults to NULL, which uses the
-#'   built-in margin (0mm). Set higher to add whitespace around the outer
-#'   edge of the figure; unlike `pad_height`, this does not affect the gap
-#'   between panel rows.
+#'   built-in margin (0mm). Set higher to add whitespace around the outer edge
+#'   of the figure; unlike `pad_height`, this does not affect the gap between
+#'   panel rows.
 #'   * `height_adj`: Rescales the height of the multi-panel. The function
 #'   sets sensible defaults but this provides you with manual control if you
 #'   need it.
 #'   * `rel_heights`: A numeric vector giving the relative proportions of
 #'   each graph component (title, plots, footer).
 #'   * `title`, `subtitle`: Rescales the size of the space given to the
-#'   multi-panel title/subtitle. Use if you think the title looks too
-#'   cramped on the chart. Both default to 1.
+#'   multi-panel title/subtitle. Use if you think the title looks too cramped on
+#'   the chart. Both default to 1.
 #' @param chart_type String, or vector of strings if saving multiple plots. Type
 #'   of chart. This is used to set sensible chart widths based on the type of
 #'   plot you are saving. Options are:
@@ -89,7 +88,10 @@
 #'   while iterating, not the version you'd actually publish. Explicit `x`/`y`
 #'   positions are unaffected either way. Defaults to FALSE.
 #' @param spell_check Logical. Check spelling of words in the title and caption.
-#'   Defaults to TRUE. Set to FALSE to turn off.
+#'   Defaults to TRUE. Set to FALSE to turn off, or set the
+#'   `theme61.disable_spellcheck` option to skip it session-wide (see
+#'   [set_t61_options]). Words listed in `inst/extdata/custom_dictionary.txt`
+#'   are skipped - add words to that file if they should not be flagged.
 #' @param preview Logical. Set to TRUE to show a preview of the graph in the
 #'   Viewer pane but not save to disk. Defaults to FALSE.
 #' @param base_size Numeric. Chart font size. Default is 10.
@@ -98,22 +100,22 @@
 #' @param bg_colour Set the graph background colour. Accepts a colour name, hex
 #'   code or theme61 colour object name. Defaults to "white". For graphs used in
 #'   research note boxes, set the colour to `e61_boxback`.
-#' @param return_plot_obj (multi-panel specific) Logical. If TRUE, skips
-#'   saving entirely and returns the composed multi-panel plot object instead
-#'   (e.g. to print it in the Plots pane, or use it in a Shiny app). Only
-#'   supported for multi-panel graphs (2 or more plots) - for a single plot,
-#'   just print the ggplot object directly. Defaults to FALSE. Like a saved
-#'   graph, the returned object's layout (text sizes, panel spacing) is
-#'   computed for a fixed target size (`dim`, or the same defaults `save_e61`
-#'   would otherwise use) - it won't reflow if you resize the device
-#'   afterwards.
+#' @param return_plot_obj (multi-panel specific) Logical. If TRUE, skips saving
+#'   entirely and returns the composed multi-panel plot object instead (e.g. to
+#'   print it in the Plots pane, or use it in a Shiny app). Only supported for
+#'   multi-panel graphs - for a single plot, just print the ggplot object
+#'   directly. Defaults to FALSE. Note that the returned object's layout (text
+#'   sizes, panel spacing) is computed for a fixed target size (`dim`, or the
+#'   same defaults `save_e61` would otherwise use) - it won't reflow if you
+#'   resize the device afterwards.
 #' @param ... (multi-panel specific) Plot objects to put on the panel.
 #' @param title,subtitle,footnotes,sources `r lifecycle::badge("deprecated")`
 #'   Use `labs` instead.
 #' @param ncol,nrow,align,axis `r lifecycle::badge("deprecated")` Use `layout`
 #'   instead.
-#' @param pad_width,pad_height,outer_width,outer_height,height_adj,rel_heights,spacing_adj
-#'   `r lifecycle::badge("deprecated")` Use `spacing` instead.
+#' @param
+#' pad_width,pad_height,outer_width,outer_height,height_adj,rel_heights,spacing_adj
+#' `r lifecycle::badge("deprecated")` Use `spacing` instead.
 #' @return Invisibly returns the file name.
 #' @export
 
@@ -233,17 +235,40 @@ save_e61 <- function(filename = NULL,
   layout$align <- layout$align %||% "v"
   layout$axis  <- layout$axis  %||% "none"
 
+  # Coerce plot classes and prep --------------------------------------------
+
   # Compile plots
   plots <- c(list(...), plotlist)
 
   # For single-panel graphs
   if (length(plots) == 0) plots <- list(plot)
 
-  # Guard clauses and checks ------------------------------------------------
+  # Ensure plots are e61 plots
+  plots <- as_e61_plot(plots)
+
+  # Classify each plot as map/non-map (and correct map-only axis chrome).
+  # This has to happen for every panel (not just single-panel saves) since
+  # save_multi() reads the theme (e.g. legend position/title) straight off
+  # each plot.
+  plots <- lapply(plots, finalise_e61_plot)
+
+  if (length(plots) == 1) {
+    is_map <- inherits(plots[[1]], "e61_map")
+
+    if (is_map) {
+      auto_scale <- FALSE
+      chart_type <- "custom"
+    } else if (is.null(chart_type)) {
+      chart_type <- "normal"
+    }
+
+    plots[[1]] <- plots[[1]] + ggplot2::theme(rect = ggplot2::element_rect(fill = bg_colour))
+  }
 
   # Check whether the plots are ggplot2 objects
   plots <- check_plots(plots)
 
+  # Guard clauses -----------------------------------------------------------
   if (return_plot_obj && length(plots) <= 1) {
     stop("return_plot_obj is only supported for multi-panel graphs (2 or more plots). For a single plot, just print the ggplot object directly.")
   }
@@ -327,73 +352,28 @@ save_e61 <- function(filename = NULL,
                                   "height_adj", "rel_heights", "title", "subtitle")))
     stop("You have specified invalid list elements in 'spacing'.")
 
-  # Advisory messages -------------------------------------------------------
+  # Spell checker -------------------------------------------------------
 
-  # Currently spell check is the only function provided in the advisory msgs
-  bad_msg <- c()
-  adv_msg <- c()
+  if (spell_check && !isTRUE(getOption("theme61.disable_spellcheck", FALSE))) {
+    # Loop through the plots. unlist() (not c()) so that plots with no typos
+    # (check_plot_spelling() returns NULL) are dropped rather than counted as
+    # an empty message.
+    spell_chk <- unlist(lapply(plots, check_plot_spelling))
 
-  spell_chk <- list()
+    # Compile the messages
+    adv_msg <- c(spell_chk)
 
-  # Loop through the plots
-  for(i in seq_along(plots)){
+    # Compile advisory messages
+    print_adv <- function() {
+      cli::cli_div(theme = list(".adv" = list(`color` = "#cc0000")))
+      sapply(adv_msg, cli::cli_alert, class = "adv")
+      cli::cli_end()
+    }
 
-    # Spell checks
-    fields <- c("title", "subtitle", "caption")
-
-    spell_chk_i <- lapply(fields, function(field) {
-      val <- plots[[i]]@labels[[field]]
-      if (!is.null(val)) {
-        # replace html line breaks with a space and remove other elements before
-        # spell checking
-        val <- gsub("<br>", " ", val)
-        val <- gsub("<[^>]+>", "", val)
-
-        res <- check_spelling(val)
-        if (length(res) > 0) return(res)
-      }
-      return(NULL)
-    })
-
-    # Assign names and remove NULLs (i.e. no typos)
-    names(spell_chk_i) <- fields
-    spell_chk_i <- Filter(Negate(is.null), spell_chk_i)
-
-    # Format nicely
-    spell_chk_i <- lapply(names(spell_chk_i), function(x) {
-
-      paste0("There may be a typo in the ", x, ": ",
-             paste(spell_chk_i[[x]], collapse = ", "))
-    })
-
-    spell_chk_i <- unlist(spell_chk_i)
-    spell_chk <- c(spell_chk, spell_chk_i)
+    # Print advisory messages
+    if (length(adv_msg) > 0) print_adv()
 
   }
-
-  # Turn off spell check
-  if (!spell_check) spell_chk <- NULL
-
-  # Compile the messages
-  bad_msg <- NULL
-  adv_msg <- c(spell_chk)
-
-  # Compile advisory messages
-  print_adv <- function() {
-    cli::cli_div(theme = list(".bad" = list(color = "#cc0000",
-                                            before = paste0(cli::symbol$cross, " ")),
-                              ".adv" = list(`color` = "#cc0000")
-    )
-    )
-    cli::cli_h1("--- Your graph may have some issues to address ----------------------------------------", class = "adv")
-    cli::cli_ul()
-    sapply(bad_msg, cli::cli_alert, class = "bad")
-    sapply(adv_msg, cli::cli_alert, class = "adv")
-    cli::cli_end()
-  }
-
-  # Print advisory messages
-  if (length(adv_msg) + length(bad_msg) > 0 && is.null(getOption("no_advisory"))) print_adv()
 
   # Make graph to save --------------------------------
 
@@ -433,8 +413,6 @@ save_e61 <- function(filename = NULL,
     if (return_plot_obj) return(save_input$graph)
 
   } else {
-
-    temp <- plots[[1]]
 
     save_input <- save_single(
       filename = filename,
@@ -498,11 +476,11 @@ save_e61 <- function(filename = NULL,
   file_to_open <- paste0(filename, ".", format[[1]])
 
   if (isTRUE(getOption("theme61.open_in_browser", FALSE))) {
-    file_to_open_browser <- shQuote(here::here(file_to_open))
+    # browseURL() is cross-platform (unlike system2("open", ...), which is
+    # macOS-only) and picks the right opener for the current OS itself.
+    out <- try(utils::browseURL(here::here(file_to_open)))
 
-    out <- try(system2("open", file_to_open_browser))
-
-    if (out != 0) warning("Graph file could not be opened")
+    if (inherits(out, "try-error")) warning("Graph file could not be opened")
   }
 
   if (interactive()) {
@@ -530,78 +508,4 @@ save_e61 <- function(filename = NULL,
   retval <- paste(filename, format, sep = ".")
 
   invisible(retval)
-}
-
-#' Converts SVG to a bitmap file
-#'
-#' Converts an SVG file to a bitmap file, currently supports JPEG and PNG.
-#'
-#' @param file_in File path to the SVG image to convert.
-#' @param file_out File path to the PNG or JPEG. image to save. Default saves a
-#'   file with the same name and location (except for the file extension).
-#' @param delete Logical. Delete the original SVG file? (defaults to FALSE).
-#' @param res Numeric. Increase the dimensions of the saved PNG or JPEG. E.g.
-#'   `res = 2` doubles the dimensions of the saved graph.
-#' @return Invisibly returns the file path to the PNG image
-#' @keywords internal
-#' @export
-svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
-
-  res <- res * 4 # res = 1 alone renders too small to be usable
-
-  if (!grepl(".*\\.svg$", file_in))
-    stop("file_in must be an svg file.")
-
-  # If file_out is null, then save to a PNG by default
-  if (is.null(file_out)) {
-    file_out <- gsub("(.*)\\.svg$", "\\1.png", file_in)
-  } else if (!grepl(".*\\.png$", file_out) & !grepl(".*\\.jpg$", file_out)) {
-    stop("file_out must be a png or jpg file.")
-  }
-
-  if(grepl(".*\\.png$", file_out)) fmt <- "png" else fmt <- "jpg"
-
-  if (res != 1) {
-    # This approach to rescaling starts by saving a rescaled SVG before
-    # converting it to PNG. Hence the need for temp files.
-    file_temp_svg <- "intermed.svg"
-    file_temp_out <- paste0("intermed.", fmt)
-
-    rsvg::rsvg_png(svg = file_in, file = file_temp_out)
-
-    g_info <- magick::image_info(magick::image_read(file_temp_out))
-
-    rsvg::rsvg_svg(svg = file_in,
-                   file = file_temp_svg,
-                   width = g_info$width * res,
-                   height = g_info$height * res
-                   )
-
-    if(fmt == "png"){
-      rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
-
-    } else if(fmt == "jpg"){
-      image_temp <- magick::image_read_svg(file_temp_svg)
-
-      magick::image_write(image = image_temp, path = file_out, format = "jpg")
-    }
-
-    unlink(file_temp_svg)
-    unlink(file_temp_out)
-
-  } else {
-
-    if(fmt == "png"){
-      rsvg::rsvg_png(svg = file_in, file = file_out)
-
-    } else if(fmt == "jpg"){
-      image_temp <- magick::image_read_svg(file_in)
-
-      magick::image_write(image = image_temp, path = file_out, format = "jpg")
-    }
-  }
-
-  if (delete) unlink(file_in)
-
-  invisible(file_out)
 }

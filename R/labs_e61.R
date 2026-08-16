@@ -73,12 +73,6 @@ labs_e61 <- function(title = NULL,
   # doesn't show literal "<span>"/"<br>" text in the subtitle/y-axis title.
   iterate_mode <- isTRUE(getOption("theme61.iterate_mode", FALSE))
 
-  # Track whether a label has been wrapped
-  wrap_title_trk <- FALSE
-  wrap_subtitle_trk <- FALSE
-  wrap_ytitle_trk <- FALSE
-  wrap_caption_trk <- FALSE
-
   # Turn off text wrapping if FALSE is the argument
   if (isFALSE(title_wrap)) title_wrap <- 9999
   if (isFALSE(subtitle_wrap)) subtitle_wrap <- 9999
@@ -86,86 +80,37 @@ labs_e61 <- function(title = NULL,
   if (isFALSE(ytitle_wrap)) ytitle_wrap <- 9999
 
   # Title ----
-  # For each label check whether to wrap the title
+  # Keep title as NULL so ggplot2 does not reserve space for an empty title
+  # grob (an empty string title still takes up vertical space)
   if (is.null(title)) {
-
-    # Keep title as NULL so ggplot2 does not reserve space for an empty
-    # title grob (an empty string title still takes up vertical space)
     title_text <- NULL
-
-  } else if (!is.null(title_wrap)) {
-
-    # Check the title and title_wrap have been correctly supplied
-    if (!is.numeric(title_wrap) || title_wrap < 0) {
-      stop("title_wrap must be a positive integer.")
-    }
-
-    # Wrap the title text
-    title_text <- paste(strwrap(title, width = title_wrap), collapse = "\n")
-
-    wrap_title_trk <- TRUE
-
+    wrap_title_trk <- FALSE
   } else {
-    title_text <- paste(strwrap(title, width = 120), collapse = "\n")
+    w <- resolve_wrap(title, title_wrap, "title", default_width = 120)
+    title_text <- w$text
+    wrap_title_trk <- w$wrapped
   }
 
   # Subtitle ----
-  if (!is.null(subtitle_wrap)) {
-
-    # Check the subtitle and subtitle_wrap have been correctly supplied
-    if (!is.numeric(subtitle_wrap) || subtitle_wrap < 0){
-      stop("subtitle_wrap must be a positive integer.")
-    }
-
-    if (!is.null(subtitle) && !is.character(subtitle)){
-      stop("subtitle must be a string.")
-    }
-
-    # Wrap the subtitle text
-    subtitle_text <- paste(strwrap(subtitle, width = subtitle_wrap), collapse = "\n")
-
-    wrap_subtitle_trk <- TRUE
-
-  } else {
-    subtitle_text <- paste(strwrap(subtitle, width = 120), collapse = "\n")
-  }
+  w <- resolve_wrap(subtitle, subtitle_wrap, "subtitle", default_width = 120)
+  subtitle_text <- w$text
+  wrap_subtitle_trk <- w$wrapped
 
   # Y-axis title ----
+  # In iterate_mode, the y-axis title below won't be merged into the
+  # (markdown-rendered) subtitle, so join with a plain newline instead of
+  # "<br>" - it stays a normal, non-markdown axis title.
+  wrap_ytitle_trk <- FALSE
   if (y_top && !is.null(ytitle_wrap)) {
-
-    # Check the ytitle and ytitle_wrap have been correctly supplied
-    if (!is.numeric(ytitle_wrap) || ytitle_wrap < 0) {
-      stop("ytitle_wrap must be a positive integer.")
-    }
-
-    if (!is.null(y) && !is.character(y)) {
-      stop("y must be a string.")
-    }
-
-    # Wrap the ytitle text. In iterate_mode, the y-axis title below won't be
-    # merged into the (markdown-rendered) subtitle, so join with a plain
-    # newline instead of "<br>" - it stays a normal, non-markdown axis title.
-    y <- paste(strwrap(y, width = ytitle_wrap), collapse = if (iterate_mode) "\n" else "<br>")
-
-    wrap_ytitle_trk <- TRUE
-
+    w <- resolve_wrap(y, ytitle_wrap, "ytitle", collapse = if (iterate_mode) "\n" else "<br>")
+    y <- w$text
+    wrap_ytitle_trk <- w$wrapped
   }
 
   # Footnotes ----
-  if (!is.null(footnote_wrap)) {
-
-    # Check the footnote and footnote_wrap have been correctly supplied
-    if (!is.numeric(footnote_wrap) || footnote_wrap < 0) {
-      stop("footnote_wrap must be a positive integer.")
-    }
-
-    # Wrap the caption text
-    caption_text <- caption_wrap(footnotes, sources, max_char = footnote_wrap)
-    wrap_caption_trk <- TRUE
-
-  } else {
-    caption_text <- caption_wrap(footnotes, sources, max_char = 120)
-  }
+  validate_wrap(footnote_wrap, "footnote")
+  caption_text <- caption_wrap(footnotes, sources, max_char = footnote_wrap %||% 120)
+  wrap_caption_trk <- !is.null(footnote_wrap)
 
   if(wrap_title_trk) attr(title_text, "title_wrap") <- TRUE
   if(wrap_subtitle_trk) attr(subtitle_text, "subtitle_wrap") <- TRUE
@@ -287,4 +232,33 @@ caption_wrap <- function(
   if (caption == "") caption <- NULL # Return NULL caption if blank
 
   return(caption)
+}
+
+#' Validate a `*_wrap` argument: must be NULL or a non-negative number.
+#' Shared by all four wrap arguments in labs_e61() (title_wrap, subtitle_wrap,
+#' ytitle_wrap, footnote_wrap).
+#' @noRd
+validate_wrap <- function(wrap, label) {
+  if (!is.null(wrap) && (!is.numeric(wrap) || wrap < 0)) {
+    stop(label, "_wrap must be a positive integer.")
+  }
+  invisible(wrap)
+}
+
+#' Validate and apply a `*_wrap` argument to `text` via strwrap(), falling
+#' back to `default_width` if `wrap` is NULL (or leaving `text` untouched if
+#' there's no default either). Returns the (possibly wrapped) text and
+#' whether an explicit wrap was applied - used to set labs_e61()'s `*_wrap`
+#' tracking attributes downstream. Shared by the title/subtitle/y-axis-title
+#' blocks in labs_e61().
+#' @noRd
+resolve_wrap <- function(text, wrap, label, default_width = NULL, collapse = "\n") {
+
+  validate_wrap(wrap, label)
+
+  width <- if (is.null(wrap)) default_width else wrap
+
+  if (is.null(width)) return(list(text = text, wrapped = FALSE))
+
+  list(text = paste(strwrap(text, width = width), collapse = collapse), wrapped = !is.null(wrap))
 }

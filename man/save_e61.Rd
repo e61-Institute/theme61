@@ -65,37 +65,35 @@ arguments to the function.}
 \code{title}, \code{subtitle}, \code{footnotes} and \code{sources} to place around the
 multi-panel figure. Defaults to \code{NULL} for each.}
 
-\item{layout}{(multi-panel specific) A named list specifying the panel
-grid: \code{ncol}, \code{nrow}, \code{align} and \code{axis}. See \code{patchwork::plot_layout()}
-for what \code{align} and \code{axis} do. Defaults to
-\code{list(ncol = 2, nrow = NULL, align = "v", axis = "none")}.}
+\item{layout}{(multi-panel specific) A named list specifying the panel grid:
+\code{ncol}, \code{nrow}, \code{align} and \code{axis}. See \code{patchwork::plot_layout()} for what
+\code{align} and \code{axis} do. Defaults to \code{list(ncol = 2, nrow = NULL, align = "v", axis = "none")}.}
 
-\item{spacing}{(multi-panel specific) A named list controlling whitespace
-and relative sizing:
+\item{spacing}{(multi-panel specific) A named list controlling whitespace and
+relative sizing:
 \itemize{
 \item \code{pad_width}, \code{pad_height}: Numeric (mm). Adds horizontal/vertical
-whitespace to the sides of all graphs. If saving multiple charts this
-will add the same spacing to all charts. Defaults to no additional
-padding.
+whitespace to the sides of all graphs. If saving multiple charts this will
+add the same spacing to all charts. Defaults to no additional padding.
 \item \code{outer_width}: Numeric (mm). Overrides the margin between the
-left/right edges of the figure and the outermost panels. Defaults to
-NULL, which uses the built-in margin (0mm). Set higher to add whitespace
-around the outer edge of the figure; unlike \code{pad_width}, this does not
-affect the gap between panels.
+left/right edges of the figure and the outermost panels. Defaults to NULL,
+which uses the built-in margin (0mm). Set higher to add whitespace around
+the outer edge of the figure; unlike \code{pad_width}, this does not affect the
+gap between panels.
 \item \code{outer_height}: Numeric (mm). Overrides the margin between the
 top/bottom edges of the figure (i.e. above the title and below the
 footnotes/sources) and the panels. Defaults to NULL, which uses the
-built-in margin (0mm). Set higher to add whitespace around the outer
-edge of the figure; unlike \code{pad_height}, this does not affect the gap
-between panel rows.
+built-in margin (0mm). Set higher to add whitespace around the outer edge
+of the figure; unlike \code{pad_height}, this does not affect the gap between
+panel rows.
 \item \code{height_adj}: Rescales the height of the multi-panel. The function
 sets sensible defaults but this provides you with manual control if you
 need it.
 \item \code{rel_heights}: A numeric vector giving the relative proportions of
 each graph component (title, plots, footer).
 \item \code{title}, \code{subtitle}: Rescales the size of the space given to the
-multi-panel title/subtitle. Use if you think the title looks too
-cramped on the chart. Both default to 1.
+multi-panel title/subtitle. Use if you think the title looks too cramped on
+the chart. Both default to 1.
 }}
 
 \item{dim}{An optional named list specifying the plot height and width.
@@ -148,7 +146,10 @@ while iterating, not the version you'd actually publish. Explicit \code{x}/\code
 positions are unaffected either way. Defaults to FALSE.}
 
 \item{spell_check}{Logical. Check spelling of words in the title and caption.
-Defaults to TRUE. Set to FALSE to turn off.}
+Defaults to TRUE. Set to FALSE to turn off, or set the
+\code{theme61.disable_spellcheck} option to skip it session-wide (see
+\link{set_t61_options}). Words listed in \code{inst/extdata/custom_dictionary.txt}
+are skipped - add words to that file if they should not be flagged.}
 
 \item{preview}{Logical. Set to TRUE to show a preview of the graph in the
 Viewer pane but not save to disk. Defaults to FALSE.}
@@ -162,15 +163,14 @@ PNG. E.g. \code{res = 2} doubles the size of the saved graph.}
 code or theme61 colour object name. Defaults to "white". For graphs used in
 research note boxes, set the colour to \code{e61_boxback}.}
 
-\item{return_plot_obj}{(multi-panel specific) Logical. If TRUE, skips
-saving entirely and returns the composed multi-panel plot object instead
-(e.g. to print it in the Plots pane, or use it in a Shiny app). Only
-supported for multi-panel graphs (2 or more plots) - for a single plot,
-just print the ggplot object directly. Defaults to FALSE. Like a saved
-graph, the returned object's layout (text sizes, panel spacing) is
-computed for a fixed target size (\code{dim}, or the same defaults \code{save_e61}
-would otherwise use) - it won't reflow if you resize the device
-afterwards.}
+\item{return_plot_obj}{(multi-panel specific) Logical. If TRUE, skips saving
+entirely and returns the composed multi-panel plot object instead (e.g. to
+print it in the Plots pane, or use it in a Shiny app). Only supported for
+multi-panel graphs - for a single plot, just print the ggplot object
+directly. Defaults to FALSE. Note that the returned object's layout (text
+sizes, panel spacing) is computed for a fixed target size (\code{dim}, or the
+same defaults \code{save_e61} would otherwise use) - it won't reflow if you
+resize the device afterwards.}
 
 \item{title, subtitle, footnotes, sources}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 Use \code{labs} instead.}
