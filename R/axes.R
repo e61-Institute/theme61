@@ -72,9 +72,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
     applied_limits <- NULL
   }
 
-  # Put it all together. When limits is NULL, applied_limits is NULL (the
-  # ggplot2 default) and breaks is a waiver() (also the ggplot2 default) --
-  # so a single call covers all three cases above.
+  # Put it all together
   retval <- ggplot2::scale_y_continuous(
     expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
     sec.axis = sec_axis,

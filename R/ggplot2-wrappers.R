@@ -67,7 +67,7 @@ labs <- function(...) {
 
 #' Shared body for facet_wrap()/facet_grid() -- identical apart from which
 #' ggplot2 facet function they wrap. `axes_missing` must be `missing(axes)`
-#' evaluated in the *caller's* frame (facet_wrap()/facet_grid() itself),
+#' evaluated in the caller's frame (facet_wrap()/facet_grid() itself),
 #' since evaluating it in here would always see axes as supplied (it's
 #' always forwarded explicitly by the caller).
 #' @noRd
