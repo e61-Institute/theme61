@@ -26,11 +26,8 @@ ggplot_build.e61_plot <- function(plot, ...) {
 
 # Helpers ----
 
-# Find the first mapping quosure for aes_name: plot mapping first, else the
-# first layer with a mapping for it. Returns list(quo, layer) where layer is
-# NULL if the match came from the plot-level mapping, else the matching
-# layer (so callers can recover which data the quosure should be evaluated
-# against). Returns NULL if no mapping is found anywhere.
+# First mapping quosure for aes_name (plot, else layers). list(quo, layer),
+# layer NULL for a plot-level match; NULL if no mapping is found.
 find_aes_match <- function(plot, aes_name) {
 
   if (!is.null(plot@mapping[[aes_name]])) {
@@ -77,11 +74,8 @@ safe_eval_tidy <- function(quo, data) {
   )
 }
 
-# Resolve the value of a quosure against a list of candidate datasets: if the
-# quosure is a bare symbol, look up the column directly by name (avoids name
-# collisions with objects in the calling environment); otherwise safely
-# eval_tidy it in each candidate's data mask, in order, using the first
-# non-NULL result. Returns NULL if no value could be resolved.
+# Value of a quosure against candidate datasets: bare symbol -> direct column
+# lookup (avoids name collisions), else eval_tidy against each in turn.
 resolve_aes_value <- function(quo, data_candidates) {
 
   expr <- rlang::quo_get_expr(quo)
@@ -104,8 +98,7 @@ resolve_aes_value <- function(quo, data_candidates) {
   NULL
 }
 
-# Skip computed aesthetics (after_stat()/after_scale()/stat()): too hard (and
-# unsafe) to infer pre-build.
+# Computed aesthetics (after_stat()/after_scale()/stat()) can't be inferred pre-build.
 is_unsafe_mapping <- function(q) {
   expr <- rlang::quo_get_expr(q)
   txt <- paste(deparse(expr), collapse = "")

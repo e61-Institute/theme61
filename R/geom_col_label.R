@@ -207,17 +207,12 @@ GeomTextFlipAware <- ggplot2::ggproto("GeomTextFlipAware", ggplot2::GeomText,
 .COL_LABEL_GAP_FRAC <- 0.025
 .COL_LABEL_HEADROOM_FRAC <- 0.08
 
-
-# Number of rows (segments) sharing each x value, mapped back onto data's own
-# row order via match(). Used by both stats below to tell whether a given x
-# is stacked (>1 row sharing it) or a lone/single column (1 row).
+# Rows sharing each x value (>1 = stacked column).
 col_label_n_group <- function(data) {
   n_per_x <- tapply(data$y, data$x, length)
   as.numeric(n_per_x[match(data$x, names(n_per_x))])
 }
 
-# Percent-of-total label for each row, given its y value(s) and a matching
-# total (either a single grand total or a per-row vector of per-x totals).
 col_label_percent <- function(y, total, accuracy) {
   scales::label_percent(accuracy = accuracy)(y / total)
 }
