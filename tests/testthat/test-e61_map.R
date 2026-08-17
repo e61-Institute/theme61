@@ -61,6 +61,8 @@ test_that("setup_stadia_maps(update_ggmap = FALSE) does not prompt for the ggmap
     regexp = "non-interactive"
   )
   expect_equal(n_readline, 0L)
+})
+
 # add_map_e61() and setup_stadia_maps() both need network access and a real
 # Stadia Maps API key (via ggmap::get_stadiamap()/ggmap::has_stadiamaps_key()),
 # so full integration tests aren't feasible here. These tests instead cover
