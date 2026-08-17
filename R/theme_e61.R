@@ -41,6 +41,17 @@
 #'   theme_e61()
 #' }
 #'
+#' Validate a legend_position argument when legend == "inside"
+#' @noRd
+.validate_legend_position <- function(legend_position) {
+  if (!is.numeric(legend_position) || length(legend_position) != 2)
+    stop("legend_position needs to be a length two numeric vector.")
+
+  if (!(data.table::between(legend_position[[1]], 0, 1) |
+        data.table::between(legend_position[[2]], 0, 1)))
+    stop("Both legend_position values must be between 0 and 1.")
+}
+
 theme_e61 <- function(
     legend = c("none", "bottom", "top", "left", "right", "inside"),
     legend_position = NULL,
@@ -58,12 +69,7 @@ theme_e61 <- function(
   )
 
   if (legend == "inside") {
-    if (!is.numeric(legend_position) || length(legend_position) != 2)
-      stop("legend_position needs to be a length two numeric vector.")
-
-    if (!(data.table::between(legend_position[[1]], 0, 1) |
-          data.table::between(legend_position[[2]], 0, 1)))
-      stop("Both legend_position values must be between 0 and 1.")
+    .validate_legend_position(legend_position)
   }
 
   # This deals with an issue where the test environment can't install pt-sans
@@ -150,12 +156,12 @@ theme_e61 <- function(
   }
 
   # adjust legend direction based on legend position
-  if (data.table::like(legend, "bottom|top", ignore.case = TRUE)) {
+  if (grepl("bottom|top", legend)) {
     ret <- ret + theme(legend.direction = "horizontal")
   }
 
   # Adds a grey background option
-  if (background == "grey" |  background == "box") {
+  if (background %in% c("grey", "box")) {
     ret <- ret + theme(rect = element_rect(fill = e61_greylight6))
   }
 
@@ -195,12 +201,7 @@ theme_e61_spatial <- function(
   aspect_ratio <- if (is.null(aspect_ratio)) 0.75 else aspect_ratio
 
   if (legend == "inside") {
-    if (!is.numeric(legend_position) || length(legend_position) != 2)
-      stop("legend_position needs to be a length two numeric vector.")
-
-    if (!(data.table::between(legend_position[[1]], 0, 1) |
-          data.table::between(legend_position[[2]], 0, 1)))
-      stop("Both legend_position values must be between 0 and 1.")
+    .validate_legend_position(legend_position)
   }
 
   base_family <- if (is_testing()) "sans" else base_family

@@ -183,7 +183,7 @@ plot_label <-
         # Marks whether the default size was used, so update_plot_label()
         # (aes_labs.R) can scale it with the chart's base_size -- an
         # explicit custom size is left alone instead.
-        adj_plot_label = isTRUE(all.equal(size, 3.5))
+        adj_plot_label = identical(size, 3.5)
       ),
       class = "e61_plot_label"
     )
