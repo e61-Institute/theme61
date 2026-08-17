@@ -144,6 +144,24 @@ t61_box_distance_to_series <- function(box, mask, series, geom_type, units) {
   rxmin <- rect$xmin * sx; rxmax <- rect$xmax * sx
   rymin <- rect$ymin * sy; rymax <- rect$ymax * sy
 
+  # Shared by the "line" and "pointbar" branches below: both need the
+  # candidate box's 4 corners (to test against a segment) and a running
+  # "closest so far" tracker (to fold a per-i loop's distance/x/y down to
+  # one best result). Hoisted here, above the geom_type branches, rather
+  # than each branch defining its own -- rxmin/rxmax/rymin/rymax (the only
+  # inputs corners depends on) are already fixed at this point regardless
+  # of which branch runs.
+  corners <- expand.grid(x = c(rxmin, rxmax), y = c(rymin, rymax))
+  new_best_tracker <- function() {
+    best <- NULL
+    list(
+      update = function(d, x, y) {
+        if (is.null(best) || d < best$distance) best <<- list(distance = d, x = x, y = y)
+      },
+      get = function() best
+    )
+  }
+
   if (identical(geom_type, "point")) {
     qx <- series$x * sx
     qy <- series$y * sy
@@ -161,29 +179,24 @@ t61_box_distance_to_series <- function(box, mask, series, geom_type, units) {
       return(list(distance = d, x = series_x, y = series_y))
     }
 
-    corners <- expand.grid(x = c(rxmin, rxmax), y = c(rymin, rymax))
-    best <- NULL
-
-    update_best <- function(d, x, y) {
-      if (is.null(best) || d < best$distance) best <<- list(distance = d, x = x, y = y)
-    }
+    tracker <- new_best_tracker()
 
     for (i in seq_len(n - 1)) {
       ax <- series_x[i] * sx;     ay <- series_y[i] * sy
       bx <- series_x[i + 1] * sx; by <- series_y[i + 1] * sy
 
       # Segment endpoints against the rectangle.
-      update_best(t61_point_rect_distance(ax, ay, rxmin, rxmax, rymin, rymax), series_x[i], series_y[i])
-      update_best(t61_point_rect_distance(bx, by, rxmin, rxmax, rymin, rymax), series_x[i + 1], series_y[i + 1])
+      tracker$update(t61_point_rect_distance(ax, ay, rxmin, rxmax, rymin, rymax), series_x[i], series_y[i])
+      tracker$update(t61_point_rect_distance(bx, by, rxmin, rxmax, rymin, rymax), series_x[i + 1], series_y[i + 1])
 
       # Rectangle corners against the segment.
       for (k in seq_len(nrow(corners))) {
         seg <- t61_point_segment_distance(corners$x[k], corners$y[k], ax, ay, bx, by)
-        update_best(seg$distance, seg$x / sx, seg$y / sy)
+        tracker$update(seg$distance, seg$x / sx, seg$y / sy)
       }
     }
 
-    return(best)
+    return(tracker$get())
   }
 
   if (identical(geom_type, "column")) {
@@ -232,24 +245,19 @@ t61_box_distance_to_series <- function(box, mask, series, geom_type, units) {
     ymin <- series$ymin * sy
     ymax <- series$ymax * sy
 
-    corners <- expand.grid(x = c(rxmin, rxmax), y = c(rymin, rymax))
-    best <- NULL
-
-    update_best <- function(d, xx, yy) {
-      if (is.null(best) || d < best$distance) best <<- list(distance = d, x = xx, y = yy)
-    }
+    tracker <- new_best_tracker()
 
     for (i in seq_along(x)) {
-      update_best(t61_point_rect_distance(x[i], ymin[i], rxmin, rxmax, rymin, rymax), series$x[i], series$ymin[i])
-      update_best(t61_point_rect_distance(x[i], ymax[i], rxmin, rxmax, rymin, rymax), series$x[i], series$ymax[i])
+      tracker$update(t61_point_rect_distance(x[i], ymin[i], rxmin, rxmax, rymin, rymax), series$x[i], series$ymin[i])
+      tracker$update(t61_point_rect_distance(x[i], ymax[i], rxmin, rxmax, rymin, rymax), series$x[i], series$ymax[i])
 
       for (k in seq_len(nrow(corners))) {
         seg <- t61_point_segment_distance(corners$x[k], corners$y[k], x[i], ymin[i], x[i], ymax[i])
-        update_best(seg$distance, seg$x / sx, seg$y / sy)
+        tracker$update(seg$distance, seg$x / sx, seg$y / sy)
       }
     }
 
-    return(best)
+    return(tracker$get())
   }
 
   stop("t61_box_distance_to_series: unsupported geom_type '", geom_type, "' (v1 scope: point, line, column, area, pointbar)")

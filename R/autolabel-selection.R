@@ -1,6 +1,51 @@
 # Candidate position generation, and picking the best of a set of already-
 # evaluated candidates.
 
+# Multiplier applied to a label's own height (cm) to get its buffer
+# distance from its own series, by geom_type -- shared between the HARD
+# exclusion threshold (t61_place_label()'s min_buffer_cm, autolabel.R:
+# candidates closer than this are rejected outright) and the SOFT scoring
+# target used only to break ties among already-accepted candidates
+# (t61_target_buffer_cm() below). "point" needs a much bigger multiplier
+# than any other geom: a line has one "own" direction to step away from,
+# so a buffer scaled off label height reads fine, but a scattered point
+# cluster has no single direction -- "distance to the nearest point"
+# collapses back down to a small value the moment a candidate sits
+# anywhere near the cloud, no matter which way it moves.
+T61_BUFFER_MULT <- c(point = 3.4, line = 1.13)
+
+#' Base buffer multiplier (see T61_BUFFER_MULT) for a geom_type. "line" is
+#' also the fallback for every other geom (column/area/pointbar), same as
+#' the original hand-duplicated `if (identical(geom_type, "point")) ...
+#' else ...` this replaces.
+#' @noRd
+t61_buffer_mult <- function(geom_type) {
+  if (identical(geom_type, "point")) T61_BUFFER_MULT[["point"]] else T61_BUFFER_MULT[["line"]]
+}
+
+# t61_target_buffer_cm()'s soft scoring target is deliberately larger than
+# t61_place_label()'s hard min_buffer_cm by this fixed factor -- it must
+# land inside the "near" selection group, whose own boundary is a multiple
+# of the target (see t61_selection_group()), so the target has to clear
+# the minimum by some margin to have room to do that.
+#
+# Before this refactor the two buffers were independent hand-tuned magic
+# numbers (point: 3.4 vs 3.8, a ratio of 19/17 = 1.11765; line/default:
+# 1.13 vs 1.27, a ratio of 127/113 = 1.12389) that were never actually
+# equal -- close enough (~0.6% apart) to look like they were meant to
+# track each other, but not expressed as such in code. They are NOT the
+# same conceptual quantity (see t61_place_label()'s min_buffer_cm comment
+# vs this file's t61_selection_group() comment) and should not be merged
+# to one value, but the *relationship* between them should be a single
+# named constant rather than two independently-tunable literals.
+#
+# 19/17 (the exact "point" ratio) is used here, so the point target is
+# preserved exactly (3.4 * 19/17 = 3.8, unchanged). The line/default
+# target shifts by the same factor: 1.13 * 19/17 = 1.264706 cm-per-cm,
+# a ~0.42% decrease from the original 1.27 -- a negligible adjustment
+# given both source numbers were independently hand-tuned to begin with.
+T61_TARGET_OVER_MIN <- 19 / 17
+
 #' A grid of candidate (x, y) anchor positions to try for a label, spread
 #' across the panel's data ranges. Anchors near the very edges are excluded
 #' -- a label anchored right at the axis limit tends to look cramped and is
@@ -97,8 +142,7 @@ t61_selection_group <- function(distance_cm, label_height_cm, geom_type = "line"
 #' would suggest.
 #' @noRd
 t61_target_buffer_cm <- function(label_height_cm, geom_type = "line") {
-  mult <- if (identical(geom_type, "point")) 3.8 else 1.27
-  mult * label_height_cm
+  t61_buffer_mult(geom_type) * T61_TARGET_OVER_MIN * label_height_cm
 }
 
 #' @noRd

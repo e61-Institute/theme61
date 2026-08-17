@@ -28,9 +28,10 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
 
   if (is.null(min_buffer_cm)) {
     # Points need a much higher multiplier than lines to clear a scattered
-    # cluster rather than just the one nearest point.
-    mult <- if (identical(geom_type, "point")) 3.4 else 1.13
-    min_buffer_cm <- mult * label_cm$height_cm
+    # cluster rather than just the one nearest point. Shared with
+    # t61_target_buffer_cm() (autolabel-selection.R) via t61_buffer_mult()
+    # -- see T61_TARGET_OVER_MIN's comment there for how the two relate.
+    min_buffer_cm <- t61_buffer_mult(geom_type) * label_cm$height_cm
   }
 
   units <- t61_mask_units_cm(mask)
@@ -82,16 +83,19 @@ t61_place_label <- function(series, geom_type, other_series, mask, label_cm,
 
   # Gridline avoidance is exhausted across both buffer levels before a
   # touch is ever allowed: buffered+clear, tight+clear, buffered+touching,
-  # tight+touching.
-  candidates <- build_candidates(enforce_min_buffer = TRUE, avoid_gridline = TRUE)
-  if (is.null(candidates) || nrow(candidates) == 0) {
-    candidates <- build_candidates(enforce_min_buffer = FALSE, avoid_gridline = TRUE)
-  }
-  if (is.null(candidates) || nrow(candidates) == 0) {
-    candidates <- build_candidates(enforce_min_buffer = TRUE, avoid_gridline = FALSE)
-  }
-  if (is.null(candidates) || nrow(candidates) == 0) {
-    candidates <- build_candidates(enforce_min_buffer = FALSE, avoid_gridline = FALSE)
+  # tight+touching -- tried in that fixed degrade order, stopping at the
+  # first that yields any candidates at all.
+  degrade_order <- list(
+    c(enforce_min_buffer = TRUE,  avoid_gridline = TRUE),
+    c(enforce_min_buffer = FALSE, avoid_gridline = TRUE),
+    c(enforce_min_buffer = TRUE,  avoid_gridline = FALSE),
+    c(enforce_min_buffer = FALSE, avoid_gridline = FALSE)
+  )
+  candidates <- NULL
+  for (combo in degrade_order) {
+    candidates <- build_candidates(enforce_min_buffer = combo[["enforce_min_buffer"]],
+                                    avoid_gridline = combo[["avoid_gridline"]])
+    if (!is.null(candidates) && nrow(candidates) > 0) break
   }
   if (is.null(candidates) || nrow(candidates) == 0) return(NULL)
 

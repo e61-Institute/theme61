@@ -43,6 +43,38 @@
 #'   through for t61_place_label_area()'s outside-placement fallback and
 #'   contrast-colour decision). For "pointbar": list(x=, y=, ymin=, ymax=,
 #'   geom_type=). NULL if nothing matches.
+#' Shared "does this candidate colour vector match, and in what order"
+#' step used by every t61_match_label_series() branch: col2rgb() the
+#' candidate colours, compare against the label's target colour, and (if
+#' anything matched) order the matching rows by their own x-position.
+#' Each branch differs only in which colour column it matches on
+#' (fill vs colour) and which field it orders by (xmin for "column", x for
+#' everything else) -- the col2rgb/compare/order mechanics themselves are
+#' identical, so this is the piece worth sharing; the differing return
+#' shapes per geom_type (see t61_match_label_series()'s @return) are built
+#' back in each branch rather than forced into one artificial common
+#' shape.
+#'
+#' @param match_colour Character vector of colours to test, one per row of
+#'   the candidate layer's built data.
+#' @param order_by Numeric vector, same length as `match_colour`, used to
+#'   order the matching rows (xmin for "column", x otherwise).
+#' @param target_rgb Output of grDevices::col2rgb() for the label's own
+#'   colour.
+#' @return NULL if `match_colour` fails to parse or nothing matches, else
+#'   list(is_match=, ord=): a logical mask into `match_colour` and the
+#'   order (already restricted to matches) to apply to it.
+#' @noRd
+t61_resolve_series_match <- function(match_colour, order_by, target_rgb) {
+  d_rgb <- tryCatch(grDevices::col2rgb(match_colour), error = function(e) NULL)
+  if (is.null(d_rgb)) return(NULL)
+
+  is_match <- colSums(abs(d_rgb - as.vector(target_rgb))) == 0
+  if (!any(is_match)) return(NULL)
+
+  list(is_match = is_match, ord = order(order_by[is_match]))
+}
+
 #' @noRd
 t61_match_label_series <- function(layers, built_data, colour) {
   target_rgb <- tryCatch(grDevices::col2rgb(colour), error = function(e) NULL)
@@ -86,14 +118,12 @@ t61_match_label_series <- function(layers, built_data, colour) {
       match_colour <- d$colour
     }
 
-    d_rgb <- tryCatch(grDevices::col2rgb(match_colour), error = function(e) NULL)
-    if (is.null(d_rgb)) next
-
-    is_match <- colSums(abs(d_rgb - as.vector(target_rgb))) == 0
-    if (!any(is_match)) next
+    order_by <- if (identical(geom_type, "column")) d$xmin else d$x
+    match <- t61_resolve_series_match(match_colour, order_by, target_rgb)
+    if (is.null(match)) next
+    is_match <- match$is_match; ord <- match$ord
 
     if (identical(geom_type, "column")) {
-      ord <- order(d$xmin[is_match])
       return(list(
         xmin = d$xmin[is_match][ord], xmax = d$xmax[is_match][ord],
         ymin = d$ymin[is_match][ord], ymax = d$ymax[is_match][ord],
@@ -102,7 +132,6 @@ t61_match_label_series <- function(layers, built_data, colour) {
     }
 
     if (identical(geom_type, "area")) {
-      ord <- order(d$x[is_match])
       return(list(
         x = d$x[is_match][ord], ymin = d$ymin[is_match][ord], ymax = d$ymax[is_match][ord],
         fill = match_colour[is_match][1], alpha = alpha[is_match][1], geom_type = geom_type
@@ -110,7 +139,6 @@ t61_match_label_series <- function(layers, built_data, colour) {
     }
 
     if (identical(geom_type, "pointbar")) {
-      ord <- order(d$x[is_match])
       y_match <- if (is.null(d$y)) (d$ymin[is_match] + d$ymax[is_match]) / 2 else d$y[is_match]
       return(list(
         x = d$x[is_match][ord], y = y_match[ord],
@@ -119,7 +147,6 @@ t61_match_label_series <- function(layers, built_data, colour) {
       ))
     }
 
-    ord <- order(d$x[is_match])
     return(list(x = d$x[is_match][ord], y = d$y[is_match][ord], geom_type = geom_type))
   }
 
@@ -142,35 +169,59 @@ t61_collect_autolabel_targets <- function(plot) {
 
   built_data <- ggplot2::ggplot_build(plot)$data
 
-  layer_idx <- integer(0); row_idx <- integer(0)
-  text <- character(0); geom_type <- character(0)
-  hjust <- numeric(0); size_mm <- numeric(0)
-  fallback_x <- numeric(0); fallback_y <- numeric(0)
-  is_date_x <- logical(0); is_date_y <- logical(0)
-  series <- list()
-
-  for (i in label_layers) {
-    ly <- plot@layers[[i]]
+  # First pass: find eligible rows (auto_position TRUE, angle ~ 0 -- see
+  # the note on rotated text below) per label layer, purely to get a
+  # total count up front. Every parallel vector below is then preallocated
+  # to that length and filled by index in the second pass, instead of
+  # growing with repeated c() calls inside a nested loop (O(n^2)
+  # reallocation for plots with many labels).
+  eligible_rows <- vector("list", length(label_layers))
+  n_total <- 0L
+  for (k in seq_along(label_layers)) {
+    ly <- plot@layers[[label_layers[k]]]
     d  <- ly$data
-    n  <- nrow(d)
-
-    # colour/hjust/size/angle are passed to geom_text()/geom_label() as
-    # literal (non-aes) args in .build_plot_label_layer(), so ggplot2
-    # stores them in aes_params (as per-row vectors), not data -- data's
-    # copies of these columns are inert. x/y/label ARE aes-mapped, so data
-    # is the source of truth for those.
-    colours <- if (is.null(ly$aes_params$colour)) d$colour else ly$aes_params$colour
-    hjusts  <- if (is.null(ly$aes_params$hjust))  d$hjust  else ly$aes_params$hjust
-    sizes   <- if (is.null(ly$aes_params$size))   d$size   else ly$aes_params$size
-    angles  <- if (is.null(ly$aes_params$angle))  d$angle  else ly$aes_params$angle
-
-    for (r in seq_len(n)) {
-      if (!isTRUE(d$auto_position[r])) next
+    # angle is a literal (non-aes) arg in .build_plot_label_layer(), so
+    # ggplot2 stores it in aes_params (a per-row vector), not data --
+    # data's own copy is inert. See the second pass below for the same
+    # aes_params-vs-data note on colour/hjust/size.
+    angles <- if (is.null(ly$aes_params$angle)) d$angle else ly$aes_params$angle
+    is_eligible <- vapply(seq_len(nrow(d)), function(r) {
       # Rotated text is out of v1 scope entirely; renders exactly where
       # given, same as auto_position = FALSE. plot_label() itself refuses
       # to construct a rotated label with no x/y (there's nothing safe to
       # fall back on), so reaching here always means an explicit position.
-      if (!isTRUE(all.equal(angles[r], 0))) next
+      isTRUE(d$auto_position[r]) && isTRUE(all.equal(angles[r], 0))
+    }, logical(1))
+    eligible_rows[[k]] <- which(is_eligible)
+    n_total <- n_total + length(eligible_rows[[k]])
+  }
+
+  if (n_total == 0L) return(empty)
+
+  layer_idx <- integer(n_total); row_idx <- integer(n_total)
+  text <- character(n_total); geom_type <- character(n_total)
+  hjust <- numeric(n_total); size_mm <- numeric(n_total)
+  fallback_x <- numeric(n_total); fallback_y <- numeric(n_total)
+  is_date_x <- logical(n_total); is_date_y <- logical(n_total)
+  series <- vector("list", n_total)
+
+  pos <- 0L
+  for (k in seq_along(label_layers)) {
+    i <- label_layers[k]
+    ly <- plot@layers[[i]]
+    d  <- ly$data
+
+    # colour/hjust/size are passed to geom_text()/geom_label() as literal
+    # (non-aes) args in .build_plot_label_layer(), so ggplot2 stores them
+    # in aes_params (as per-row vectors), not data -- data's copies of
+    # these columns are inert. x/y/label ARE aes-mapped, so data is the
+    # source of truth for those.
+    colours <- if (is.null(ly$aes_params$colour)) d$colour else ly$aes_params$colour
+    hjusts  <- if (is.null(ly$aes_params$hjust))  d$hjust  else ly$aes_params$hjust
+    sizes   <- if (is.null(ly$aes_params$size))   d$size   else ly$aes_params$size
+
+    for (r in eligible_rows[[k]]) {
+      pos <- pos + 1L
 
       match <- t61_match_label_series(plot@layers, built_data, colours[r])
       # Not skipped even when no series matches: still eligible for the
@@ -179,29 +230,29 @@ t61_collect_autolabel_targets <- function(plot) {
       # ?plot_label) rather than leaving the label invisible.
       # series = list() is the "no series matched" sentinel.
 
-      layer_idx <- c(layer_idx, i)
-      row_idx   <- c(row_idx, r)
-      text      <- c(text, d$label[r])
-      geom_type <- c(geom_type, if (is.null(match)) NA_character_ else match$geom_type)
-      hjust     <- c(hjust, hjusts[r])
-      size_mm   <- c(size_mm, sizes[r])
-      fallback_x <- c(fallback_x, d$x[r])
-      fallback_y <- c(fallback_y, d$y[r])
+      layer_idx[pos] <- i
+      row_idx[pos]   <- r
+      text[pos]      <- d$label[r]
+      geom_type[pos] <- if (is.null(match)) NA_character_ else match$geom_type
+      hjust[pos]     <- hjusts[r]
+      size_mm[pos]   <- sizes[r]
+      fallback_x[pos] <- d$x[r]
+      fallback_y[pos] <- d$y[r]
 
       if (is.null(match)) {
-        is_date_x <- c(is_date_x, inherits(d$x[r], "Date"))
-        is_date_y <- c(is_date_y, inherits(d$y[r], "Date"))
+        is_date_x[pos] <- inherits(d$x[r], "Date")
+        is_date_y[pos] <- inherits(d$y[r], "Date")
       } else {
         # Derived from the matched series' own data, not the label's
         # fallback x/y -- the fallback may just be NA now that x/y are
         # optional, which would otherwise always read as "not a date".
         match_x <- if (identical(match$geom_type, "column")) match$xmin else match$x
         match_y <- if (match$geom_type %in% c("column", "area")) match$ymin else match$y
-        is_date_x <- c(is_date_x, inherits(match_x, "Date"))
-        is_date_y <- c(is_date_y, inherits(match_y, "Date"))
+        is_date_x[pos] <- inherits(match_x, "Date")
+        is_date_y[pos] <- inherits(match_y, "Date")
       }
 
-      series[[length(series) + 1]] <- if (is.null(match)) {
+      series[[pos]] <- if (is.null(match)) {
         list()
       } else if (identical(match$geom_type, "column")) {
         list(xmin = match$xmin, xmax = match$xmax, ymin = match$ymin, ymax = match$ymax)
@@ -214,8 +265,6 @@ t61_collect_autolabel_targets <- function(plot) {
       }
     }
   }
-
-  if (length(text) == 0) return(empty)
 
   labels <- data.frame(
     text = text, geom_type = geom_type, hjust = hjust, size_mm = size_mm,
