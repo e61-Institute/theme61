@@ -138,18 +138,15 @@ plot_label <-
         "doesn't apply to rotated text -- see `?plot_label`)."
       )
     }
-    # `label` is optional so its length isn't known here yet. Checked again in
-    # .build_plot_label_layer() once label is resolved, alongside the same check
-    # for a colour vector.
+    # label/colour length checks are repeated in .build_plot_label_layer(),
+    # since label may still be unresolved here (its length isn't known until
+    # then, and colour defaulting needs `plot`, unavailable until then too).
     if (!is.null(x) && !is.null(label) && (length(label) != length(x) || length(x) != length(y))) {
       stop("The number of x and y positions must equal the number of labels.")
     }
 
     geom <- match.arg(geom)
 
-    # Colour defaulting needs `plot`, which isn't available until
-    # .build_plot_label_layer() -- so an explicit colour is length-checked there
-    # too, once label is resolved and its length is actually known.
     if (length(colour) != 1 && !is.null(label) && length(colour) != length(label)) {
       stop("The number of colours must equal the number of labels.")
     }

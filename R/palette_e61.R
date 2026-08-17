@@ -28,11 +28,9 @@ palette_e61 <- function(n, reverse = FALSE) {
 
 #' Get colours for palette functions
 #'
-#' Validates `n` itself (rather than relying on callers to pre-check it) so
-#' that every caller - including scale_colour_e61()/scale_fill_e61(), which
-#' pass this function straight into ggplot2::discrete_scale() without any
-#' validation of their own - gets a clear error for an out-of-range `n`,
-#' rather than a cryptic "object not found" from an unmatched branch.
+#' Validates `n` itself so every caller gets a clear error for an
+#' out-of-range value, including callers (e.g. scale_colour_e61()) that pass
+#' it straight into ggplot2::discrete_scale() with no validation of their own.
 #'
 #' @param n Numeric.
 #'

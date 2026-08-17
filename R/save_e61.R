@@ -471,8 +471,6 @@ save_e61 <- function(filename = NULL,
   }
 
   # Opens the graph file in the Viewer, and also in the browser if requested
-
-  # Put filename back together
   file_to_open <- paste0(filename, ".", format[[1]])
 
   if (isTRUE(getOption("theme61.open_in_browser", FALSE))) {
