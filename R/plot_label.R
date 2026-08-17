@@ -467,27 +467,16 @@ plot_label <-
   }
 
   # Create the geom
-  if (object$geom == "text") {
-    retval <- ggplot2::geom_text(
-      data = plot_lab_data,
-      mapping = ggplot2::aes(x, y, label = label),
-      colour = plot_lab_data$colour,
-      size   = plot_lab_data$size,
-      hjust  = plot_lab_data$hjust,
-      angle  = plot_lab_data$angle,
-      inherit.aes = FALSE
-    )
-  } else {
-    retval <- ggplot2::geom_label(
-      data = plot_lab_data,
-      mapping = ggplot2::aes(x, y, label = label),
-      colour = plot_lab_data$colour,
-      size   = plot_lab_data$size,
-      hjust  = plot_lab_data$hjust,
-      angle  = plot_lab_data$angle,
-      inherit.aes = FALSE
-    )
-  }
+  geom_fn <- if (object$geom == "text") ggplot2::geom_text else ggplot2::geom_label
+  retval <- geom_fn(
+    data = plot_lab_data,
+    mapping = ggplot2::aes(x, y, label = label),
+    colour = plot_lab_data$colour,
+    size   = plot_lab_data$size,
+    hjust  = plot_lab_data$hjust,
+    angle  = plot_lab_data$angle,
+    inherit.aes = FALSE
+  )
 
   if (isTRUE(object$adj_plot_label)) {
     attr(retval, "adj_plot_label") <- TRUE

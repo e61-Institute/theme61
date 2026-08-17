@@ -65,25 +65,34 @@ labs <- function(...) {
   labs_e61(...)
 }
 
+#' Shared body for facet_wrap()/facet_grid() -- identical apart from which
+#' ggplot2 facet function they wrap. `axes_missing` must be `missing(axes)`
+#' evaluated in the caller's frame (facet_wrap()/facet_grid() itself),
+#' since evaluating it in here would always see axes as supplied (it's
+#' always forwarded explicitly by the caller).
+#' @noRd
+.mask_facet <- function(facet_fn, axes_missing, ..., axes) {
+
+  # theme61.iterate_mode: don't force axes = "all", just pass straight
+  # through to ggplot2's facet function (defaults to axes = "margins"),
+  # unless the user explicitly asked for a specific axes value.
+  if (isTRUE(getOption("theme61.iterate_mode", FALSE))) {
+    if (axes_missing) return(facet_fn(...))
+    return(facet_fn(..., axes = axes))
+  }
+
+  f <- facet_fn(..., axes = axes)
+  attr(f, "t61_axes") <- axes
+  f
+}
+
 #' Masks ggplot2::facet_wrap to set axes to "all" better distinguish facet
 #' panels
 #'
 #' @noRd
 #' @export
 facet_wrap <- function(..., axes = "all") {
-
-  # theme61.iterate_mode: don't force axes = "all", just pass straight
-  # through to ggplot2::facet_wrap() (defaults to axes = "margins"), unless
-  # the user explicitly asked for a specific axes value.
-  if (isTRUE(getOption("theme61.iterate_mode", FALSE))) {
-    if (missing(axes)) return(ggplot2::facet_wrap(...))
-    return(ggplot2::facet_wrap(..., axes = axes))
-  }
-
-  f <- ggplot2::facet_wrap(..., axes = axes)
-  attr(f, "t61_axes") <- axes
-  return(f)
-
+  .mask_facet(ggplot2::facet_wrap, missing(axes), ..., axes = axes)
 }
 
 #' Masks ggplot2::facet_grid to set axes to "all" better distinguish facet
@@ -92,16 +101,5 @@ facet_wrap <- function(..., axes = "all") {
 #' @noRd
 #' @export
 facet_grid <- function(..., axes = "all") {
-
-  # theme61.iterate_mode: don't force axes = "all", just pass straight
-  # through to ggplot2::facet_grid() (defaults to axes = "margins"), unless
-  # the user explicitly asked for a specific axes value.
-  if (isTRUE(getOption("theme61.iterate_mode", FALSE))) {
-    if (missing(axes)) return(ggplot2::facet_grid(...))
-    return(ggplot2::facet_grid(..., axes = axes))
-  }
-
-  f <- ggplot2::facet_grid(..., axes = axes)
-  attr(f, "t61_axes") <- axes
-  return(f)
+  .mask_facet(ggplot2::facet_grid, missing(axes), ..., axes = axes)
 }

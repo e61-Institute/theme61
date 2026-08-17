@@ -282,10 +282,8 @@ save_multi <-
         print_positions = print_label_positions
       )
 
-      # Now that autolabel positioning (above) is done against the uniform
-      # margin, set the margin each panel actually renders with: outer grid
-      # edges get base_margin_h/w, interior-facing sides get
-      # chart_height_pad/chart_width_pad.
+      # Set the margin each panel renders with: outer grid edges get base_margin
+      # interior-facing sides get chart_height/width_pad
       row_i <- ceiling(i / ncol)
       col_i <- ((i - 1) %% ncol) + 1
 
