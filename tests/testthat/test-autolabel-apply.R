@@ -91,10 +91,8 @@ test_that("t61_apply_autolabel is a complete no-op when theme61.auto_label = FAL
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  # Returns the exact same object (the early return happens before any
-  # collection/matching/render work), not just an equivalent copy -- this
-  # is what guarantees the option costs nothing, not merely that it
-  # produces the same visible output.
+  # Same object, not just an equivalent copy -- proves the early return
+  # happens before any collection/matching/render work.
   expect_identical(result, p)
 })
 
@@ -131,12 +129,9 @@ test_that("t61_apply_autolabel leaves an explicit position untouched even when a
 test_that("t61_apply_autolabel doesn't mutate the caller's own plot object", {
   skip_on_cran()
 
-  # A layer's data is a data.table, and the layer itself is a ggproto
-  # (environment) -- both mutate by reference, so writing a resolved
-  # position into the RETURNED plot could silently write through to the
-  # plot the caller still holds too (e.g. one print()/save_e61() call
-  # leaving stale positions behind for a later, independent call on the
-  # same object).
+  # Layer data (data.table) and the layer itself (ggproto) both mutate by
+  # reference, so writing a resolved position into the returned plot could
+  # silently write through to the caller's own copy too.
   p <- autolabel_apply_test_setup()
   before <- data.table::copy(t61_label_layer_data(p))
 
@@ -375,14 +370,10 @@ test_that("t61_apply_autolabel places an area label inside its band with a contr
 test_that("t61_apply_autolabel falls back to edge-hugging line-style placement when an area's band is too narrow everywhere", {
   skip_on_cran()
 
-  # Same narrow-band shape as t61_place_label_area()'s own "too narrow"
-  # unit test (test-autolabel-area.R) -- a thin sliver of fill inside a
-  # much taller panel, so there's genuinely nowhere inside the band for
-  # a label to fit. Unlike that unit test, this drives the *orchestrator*
-  # (t61_apply_autolabel(), not t61_place_label_area() directly), to
-  # confirm it actually falls through to the ordinary edge-hugging
-  # line-style search (against the area's top boundary) instead of
-  # skipping straight to the "any empty space" tier.
+  # Same narrow-band shape as t61_place_label_area()'s own unit test
+  # (test-autolabel-area.R), but drives the orchestrator instead, to
+  # confirm it falls through to the edge-hugging line-style search rather
+  # than skipping straight to the "any empty space" tier.
   data <- data.frame(x = 0:20, y = rep(0.05, 21))
   p <- ggplot(data, aes(x, y)) +
     geom_area(fill = "#e57200") +
@@ -396,10 +387,8 @@ test_that("t61_apply_autolabel falls back to edge-hugging line-style placement w
 
   expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 
-  # The inside-the-band placement is the only path that overrides the
-  # label's colour to a contrast colour -- it staying at the original
-  # fill colour confirms the edge-hugging fallback ran instead, not the
-  # inside placement somehow succeeding despite the narrow band.
+  # Only the inside-the-band placement overrides to a contrast colour --
+  # staying at the original colour confirms the fallback ran instead.
   expect_equal(t61_label_layer(result)$aes_params$colour, "#e57200")
 
   mask <- t61_render_mask(t61_strip_autolabel_layers(p), width_cm = 16, height_cm = 12)
@@ -433,11 +422,9 @@ test_that("t61_apply_autolabel repositions a geom_pointbar() label clear of the 
   expect_false(t61_test_collision(mask$occupancy, box$row_range, box$col_range))
 })
 
-# x/y are optional when auto_position = TRUE (see ?plot_label): the
-# fallback order is (1) a good spot found by the placement algorithm, (2)
-# the caller's own x/y if they gave one, (3) any empty space at all if
-# they didn't. These tests cover (1) and (3) end-to-end, and (2)'s
-# priority over (3) directly.
+# x/y are optional when auto_position = TRUE: fallback order is (1) a good
+# spot from the placement algorithm, (2) the caller's own x/y, (3) any
+# empty space. Tests below cover (1)/(3) end-to-end and (2)'s priority.
 
 test_that("t61_apply_autolabel resolves a real position with no x/y supplied at all", {
   skip_on_cran()
@@ -469,9 +456,8 @@ test_that("t61_apply_autolabel still resolves a position when no series matches 
 
   d <- t61_label_layer_data(result)
 
-  # Not NA (the old "keep the fallback" behaviour would leave it invisible,
-  # since there's no fallback to keep any more), and it shouldn't collide
-  # with the line
+  # Not NA (there's no fallback to keep any more) and shouldn't collide
+  # with the line.
   expect_false(is.na(d$x))
   expect_false(is.na(d$y))
 
@@ -490,15 +476,10 @@ test_that("t61_apply_autolabel prefers the caller's own x/y over random empty sp
     theme_bw(base_size = 10) +
     plot_label("Series A", x = 2019, y = 4.5, colour = "#e57200")
 
-  # An explicit position always wins outright -- the scored search (tier
-  # 1) never even runs for a label that has one, so it can't be
-  # overridden by something the algorithm merely scores "better" (or
-  # anything else it might do). A flag set by the mock (rather than e.g.
-  # stop()) makes that assertion concrete without relying on
-  # t61_apply_autolabel()'s own error-swallowing tryCatch(), which would
-  # otherwise mask a stop() here as a silent "keep the original plot" --
-  # coincidentally identical to what's being asserted below, so a stop()
-  # would pass even if the search wrongly ran.
+  # An explicit position always wins outright -- the scored search never
+  # runs for it. Mocked (rather than e.g. stop()) since t61_apply_autolabel()
+  # swallows errors, which would otherwise mask a wrongly-run search as a
+  # silent "keep the original plot" -- identical to what's asserted below.
   search_ran <- FALSE
   testthat::local_mocked_bindings(t61_place_label = function(...) { search_ran <<- TRUE; NULL })
 
@@ -543,9 +524,8 @@ test_that("save_e61(fast_labels = TRUE) skips the search but still resolves a po
 
   expect_false(anyNA(d_fast$x)); expect_false(anyNA(d_fast$y))
 
-  # fast_labels = FALSE (the save_e61() default) still runs the real
-  # search and should generally land somewhere different, since it's
-  # scored against collision/distance rather than a fixed cheap offset.
+  # fast_labels = FALSE runs the real scored search, so should generally
+  # land somewhere different from the fixed cheap offset above.
   sv_slow <- theme61:::save_single(
     filename = NULL, plot = p, chart_type = "normal", auto_scale = TRUE,
     width = NULL, height = NULL, max_height = NULL, format = "svg", base_size = 10,
@@ -559,13 +539,10 @@ test_that("save_e61(fast_labels = TRUE) skips the search but still resolves a po
 test_that("save_e61(preview = TRUE, fast_labels = TRUE) doesn't crash on a steeply diverging line chart", {
   skip_on_cran()
 
-  # Two lines that pull apart, each ending near its own max -- an
-  # unclamped fast-mode offset could push a label's y beyond the y-axis
-  # limits update_scales() already fixed earlier in save_single()'s
-  # pipeline (see t61_place_label_fast()'s clamping), erroring at render
-  # time ("Supplied limits are outside the data's range") instead of
-  # rendering imprecisely. This is exactly print.e61_ggplot()'s Viewer
-  # preview call.
+  # Two lines that pull apart -- an unclamped fast-mode offset could push
+  # a label's y beyond the already-fixed y-axis limits, erroring at
+  # render time instead of just rendering imprecisely (see
+  # t61_place_label_fast()'s clamping).
   set.seed(1)
   data1 <- data.frame(
     year = rep(2005:2024, 2),
@@ -596,12 +573,8 @@ coord_flip_apply_test <- function(p) {
   expect_false(anyNA(d$x))
   expect_false(anyNA(d$y))
 
-  # Rebuild the mask for the now-labelled plot and check each resolved
-  # position renders fully inside the flipped panel, not off the edge.
-  # d$x/d$y are stored in pre-flip data space (ggplot re-flips them at
-  # render time, same as any other layer), so they need converting to the
-  # mask's screen space before box math -- same conversion t61_autolabel_plot()
-  # itself does before stamping.
+  # d$x/d$y are stored in pre-flip data space -- convert to the mask's
+  # screen space before box math, same as t61_autolabel_plot() itself does.
   labelled_mask <- t61_render_mask(result, width_cm = 16, height_cm = 12)
   for (i in seq_len(nrow(d))) {
     lab_cm <- t61_measure_label_cm(d$label[i], size_mm = 3.5, width_cm = 16, height_cm = 12)
@@ -635,10 +608,8 @@ test_that("t61_apply_autolabel auto-positions labels on a coord_flip() line char
 test_that("t61_apply_autolabel auto-positions labels on a coord_flip() column chart, clear of every bar", {
   skip_on_cran()
 
-  # Combines what were two separate tests: a plain in-bounds check
-  # (subsumed below) and the stronger property that actually matters --
-  # the label doesn't land on top of bar ink, the same way the unflipped
-  # "repositions a column label clear of every bar" test does.
+  # Checks placement lands in-bounds and clear of bar ink, same as the
+  # unflipped "repositions a column label clear of every bar" test.
   data <- data.frame(
     category = rep(c("A", "B", "C", "D", "E"), 2),
     value = c(5, 8, 3, 9, 4, 6, 2, 9, 5, 7),
@@ -658,10 +629,8 @@ test_that("t61_apply_autolabel auto-positions labels on a coord_flip() column ch
   d <- t61_label_layer_data(result)
   expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 
-  # d$x/d$y are stored in pre-flip data space (see t61_flip_xy()'s
-  # docs) -- the occupancy mask is in the flipped screen space ggplot
-  # actually renders into, so the box for collision-checking needs the
-  # same conversion t61_autolabel_plot() applies before stamping.
+  # d$x/d$y are pre-flip data space; convert to the mask's screen space
+  # (see t61_flip_xy()) before the collision check.
   mask <- t61_render_mask(t61_strip_autolabel_layers(p), width_cm = 16, height_cm = 12)
   cm_x <- t61_measure_label_cm("X", size_mm = 3.5, width_cm = 16, height_cm = 12)
   cm_y <- t61_measure_label_cm("Y", size_mm = 3.5, width_cm = 16, height_cm = 12)
@@ -679,11 +648,10 @@ test_that("t61_apply_autolabel auto-positions labels on a coord_flip() column ch
 test_that("t61_apply_autolabel falls back (doesn't crash or misplace) for a geom_pointbar() label under coord_flip()", {
   skip_on_cran()
 
-  # geom_pointbar()'s error-bar orientation isn't flip-aware (see
-  # t61_autolabel_plot()'s docs: area/pointbar are treated as unmatched
-  # under a flip, skipping straight to the fallback tiers) -- this
-  # confirms that bail-out actually happens rather than, say, erroring or
-  # scoring against the error bars as if they were still vertical.
+  # geom_pointbar()'s error-bar orientation isn't flip-aware -- area/pointbar
+  # are treated as unmatched under a flip (see t61_autolabel_plot()'s docs),
+  # skipping straight to the fallback tiers instead of erroring or scoring
+  # against the error bars as if still vertical.
   data <- data.frame(x = 2000:2010, y = seq(0, 5, length.out = 11))
   data$ymin <- data$y - 1
   data$ymax <- data$y + 1
@@ -695,9 +663,8 @@ test_that("t61_apply_autolabel falls back (doesn't crash or misplace) for a geom
     plot_label("Series A", colour = "#e57200")
 
   # If the bail-out didn't happen, t61_place_label() would be called with
-  # geom_type = "pointbar" (has_series would stay TRUE); asserting it's
-  # never called at all proves the series really was invalidated, not
-  # just that some other tier happened to win.
+  # geom_type = "pointbar" -- asserting it's never called proves the
+  # series really was invalidated, not that some other tier just won.
   search_ran <- FALSE
   testthat::local_mocked_bindings(t61_place_label = function(...) { search_ran <<- TRUE; NULL })
 
@@ -718,20 +685,14 @@ test_that("t61_apply_autolabel falls back (doesn't crash or misplace) for a geom
   expect_true(t61_box_in_bounds(box$row_range, box$col_range, mask))
 })
 
-# save_multi() (save_e61(plot1, plot2, ...)) combines independent
-# single-panel plots via patchwork rather than through save_single(), so it
-# needs its own call to t61_apply_autolabel() per panel -- these tests
-# exercise that wiring directly, since save_e61() itself doesn't return the
-# plot object to inspect.
+# save_multi() combines independent single-panel plots via patchwork
+# rather than save_single(), so it needs its own t61_apply_autolabel()
+# call per panel -- these tests exercise that wiring directly.
 
 #' Pull a plot_label() layer's resolved data out of a save_multi() result.
-#' `graph` is a patchwork object: the base plot's own layers hold one panel,
-#' and `graph$patches$plots` holds the rest -- but which panel ends up as
-#' the base grob isn't part of patchwork's contract, so a fixed
-#' index-to-panel mapping is unreliable (it can flip between runs). Matched
-#' instead by comparing each candidate panel's first (non-label) layer's
-#' rendered y-values against the source plot's, which uniquely identifies
-#' the panel regardless of patchwork's internal order.
+#' Which panel ends up as `graph`'s own layers vs. `graph$patches$plots`
+#' isn't part of patchwork's contract, so match panels by comparing each
+#' candidate's first layer's rendered y-values against the source plot's.
 #' @noRd
 multi_panel_label_data <- function(graph, source_plot) {
   candidates <- c(list(graph), graph$patches$plots)
@@ -761,10 +722,9 @@ save_multi_test <- function(plots) {
 test_that("save_multi() auto-positions labels independently on each panel", {
   skip_on_cran()
 
-  # Two panels sharing series names but with different underlying data, so
-  # a correct per-panel resolve should land on genuinely different
-  # positions -- if the panels ended up identical, that would mean the
-  # second panel's mask/series were never actually rebuilt for its own data.
+  # Two panels sharing series names but with different data -- identical
+  # resolved positions would mean the second panel's mask/series were
+  # never actually rebuilt for its own data.
   data1 <- data.frame(
     x = rep(2000:2020, 2),
     y = c(seq(0, 5, length.out = 21), seq(10, 2, length.out = 21)),
