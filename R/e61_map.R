@@ -87,17 +87,49 @@ add_map_e61 <-
 #' To get an API key, you must sign up at
 #' \url{https://client.stadiamaps.com/signup/}{Stadia Maps sign up}.
 #'
+#' When run at an interactive console with no arguments, this function behaves
+#' as before: it asks (via [readline()]) whether `ggmap` needs updating and
+#' whether you already have an API key, prompting you to paste it in if so.
+#'
+#' In a non-interactive context (e.g. a script run with `Rscript`, a CI job, a
+#' Quarto/Rmd render, or a `testthat` test), [readline()] cannot be used, so
+#' both prompts must instead be answered up-front via `api_key` and
+#' `update_ggmap`. If either of these is left unanswered (`NULL`/`NA`) in a
+#' non-interactive session, this function fails fast with an informative error
+#' instead of hanging or erroring obscurely on a blocked `readline()` call.
+#'
+#' @param api_key Character. Your Stadia Maps API key. If supplied, the
+#'   "have you registered a key?"/"paste your key" prompts are skipped
+#'   entirely and the key is registered directly via
+#'   [ggmap::register_stadiamaps()]. Defaults to `NULL`, which preserves the
+#'   original interactive prompting behaviour when run at a console.
+#' @param update_ggmap Logical. Whether to update `ggmap` (via
+#'   `remotes::install_github("dkahle/ggmap")`) when the installed version
+#'   does not support Stadia Maps tiles. `TRUE` updates, `FALSE` skips the
+#'   update, and the default `NA` preserves the original interactive prompt
+#'   asking the user to enter 'Y'/'N'.
 #' @export
 #' @family map functions
-setup_stadia_maps <- function() {
+setup_stadia_maps <- function(api_key = NULL, update_ggmap = NA) {
 
   # Check if ggmap package version has the required functions, install from Github if it doesn't
   inst_v <- packageVersion("ggmap")
   if (inst_v < "3.0.2") {
-    install_prompt <- ""
 
-    while (install_prompt == "") {
-      install_prompt <- readline("Your installed version of ggmap is does not support downloading Stadia Map tiles. Enter 'Y' to update or 'N' to exit.")
+    if (!is.na(update_ggmap)) {
+      # Non-interactive/explicit bypass: act on the supplied value directly
+      install_prompt <- if (isTRUE(update_ggmap)) "Y" else "N"
+    } else if (!interactive()) {
+      cli::cli_abort(c(
+        "Your installed version of ggmap does not support Stadia Map tiles, and this is a non-interactive session.",
+        "i" = "Pass {.code update_ggmap = TRUE} to update ggmap, or {.code update_ggmap = FALSE} to skip, instead of relying on an interactive prompt."
+      ))
+    } else {
+      install_prompt <- ""
+
+      while (install_prompt == "") {
+        install_prompt <- .t61_readline("Your installed version of ggmap is does not support downloading Stadia Map tiles. Enter 'Y' to update or 'N' to exit.")
+      }
     }
 
     if (install_prompt == "Y") {
@@ -109,15 +141,34 @@ setup_stadia_maps <- function() {
 
   }
 
+  # If an API key has been supplied directly, register it and skip the prompts entirely
+  if (!is.null(api_key)) {
+    ggmap::register_stadiamaps(key = api_key, write = FALSE)
+
+    if (ggmap::has_stadiamaps_key()) {
+      return(cli::cli_alert_success("You have successfully entered your Stadia Maps API key for this session. This key needs to be registered in each new R session using the `ggmap::register_stadiamaps()` function."))
+    } else {
+      return(cli::cli_alert_warning("You have not entered your API key correctly, please try again using the `ggmap::register_stadiamaps()` function."))
+    }
+  }
+
+  if (!interactive()) {
+    cli::cli_abort(c(
+      "No Stadia Maps API key was supplied, and this is a non-interactive session.",
+      "i" = "Pass {.code api_key = \"<your key>\"} explicitly instead of relying on an interactive prompt.",
+      "i" = "You can register a free API key at https://client.stadiamaps.com/signup/."
+    ))
+  }
+
   # Prompt user: do you have an API key from Stadia Maps, provide the URL to navigate to if no...
   api_prompt <- ""
 
   while (api_prompt == "") {
-    api_prompt <- readline("Have you have registered an API key from Stadia Maps? Enter 'Y' for yes or 'N' for no.")
+    api_prompt <- .t61_readline("Have you have registered an API key from Stadia Maps? Enter 'Y' for yes or 'N' for no.")
   }
 
   if (api_prompt == "Y") {
-    api <- readline("Please type or paste in your API key:")
+    api <- .t61_readline("Please type or paste in your API key:")
     ggmap::register_stadiamaps(key = api, write = FALSE)
 
     if (ggmap::has_stadiamaps_key()) {
