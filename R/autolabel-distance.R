@@ -144,13 +144,8 @@ t61_box_distance_to_series <- function(box, mask, series, geom_type, units) {
   rxmin <- rect$xmin * sx; rxmax <- rect$xmax * sx
   rymin <- rect$ymin * sy; rymax <- rect$ymax * sy
 
-  # Shared by the "line" and "pointbar" branches below: both need the
-  # candidate box's 4 corners (to test against a segment) and a running
-  # "closest so far" tracker (to fold a per-i loop's distance/x/y down to
-  # one best result). Hoisted here, above the geom_type branches, rather
-  # than each branch defining its own -- rxmin/rxmax/rymin/rymax (the only
-  # inputs corners depends on) are already fixed at this point regardless
-  # of which branch runs.
+  # Shared by "line"/"pointbar" below: the box's 4 corners, and a "closest
+  # so far" tracker to fold each loop down to one best result.
   corners <- expand.grid(x = c(rxmin, rxmax), y = c(rymin, rymax))
   new_best_tracker <- function() {
     best <- NULL

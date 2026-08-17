@@ -13,6 +13,20 @@
 # matches no series still gets a position via the engine's own fallback
 # tiers (see t61_autolabel_plot()).
 
+#' Shared col2rgb-match-and-order step for t61_match_label_series()'s
+#' branches: they differ only in which colour column and order-by field
+#' they use, not in this mechanic.
+#' @noRd
+t61_resolve_series_match <- function(match_colour, order_by, target_rgb) {
+  d_rgb <- tryCatch(grDevices::col2rgb(match_colour), error = function(e) NULL)
+  if (is.null(d_rgb)) return(NULL)
+
+  is_match <- colSums(abs(d_rgb - as.vector(target_rgb))) == 0
+  if (!any(is_match)) return(NULL)
+
+  list(is_match = is_match, ord = order(order_by[is_match]))
+}
+
 #' Find a "point", "line", "column", "area" or "pointbar" data layer in a
 #' plot whose resolved colour matches a label's colour -- this is treated
 #' as the series the label belongs to.
@@ -43,38 +57,6 @@
 #'   through for t61_place_label_area()'s outside-placement fallback and
 #'   contrast-colour decision). For "pointbar": list(x=, y=, ymin=, ymax=,
 #'   geom_type=). NULL if nothing matches.
-#' Shared "does this candidate colour vector match, and in what order"
-#' step used by every t61_match_label_series() branch: col2rgb() the
-#' candidate colours, compare against the label's target colour, and (if
-#' anything matched) order the matching rows by their own x-position.
-#' Each branch differs only in which colour column it matches on
-#' (fill vs colour) and which field it orders by (xmin for "column", x for
-#' everything else) -- the col2rgb/compare/order mechanics themselves are
-#' identical, so this is the piece worth sharing; the differing return
-#' shapes per geom_type (see t61_match_label_series()'s @return) are built
-#' back in each branch rather than forced into one artificial common
-#' shape.
-#'
-#' @param match_colour Character vector of colours to test, one per row of
-#'   the candidate layer's built data.
-#' @param order_by Numeric vector, same length as `match_colour`, used to
-#'   order the matching rows (xmin for "column", x otherwise).
-#' @param target_rgb Output of grDevices::col2rgb() for the label's own
-#'   colour.
-#' @return NULL if `match_colour` fails to parse or nothing matches, else
-#'   list(is_match=, ord=): a logical mask into `match_colour` and the
-#'   order (already restricted to matches) to apply to it.
-#' @noRd
-t61_resolve_series_match <- function(match_colour, order_by, target_rgb) {
-  d_rgb <- tryCatch(grDevices::col2rgb(match_colour), error = function(e) NULL)
-  if (is.null(d_rgb)) return(NULL)
-
-  is_match <- colSums(abs(d_rgb - as.vector(target_rgb))) == 0
-  if (!any(is_match)) return(NULL)
-
-  list(is_match = is_match, ord = order(order_by[is_match]))
-}
-
 #' @noRd
 t61_match_label_series <- function(layers, built_data, colour) {
   target_rgb <- tryCatch(grDevices::col2rgb(colour), error = function(e) NULL)
@@ -169,27 +151,19 @@ t61_collect_autolabel_targets <- function(plot) {
 
   built_data <- ggplot2::ggplot_build(plot)$data
 
-  # First pass: find eligible rows (auto_position TRUE, angle ~ 0 -- see
-  # the note on rotated text below) per label layer, purely to get a
-  # total count up front. Every parallel vector below is then preallocated
-  # to that length and filled by index in the second pass, instead of
-  # growing with repeated c() calls inside a nested loop (O(n^2)
-  # reallocation for plots with many labels).
+  # First pass: count eligible rows per layer so the parallel vectors below
+  # can be preallocated and filled by index, instead of growing with
+  # repeated c() calls (O(n^2) reallocation).
   eligible_rows <- vector("list", length(label_layers))
   n_total <- 0L
   for (k in seq_along(label_layers)) {
     ly <- plot@layers[[label_layers[k]]]
     d  <- ly$data
-    # angle is a literal (non-aes) arg in .build_plot_label_layer(), so
-    # ggplot2 stores it in aes_params (a per-row vector), not data --
-    # data's own copy is inert. See the second pass below for the same
-    # aes_params-vs-data note on colour/hjust/size.
+    # angle is a literal (non-aes) arg, so it lives in aes_params, not
+    # data -- same aes_params-vs-data note applies to colour/hjust/size below.
     angles <- if (is.null(ly$aes_params$angle)) d$angle else ly$aes_params$angle
     is_eligible <- vapply(seq_len(nrow(d)), function(r) {
-      # Rotated text is out of v1 scope entirely; renders exactly where
-      # given, same as auto_position = FALSE. plot_label() itself refuses
-      # to construct a rotated label with no x/y (there's nothing safe to
-      # fall back on), so reaching here always means an explicit position.
+      # Rotated text is out of v1 scope; renders as-is, same as auto_position = FALSE.
       isTRUE(d$auto_position[r]) && isTRUE(all.equal(angles[r], 0))
     }, logical(1))
     eligible_rows[[k]] <- which(is_eligible)
