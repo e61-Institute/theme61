@@ -237,9 +237,6 @@ save_e61 <- function(filename = NULL,
 
   # Coerce plot classes and prep --------------------------------------------
 
-  # Compile plots
-  plots <- c(list(...), plotlist)
-
   # For single-panel graphs
   if (length(plots) == 0) plots <- list(plot)
 
@@ -284,10 +281,8 @@ save_e61 <- function(filename = NULL,
 
   } else if(length(chart_type) > 1){
 
-    for(i in 1:length(chart_type)){
-      if(!chart_type[i] %in% c("normal", "wide", "square"))
-        stop("Invalid chart type. All chart types must be one of 'normal', 'wide' or 'square'.")
-    }
+    if(!all(chart_type %in% c("normal", "wide", "square")))
+      stop("Invalid chart type. All chart types must be one of 'normal', 'wide' or 'square'.")
   }
 
   # Check if filename has been provided when preview/return_plot_obj mode is FALSE
@@ -471,8 +466,6 @@ save_e61 <- function(filename = NULL,
   }
 
   # Opens the graph file in the Viewer, and also in the browser if requested
-
-  # Put filename back together
   file_to_open <- paste0(filename, ".", format[[1]])
 
   if (isTRUE(getOption("theme61.open_in_browser", FALSE))) {

@@ -11,9 +11,8 @@ ggplot_build.e61_plot <- function(plot, ...) {
     return(ggplot2::ggplot_build(plot, ...))
   }
 
-  # Classify + correct defensively, in case ggplot_build() is reached
-  # without going through print.e61_plot() or save_e61() first (e.g. a
-  # direct ggplot_build()/ggplotGrob() call). Idempotent either way.
+  # Defensive: handles ggplot_build() called directly, without
+  # print.e61_plot()/save_e61(). Idempotent either way.
   plot2 <- finalise_e61_plot(plot)
   plot2 <- maybe_add_default_scales(plot2)
   plot2 <- maybe_adjust_facet_spacing(plot2)
