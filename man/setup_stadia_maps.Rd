@@ -4,7 +4,20 @@
 \alias{setup_stadia_maps}
 \title{Setup Stadia Maps API}
 \usage{
-setup_stadia_maps()
+setup_stadia_maps(api_key = NULL, update_ggmap = NA)
+}
+\arguments{
+\item{api_key}{Character. Your Stadia Maps API key. If supplied, the
+"have you registered a key?"/"paste your key" prompts are skipped
+entirely and the key is registered directly via
+\code{\link[ggmap:register_stadiamaps]{ggmap::register_stadiamaps()}}. Defaults to \code{NULL}, which preserves the
+original interactive prompting behaviour when run at a console.}
+
+\item{update_ggmap}{Logical. Whether to update \code{ggmap} (via
+\code{remotes::install_github("dkahle/ggmap")}) when the installed version
+does not support Stadia Maps tiles. \code{TRUE} updates, \code{FALSE} skips the
+update, and the default \code{NA} preserves the original interactive prompt
+asking the user to enter 'Y'/'N'.}
 }
 \description{
 Using Stadia Maps (formerly Stamen Maps) tiles requires setting up a free API
@@ -14,6 +27,17 @@ up your session accordingly.
 \details{
 To get an API key, you must sign up at
 \url{https://client.stadiamaps.com/signup/}{Stadia Maps sign up}.
+
+When run at an interactive console with no arguments, this function behaves
+as before: it asks (via \code{\link[=readline]{readline()}}) whether \code{ggmap} needs updating and
+whether you already have an API key, prompting you to paste it in if so.
+
+In a non-interactive context (e.g. a script run with \code{Rscript}, a CI job, a
+Quarto/Rmd render, or a \code{testthat} test), \code{\link[=readline]{readline()}} cannot be used, so
+both prompts must instead be answered up-front via \code{api_key} and
+\code{update_ggmap}. If either of these is left unanswered (\code{NULL}/\code{NA}) in a
+non-interactive session, this function fails fast with an informative error
+instead of hanging or erroring obscurely on a blocked \code{readline()} call.
 }
 \seealso{
 Other map functions:
