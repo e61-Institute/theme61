@@ -1,3 +1,33 @@
+#' Resolve the final text for a title/subtitle/caption label: pass through
+#' unchanged if already manually wrapped (tracked via the `*_wrap` attribute
+#' set by labs_e61()), otherwise look up its rendered grob to get the actual
+#' font size and rescale it to fit plot_width.
+#' text_type - One of "title", "subtitle", "caption" - also the grob/label name.
+#' @noRd
+resolve_label_text <- function(plot, grobs, layout_names, text_type, plot_width){
+
+  wrap_attr <- paste0(text_type, "_wrap")
+  raw_text <- plot@labels[[text_type]]
+
+  if(!is.null(attr(raw_text, wrap_attr))){
+    return(raw_text)
+  }
+
+  grob <- grobs[[which(layout_names == text_type)]]
+
+  if(is.null(grob$children) || length(grob$children) == 0){
+    return(NULL)
+  }
+
+  font_size <- if(text_type == "subtitle"){
+    tryCatch(grob$children[[1]]$children[[1]]$gp$fontsize, error = function(e) 10)
+  } else {
+    grob$children[[1]]$gp$fontsize
+  }
+
+  rescale_text(text = raw_text, text_type = text_type, font_size = font_size, plot_width = plot_width)
+}
+
 #' Get aesthetic titles, subtitles and footnotes.
 #' plot - Plot object to adjust.
 #' plot_width - Numeric. Width of the plot.
@@ -6,83 +36,21 @@ update_labs <- function(plot, plot_width){
 
   p <- t61_ggplotGrob_quiet_na(plot)
 
-  # Title ----
-
-  # First check whether the title has already been manually wrapped
-  if(is.null(attr(plot@labels$title, "title_wrap"))){
-
-    # check if the title exists
-    title_grob <- p$grobs[[which(p$layout$name == "title")]]
-    title_text <- NULL
-
-    if(!is.null(title_grob$children)){
-      title_size <- title_grob$children[[1]]$gp$fontsize
-
-      title_text <-
-        rescale_text(
-          text = plot@labels$title,
-          text_type = "title",
-          font_size = title_size,
-          plot_width = plot_width
-        )
-    }
-  } else {
-    title_text <- plot@labels$title
-  }
+  title_text <- resolve_label_text(plot, p$grobs, p$layout$name, "title", plot_width)
 
   # set the title to element blank if it is not required - otherwise it leaves a useless space
   if(is.null(title_text) || title_text == ""){
     plot <- plot + theme(plot.title = element_blank())
   }
 
-  # Subtitle ----
-  if(is.null(attr(plot@labels$subtitle, "subtitle_wrap"))){
-    subtitle_grob <- p$grobs[[which(p$layout$name == "subtitle")]]
-    subtitle_text <- NULL
-
-    if(!is.null(subtitle_grob$children) && length(subtitle_grob$children) > 0){
-      subtitle_size <- tryCatch(
-        subtitle_grob$children[[1]]$children[[1]]$gp$fontsize,
-        error = function(e) 10
-      )
-
-      subtitle_text <-
-        rescale_text(
-          text = plot@labels$subtitle,
-          text_type = "subtitle",
-          font_size = subtitle_size,
-          plot_width = plot_width
-        )
-    }
-  } else {
-    subtitle_text <- plot@labels$subtitle
-  }
+  subtitle_text <- resolve_label_text(plot, p$grobs, p$layout$name, "subtitle", plot_width)
 
   # set the subtitle to element blank if it is not required - otherwise it leaves a useless space
   if(is.null(subtitle_text) || subtitle_text == ""){
     plot <- plot + theme(plot.subtitle = element_blank())
   }
 
-  # Footnotes ----
-
-  if(is.null(attr(plot@labels$caption, "caption_wrap"))){
-    footnote_grob <- p$grobs[[which(p$layout$name == "caption")]]
-    caption_text <- NULL
-
-    if(!is.null(footnote_grob$children)){
-
-      footnote_size <- footnote_grob$children[[1]]$gp$fontsize
-      caption_text <-
-        rescale_text(
-          text = plot@labels$caption,
-          text_type = "caption",
-          font_size = footnote_size,
-          plot_width = plot_width
-        )
-    }
-  } else {
-    caption_text <- plot@labels$caption
-  }
+  caption_text <- resolve_label_text(plot, p$grobs, p$layout$name, "caption", plot_width)
 
   # Update the x-axis label spacing if there is no x-axis label ----
 
@@ -118,11 +86,7 @@ rescale_text <- function(text, text_type, font_size, plot_width){
   # algo for titles
   if(text_type == "title") {
 
-    text <- stringr::str_replace_all(text, "\\\n", " ")
-
-    text <- get_lines(text, font_size, plot_width, font_face = 2)
-
-    text <- paste(text$collapsed_text, collapse = "\n")
+    text <- rescale_title_text(text, font_size, plot_width)
 
     # algo for subtitles
   } else if (text_type == "subtitle") {
@@ -191,110 +155,7 @@ rescale_text <- function(text, text_type, font_size, plot_width){
     # algo for footnotes
   } else if(text_type == "caption"){
 
-    footnote_text <- stringr::str_replace_all(text, "\\\n\\*", " new_footnote\\*")
-    footnote_text <- stringr::str_replace_all(footnote_text, "\\\n", " ")
-    footnote_text <- stringr::str_remove(footnote_text, pattern = "^\\* ")
-
-    sources <-
-      stringr::str_extract(footnote_text, "(?<=Sources{0,1}\\:).*$") |>
-      stringr::str_split(";") |>
-      unlist() |>
-      stringr::str_squish()
-
-    # remove sources - if we have them
-    if(stringr::str_detect(footnote_text, "Source")){
-      footnote_text <- stringr::str_extract(footnote_text, "^.*(?=Source.*:.+)")
-
-    } else {
-      footnote_text <- footnote_text
-    }
-
-    # split footnotes up if there are multiple and drop those with length 0
-    footnote_text <- stringr::str_split(footnote_text, "new_footnote\\*+\\s*")
-
-    footnote_text <- lapply(footnote_text, stringr::str_remove_all, pattern = "new_footnote")
-
-    text_lengths <- lapply(footnote_text, get_text_width, font_size = font_size)
-
-    footnote_data <- data.table::data.table(footnote_text = unlist(footnote_text), text_width = unlist(text_lengths))
-
-    footnote_data <- footnote_data |>
-      _[text_width != 0] |>
-      _[, footnote_text := stringr::str_replace_all(footnote_text, "[\r\n]" , " ")]
-
-    # number footnotes and then split into words
-    footnote_data[, footnote_num := 1:.N]
-
-    if(nrow(footnote_data) > 0){
-
-      # split into words to calculate line lengths
-      text_lines <- list()
-
-      for(i in 1:nrow(footnote_data)){
-
-        # Get lines and make sure to add the *s
-        text_lines[[i]] <- get_lines(
-          paste(strrep("*", i), footnote_data$footnote_text[i]),
-          font_size,
-          plot_width
-        )
-
-        text_lines[[i]][, footnote_num := i]
-      }
-
-      text_lines <- data.table::rbindlist(text_lines)
-
-      # combine text into a caption along with the sources
-      footnote_data <-
-        text_lines[, .(footnote = paste(collapsed_text, collapse = "\n")), by = footnote_num]
-
-      footnote_data <- footnote_data[, .(footnotes = paste(footnote, collapse = "\n"))]
-
-      footnote_text <- footnote_data$footnotes[1]
-
-      # Otherwise we didn't have any footnotes to begin with, so set as an empty string
-    } else {
-      footnote_text <- NULL
-    }
-
-    # Check whether we have sources to add and how many
-    if(any(is.na(sources)) || is.null(sources)){
-      if(is.null(footnote_text)){
-        text <- NULL
-
-      } else {
-        text <- footnote_text
-      }
-
-      # we have sources - check how many
-    } else {
-
-      # Add the sources label and collapse
-      if(length(sources) > 1) {
-        sources <- paste0(sources, collapse = "; ")
-
-        sources <- paste0("Sources: ", sources)
-
-      } else if(length(sources) == 1){
-        sources <- paste0(sources, collapse = "; ")
-
-        sources <- paste0("Source: ", sources)
-      }
-
-      # Make sure the sources don't extend over the width of the plot
-      sources <- get_lines(sources, font_size, plot_width)
-
-      sources <- paste0(sources$collapsed_text, collapse = "\n")
-
-      # Add the rest of the footnote text
-      if(is.null(footnote_text)){
-        text <- sources
-
-      } else {
-        text <- paste0(footnote_text, "\n", sources)
-      }
-
-    }
+    text <- rescale_caption_text(text, font_size, plot_width)
   }
 
   return(text)
@@ -313,11 +174,7 @@ rescale_text_multi <- function(text, text_type, font_size, plot_width){
   # algo for titles
   if(text_type == "title") {
 
-    text <- stringr::str_replace_all(text, "\\\n", " ")
-
-    text <- get_lines(text, font_size, plot_width, font_face = 2) # set font face to bold
-
-    text <- paste(text$collapsed_text, collapse = "\n")
+    text <- rescale_title_text(text, font_size, plot_width)
 
     # algo for titles
   } else if(text_type == "subtitle") {
@@ -331,113 +188,133 @@ rescale_text_multi <- function(text, text_type, font_size, plot_width){
     # algo for footnotes
   } else if(text_type == "caption"){
 
-    footnote_text <- stringr::str_replace_all(text, "\\\n\\*", " new_footnote\\*")
-    footnote_text <- stringr::str_replace_all(footnote_text, "\\\n", " ")
-    footnote_text <- stringr::str_remove(footnote_text, pattern = "^\\* ")
-
-    sources <-
-      stringr::str_extract(footnote_text, "(?<=Sources{0,1}\\:).*$") |>
-      stringr::str_split(";") |>
-      unlist() |>
-      stringr::str_squish()
-
-    # remove sources - if we have them
-    if(stringr::str_detect(footnote_text, "Source")){
-      footnote_text <- stringr::str_extract(footnote_text, "^.*(?=Source.*:.+)")
-
-    } else {
-      footnote_text <- footnote_text
-    }
-
-    # split footnotes up if there are multiple and drop those with length 0
-    footnote_text <- stringr::str_split(footnote_text, "new_footnote\\*+\\s*")
-
-    footnote_text <- lapply(footnote_text, stringr::str_remove_all, pattern = "new_footnote")
-
-    text_lengths <- lapply(footnote_text, get_text_width, font_size = font_size)
-
-    footnote_data <- data.table::data.table(footnote_text = unlist(footnote_text), text_width = unlist(text_lengths))
-
-    footnote_data <- footnote_data |>
-      _[text_width != 0] |>
-      _[, footnote_text := stringr::str_replace_all(footnote_text, "[\r\n]" , " ")]
-
-    # number footnotes and then split into words
-    footnote_data[, footnote_num := 1:.N]
-
-    if(nrow(footnote_data) > 0){
-
-      # split into words to calculate line lengths
-      text_lines <- list()
-
-      for(i in 1:nrow(footnote_data)){
-
-        # Get lines and make sure to add the *s
-        text_lines[[i]] <- get_lines(
-          paste(strrep("*", i), footnote_data$footnote_text[i]),
-          font_size,
-          plot_width
-        )
-
-        text_lines[[i]][, footnote_num := i]
-      }
-
-      text_lines <- data.table::rbindlist(text_lines)
-
-      # combine text into a caption along with the sources
-      footnote_data <-
-        text_lines[, .(footnote = paste(collapsed_text, collapse = "\n")), by = footnote_num]
-
-      footnote_data <- footnote_data[, .(footnotes = paste(footnote, collapse = "\n"))]
-
-      footnote_text <- footnote_data$footnotes[1]
-
-      # Otherwise we didn't have any footnotes to begin with, so set as an empty string
-    } else {
-      footnote_text <- NULL
-    }
-
-    # Check whether we have sources to add and how many
-    if(any(is.na(sources)) || is.null(sources)){
-      if(is.null(footnote_text)){
-        text <- NULL
-
-      } else {
-        text <- footnote_text
-      }
-
-      # we have sources - check how many
-    } else {
-
-      # Add the sources label and collapse
-      if(length(sources) > 1) {
-        sources <- paste0(sources, collapse = "; ")
-
-        sources <- paste0("Sources: ", sources)
-
-      } else if(length(sources) == 1){
-        sources <- paste0(sources, collapse = "; ")
-
-        sources <- paste0("Source: ", sources)
-      }
-
-      # Make sure the sources don't extend over the width of the plot
-      sources <- get_lines(sources, font_size, plot_width)
-
-      sources <- paste0(sources$collapsed_text, collapse = "\n")
-
-      # Add the rest of the footnote text
-      if(is.null(footnote_text)){
-        text <- sources
-
-      } else {
-        text <- paste0(footnote_text, "\n", sources)
-      }
-
-    }
+    text <- rescale_caption_text(text, font_size, plot_width)
   }
 
   return(text)
+}
+
+#' Wrap a title string into font-fitted lines. Shared by rescale_text() and
+#' rescale_text_multi() - the title algorithm is identical for both.
+#' @noRd
+rescale_title_text <- function(text, font_size, plot_width){
+  text <- stringr::str_replace_all(text, "\\\n", " ")
+  text <- get_lines(text, font_size, plot_width, font_face = 2)
+  paste(text$collapsed_text, collapse = "\n")
+}
+
+#' Parse a combined footnotes/sources caption string and wrap each footnote
+#' and the sources line to plot_width. Shared by rescale_text() and
+#' rescale_text_multi() - the caption algorithm is identical for both.
+#' @noRd
+rescale_caption_text <- function(text, font_size, plot_width){
+
+  footnote_text <- stringr::str_replace_all(text, "\\\n\\*", " new_footnote\\*")
+  footnote_text <- stringr::str_replace_all(footnote_text, "\\\n", " ")
+  footnote_text <- stringr::str_remove(footnote_text, pattern = "^\\* ")
+
+  sources <-
+    stringr::str_extract(footnote_text, "(?<=Sources{0,1}\\:).*$") |>
+    stringr::str_split(";") |>
+    unlist() |>
+    stringr::str_squish()
+
+  # remove sources - if we have them
+  if(stringr::str_detect(footnote_text, "Source")){
+    footnote_text <- stringr::str_extract(footnote_text, "^.*(?=Source.*:.+)")
+
+  } else {
+    footnote_text <- footnote_text
+  }
+
+  # split footnotes up if there are multiple and drop those with length 0
+  footnote_text <- stringr::str_split(footnote_text, "new_footnote\\*+\\s*")
+
+  footnote_text <- lapply(footnote_text, stringr::str_remove_all, pattern = "new_footnote")
+
+  text_lengths <- lapply(footnote_text, get_text_width, font_size = font_size)
+
+  footnote_data <- data.table::data.table(footnote_text = unlist(footnote_text), text_width = unlist(text_lengths))
+
+  footnote_data <- footnote_data |>
+    _[text_width != 0] |>
+    _[, footnote_text := stringr::str_replace_all(footnote_text, "[\r\n]" , " ")]
+
+  # number footnotes and then split into words
+  footnote_data[, footnote_num := 1:.N]
+
+  if(nrow(footnote_data) > 0){
+
+    # split into words to calculate line lengths
+    text_lines <- list()
+
+    for(i in 1:nrow(footnote_data)){
+
+      # Get lines and make sure to add the *s
+      text_lines[[i]] <- get_lines(
+        paste(strrep("*", i), footnote_data$footnote_text[i]),
+        font_size,
+        plot_width
+      )
+
+      text_lines[[i]][, footnote_num := i]
+    }
+
+    text_lines <- data.table::rbindlist(text_lines)
+
+    # combine text into a caption along with the sources
+    footnote_data <-
+      text_lines[, .(footnote = paste(collapsed_text, collapse = "\n")), by = footnote_num]
+
+    footnote_data <- footnote_data[, .(footnotes = paste(footnote, collapse = "\n"))]
+
+    footnote_text <- footnote_data$footnotes[1]
+
+    # Otherwise we didn't have any footnotes to begin with, so set as an empty string
+  } else {
+    footnote_text <- NULL
+  }
+
+  # Check whether we have sources to add and how many
+  if(any(is.na(sources)) || is.null(sources)){
+    if(is.null(footnote_text)){
+      text <- NULL
+
+    } else {
+      text <- footnote_text
+    }
+
+    # we have sources - check how many
+  } else {
+
+    # Add the sources label and collapse
+    if(length(sources) > 1) {
+      sources <- paste0(sources, collapse = "; ")
+
+      sources <- paste0("Sources: ", sources)
+
+    } else if(length(sources) == 1){
+      sources <- paste0(sources, collapse = "; ")
+
+      sources <- paste0("Source: ", sources)
+    }
+
+    # Make sure the sources don't extend over the width of the plot
+    sources <- get_lines(sources, font_size, plot_width)
+
+    sources <- paste0(sources$collapsed_text, collapse = "\n")
+
+    # Add the rest of the footnote text
+    if(is.null(footnote_text)){
+      text <- sources
+
+    } else {
+      text <- paste0(footnote_text, "\n", sources)
+    }
+
+  }
+
+  text
 }
 
 
@@ -449,53 +326,48 @@ rescale_text_multi <- function(text, text_type, font_size, plot_width){
 #' @noRd
 get_lines <- function(text, font_size, plot_width, font_face = 1){
 
-  # split text into words and calculate the length of each word
+  # split text into words and calculate the length of each word. Word widths
+  # include a trailing space, but the last word on a line never renders one
+  # (nothing follows it), so space_width is subtracted from each line's
+  # running total below to match what's actually drawn. Measuring the words
+  # and the lone space together in one call keeps this to a single
+  # throwaway measurement device instead of two.
   words <- split_text_into_words(text)
-  words[, word_width := get_text_width(paste0(word, " "), font_size, font_face)]
+  n <- nrow(words)
 
-  # word_width includes a trailing space, but the last word on a line never
-  # renders one (nothing follows it), so subtract one space width from the
-  # running total below to match what's actually drawn.
-  space_width <- get_text_width(" ", font_size, font_face)
+  widths <- get_text_width(c(paste0(words$word, " "), " "), font_size, font_face)
+  words[, word_width := utils::head(widths, n)]
+  space_width <- utils::tail(widths, 1)
 
-  # assign words to different lines based on the cumulative length
-  words[, cumsum_word_width := (cumsum(word_width) - space_width) / plot_width]
+  # Running total from the very start of the text - a line's own cumulative
+  # width is this minus its running total as of the previous line's end
+  # (`offset`), computed once rather than re-summed from scratch per line.
+  cum <- cumsum(words$word_width)
 
-  check_lines <- T
-  i <- 1
-  text_lines <- list()
+  line <- integer(n)
+  line_no <- 1L
+  start <- 1L
+  offset <- 0
 
-  while(check_lines){
+  for (i in seq_len(n)) {
 
-    # check whether we can create a line (i.e. some words are under the limit), otherwise take the first word and try again
-    temp_line <- words[cumsum_word_width <= 1]
+    local_width <- (cum[i] - offset - space_width) / plot_width
 
-    if(nrow(temp_line) == 0){
-
-      text_lines[[i]] <- words[1][, line := i]
-
-      words <- words[-1]
-
-    } else {
-      text_lines[[i]] <- words[cumsum_word_width <= 1][, line := i]
-
-      words <- words[cumsum_word_width > 1]
-
+    # start a new line, unless this is the first word on the line (always
+    # keep at least one word per line, even if it alone exceeds plot_width)
+    if (local_width > 1 && i > start) {
+      line_no <- line_no + 1L
+      start <- i
+      offset <- cum[i - 1L]
     }
 
-    words <- words[, cumsum_word_width := (cumsum(word_width) - space_width) / plot_width]
-
-    i <- i + 1
-
-    if(nrow(words) == 0) break
+    line[i] <- line_no
   }
 
-  text_lines <- data.table::rbindlist(text_lines)
+  words[, line := line]
 
   # combine lines
-  text_lines <- text_lines[, .(collapsed_text = paste(word, collapse = " ")), by = line]
-
-  return(text_lines)
+  words[, .(collapsed_text = paste(word, collapse = " ")), by = line]
 }
 
 #' Calculate the width of text in ggplot titles, subtitles and footnotes

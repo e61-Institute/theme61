@@ -520,7 +520,6 @@ plot_label <-
   retval
 }
 
-
 # New methods ----
 
 # ggplot2 v4+ hook

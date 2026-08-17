@@ -7,7 +7,7 @@
 #'
 #' @keywords internal
 #' @export
-print.e61_ggplot <- function(x, ...) {
+print.e61_plot <- function(x, ...) {
 
   # theme61.iterate_mode: skip the Viewer preview and all automatic
   # theme61 styling (theme, scales, facet spacing, etc.) for fast
@@ -16,7 +16,7 @@ print.e61_ggplot <- function(x, ...) {
   # explicitly (e.g. scale_colour_e61()) are already part of the plot
   # object and still apply.
   if (isTRUE(getOption("theme61.iterate_mode", FALSE))) {
-    class(x) <- setdiff(class(x), "e61_ggplot")
+    class(x) <- setdiff(class(x), c("e61_map", "e61_plot"))
     return(print(x))
   }
 
@@ -72,8 +72,9 @@ print.e61_ggplot <- function(x, ...) {
   }
 
   # Plots pane render (must include theme61 defaults)
-  x_plot <- maybe_add_default_scales(x)
-  class(x_plot) <- setdiff(class(x_plot), "e61_ggplot")
+  x_plot <- finalise_e61_plot(x)
+  x_plot <- maybe_add_default_scales(x_plot)
+  class(x_plot) <- setdiff(class(x_plot), c("e61_map", "e61_plot"))
   print(x_plot)
 
   # Prefer Viewer focus by default (best-effort). Users who don't want any
