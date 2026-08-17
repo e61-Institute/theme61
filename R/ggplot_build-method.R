@@ -26,6 +26,26 @@ ggplot_build.e61_plot <- function(plot, ...) {
 
 # Helpers ----
 
+# Find the first mapping quosure for aes_name: plot mapping first, else the
+# first layer with a mapping for it. Returns list(quo, layer) where layer is
+# NULL if the match came from the plot-level mapping, else the matching
+# layer (so callers can recover which data the quosure should be evaluated
+# against). Returns NULL if no mapping is found anywhere.
+find_aes_match <- function(plot, aes_name) {
+
+  if (!is.null(plot@mapping[[aes_name]])) {
+    return(list(quo = plot@mapping[[aes_name]], layer = NULL))
+  }
+
+  for (ly in plot@layers) {
+    if (!is.null(ly$mapping[[aes_name]])) {
+      return(list(quo = ly$mapping[[aes_name]], layer = ly))
+    }
+  }
+
+  NULL
+}
+
 # Find the first mapping for aes_name from plot mapping, else from layers.
 # Returns list(quo = <quosure>, data = <data.frame>) or NULL.
 find_aes <- function(plot, aes_name) {
@@ -36,23 +56,17 @@ find_aes <- function(plot, aes_name) {
     stop("Plot has no data.")
   }
 
-  # plot-level mapping first
-  if (!is.null(plot@mapping[[aes_name]])) {
-    return(list(quo = plot@mapping[[aes_name]], data = plot_data))
+  m <- find_aes_match(plot, aes_name)
+  if (is.null(m)) return(NULL)
+
+  if (is.null(m$layer)) {
+    d <- plot_data
+  } else {
+    d <- m$layer$data
+    if (is.null(d) || inherits(d, "waiver")) d <- plot_data
   }
 
-  # layer-level mapping next
-  for (ly in plot@layers) {
-    if (!is.null(ly$mapping[[aes_name]])) {
-      d <- ly$data
-
-      if (is.null(d) || inherits(d, "waiver")) d <- plot_data
-
-      return(list(quo = ly$mapping[[aes_name]], data = d))
-    }
-  }
-
-  NULL
+  list(quo = m$quo, data = d)
 }
 
 # Safe version of eval_tidy that returns NULL rather than an error if it fails
@@ -61,6 +75,41 @@ safe_eval_tidy <- function(quo, data) {
     rlang::eval_tidy(quo, data = rlang::as_data_mask(data)),
     error = function(e) NULL
   )
+}
+
+# Resolve the value of a quosure against a list of candidate datasets: if the
+# quosure is a bare symbol, look up the column directly by name (avoids name
+# collisions with objects in the calling environment); otherwise safely
+# eval_tidy it in each candidate's data mask, in order, using the first
+# non-NULL result. Returns NULL if no value could be resolved.
+resolve_aes_value <- function(quo, data_candidates) {
+
+  expr <- rlang::quo_get_expr(quo)
+
+  if (rlang::is_symbol(expr)) {
+    nm <- rlang::as_string(expr)
+    for (d in data_candidates) {
+      if (!is.null(names(d)) && nm %in% names(d)) {
+        return(d[[nm]])
+      }
+    }
+    return(NULL)
+  }
+
+  for (d in data_candidates) {
+    val <- safe_eval_tidy(quo, data = d)
+    if (!is.null(val)) return(val)
+  }
+
+  NULL
+}
+
+# Skip computed aesthetics (after_stat()/after_scale()/stat()): too hard (and
+# unsafe) to infer pre-build.
+is_unsafe_mapping <- function(q) {
+  expr <- rlang::quo_get_expr(q)
+  txt <- paste(deparse(expr), collapse = "")
+  grepl("after_stat\\(|after_scale\\(|stat\\(", txt)
 }
 
 #' @noRd
@@ -80,13 +129,6 @@ infer_aes_type <- function(plot, aes_name) {
 
   if (length(quos) == 0) return(NA_character_)
 
-  # Skip computed aesthetics
-  is_unsafe_mapping <- function(q) {
-    expr <- rlang::quo_get_expr(q)
-    txt <- paste(deparse(expr), collapse = "")
-    grepl("after_stat\\(|after_scale\\(|stat\\(", txt)
-  }
-
   # Candidate datasets (layer overrides plot); ignore waiver
   data_candidates <- list(plot@data)
   for (ly in plot@layers) data_candidates <- c(data_candidates, list(ly$data))
@@ -98,29 +140,8 @@ infer_aes_type <- function(plot, aes_name) {
   for (q in quos) {
     if (is_unsafe_mapping(q)) next
 
-    expr <- rlang::quo_get_expr(q)
-
-    # If mapping is a bare symbol, pull directly from data to avoid name collisions
-    if (rlang::is_symbol(expr)) {
-      nm <- rlang::as_string(expr)
-      val <- NULL
-      for (d in data_candidates) {
-        if (!is.null(names(d)) && nm %in% names(d)) {
-          val <- d[[nm]]
-          break
-        }
-      }
-      if (is.null(val) || is.function(val)) next
-
-    } else {
-      # Otherwise evaluate safely in a data mask
-      val <- NULL
-      for (d in data_candidates) {
-        val <- safe_eval_tidy(q, data = d)
-        if (!is.null(val)) break
-      }
-      if (is.null(val) || is.function(val)) next
-    }
+    val <- resolve_aes_value(q, data_candidates)
+    if (is.null(val) || is.function(val)) next
 
     if (is.numeric(val) || inherits(val, c("Date", "POSIXct", "POSIXt", "difftime"))) {
       types <- c(types, "continuous")
@@ -137,14 +158,9 @@ infer_aes_type <- function(plot, aes_name) {
 infer_discrete_nlevels <- function(plot, aes_name) {
 
   # Find mapping quosure
-  q <- plot@mapping[[aes_name]]
-  if (is.null(q)) {
-    for (ly in plot@layers) {
-      q <- ly$mapping[[aes_name]]
-      if (!is.null(q)) break
-    }
-  }
-  if (is.null(q)) return(NA_integer_)
+  m <- find_aes_match(plot, aes_name)
+  if (is.null(m)) return(NA_integer_)
+  q <- m$quo
 
   expr <- rlang::quo_get_expr(q)
 
@@ -154,38 +170,26 @@ infer_discrete_nlevels <- function(plot, aes_name) {
   data_candidates <- Filter(Negate(is.null), data_candidates)
   if (length(data_candidates) == 0) return(NA_integer_)
 
+  is_discrete_ish <- function(val) {
+    !(is.function(val) || is.numeric(val) ||
+        inherits(val, c("Date", "POSIXct", "POSIXt", "difftime")))
+  }
+
   # If mapping is a bare symbol, pull directly from data to avoid name collisions
   if (rlang::is_symbol(expr)) {
-    nm <- rlang::as_string(expr)
-    for (d in data_candidates) {
-      if (!is.null(names(d)) && nm %in% names(d)) {
-        val <- d[[nm]]
-        # Discrete-ish only
-        if (is.function(val) || is.numeric(val) ||
-            inherits(val, c("Date", "POSIXct", "POSIXt", "difftime"))) {
-          return(NA_integer_)
-        }
-        return(length(unique(as.character(val))))
-      }
-    }
-    return(NA_integer_)
+    val <- resolve_aes_value(q, data_candidates)
+    if (is.null(val)) return(NA_integer_)
+    if (!is_discrete_ish(val)) return(NA_integer_)
+    return(length(unique(as.character(val))))
   }
 
   # Skip computed aesthetics (too hard to infer pre-build)
-  expr_txt <- paste(deparse(expr), collapse = "")
-  if (grepl("after_stat\\(|after_scale\\(|stat\\(", expr_txt)) return(NA_integer_)
+  if (is_unsafe_mapping(q)) return(NA_integer_)
 
   # Fallback: evaluate expression safely
-  val <- NULL
-  for (d in data_candidates) {
-    val <- tryCatch(rlang::eval_tidy(q, data = d), error = function(e) NULL)
-    if (!is.null(val)) break
-  }
+  val <- resolve_aes_value(q, data_candidates)
   if (is.null(val) || is.function(val)) return(NA_integer_)
-
-  if (is.numeric(val) || inherits(val, c("Date", "POSIXct", "POSIXt", "difftime"))) {
-    return(NA_integer_)
-  }
+  if (!is_discrete_ish(val)) return(NA_integer_)
 
   length(unique(as.character(val)))
 }

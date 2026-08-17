@@ -11,11 +11,10 @@
 
 palette_e61 <- function(n, reverse = FALSE) {
 
-  if (n == 0) stop("You need to specify the number of colours/fills in your palette.")
-  if (n > 12) stop("You cannot request more than 12 colours, consider using a
-                   continuous colour scale or reducing the number of groups in
-                   your data.")
-
+  # n is validated inside get_palette() (broader checks - non-numeric,
+  # non-integer, length != 1, as well as range - covering both cases below
+  # plus more), so every caller gets the same clear error and it doesn't
+  # need to be duplicated here.
   palette <- get_palette(n)
 
   if (isTRUE(reverse)) {

@@ -207,6 +207,21 @@ GeomTextFlipAware <- ggplot2::ggproto("GeomTextFlipAware", ggplot2::GeomText,
 .COL_LABEL_GAP_FRAC <- 0.025
 .COL_LABEL_HEADROOM_FRAC <- 0.08
 
+
+# Number of rows (segments) sharing each x value, mapped back onto data's own
+# row order via match(). Used by both stats below to tell whether a given x
+# is stacked (>1 row sharing it) or a lone/single column (1 row).
+col_label_n_group <- function(data) {
+  n_per_x <- tapply(data$y, data$x, length)
+  as.numeric(n_per_x[match(data$x, names(n_per_x))])
+}
+
+# Percent-of-total label for each row, given its y value(s) and a matching
+# total (either a single grand total or a per-row vector of per-x totals).
+col_label_percent <- function(y, total, accuracy) {
+  scales::label_percent(accuracy = accuracy)(y / total)
+}
+
 .resolve_col_label_align <- function(align) {
 
   if (is.character(align)) {
@@ -234,8 +249,7 @@ StatColLabel <- ggplot2::ggproto("StatColLabel", ggplot2::Stat,
   compute_panel = function(data, scales, accuracy = 1, align = 1) {
 
     # Number of rows (segments) sharing each x: >1 means this x is stacked.
-    n_per_x <- tapply(data$y, data$x, length)
-    data$n_group <- as.numeric(n_per_x[match(data$x, names(n_per_x))])
+    data$n_group <- col_label_n_group(data)
 
     # Stacked columns: share of that x's stack. Single columns: share of the
     # panel-wide total (e.g. each category's share of an overall total).
@@ -246,7 +260,7 @@ StatColLabel <- ggplot2::ggproto("StatColLabel", ggplot2::Stat,
       sum(data$y, na.rm = TRUE)
     )
 
-    data$label <- scales::label_percent(accuracy = accuracy)(data$y / data$total)
+    data$label <- col_label_percent(data$y, data$total, accuracy)
 
     if (align <= 0 || align >= 1) {
       data <- data[data$n_group > 1, , drop = FALSE]
@@ -306,14 +320,13 @@ StatColLabelFloat <- ggplot2::ggproto("StatColLabelFloat", ggplot2::Stat,
 
   compute_panel = function(data, scales, accuracy = 1, align = 1) {
 
-    n_per_x <- tapply(data$y, data$x, length)
-    n_group <- as.numeric(n_per_x[match(data$x, names(n_per_x))])
+    n_group <- col_label_n_group(data)
 
     data <- data[n_group <= 1, , drop = FALSE]
     if (nrow(data) == 0) return(data)
 
     total <- sum(data$y, na.rm = TRUE)
-    data$label <- scales::label_percent(accuracy = accuracy)(data$y / total)
+    data$label <- col_label_percent(data$y, total, accuracy)
 
     gap <- diff(range(c(0, data$y), na.rm = TRUE)) * .COL_LABEL_GAP_FRAC
     if (!is.finite(gap)) gap <- 0
