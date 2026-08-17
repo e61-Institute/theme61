@@ -141,7 +141,7 @@ plot_label <-
     # `label` is optional so its length isn't known here yet. Checked again in
     # .build_plot_label_layer() once label is resolved, alongside the same check
     # for a colour vector.
-    if (!is.null(x) && !is.null(label) && !all.equal(length(label), length(x), length(y))) {
+    if (!is.null(x) && !is.null(label) && (length(label) != length(x) || length(x) != length(y))) {
       stop("The number of x and y positions must equal the number of labels.")
     }
 
@@ -346,7 +346,7 @@ plot_label <-
   }
   n <- length(label)
 
-  if (!is.null(object$x) && !all.equal(n, length(object$x), length(object$y))) {
+  if (!is.null(object$x) && (n != length(object$x) || length(object$x) != length(object$y))) {
     stop("The number of x and y positions must equal the number of labels.")
   }
 
