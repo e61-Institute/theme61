@@ -27,6 +27,8 @@ save_e61(
   base_size = 10,
   res = 1,
   bg_colour = "white",
+  build_up = FALSE,
+  build_up_n = NULL,
   return_plot_obj = FALSE,
   title = lifecycle::deprecated(),
   subtitle = lifecycle::deprecated(),
@@ -163,6 +165,16 @@ PNG. E.g. \code{res = 2} doubles the size of the saved graph.}
 code or theme61 colour object name. Defaults to "white". For graphs used in
 research note boxes, set the colour to \code{e61_boxback}.}
 
+\item{build_up}{(single-panel specific) Logical. Save a sequence of files
+that each reveal one more category/series than the last, with a \verb{_1},
+\verb{_2}, ..., \verb{_N} suffix added to \code{filename}. See Details. Defaults to
+FALSE.}
+
+\item{build_up_n}{(single-panel specific) Numeric. Only used by \code{build_up}
+for a single, ungrouped line or area series, where there's no existing
+category to step through and the x-axis instead needs to be divided into
+steps. Defaults to the number of unique x-values, capped at 10.}
+
 \item{return_plot_obj}{(multi-panel specific) Logical. If TRUE, skips saving
 entirely and returns the composed multi-panel plot object instead (e.g. to
 print it in the Plots pane, or use it in a Shiny app). Only supported for
@@ -184,7 +196,7 @@ instead.}
 Invisibly returns the file name.
 }
 \description{
-Saves ggplot2 graphs made with using theme61. Using \code{save_e61()} is required
+Saves ggplot2 graphs made using theme61. Using \code{save_e61()} is required
 to ensure graphs are consistent with the e61 style and formatting.
 }
 \details{
@@ -192,4 +204,30 @@ Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 better as they are modern vector graphics file formats which can be scaled up
 and down in size without blurring or becoming pixelated. PNG should only be
 used when required for compatibility reasons.
+
+\code{build_up = TRUE} saves a sequence of files (\code{filename_1},
+\code{filename_2}, ..., \code{filename_N}) that each reveal one more
+category/series than the last, for stepping a chart across several
+PowerPoint slides. Categories not yet revealed are blanked (zeroed, or
+set to missing) rather than removed from the data, so the axes, scales
+and dimensions are identical across every step. Supported chart types:
+\itemize{
+\item bar/column charts (\code{geom_col()}/\code{geom_bar()}): reveals the x-axis
+categories left to right;
+\item stacked area/ribbon charts (\code{geom_area()}/\code{geom_ribbon()}): reveals the
+stacked groups bottom to top;
+\item grouped line/point charts (\code{geom_line()}/\code{geom_path()}/\code{geom_point()}/
+\code{geom_pointbar()}): reveals one colour/fill group (e.g. one line) at a
+time;
+\item a single, ungrouped line or area series: reveals progressively along
+the x-axis instead (see \code{build_up_n}).
+}
+
+\code{\link[=plot_label]{plot_label()}} labels are also synced to the reveal sequence, if the
+label's \code{colour} matches the rendered colour of a category/group (the
+usual way to label a line/bar instead of using a legend) - a label whose
+colour doesn't match any category (e.g. a source note) is left alone.
+
+\code{build_up} is not supported for multi-panel graphs, faceted graphs,
+\code{preview = TRUE} or \code{return_plot_obj = TRUE}.
 }
