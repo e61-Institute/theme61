@@ -409,3 +409,125 @@ test_that("theme61.iterate_mode makes facet_wrap()/facet_grid() pass through to 
 test_that("set_t61_options rejects the unnamespaced quiet_mask option", {
   expect_error(set_t61_options(list(quiet_mask = TRUE)), "Invalid options supplied")
 })
+
+# ---- Upstream ggplot2 signature-drift safety net (issue #336) ------------
+#
+# theme61 masks ggplot(), labs(), facet_wrap(), facet_grid() and ggsave().
+# That's deliberate (see R/ggplot2-wrappers.R) and not being removed here.
+# What these tests guard against is the masking *silently* breaking because
+# a future ggplot2 release renames/reorders/removes an argument our wrappers
+# rely on by name (this already happened once, on ggplot2 4.0) -- these
+# tests fail loudly in CI the moment that happens, instead of a user hitting
+# a confusing runtime error or silent misbehaviour.
+
+test_that("ggplot2::ggplot()'s formals still cover what theme61::ggplot() forwards by name", {
+
+  # theme61::ggplot() explicitly declares data/mapping/environment (plus
+  # ...) and forwards them to ggplot2::ggplot() *by name*, so it doesn't
+  # matter if ggplot2 reorders its formals -- but it does matter if any of
+  # these named arguments disappear or get renamed upstream.
+  t61_named_args <- c("data", "mapping", "environment")
+
+  upstream_formals <- names(formals(ggplot2::ggplot))
+
+  expect_true(
+    all(t61_named_args %in% upstream_formals),
+    info = paste0(
+      "ggplot2::ggplot() no longer has formal(s): ",
+      paste(setdiff(t61_named_args, upstream_formals), collapse = ", "),
+      ". theme61::ggplot() forwards these by name and needs updating."
+    )
+  )
+
+  # theme61::ggplot()'s own formals should match what we expect it to
+  # explicitly declare (data, mapping, ..., environment). If this changes,
+  # someone edited the wrapper itself -- not an upstream drift issue, but
+  # worth catching too since the rest of this test assumes this shape.
+  expect_identical(
+    names(formals(theme61::ggplot)),
+    c("data", "mapping", "...", "environment")
+  )
+
+  # Informational tripwire (not a hard failure): if ggplot2::ggplot() has
+  # gained new named arguments beyond data/mapping/.../environment, they
+  # are still safely absorbed by theme61::ggplot()'s `...` as long as they
+  # come after `environment` is matched by name (which our call does,
+  # explicitly, for all four args) -- but it's worth knowing about.
+  extra_upstream_args <- setdiff(upstream_formals, c(t61_named_args, "..."))
+  if (length(extra_upstream_args) > 0) {
+    warning(
+      "ggplot2::ggplot() has gained new formal(s) not explicitly named by ",
+      "theme61::ggplot(): ", paste(extra_upstream_args, collapse = ", "),
+      ". These are forwarded via `...` and should still work, but review ",
+      "R/ggplot2-wrappers.R to confirm."
+    )
+  }
+})
+
+test_that("ggplot2::facet_wrap()/facet_grid() still have an 'axes' formal", {
+
+  # theme61's facet_wrap()/facet_grid() wrappers only explicitly declare
+  # `axes` (to default it to "all" instead of ggplot2's "margins"); every
+  # other argument is passed through untouched via `...`. If ggplot2 ever
+  # renamed or removed `axes`, the wrapper would silently stop forcing
+  # axes = "all" instead of erroring -- exactly the kind of break #336
+  # warns about, so this needs to be a hard failure.
+  expect_true("axes" %in% names(formals(ggplot2::facet_wrap)))
+  expect_true("axes" %in% names(formals(ggplot2::facet_grid)))
+})
+
+test_that("ggplot2::labs() and ggplot2::ggsave() still exist as functions", {
+
+  # theme61::labs()/ggsave() take pure `...` and forward to labs_e61()/
+  # save_e61() (not to ggplot2::labs()/ggsave() in the normal, non-iterate
+  # mode path), so there's little upstream-signature risk to check here.
+  # This is just a tripwire for the (unlikely) case ggplot2 renames or
+  # removes these entirely, since theme61.iterate_mode does call them
+  # directly.
+  expect_true(is.function(ggplot2::labs))
+  expect_true(is.function(ggplot2::ggsave))
+})
+
+# ---- Behavioural smoke test for the e61_plot / iterate_mode contract -----
+
+test_that("theme61::ggplot() tags plots as e61_plot, and iterate_mode bypasses the automatic e61 additions at build time", {
+
+  df <- data.frame(x = 1:10, y = seq(10, 100, length.out = 10))
+
+  # ---- Normal mode: ggplot() eagerly tags the plot as e61_plot ----
+  p <- ggplot(df, aes(x, y)) + geom_point()
+  expect_true(inherits(p, "e61_plot"))
+
+  # ...and building it applies theme61's automatic scale injection (here:
+  # a duplicated secondary y-axis), confirming the e61_plot class actually
+  # does something at build time in the default path.
+  b <- ggplot_build(p)
+  ysc <- b@plot@scales$get_scales("y")
+  expect_false(is.null(ysc))
+  expect_false(inherits(ysc$secondary.axis, "waiver") || is.null(ysc$secondary.axis))
+
+  # ---- theme61.iterate_mode: the escape hatch ----
+  # Note: ggplot() itself still tags the plot as e61_plot even under
+  # iterate_mode (tagging is what lets ggplot_build.e61_plot() dispatch at
+  # all) -- iterate_mode instead makes that S3 method itself strip the tag
+  # and hand off to plain ggplot2::ggplot_build() *before* doing any of the
+  # automatic scale/facet/theme injection. So the observable contract is:
+  # the automatic e61 additions are skipped, not that the class is never
+  # applied in the first place.
+  withr::local_options(list(theme61.iterate_mode = TRUE))
+
+  p_iter <- ggplot(df, aes(x, y)) + geom_point()
+  expect_true(inherits(p_iter, "e61_plot"))
+
+  b_iter <- ggplot_build(p_iter)
+
+  # The e61_plot tag must not survive into the built plot's class...
+  expect_false(inherits(b_iter@plot, "e61_plot"))
+
+  # ...and, more importantly, none of theme61's automatic styling ran: no
+  # duplicated secondary y-axis should have been injected under iterate_mode.
+  ysc_iter <- b_iter@plot@scales$get_scales("y")
+  expect_true(is.null(ysc_iter) ||
+                inherits(ysc_iter$secondary.axis, "waiver") ||
+                is.null(ysc_iter$secondary.axis))
+})
