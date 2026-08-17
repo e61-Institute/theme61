@@ -239,9 +239,9 @@ update_chart_scales <- function(plot, auto_scale, sec_axis, build = NULL){
     suppressWarnings({
       if (sec_axis) {
         plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), add_space = TRUE)
-        } else if (!sec_axis) {
+      } else {
         plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE, add_space = TRUE)
-        }
+      }
     })
   }
 

@@ -1,12 +1,36 @@
 #' Save graphs with theme61 styles and defaults
 #'
-#' Saves ggplot2 graphs made with using theme61. Using `save_e61()` is required
+#' Saves ggplot2 graphs made using theme61. Using `save_e61()` is required
 #' to ensure graphs are consistent with the e61 style and formatting.
 #'
 #' Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs are
 #' better as they are modern vector graphics file formats which can be scaled up
 #' and down in size without blurring or becoming pixelated. PNG should only be
 #' used when required for compatibility reasons.
+#'
+#' @details `build_up = TRUE` saves a sequence of files (`filename_1`,
+#'   `filename_2`, ..., `filename_N`) that each reveal one more
+#'   category/series than the last, for stepping a chart across several
+#'   PowerPoint slides. Categories not yet revealed are blanked (zeroed, or
+#'   set to missing) rather than removed from the data, so the axes, scales
+#'   and dimensions are identical across every step. Supported chart types:
+#'   * bar/column charts (`geom_col()`/`geom_bar()`): reveals the x-axis
+#'   categories left to right;
+#'   * stacked area/ribbon charts (`geom_area()`/`geom_ribbon()`): reveals the
+#'   stacked groups bottom to top;
+#'   * grouped line/point charts (`geom_line()`/`geom_path()`/`geom_point()`/
+#'   `geom_pointbar()`): reveals one colour/fill group (e.g. one line) at a
+#'   time;
+#'   * a single, ungrouped line or area series: reveals progressively along
+#'   the x-axis instead (see `build_up_n`).
+#'
+#'   [plot_label()] labels are also synced to the reveal sequence, if the
+#'   label's `colour` matches the rendered colour of a category/group (the
+#'   usual way to label a line/bar instead of using a legend) - a label whose
+#'   colour doesn't match any category (e.g. a source note) is left alone.
+#'
+#'   `build_up` is not supported for multi-panel graphs, faceted graphs,
+#'   `preview = TRUE` or `return_plot_obj = TRUE`.
 #'
 #' @param filename File name to create on disk. Providing the file format
 #'   extension (e.g. .svg) is suggested when saving to a single file format. The
@@ -100,6 +124,14 @@
 #' @param bg_colour Set the graph background colour. Accepts a colour name, hex
 #'   code or theme61 colour object name. Defaults to "white". For graphs used in
 #'   research note boxes, set the colour to `e61_boxback`.
+#' @param build_up (single-panel specific) Logical. Save a sequence of files
+#'   that each reveal one more category/series than the last, with a `_1`,
+#'   `_2`, ..., `_N` suffix added to `filename`. See Details. Defaults to
+#'   FALSE.
+#' @param build_up_n (single-panel specific) Numeric. Only used by `build_up`
+#'   for a single, ungrouped line or area series, where there's no existing
+#'   category to step through and the x-axis instead needs to be divided into
+#'   steps. Defaults to the number of unique x-values, capped at 10.
 #' @param return_plot_obj (multi-panel specific) Logical. If TRUE, skips saving
 #'   entirely and returns the composed multi-panel plot object instead (e.g. to
 #'   print it in the Plots pane, or use it in a Shiny app). Only supported for
@@ -142,6 +174,8 @@ save_e61 <- function(filename = NULL,
                      base_size = 10,
                      res = 1,
                      bg_colour = "white",
+                     build_up = FALSE,
+                     build_up_n = NULL,
                      return_plot_obj = FALSE,
                      # Deprecated - use `labs` instead
                      title = lifecycle::deprecated(),
@@ -237,9 +271,6 @@ save_e61 <- function(filename = NULL,
 
   # Coerce plot classes and prep --------------------------------------------
 
-  # Compile plots
-  plots <- c(list(...), plotlist)
-
   # For single-panel graphs
   if (length(plots) == 0) plots <- list(plot)
 
@@ -273,6 +304,20 @@ save_e61 <- function(filename = NULL,
     stop("return_plot_obj is only supported for multi-panel graphs (2 or more plots). For a single plot, just print the ggplot object directly.")
   }
 
+  if (build_up) {
+    if (length(plots) > 1)
+      stop("build_up is only supported for single-panel graphs.")
+
+    if (return_plot_obj)
+      stop("build_up cannot be combined with return_plot_obj.")
+
+    if (preview)
+      stop("build_up cannot be combined with preview = TRUE.")
+
+    if (length(plots[[1]]@facet$params) != 0)
+      stop("build_up is not supported for faceted graphs.")
+  }
+
   # Enforce chart type
   if(is.null(chart_type)){
     chart_type <- "normal"
@@ -284,10 +329,8 @@ save_e61 <- function(filename = NULL,
 
   } else if(length(chart_type) > 1){
 
-    for(i in 1:length(chart_type)){
-      if(!chart_type[i] %in% c("normal", "wide", "square"))
-        stop("Invalid chart type. All chart types must be one of 'normal', 'wide' or 'square'.")
-    }
+    if(!all(chart_type %in% c("normal", "wide", "square")))
+      stop("Invalid chart type. All chart types must be one of 'normal', 'wide' or 'square'.")
   }
 
   # Check if filename has been provided when preview/return_plot_obj mode is FALSE
@@ -435,15 +478,48 @@ save_e61 <- function(filename = NULL,
 
   # Save --------------------------------------------------------------------
 
-  save_graph(
-    graph = save_input$graph,
-    format = format,
-    filename = filename,
-    width = save_input$width,
-    height = save_input$height,
-    bg_colour = bg_colour,
-    res = res
-  )
+  if (build_up) {
+
+    # The expensive layout/scaling work above (save_single()) was done once,
+    # using the complete data, so every step below shares identical
+    # dimensions and axis limits - all that's left is a cheap re-render per
+    # step with some rows blanked out.
+    build_up_result <- resolve_build_up(save_input$graph, build_up_n)
+    step_filenames <- paste0(filename, "_", seq_along(build_up_result$steps))
+
+    for (k in seq_along(build_up_result$steps)) {
+
+      step_plot <- save_input$graph
+
+      for (j in seq_along(build_up_result$targets)) {
+        step_plot@layers[[build_up_result$targets[j]]]$data <- build_up_result$steps[[k]][[j]]
+      }
+
+      save_graph(
+        graph = step_plot,
+        format = format,
+        filename = step_filenames[k],
+        width = save_input$width,
+        height = save_input$height,
+        bg_colour = bg_colour,
+        res = res
+      )
+    }
+
+    cli::cli_alert_info("build_up saved {length(step_filenames)} chart(s): {paste(basename(step_filenames), collapse = ', ')}")
+
+  } else {
+
+    save_graph(
+      graph = save_input$graph,
+      format = format,
+      filename = filename,
+      width = save_input$width,
+      height = save_input$height,
+      bg_colour = bg_colour,
+      res = res
+    )
+  }
 
   # Post-saving -------------------------------------------------------------
 
@@ -455,57 +531,77 @@ save_e61 <- function(filename = NULL,
   # Save the data used to make the graph
   if (save_data) {
 
-    for (i in seq_along(plots)) {
-      # Give each plot's data file the same name as the graph. When there are
-      # multiple plots (multi-panel), append the panel number to keep the
-      # file names unique, since each panel may be built from a different
-      # data frame.
-      data_name <- if (length(plots) > 1) {
-        paste0(filename, " ", i, ".csv")
-      } else {
-        paste0(filename, ".csv")
+    if (build_up) {
+
+      for (k in seq_along(build_up_result$steps)) {
+        # A build_up chart only ever has one target data frame worth writing
+        # out per step (the reference layer's) if there are several, they're
+        # all derived from the same reveal sequence, so the first is enough.
+        data.table::fwrite(build_up_result$steps[[k]][[1]], paste0(step_filenames[k], ".csv"))
       }
 
-      data.table::fwrite(plots[[i]]@data, data_name)
+    } else {
+
+      for (i in seq_along(plots)) {
+        # Give each plot's data file the same name as the graph. When there are
+        # multiple plots (multi-panel), append the panel number to keep the
+        # file names unique, since each panel may be built from a different
+        # data frame.
+        data_name <- if (length(plots) > 1) {
+          paste0(filename, " ", i, ".csv")
+        } else {
+          paste0(filename, ".csv")
+        }
+
+        data.table::fwrite(plots[[i]]@data, data_name)
+      }
     }
   }
 
   # Opens the graph file in the Viewer, and also in the browser if requested
+  # Not attempted for build_up - there's a sequence of files, not one - the
+  # info message above already tells the user what was saved.
+  if (!build_up) {
 
-  # Put filename back together
-  file_to_open <- paste0(filename, ".", format[[1]])
+    # Put filename back together
+    file_to_open <- paste0(filename, ".", format[[1]])
 
-  if (isTRUE(getOption("theme61.open_in_browser", FALSE))) {
-    # browseURL() is cross-platform (unlike system2("open", ...), which is
-    # macOS-only) and picks the right opener for the current OS itself.
-    out <- try(utils::browseURL(here::here(file_to_open)))
+    if (isTRUE(getOption("theme61.open_in_browser", FALSE))) {
+      file_to_open_browser <- shQuote(here::here(file_to_open))
 
-    if (inherits(out, "try-error")) warning("Graph file could not be opened")
-  }
+      out <- try(utils::browseURL(here::here(file_to_open)))
 
-  if (interactive()) {
-    # rstudioapi::viewer only opens temp files in the Viewer pane, not
-    # arbitrary saved paths -- always preview via a temp file, below.
+      if (inherits(out, "try-error")) warning("Graph file could not be opened")
 
-    # Always preview an SVG, even if the saved format(s) are not SVG
-    preview_svg <- make_preview_svg(
-      graph = save_input$graph,
-      format = format,
-      filename = filename,
-      width = save_input$width,
-      height = save_input$height,
-      bg_colour = bg_colour,
-      res = res
-    )
+    }
 
-    out <- try(rstudioapi::viewer(preview_svg))
+    if (interactive()) {
+      # Only run this in interactive mode
+      # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
+      # Always preview an SVG, even if the saved format(s) are not SVG
+      preview_svg <- make_preview_svg(
+        graph = save_input$graph,
+        format = format,
+        filename = filename,
+        width = save_input$width,
+        height = save_input$height,
+        bg_colour = bg_colour,
+        res = res
+      )
 
-    if (!is.null(out)) warning("Graph file could not be opened.")
+      out <- try(rstudioapi::viewer(preview_svg))
 
+      if (!is.null(out)) warning("Graph file could not be opened.")
+
+    }
   }
 
   # Invisibly returns the filename/s
-  retval <- paste(filename, format, sep = ".")
+  retval <- if (build_up) {
+    as.vector(outer(step_filenames, format, paste, sep = "."))
+  } else {
+    paste(filename, format, sep = ".")
+  }
 
   invisible(retval)
 }

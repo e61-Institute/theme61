@@ -257,7 +257,7 @@ test_that("save_e61() end-to-end repositions eligible plot_label() text", {
 
   out <- tempfile(fileext = ".svg")
   expect_no_error(
-    save_e61(out, plot = p, preview = TRUE, spell_check = FALSE)
+    suppressMessages(save_e61(out, plot = p, preview = TRUE, spell_check = FALSE))
   )
 })
 
