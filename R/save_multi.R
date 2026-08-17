@@ -281,30 +281,26 @@ save_multi <-
         clean_plotlist[[i]], width_cm = panel_total_width, height_cm = panel_total_height,
         print_positions = print_label_positions
       )
-    }
 
+      # Now that autolabel positioning (above) is done against the uniform
+      # margin, set the margin each panel actually renders with: outer grid
+      # edges get base_margin_h/w, interior-facing sides get
+      # chart_height_pad/chart_width_pad.
+      row_i <- ceiling(i / ncol)
+      col_i <- ((i - 1) %% ncol) + 1
+
+      top_i <- if (row_i == 1) base_margin_h else chart_height_pad
+      bottom_i <- if (row_i == nrow) base_margin_h else chart_height_pad
+      left_i <- if (col_i == 1) base_margin_w else chart_width_pad
+      right_i <- if (col_i == ncol) base_margin_w else chart_width_pad
+
+      clean_plotlist[[i]] <- clean_plotlist[[i]] +
+        theme(plot.margin = margin(t = top_i, b = bottom_i, r = right_i, l = left_i, unit = "mm"))
+    }
 
     # Gather the plots ----------------------------------------------------
 
     plots <- clean_plotlist
-
-    # Only needed when auto_scale is FALSE: the loop above already applied
-    # this exact margin to every panel when auto_scale is TRUE, so re-running
-    # it here would just repeat the same theme merge for no visual effect.
-    if (!auto_scale) {
-      for (i in seq_along(plots)) {
-        row_i <- ceiling(i / ncol)
-        col_i <- ((i - 1) %% ncol) + 1
-
-        top_i <- if (row_i == 1) base_margin_h else chart_height_pad
-        bottom_i <- if (row_i == nrow) base_margin_h else chart_height_pad
-        left_i <- if (col_i == 1) base_margin_w else chart_width_pad
-        right_i <- if (col_i == ncol) base_margin_w else chart_width_pad
-
-        plots[[i]] <- plots[[i]] +
-          theme(plot.margin = margin(t = top_i, b = bottom_i, r = right_i, l = left_i, unit = "mm"))
-      }
-    }
 
     # Create the main chart
     multi_plot <- patchwork::wrap_plots(
