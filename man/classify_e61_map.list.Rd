@@ -9,3 +9,4 @@
 \description{
 Method that works for lists of plots
 }
+\keyword{internal}

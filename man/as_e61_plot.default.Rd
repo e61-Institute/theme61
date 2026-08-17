@@ -9,3 +9,4 @@
 \description{
 Method that fails for non-plots
 }
+\keyword{internal}

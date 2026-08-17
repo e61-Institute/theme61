@@ -9,3 +9,4 @@ as_e61_plot(x, ...)
 \description{
 Generic to coerce plots to e61_plot class
 }
+\keyword{internal}

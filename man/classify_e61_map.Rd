@@ -9,3 +9,4 @@ classify_e61_map(x, ..., force = NULL)
 \description{
 Generic to coerce plots to e61_map class
 }
+\keyword{internal}

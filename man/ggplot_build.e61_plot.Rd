@@ -9,3 +9,4 @@
 \description{
 Method for theme61 plots to add default scales at build time
 }
+\keyword{internal}

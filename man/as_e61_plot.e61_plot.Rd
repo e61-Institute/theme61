@@ -9,3 +9,4 @@
 \description{
 Method for existing e61_plot class objects
 }
+\keyword{internal}
