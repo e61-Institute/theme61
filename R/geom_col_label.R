@@ -112,11 +112,17 @@ geom_col_label <- function(mapping = NULL,
   # Build extra geom_text() params from ... once, so an explicit user vjust
   # (unusual, but possible) overwrites our default exactly once rather than
   # producing a duplicate named argument.
-  interior_params <- list(...)
-  interior_params$accuracy <- accuracy
-  interior_params$align <- align_num
-  interior_params$na.rm <- na.rm
-  if (is.null(interior_params$vjust)) interior_params$vjust <- 0.5
+  dots <- list(...)
+  base_params <- function(default_vjust) {
+    params <- dots
+    params$accuracy <- accuracy
+    params$align <- align_num
+    params$na.rm <- na.rm
+    if (is.null(params$vjust)) params$vjust <- default_vjust
+    params
+  }
+
+  interior_params <- base_params(0.5)
 
   # Interior labels: always for stacked columns; for single columns only
   # when align is strictly between 0 and 1 (centred inside the bar at that
@@ -135,11 +141,7 @@ geom_col_label <- function(mapping = NULL,
   )
 
   if (edge_align) {
-    float_params <- list(...)
-    float_params$accuracy <- accuracy
-    float_params$align <- align_num
-    float_params$na.rm <- na.rm
-    if (is.null(float_params$vjust)) float_params$vjust <- 0
+    float_params <- base_params(0)
 
     layers[[2]] <- ggplot2::layer(
       data = data,

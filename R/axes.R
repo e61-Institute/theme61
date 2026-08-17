@@ -54,7 +54,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
     sec_axis$labels <- sec_labels
   }
 
-  if(!is.null(limits) && add_space){
+  if (!is.null(limits) && add_space) {
 
     # Add 3% to the supplied limits to create a bit of white space at the
     # top of the chart. applied_limits (not the original limits) is what
@@ -62,37 +62,26 @@ scale_y_continuous_e61 <- function(limits = NULL,
     # check below must validate against.
     applied_limits <- c(limits[1], limits[2] + (limits[2] - limits[1]) * 0.03)
 
-    retval <- ggplot2::scale_y_continuous(
-      expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
-      sec.axis = sec_axis,
-      limits = applied_limits,
-      breaks = breaks,
-      ...
-    )
-
-  } else if(!is.null(limits)){
+  } else if (!is.null(limits)) {
 
     # Make sure limits are only the min and max values (i.e. strictly length = 2)
     limits <- limits[1:2]
     applied_limits <- limits
 
-    # Put it all together
-    retval <- ggplot2::scale_y_continuous(
-      expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
-      sec.axis = sec_axis,
-      limits = applied_limits,
-      breaks = breaks,
-      ...
-    )
-
   } else {
     applied_limits <- NULL
-    retval <- ggplot2::scale_y_continuous(
-      expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
-      sec.axis = sec_axis,
-      ...
-    )
   }
+
+  # Put it all together. When limits is NULL, applied_limits is NULL (the
+  # ggplot2 default) and breaks is a waiver() (also the ggplot2 default) --
+  # so a single call covers all three cases above.
+  retval <- ggplot2::scale_y_continuous(
+    expand = ggplot2::expansion(mult = c(expand_bottom, expand_top)),
+    sec.axis = sec_axis,
+    limits = applied_limits,
+    breaks = breaks,
+    ...
+  )
 
   # Set a class if e61 scales are used
   class(retval) <- c(class(retval), "scale_e61")
