@@ -199,11 +199,6 @@ save_multi <-
     panel_width <- free_wd / ncol # width of each panel
     panel_height <- panel_width * max_panel_asps # height of the tallest panel (width * aspect ratio)
 
-    # Calc padding between charts because the per-panel label wrapping below
-    # also needs it: each panel gets this margin applied on its own left/right
-    # via patchwork's `&` operator, so it's part of that panel's true width.
-    chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
-    chart_height_pad <- points_to_mm(5.5) + pad_height * 10
     base_margin_h <- outer_height_mm
     base_margin_w <- outer_width_mm
 
@@ -263,13 +258,6 @@ save_multi <-
         known_height <- pmax(known_height, temp_height)
       }
     }
-
-    # Padding between charts, computed here (rather than only applied to
-    # the combined multi_plot further down) so each panel already carries
-    # its real, final plot.margin before t61_apply_autolabel() measures it
-    # just below.
-    chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
-    chart_height_pad <- points_to_mm(5.5) + pad_height * 10
 
     # Auto-position eligible plot_label() text on each panel now that its
     # final size within the grid is known (every panel shares the same
