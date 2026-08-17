@@ -118,24 +118,7 @@ plot_label <-
            angle = 0,
            panel = NULL,
            auto_position = TRUE,
-           print_position = FALSE,
-           facet_name = lifecycle::deprecated(),
-           facet_value = lifecycle::deprecated()) {
-
-    # Hard deprecate old args if used
-    if (lifecycle::is_present(facet_name) || lifecycle::is_present(facet_value)) {
-      lifecycle::deprecate_stop(
-        when = "0.7.1",
-        what = I("theme61::plot_label(facet_name = '', facet_value = '')"),
-        with = I("theme61::plot_label(<facet_var> = <facet_value>)"),
-        details = paste0(
-          "Facet targeting is now done using the panel argument. ",
-          "Example: ",
-          "If you have a plot where the facetting variable is 'grp' and you want a label to appear on the panel titled 'A', the correct syntax is now: ",
-          "plot_label('a point', 1.25, 1, panel = list(grp = 'A'))"
-        )
-      )
-    }
+           print_position = FALSE) {
 
     if (is.null(x) != is.null(y)) {
       stop("`x` and `y` must be supplied together, or both omitted.")
@@ -155,22 +138,18 @@ plot_label <-
         "doesn't apply to rotated text -- see `?plot_label`)."
       )
     }
-    # `label` is optional (see ?plot_label -- derived from a
-    # scale_colour_manual()/scale_fill_manual() on the plot if omitted), so
-    # its length isn't known here yet. Checked again in
-    # .build_plot_label_layer() once label is resolved, alongside the same
-    # check for a colour vector.
+    # `label` is optional so its length isn't known here yet. Checked again in
+    # .build_plot_label_layer() once label is resolved, alongside the same check
+    # for a colour vector.
     if (!is.null(x) && !is.null(label) && !all.equal(length(label), length(x), length(y))) {
       stop("The number of x and y positions must equal the number of labels.")
     }
 
     geom <- match.arg(geom)
 
-    # Colour defaulting (to the e61 palette, or to a scale_colour_manual()/
-    # scale_fill_manual() on the plot -- see ?plot_label) needs `plot`,
-    # which isn't available until .build_plot_label_layer() -- so an
-    # explicit colour is length-checked there too, once label is resolved
-    # and its length is actually known.
+    # Colour defaulting needs `plot`, which isn't available until
+    # .build_plot_label_layer() -- so an explicit colour is length-checked there
+    # too, once label is resolved and its length is actually known.
     if (length(colour) != 1 && !is.null(label) && length(colour) != length(label)) {
       stop("The number of colours must equal the number of labels.")
     }
