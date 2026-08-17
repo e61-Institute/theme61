@@ -41,22 +41,13 @@ as_e61_plot.default <- function(x, ...) {
 #' Helper function to check for spatial attributes
 #' @noRd
 is_spatial <- function(p) {
+  any(vapply(p@layers, function(ly) any(data.table::like(class(ly$geom), "*Sf")), logical(1)))
+}
 
-  is_spatial_chart <- FALSE
-
-  for(i in seq_along(p@layers)){
-
-    layer_class <- class(p@layers[[i]]$geom)
-
-    if(any(data.table::like(layer_class, "*Sf"))) {
-      is_spatial_chart <- TRUE
-
-      break
-    }
-  }
-
-  is_spatial_chart
-
+#' Whether a plot should be classified as a map, given a `force` override
+#' @noRd
+should_be_map <- function(x, force) {
+  identical(force, TRUE) || (is.null(force) && is_spatial(x))
 }
 
 #' Generic to coerce plots to e61_map class
@@ -69,7 +60,7 @@ classify_e61_map <- function(x, ..., force = NULL) {
 #' @export
 classify_e61_map.e61_plot <- function(x, ..., force = NULL) {
 
-  if (identical(force, TRUE) || (is.null(force) && is_spatial(x))) {
+  if (should_be_map(x, force)) {
     class(x) <- c("e61_map", class(x))
   }
 
@@ -80,7 +71,7 @@ classify_e61_map.e61_plot <- function(x, ..., force = NULL) {
 #' @export
 classify_e61_map.ggplot <- function(x, ..., force = NULL) {
 
-  if (identical(force, TRUE) || (is.null(force) && is_spatial(x))) {
+  if (should_be_map(x, force)) {
 
     # Adds e61_plot if not already present, then prepends e61_map
     x <- as_e61_plot(x)
