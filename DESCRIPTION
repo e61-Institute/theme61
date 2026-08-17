@@ -29,6 +29,7 @@ Imports:
     later (>= 1.4.4),
     lifecycle,
     magick (>= 2.7.3),
+    ragg (>= 1.5.2),
     remotes (>= 2.4.2),
     rsvg (>= 2.4.0),
     R.devices (>= 2.17.1),
@@ -38,6 +39,7 @@ Imports:
     stringr (>= 1.5.0),
     svglite (>= 2.1.0),
     sysfonts (>= 0.8.8),
+    systemfonts (>= 1.0.0),
     tools
 Suggests:
     testthat (>= 3.1.10),

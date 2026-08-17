@@ -31,48 +31,91 @@ t61_ggplotGrob_quiet_na <- function(plot) t61_quiet_na_removal(ggplot2::ggplotGr
 t61_ggplot_gtable_quiet_na <- function(build) t61_quiet_na_removal(ggplot2::ggplot_gtable(build))
 
 #' Helper function to actually perform the saving functionality
+#'
+#' png/jpg are rendered directly by the native `ragg` raster device (no
+#' intermediate SVG, no rsvg/magick round-trip). pdf/eps/svg keep the
+#' original svglite -> rsvg pipeline, since ragg has no vector PDF/EPS
+#' output. See NEWS/commit message for the rationale (issue #336).
 #' @noRd
 save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
   lapply(format, function(fmt) {
 
     file_i <- paste0(filename, ".", fmt)
 
-    # png/jpg/eps/pdf are all produced by rendering an SVG first and then converting it with rsvg
-    needs_temp_svg <- fmt %in% c("png", "jpg", "eps", "pdf")
-    file_name_i <- if (needs_temp_svg) tempfile(fileext = ".svg") else file_i
-
     # add very slight width buffer
     width <- width + 0.1
-
-    svglite::svglite(filename = file_name_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
-
-    closed <- FALSE
-    on.exit({
-      if (!closed) try(grDevices::dev.off(), silent = TRUE)
-    }, add = TRUE)
 
     graph_i <- maybe_add_default_scales(graph)
     class(graph_i) <- setdiff(class(graph_i), "e61_plot")
 
-    print(graph_i)
+    if (fmt %in% c("png", "jpg")) {
+      # Native raster rendering via ragg -- no temp SVG, no rsvg/magick
+      # round-trip needed for these two formats.
+      #
+      # `res` here is a user-facing multiplier (res = 2 doubles the
+      # dimensions), not a literal DPI value. 288 * res reproduces the
+      # effective output resolution of the previous
+      # svglite -> rsvg -> magick pipeline at res = 1 (empirically ~287.5
+      # dpi), so existing callers see the same pixel dimensions as before.
+      dpi <- 288 * res
 
-    grDevices::dev.off()
-    closed <- TRUE
+      if (fmt == "png") {
+        ragg::agg_png(
+          filename = file_i,
+          width = cm_to_in(width),
+          height = cm_to_in(height),
+          units = "in",
+          res = dpi,
+          background = bg_colour
+        )
+      } else {
+        ragg::agg_jpeg(
+          filename = file_i,
+          width = cm_to_in(width),
+          height = cm_to_in(height),
+          units = "in",
+          res = dpi,
+          background = bg_colour,
+          quality = 95
+        )
+      }
 
-    # Convert the rendered SVG into the requested format
-    if (fmt == "png") {
-      svg_to_bitmap(file_name_i, paste0(filename, ".png"), delete = TRUE, res = res)
+      closed <- FALSE
+      on.exit({
+        if (!closed) try(grDevices::dev.off(), silent = TRUE)
+      }, add = TRUE)
 
-    } else if (fmt == "jpg") {
-      svg_to_bitmap(file_name_i, paste0(filename, ".jpg"), delete = TRUE, res = res)
+      print(graph_i)
 
-    } else if (fmt == "pdf") {
-      rsvg::rsvg_pdf(svg = file_name_i, file = file_i)
-      unlink(file_name_i)
+      grDevices::dev.off()
+      closed <- TRUE
 
-    } else if (fmt == "eps") {
-      rsvg::rsvg_eps(svg = file_name_i, file = file_i)
-      unlink(file_name_i)
+    } else {
+      # svg/pdf/eps: svglite renders the vector SVG; pdf/eps are then
+      # converted from that SVG via rsvg (ragg has no vector output).
+      needs_temp_svg <- fmt %in% c("eps", "pdf")
+      file_name_i <- if (needs_temp_svg) tempfile(fileext = ".svg") else file_i
+
+      svglite::svglite(filename = file_name_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
+
+      closed <- FALSE
+      on.exit({
+        if (!closed) try(grDevices::dev.off(), silent = TRUE)
+      }, add = TRUE)
+
+      print(graph_i)
+
+      grDevices::dev.off()
+      closed <- TRUE
+
+      if (fmt == "pdf") {
+        rsvg::rsvg_pdf(svg = file_name_i, file = file_i)
+        unlink(file_name_i)
+
+      } else if (fmt == "eps") {
+        rsvg::rsvg_eps(svg = file_name_i, file = file_i)
+        unlink(file_name_i)
+      }
     }
   })
 }

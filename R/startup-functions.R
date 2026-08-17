@@ -93,10 +93,13 @@ check_pkg_ver <- function(test = FALSE) {
     return(invisible(NULL))
   }
 
-  # If already registered, just enable showtext and exit
+  # If already registered, just enable showtext (for the svglite/pdf/eps
+  # paths) and additionally make sure systemfonts/ragg know about it too
+  # (for the ragg png/jpg path), then exit
   fams <- try(sysfonts::font_families(), silent = TRUE)
   if (!inherits(fams, "try-error") && "pt-sans" %in% fams) {
     try(showtext::showtext_auto(), silent = TRUE)
+    try(.t61_register_systemfonts(), silent = TRUE)
     return(invisible(NULL))
   }
 
@@ -112,11 +115,84 @@ check_pkg_ver <- function(test = FALSE) {
     {
       sysfonts::font_add_google("PT Sans", "pt-sans")
       showtext::showtext_auto()
+      # ggplot2 4.0's device-agnostic text rendering, and ragg-based
+      # devices (see save_graph()'s png/jpg path), resolve fonts via
+      # systemfonts rather than showtext's device-patching shim, so also
+      # register the font file sysfonts just downloaded with
+      # systemfonts. Wrapped separately/defensively -- this is purely
+      # additive and must never break the showtext-based fallback above
+      # if it fails.
+      try(.t61_register_systemfonts(), silent = TRUE)
       invisible(NULL)
     },
     error   = function(e) invisible(NULL),
     warning = function(w) invisible(NULL)
   )
+}
+
+#' Register a sysfonts-downloaded font family with systemfonts, so
+#' ragg-based devices (which resolve fonts via systemfonts, not showtext)
+#' can find it natively.
+#'
+#' `sysfonts::font_add_google()` has no public accessor for the local file
+#' paths it downloads. Internally (see `sysfonts:::font_add_google` /
+#' `sysfonts:::download_font_file`) it looks the family up in the Google
+#' Fonts metadata DB to get each variant's URL, then downloads each one to
+#' `file.path(tempdir(), basename(url))` and hands those paths straight to
+#' `font_add()`, which copies the glyph data into sysfonts' own internal
+#' registry rather than keeping the file paths around. Google's URLs are
+#' opaque hashes (e.g. ".../jizaRExUiTo99u79P0WOxOGMMDQ.ttf") with no
+#' "Regular"/"Bold" in the filename, so those downloaded files can't be told
+#' apart just by name -- we instead redo the same DB lookup ourselves to
+#' recover each variant's URL (and therefore its exact download path), and
+#' just check the resulting file still exists in `tempdir()` (it is never
+#' deleted after download).
+#'
+#' This relies on unexported sysfonts internals (`google_font_db()`,
+#' `search_db()`), not a documented public API -- if a future sysfonts
+#' version renames/removes them, or changes the download path convention,
+#' this function simply fails to find anything and silently no-ops. Either
+#' way this is purely additive: the showtext fallback used for the
+#' svglite/pdf/eps paths does not depend on this succeeding.
+#' @noRd
+.t61_register_systemfonts <- function(google_name = "PT Sans", family = "pt-sans") {
+  if (!requireNamespace("systemfonts", quietly = TRUE)) {
+    return(invisible(NULL))
+  }
+
+  handle <- curl::new_handle()
+  db   <- sysfonts:::google_font_db(TRUE, handle)
+  ind  <- sysfonts:::search_db(google_name, TRUE, handle)
+  font <- db[[2]][[ind]]
+
+  variant_path <- function(variant) {
+    url <- font$files[[variant]]
+    if (is.null(url)) return(NULL)
+    path <- file.path(tempdir(), basename(url))
+    if (!file.exists(path)) return(NULL)
+    path
+  }
+
+  plain_path <- variant_path("regular")
+  if (is.null(plain_path)) {
+    return(invisible(NULL))
+  }
+
+  # Registered under the same family string theme_e61()/plot_label() use
+  # as base_family ("pt-sans", the sysfonts local key) -- not the Google
+  # display name "PT Sans" -- so that ragg's systemfonts-based font
+  # matching actually resolves the plot's requested family. Registering
+  # under a different name here would leave ragg silently falling back to
+  # a substitute font while showtext (unaffected, since it patches at the
+  # device level rather than matching by name) kept working normally.
+  systemfonts::register_font(
+    name   = family,
+    plain  = plain_path,
+    bold   = variant_path("700"),
+    italic = variant_path("italic")
+  )
+
+  invisible(NULL)
 }
 
 # Needed to make sure tests work
