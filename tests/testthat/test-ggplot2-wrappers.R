@@ -409,3 +409,83 @@ test_that("theme61.iterate_mode makes facet_wrap()/facet_grid() pass through to 
 test_that("set_t61_options rejects the unnamespaced quiet_mask option", {
   expect_error(set_t61_options(list(quiet_mask = TRUE)), "Invalid options supplied")
 })
+
+# ---- Upstream ggplot2 signature-drift safety net (issue #336) ------------
+# Catches a future ggplot2 release silently breaking the masks by
+# renaming/removing an argument they rely on by name (happened once, on
+# ggplot2 4.0).
+
+test_that("ggplot2::ggplot()'s formals still cover what theme61::ggplot() forwards by name", {
+
+  t61_named_args <- c("data", "mapping", "environment")
+  upstream_formals <- names(formals(ggplot2::ggplot))
+
+  # theme61::ggplot() forwards these by name; if ggplot2 drops/renames one,
+  # it needs updating.
+  expect_true(
+    all(t61_named_args %in% upstream_formals),
+    info = paste0(
+      "ggplot2::ggplot() no longer has formal(s): ",
+      paste(setdiff(t61_named_args, upstream_formals), collapse = ", ")
+    )
+  )
+
+  expect_identical(
+    names(formals(theme61::ggplot)),
+    c("data", "mapping", "...", "environment")
+  )
+
+  # Informational only: new upstream args are still absorbed by `...`.
+  extra_upstream_args <- setdiff(upstream_formals, c(t61_named_args, "..."))
+  if (length(extra_upstream_args) > 0) {
+    warning(
+      "ggplot2::ggplot() has gained new formal(s): ",
+      paste(extra_upstream_args, collapse = ", ")
+    )
+  }
+})
+
+test_that("ggplot2::facet_wrap()/facet_grid() still have an 'axes' formal", {
+  # theme61's wrappers default `axes` to "all"; if upstream ever
+  # renamed/removed it, the wrapper would silently stop working.
+  expect_true("axes" %in% names(formals(ggplot2::facet_wrap)))
+  expect_true("axes" %in% names(formals(ggplot2::facet_grid)))
+})
+
+test_that("ggplot2::labs() and ggplot2::ggsave() still exist as functions", {
+  # theme61's versions take pure ... and forward elsewhere, but
+  # theme61.iterate_mode calls these directly.
+  expect_true(is.function(ggplot2::labs))
+  expect_true(is.function(ggplot2::ggsave))
+})
+
+# ---- Behavioural smoke test for the e61_plot / iterate_mode contract -----
+
+test_that("theme61::ggplot() tags plots as e61_plot, and iterate_mode bypasses the automatic e61 additions at build time", {
+
+  df <- data.frame(x = 1:10, y = seq(10, 100, length.out = 10))
+
+  # Normal mode: tagged as e61_plot, and building it injects a secondary y-axis
+  p <- ggplot(df, aes(x, y)) + geom_point()
+  expect_true(inherits(p, "e61_plot"))
+
+  b <- ggplot_build(p)
+  ysc <- b@plot@scales$get_scales("y")
+  expect_false(is.null(ysc))
+  expect_false(inherits(ysc$secondary.axis, "waiver") || is.null(ysc$secondary.axis))
+
+  # iterate_mode: still tagged e61_plot, but ggplot_build.e61_plot() strips
+  # the tag and skips automatic styling before building
+  withr::local_options(list(theme61.iterate_mode = TRUE))
+
+  p_iter <- ggplot(df, aes(x, y)) + geom_point()
+  expect_true(inherits(p_iter, "e61_plot"))
+
+  b_iter <- ggplot_build(p_iter)
+  expect_false(inherits(b_iter@plot, "e61_plot"))
+
+  ysc_iter <- b_iter@plot@scales$get_scales("y")
+  expect_true(is.null(ysc_iter) ||
+                inherits(ysc_iter$secondary.axis, "waiver") ||
+                is.null(ysc_iter$secondary.axis))
+})

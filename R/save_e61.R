@@ -301,21 +301,21 @@ save_e61 <- function(filename = NULL,
 
   # Guard clauses -----------------------------------------------------------
   if (return_plot_obj && length(plots) <= 1) {
-    stop("return_plot_obj is only supported for multi-panel graphs (2 or more plots). For a single plot, just print the ggplot object directly.")
+    cli::cli_abort("return_plot_obj is only supported for multi-panel graphs (2 or more plots). For a single plot, just print the ggplot object directly.")
   }
 
   if (build_up) {
     if (length(plots) > 1)
-      stop("build_up is only supported for single-panel graphs.")
+      cli::cli_abort("build_up is only supported for single-panel graphs.")
 
     if (return_plot_obj)
-      stop("build_up cannot be combined with return_plot_obj.")
+      cli::cli_abort("build_up cannot be combined with return_plot_obj.")
 
     if (preview)
-      stop("build_up cannot be combined with preview = TRUE.")
+      cli::cli_abort("build_up cannot be combined with preview = TRUE.")
 
     if (length(plots[[1]]@facet$params) != 0)
-      stop("build_up is not supported for faceted graphs.")
+      cli::cli_abort("build_up is not supported for faceted graphs.")
   }
 
   # Enforce chart type
@@ -325,16 +325,16 @@ save_e61 <- function(filename = NULL,
   } else if(length(chart_type) == 1){
 
     if(!chart_type %in% c("normal", "wide", "square", "custom"))
-      stop("Invalid chart type. Chart types must be 'normal', 'wide', 'square', or 'custom'.")
+      cli::cli_abort("Invalid chart type. Chart types must be 'normal', 'wide', 'square', or 'custom'.")
 
   } else if(length(chart_type) > 1){
 
     if(!all(chart_type %in% c("normal", "wide", "square")))
-      stop("Invalid chart type. All chart types must be one of 'normal', 'wide' or 'square'.")
+      cli::cli_abort("Invalid chart type. All chart types must be one of 'normal', 'wide' or 'square'.")
   }
 
   # Check if filename has been provided when preview/return_plot_obj mode is FALSE
-  if (!preview && !return_plot_obj && is.null(filename)) stop("You must provide a file path to save the graph.")
+  if (!preview && !return_plot_obj && is.null(filename)) cli::cli_abort("You must provide a file path to save the graph.")
 
   # Override save directory with temp file if preview mode is TRUE
   if (preview && !return_plot_obj) {
@@ -349,7 +349,7 @@ save_e61 <- function(filename = NULL,
     dir_name <- gsub("^(.*)\\/.*\\..{3}$", "\\1", filename)
 
     if (dir_provided && !dir.exists(dir_name))
-      stop("The directory you are trying to save to does not exist.")
+      cli::cli_abort("The directory you are trying to save to does not exist.")
   }
 
   # Skip file format resolution entirely if we're just returning the plot
@@ -359,7 +359,7 @@ save_e61 <- function(filename = NULL,
 
     # Enforce file format requirements if a file extension is provided
     if (grepl("\\..{3}$", filename) && !grepl("\\.(svg|pdf|eps|png|jpg)$", filename)) {
-      stop("You must provide a valid file extension. The following file formats are supported: svg, pdf, eps, png, jpg.")
+      cli::cli_abort("You must provide a valid file extension. The following file formats are supported: svg, pdf, eps, png, jpg.")
     }
 
     # Determine which file formats to save
@@ -379,21 +379,21 @@ save_e61 <- function(filename = NULL,
   # extractable data frame, not just the first, since multi-panel graphs are
   # often built from a different data frame per panel.
   if (save_data && !all(vapply(plots, function(p) is.data.frame(p@data), logical(1))))
-    stop("You have set save_data = TRUE, but the data frame could not be extracted from one or more of the ggplots. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
+    cli::cli_abort("You have set save_data = TRUE, but the data frame could not be extracted from one or more of the ggplots. This may be caused by a plot with multiple data frames supplied (e.g. if each geom has its own data). In this case you will need to set save_data = FALSE and manually save the data used to produce the graph.")
 
   # Check list args are valid
   if (!all(names(dim) %in% c("height", "width")))
-    stop("You have specified invalid list elements in 'dim'.")
+    cli::cli_abort("You have specified invalid list elements in 'dim'.")
 
   if (!all(names(labs) %in% c("title", "subtitle", "footnotes", "sources")))
-    stop("You have specified invalid list elements in 'labs'.")
+    cli::cli_abort("You have specified invalid list elements in 'labs'.")
 
   if (!all(names(layout) %in% c("ncol", "nrow", "align", "axis")))
-    stop("You have specified invalid list elements in 'layout'.")
+    cli::cli_abort("You have specified invalid list elements in 'layout'.")
 
   if (!all(names(spacing) %in% c("pad_width", "pad_height", "outer_width", "outer_height",
                                   "height_adj", "rel_heights", "title", "subtitle")))
-    stop("You have specified invalid list elements in 'spacing'.")
+    cli::cli_abort("You have specified invalid list elements in 'spacing'.")
 
   # Spell checker -------------------------------------------------------
 
@@ -571,7 +571,7 @@ save_e61 <- function(filename = NULL,
 
       out <- try(utils::browseURL(here::here(file_to_open)))
 
-      if (inherits(out, "try-error")) warning("Graph file could not be opened")
+      if (inherits(out, "try-error")) cli::cli_warn("Graph file could not be opened")
 
     }
 
@@ -591,7 +591,7 @@ save_e61 <- function(filename = NULL,
 
       out <- try(rstudioapi::viewer(preview_svg))
 
-      if (!is.null(out)) warning("Graph file could not be opened.")
+      if (!is.null(out)) cli::cli_warn("Graph file could not be opened.")
 
     }
   }
