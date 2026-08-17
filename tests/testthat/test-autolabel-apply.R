@@ -4,11 +4,26 @@
 # v1 scope (opted-out, rotated, unmatched, facetted) exactly where the user
 # put it?
 
+# Every test needs the resolved plot_label() layer (or just its data) --
+# pull it out in one step instead of repeating the same which(vapply(...)) scan.
+t61_label_layer <- function(plot) {
+  idx <- which(vapply(plot@layers, function(ly) {
+    !is.null(ly$data) && !is.null(ly$data$auto_position)
+  }, logical(1)))
+  plot@layers[[idx]]
+}
+t61_label_layer_data <- function(plot) t61_label_layer(plot)$data
+
 autolabel_apply_test_setup <- function(auto_position = TRUE) {
+  # 5 points is enough to define each straight line exactly (same
+  # endpoints/slope as a denser sample) while keeping the mask render this
+  # setup drives in every calling test cheap -- placement only depends on
+  # line geometry, not point density.
+  x <- seq(2000, 2020, length.out = 5)
   data <- data.frame(
-    x = rep(2000:2020, 2),
-    y = c(seq(0, 5, length.out = 21), seq(10, 2, length.out = 21)),
-    series = rep(c("A", "B"), each = 21)
+    x = rep(x, 2),
+    y = c(seq(0, 5, length.out = 5), seq(10, 2, length.out = 5)),
+    series = rep(c("A", "B"), each = 5)
   )
 
   # x/y are only given for auto_position = FALSE, which requires them --
@@ -42,10 +57,7 @@ test_that("t61_apply_autolabel finds a good spot near each series when no positi
   p <- autolabel_apply_test_setup()
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 
@@ -108,10 +120,7 @@ test_that("t61_apply_autolabel leaves an explicit position untouched even when a
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   # An explicit position always wins outright -- the search never runs for
   # it, so it stays exactly where given, however bad a spot that is.
@@ -129,14 +138,11 @@ test_that("t61_apply_autolabel doesn't mutate the caller's own plot object", {
   # leaving stale positions behind for a later, independent call on the
   # same object).
   p <- autolabel_apply_test_setup()
-  label_layer <- which(vapply(p@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  before <- data.table::copy(p@layers[[label_layer]]$data)
+  before <- data.table::copy(t61_label_layer_data(p))
 
   invisible(t61_apply_autolabel(p, width_cm = 16, height_cm = 12))
 
-  expect_equal(p@layers[[label_layer]]$data, before)
+  expect_equal(t61_label_layer_data(p), before)
 })
 
 test_that("t61_apply_autolabel leaves auto_position = FALSE labels untouched", {
@@ -145,10 +151,7 @@ test_that("t61_apply_autolabel leaves auto_position = FALSE labels untouched", {
   p <- autolabel_apply_test_setup(auto_position = FALSE)
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_equal(d$x, c(2005, 2005))
   expect_equal(d$y, c(1, 1))
@@ -165,10 +168,7 @@ test_that("t61_apply_autolabel skips rotated labels (v1 scope: angle = 0 only)",
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_equal(d$x, 2005)
   expect_equal(d$y, 1)
@@ -185,10 +185,7 @@ test_that("t61_apply_autolabel keeps the fallback when the label colour matches 
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_equal(d$x, 2005)
   expect_equal(d$y, 1)
@@ -205,10 +202,7 @@ test_that("t61_apply_autolabel matches point-geom series too", {
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 })
@@ -241,10 +235,7 @@ test_that("t61_apply_autolabel keeps fallbacks for facetted plots (not v1 scope)
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_equal(d$x, 2005)
   expect_equal(d$y, 1)
@@ -348,10 +339,7 @@ test_that("t61_apply_autolabel repositions a column label clear of every bar", {
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 
@@ -376,15 +364,12 @@ test_that("t61_apply_autolabel places an area label inside its band with a contr
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
   expect_gt(d$y, 0) # placed inside the visible (growing) band
 
-  expect_equal(result@layers[[label_layer]]$aes_params$colour, "white")
+  expect_equal(t61_label_layer(result)$aes_params$colour, "white")
 })
 
 test_that("t61_apply_autolabel falls back to edge-hugging line-style placement when an area's band is too narrow everywhere", {
@@ -407,10 +392,7 @@ test_that("t61_apply_autolabel falls back to edge-hugging line-style placement w
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 
@@ -418,7 +400,7 @@ test_that("t61_apply_autolabel falls back to edge-hugging line-style placement w
   # label's colour to a contrast colour -- it staying at the original
   # fill colour confirms the edge-hugging fallback ran instead, not the
   # inside placement somehow succeeding despite the narrow band.
-  expect_equal(result@layers[[label_layer]]$aes_params$colour, "#e57200")
+  expect_equal(t61_label_layer(result)$aes_params$colour, "#e57200")
 
   mask <- t61_render_mask(t61_strip_autolabel_layers(p), width_cm = 16, height_cm = 12)
   cm <- t61_measure_label_cm("Series A", size_mm = 3.5, width_cm = 16, height_cm = 12)
@@ -440,10 +422,7 @@ test_that("t61_apply_autolabel repositions a geom_pointbar() label clear of the 
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 
@@ -471,10 +450,7 @@ test_that("t61_apply_autolabel resolves a real position with no x/y supplied at 
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_false(is.na(d$x))
   expect_false(is.na(d$y))
@@ -491,10 +467,7 @@ test_that("t61_apply_autolabel still resolves a position when no series matches 
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   # Not NA (the old "keep the fallback" behaviour would leave it invisible,
   # since there's no fallback to keep any more), and it shouldn't collide
@@ -533,10 +506,7 @@ test_that("t61_apply_autolabel prefers the caller's own x/y over random empty sp
 
   expect_false(search_ran)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_equal(d$x, 2019)
   expect_equal(d$y, 4.5)
@@ -554,10 +524,7 @@ test_that("t61_apply_autolabel(fast = TRUE) resolves a position without renderin
 
   expect_equal(render_calls, 0)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 })
@@ -572,10 +539,7 @@ test_that("save_e61(fast_labels = TRUE) skips the search but still resolves a po
     width = NULL, height = NULL, max_height = NULL, format = "svg", base_size = 10,
     pad_width = 0, pad_height = 0, bg_colour = "white", fast_labels = TRUE
   )
-  label_layer <- which(vapply(sv_fast$graph@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d_fast <- sv_fast$graph@layers[[label_layer]]$data
+  d_fast <- t61_label_layer_data(sv_fast$graph)
 
   expect_false(anyNA(d_fast$x)); expect_false(anyNA(d_fast$y))
 
@@ -587,7 +551,7 @@ test_that("save_e61(fast_labels = TRUE) skips the search but still resolves a po
     width = NULL, height = NULL, max_height = NULL, format = "svg", base_size = 10,
     pad_width = 0, pad_height = 0, bg_colour = "white", fast_labels = FALSE
   )
-  d_slow <- sv_slow$graph@layers[[label_layer]]$data
+  d_slow <- t61_label_layer_data(sv_slow$graph)
 
   expect_false(isTRUE(all.equal(d_fast$y, d_slow$y)))
 })
@@ -627,10 +591,7 @@ test_that("save_e61(preview = TRUE, fast_labels = TRUE) doesn't crash on a steep
 coord_flip_apply_test <- function(p) {
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
 
   expect_false(anyNA(d$x))
   expect_false(anyNA(d$y))
@@ -671,35 +632,13 @@ test_that("t61_apply_autolabel auto-positions labels on a coord_flip() line char
   coord_flip_apply_test(p)
 })
 
-test_that("t61_apply_autolabel auto-positions labels on a coord_flip() column chart", {
+test_that("t61_apply_autolabel auto-positions labels on a coord_flip() column chart, clear of every bar", {
   skip_on_cran()
 
-  # No fallback x/y given -- checks the resolved position is a real
-  # placement, not NA (which ggplot would silently drop from the chart).
-  data <- data.frame(
-    category = rep(c("A", "B", "C"), 2),
-    value = c(5, 8, 3, 6, 2, 9),
-    series = rep(c("X", "Y"), each = 3)
-  )
-  cols <- c(X = "#e57200", Y = "#1c3144")
-
-  p <- ggplot(data, aes(category, value, fill = series)) +
-    geom_col(position = "dodge") +
-    scale_fill_manual(values = cols) +
-    coord_flip() +
-    theme_bw(base_size = 10) +
-    plot_label(c("X", "Y"), colour = unname(cols))
-
-  coord_flip_apply_test(p)
-})
-
-test_that("t61_apply_autolabel keeps a coord_flip() column label clear of every bar", {
-  skip_on_cran()
-
-  # coord_flip_apply_test() (used above) only checks the resolved position
-  # renders in-bounds -- this checks the stronger property that actually
-  # matters: the label doesn't land on top of bar ink, the same way the
-  # unflipped "repositions a column label clear of every bar" test does.
+  # Combines what were two separate tests: a plain in-bounds check
+  # (subsumed below) and the stronger property that actually matters --
+  # the label doesn't land on top of bar ink, the same way the unflipped
+  # "repositions a column label clear of every bar" test does.
   data <- data.frame(
     category = rep(c("A", "B", "C", "D", "E"), 2),
     value = c(5, 8, 3, 9, 4, 6, 2, 9, 5, 7),
@@ -716,10 +655,7 @@ test_that("t61_apply_autolabel keeps a coord_flip() column label clear of every 
 
   result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
   expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 
   # d$x/d$y are stored in pre-flip data space (see t61_flip_xy()'s
@@ -734,6 +670,8 @@ test_that("t61_apply_autolabel keeps a coord_flip() column label clear of every 
   box_x <- t61_text_box_px(screen_x$x, screen_x$y, cm_x, mask, hjust = 0)
   box_y <- t61_text_box_px(screen_y$x, screen_y$y, cm_y, mask, hjust = 0)
 
+  expect_true(t61_box_in_bounds(box_x$row_range, box_x$col_range, mask))
+  expect_true(t61_box_in_bounds(box_y$row_range, box_y$col_range, mask))
   expect_false(t61_test_collision(mask$occupancy, box_x$row_range, box_x$col_range))
   expect_false(t61_test_collision(mask$occupancy, box_y$row_range, box_y$col_range))
 })
@@ -767,10 +705,7 @@ test_that("t61_apply_autolabel falls back (doesn't crash or misplace) for a geom
 
   expect_false(search_ran)
 
-  label_layer <- which(vapply(result@layers, function(ly) {
-    !is.null(ly$data) && !is.null(ly$data$auto_position)
-  }, logical(1)))
-  d <- result@layers[[label_layer]]$data
+  d <- t61_label_layer_data(result)
   expect_false(anyNA(d$x)); expect_false(anyNA(d$y))
 
   # Still expected to land somewhere valid via the fallback tiers (any
@@ -804,10 +739,7 @@ multi_panel_label_data <- function(graph, source_plot) {
   for (panel in candidates) {
     panel_y <- sort(ggplot2::ggplot_build(panel)$data[[1]]$y)
     if (isTRUE(all.equal(panel_y, source_y, tolerance = 1e-6))) {
-      label_layer <- which(vapply(panel@layers, function(ly) {
-        !is.null(ly$data) && !is.null(ly$data$auto_position)
-      }, logical(1)))
-      return(panel@layers[[label_layer]]$data)
+      return(t61_label_layer_data(panel))
     }
   }
   stop("Could not match panel to source plot")
@@ -893,10 +825,7 @@ test_that("save_multi() leaves explicit plot_label(x=, y=) positions untouched",
   panels <- c(list(sv$graph), sv$graph$patches$plots)
   expect_length(panels, 2)
   for (panel in panels) {
-    label_layer <- which(vapply(panel@layers, function(ly) {
-      !is.null(ly$data) && !is.null(ly$data$auto_position)
-    }, logical(1)))
-    d <- panel@layers[[label_layer]]$data
+    d <- t61_label_layer_data(panel)
     expect_equal(d$x, 5)
     expect_equal(d$y, 5)
   }
