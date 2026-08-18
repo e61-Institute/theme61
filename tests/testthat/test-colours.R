@@ -15,13 +15,13 @@ test_that("palette_e61 validates palette size", {
 })
 
 test_that("get_palette() validates n directly (no upstream validation from scale functions)", {
-  expect_error(theme61:::get_palette("a"), "does not support")
-  expect_error(theme61:::get_palette(-1), "does not support")
-  expect_error(theme61:::get_palette(0), "does not support")
-  expect_error(theme61:::get_palette(2.5), "does not support")
+  expect_error(theme61:::get_palette("a"), "whole number")
+  expect_error(theme61:::get_palette(2.5), "whole number")
+  expect_error(theme61:::get_palette(c(1, 2)), "whole number")
+  expect_error(theme61:::get_palette(NA), "whole number")
+  expect_error(theme61:::get_palette(-1), "need to specify")
+  expect_error(theme61:::get_palette(0), "need to specify")
   expect_error(theme61:::get_palette(13), "does not support")
-  expect_error(theme61:::get_palette(c(1, 2)), "does not support")
-  expect_error(theme61:::get_palette(NA), "does not support")
 })
 
 test_that("get_palette() returns the right number of hex colours for valid n", {
