@@ -107,19 +107,12 @@
 #'
 #' @return Object to add to a ggplot (via `+`).
 #' @export
-
-# Single source of truth for plot_label()'s default `size`, so the default
-# argument below and the "was the default used?" check further down (which
-# needs float tolerance, not exact equality -- see adj_plot_label) can never
-# drift out of sync with each other.
-.PLOT_LABEL_DEFAULT_SIZE <- 3.5
-
 plot_label <-
   function(label = NULL,
            x = NULL,
            y = NULL,
            colour = NA,
-           size = .PLOT_LABEL_DEFAULT_SIZE,
+           size = 3.5,
            hjust = 0,
            geom = c("text", "label"),
            angle = 0,
@@ -187,10 +180,8 @@ plot_label <-
         # Marks whether the default size was used, so update_plot_label()
         # (aes_labs.R) can scale it with the chart's base_size -- an
         # explicit custom size is left alone instead. all.equal(), not
-        # identical()/==, since size is a double and shouldn't rely on
-        # .PLOT_LABEL_DEFAULT_SIZE staying exactly representable in binary
-        # if it's ever changed to a value that isn't (3.5 currently is).
-        adj_plot_label = isTRUE(all.equal(size, .PLOT_LABEL_DEFAULT_SIZE))
+        # identical()/==, since size is a double.
+        adj_plot_label = isTRUE(all.equal(size, 3.5))
       ),
       class = "e61_plot_label"
     )

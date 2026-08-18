@@ -242,9 +242,6 @@ test_that("save_e61() end-to-end repositions eligible plot_label() text", {
   p <- autolabel_apply_test_setup()
 
   out <- tempfile(fileext = ".svg")
-  # preview = TRUE always emits "Preview mode is activated, file will not be
-  # saved to disk." via cli_alert_info(); suppressed here since it's just
-  # noise in the test runner's console, not something this test checks for.
   expect_no_error(
     suppressMessages(save_e61(out, plot = p, preview = TRUE, spell_check = FALSE))
   )
