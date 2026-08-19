@@ -24,6 +24,16 @@ t61_reclaim_device <- function(dev_num) {
   if (dev_num %in% grDevices::dev.list()) grDevices::dev.set(dev_num)
 }
 
+#' Temporary debugging aid: t61_render_mask() has several silent
+#' "not v1 scope, keep the fallback position" bail-out points that
+#' otherwise leave every auto-positioned label at NA with no error or
+#' warning at all -- message() which one actually fired.
+#' @noRd
+t61_mask_null <- function(reason) {
+  message("t61_render_mask() bailed out: ", reason)
+  NULL
+}
+
 #' Retry a flaky file-based call, backing off further each time -- seen in
 #' practice as rsvg failing with "Input file is too short" on a file
 #' that's actually complete (a transient Windows file-visibility issue,
@@ -232,7 +242,7 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   # Still used for its facet bail-out (exactly one panel cell, structurally
   # checked via the gtable layout) -- but NOT for the cm box it would
   # otherwise compute; see t61_render_panel_box_px() for why.
-  if (is.null(t61_panel_box_cm(gt, width_cm, height_cm))) return(NULL)
+  if (is.null(t61_panel_box_cm(gt, width_cm, height_cm))) return(t61_mask_null("t61_panel_box_cm() found no single panel cell"))
 
   print(t61_strip_chrome(t61_drop_e61_class(plot)))
   t61_reclaim_device(dev_num)
@@ -258,10 +268,10 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   px_per_cm_y <- nrow(raster) / height_cm
 
   panel_px <- t61_render_panel_box_px(plot, width_cm, height_cm, px_width, px_height)
-  if (is.null(panel_px)) return(NULL)
+  if (is.null(panel_px)) return(t61_mask_null("t61_render_panel_box_px() found no marker colour in the rendered raster"))
 
   pp <- built$layout$panel_params
-  if (length(pp) != 1) return(NULL) # faceted: not v1 scope
+  if (length(pp) != 1) return(t61_mask_null(sprintf("length(panel_params) == %d, expected 1 (faceted?)", length(pp)))) # faceted: not v1 scope
 
   # panel_params$y.range is the visible viewport -- wider than the scale's
   # own hard limits whenever coord_cartesian(ylim = ...) zooms out beyond
@@ -365,7 +375,13 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
 
   rows_with <- which(rowSums(occ) > 0)
   cols_with <- which(colSums(occ) > 0)
-  if (length(rows_with) == 0 || length(cols_with) == 0) return(NULL)
+  if (length(rows_with) == 0 || length(cols_with) == 0) {
+    message(sprintf(
+      "t61_render_panel_box_px(): marker not found; raster %dx%d, dominant colour %s",
+      ncol(raster), nrow(raster), names(sort(table(raster), decreasing = TRUE))[1]
+    ))
+    return(NULL)
+  }
 
   list(
     left_px   = min(cols_with),
