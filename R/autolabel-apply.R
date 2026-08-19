@@ -324,6 +324,18 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
   targets <- tryCatch(t61_collect_autolabel_targets(plot), error = function(e) NULL)
   if (is.null(targets) || nrow(targets$labels) == 0) return(plot)
 
+  # fast = TRUE means t61_place_label_fast() (no collision search) ran
+  # instead of the real search -- only worth flagging when a label actually
+  # needed that heuristic (no explicit x/y to fall back on).
+  if (isTRUE(fast) && getOption("theme61.autolabel_fast_msg", default = TRUE) &&
+      any(is.na(targets$labels$fallback_x) | is.na(targets$labels$fallback_y))) {
+    cli::cli_alert_info(
+      "Auto-positioned {.fn plot_label} text in this preview uses a quick placement heuristic, not the real collision-avoiding search -- labels may overlap here even when {.fn save_e61} would place them cleanly. Save the graph with {.fn save_e61} to see (and use) the actual auto-positioned labels. This message appears once per session; to see it again, run {.code options(theme61.autolabel_fast_msg = TRUE)}.",
+      wrap = TRUE
+    )
+    options(theme61.autolabel_fast_msg = FALSE)
+  }
+
   plot_for_mask <- t61_strip_autolabel_layers(plot)
 
   result <- tryCatch(
