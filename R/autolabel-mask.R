@@ -107,10 +107,19 @@ t61_panel_box_cm <- function(gt, width_cm, height_cm) {
 #' registered on the machine), rendering this throwaway raster can fail
 #' outright rather than just substituting a fallback with a warning. This
 #' render never needs to look right, only to complete.
+#'
+#' Set on plot.title/plot.subtitle/plot.caption too, not just the generic
+#' text element -- theme_e61() doesn't set family on these directly, but
+#' plot.subtitle is a ggtext::element_markdown() (a different rendering
+#' path, via gridtext), which in practice doesn't reliably pick up family
+#' from the generic text element the way plain element_text() does.
 #' @noRd
 t61_strip_chrome <- function(plot) {
   plot + ggplot2::theme(
     text                = ggplot2::element_text(family = "sans"),
+    plot.title          = ggplot2::element_text(family = "sans"),
+    plot.subtitle       = ggtext::element_markdown(family = "sans"),
+    plot.caption        = ggplot2::element_text(family = "sans"),
     panel.grid          = ggplot2::element_line(colour = NA),
     panel.grid.major    = ggplot2::element_line(colour = NA),
     panel.grid.minor    = ggplot2::element_line(colour = NA),
