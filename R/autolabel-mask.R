@@ -101,9 +101,16 @@ t61_panel_box_cm <- function(gt, width_cm, height_cm) {
 #' hide gridlines/axis lines/ticks, which then rendered as mask "ink" and
 #' blocked otherwise-good label candidates near any axis break or edge.
 #' Also blanks axis.title (rotated axis title text is real ink too).
+#'
+#' Forces `family = "sans"` -- theme_e61()'s real font (PT Sans) isn't a
+#' base system font, and when svglite can't resolve it (e.g. not installed/
+#' registered on the machine), rendering this throwaway raster can fail
+#' outright rather than just substituting a fallback with a warning. This
+#' render never needs to look right, only to complete.
 #' @noRd
 t61_strip_chrome <- function(plot) {
   plot + ggplot2::theme(
+    text                = ggplot2::element_text(family = "sans"),
     panel.grid          = ggplot2::element_line(colour = NA),
     panel.grid.major    = ggplot2::element_line(colour = NA),
     panel.grid.minor    = ggplot2::element_line(colour = NA),
