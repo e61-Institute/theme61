@@ -29,6 +29,10 @@ save_multi <-
            print_label_positions = FALSE
   ) {
 
+    # Guard the whole function: several plot + theme(...)/plot_annotation()
+    # merges below can silently open the session's default device on Windows.
+    t61_with_device({
+
     # Set width -------------------------------------------------------------
 
     default_width <- 18.59
@@ -524,4 +528,6 @@ save_multi <-
                    height = tot_height)
 
     return(retval)
+
+    })
   }
