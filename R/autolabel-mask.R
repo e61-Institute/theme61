@@ -10,16 +10,17 @@
 # directly, so the panel's pixel bounding box is derived from the plot's
 # gtable layout instead.
 
-#' Retry a flaky file-based call a few times with short pauses -- seen in
+#' Retry a flaky file-based call, backing off further each time -- seen in
 #' practice as rsvg failing with "Input file is too short" on a file
-#' that's actually complete (a transient Windows file-visibility issue).
+#' that's actually complete (a transient Windows file-visibility issue,
+#' e.g. antivirus scanning a freshly-written file).
 #' @noRd
-t61_retry <- function(fn, attempts = 5, pause = 0.05) {
+t61_retry <- function(fn, attempts = 8, pause = 0.1) {
   for (i in seq_len(attempts)) {
     result <- tryCatch(list(value = fn()), error = function(e) e)
     if (!inherits(result, "error")) return(result$value)
     if (i == attempts) stop(result)
-    Sys.sleep(pause)
+    Sys.sleep(pause * i)
   }
 }
 
