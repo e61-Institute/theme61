@@ -10,26 +10,18 @@
 # directly, so the panel's pixel bounding box is derived from the plot's
 # gtable layout instead.
 
-#' Close any devices opened on top of dev_num -- confirmed in practice:
-#' rendering a plot.subtitle = ggtext::element_markdown() (theme_e61()'s
-#' default) can open its own stray device mid-print()/mid-ggplotGrob(),
-#' regardless of whether one was already open, leaving a single dev.off()
-#' closing the wrong (nested) device and the intended one unflushed at 0
-#' bytes. Device numbers only increase as new devices open, so anything
-#' above dev_num must be one of these stray devices, opened after ours.
-#' A no-op if dev_num is already closed (dev.cur() then reads <= dev_num).
+#' Re-select dev_num as the current device, if it still exists -- confirmed
+#' in practice (live RStudio session): a single svglite::svglite() call can
+#' leave several other devices open too (systemfonts font-metric lookups,
+#' seen as a stray "png" plus multiple "devSVG" devices), and whichever of
+#' those was opened last, not dev_num, is left as current. Drawing then
+#' silently lands on the wrong device, and dev_num's own file is never
+#' written to. Reselecting by identity (not by closing anything -- closing
+#' devices we don't recognise turned out to be actively harmful here) is
+#' safe regardless of how many other devices are floating around.
 #' @noRd
-t61_close_device_stack <- function(dev_num) {
-  t61_close_stray_devices(dev_num)
-  if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
-}
-
-#' Close devices above dev_num without touching dev_num itself -- for
-#' reclaiming it as current again mid-pipeline, before the next step that
-#' needs to draw into it. See t61_close_device_stack().
-#' @noRd
-t61_close_stray_devices <- function(dev_num) {
-  while (grDevices::dev.cur() > dev_num) grDevices::dev.off()
+t61_reclaim_device <- function(dev_num) {
+  if (dev_num %in% grDevices::dev.list()) grDevices::dev.set(dev_num)
 }
 
 #' Retry a flaky file-based call, backing off further each time -- seen in
@@ -176,12 +168,10 @@ t61_strip_chrome <- function(plot) {
   )
 
   # plot.subtitle may be ggtext::element_markdown() (theme_e61()'s
-  # default) -- rendering markdown via gridtext confirmed (live RStudio
-  # session) to open a stray device mid-print()/ggplotGrob() that
-  # t61_close_device_stack() alone can't fully undo, leaving the mask's
-  # svg unwritten. Rebuild as a real element_text() and write it directly
-  # (not merged via theme(), which refuses to merge elements of different
-  # classes).
+  # default) -- gridtext is one more thing that can open its own device
+  # mid-render (see t61_reclaim_device()), so avoid it here regardless.
+  # Rebuilt as a real element_text() and written directly (not merged via
+  # theme(), which refuses to merge elements of different classes).
   text_args <- names(formals(ggplot2::element_text))
   for (el_name in c("plot.title", "plot.subtitle", "plot.caption")) {
     el <- plot@theme[[el_name]]
@@ -226,26 +216,27 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
   svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
-  # Safety net if print() errors partway: closes the device stack only if
-  # the explicit close below hasn't already run, so a leftover open device
-  # doesn't leave svg_file truncated or corrupt later renders.
+  # Safety net if print() errors partway: closes svg_file's own device only
+  # if the explicit close below hasn't already run.
   dev_num <- grDevices::dev.cur()
-  on.exit(t61_close_device_stack(dev_num), add = TRUE)
+  on.exit({
+    t61_reclaim_device(dev_num)
+    if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
+  }, add = TRUE)
 
   gt <- ggplot2::ggplotGrob(t61_strip_chrome(plot))
-  # ggplotGrob() (confirmed for plot.subtitle = ggtext::element_markdown(),
-  # theme_e61()'s default) can itself open a stray device mid-build,
-  # regardless of whether one was already open -- reclaim dev_num as
-  # current before print() below, or that stray device receives the real
-  # render instead of svg_file's, leaving svg_file empty.
-  t61_close_stray_devices(dev_num)
+  # ggplotGrob() can leave some other device current (see
+  # t61_reclaim_device()) -- reclaim ours before print() below, or the
+  # real render lands on the wrong device and svg_file stays empty.
+  t61_reclaim_device(dev_num)
   # Still used for its facet bail-out (exactly one panel cell, structurally
   # checked via the gtable layout) -- but NOT for the cm box it would
   # otherwise compute; see t61_render_panel_box_px() for why.
   if (is.null(t61_panel_box_cm(gt, width_cm, height_cm))) return(NULL)
 
   print(t61_strip_chrome(t61_drop_e61_class(plot)))
-  t61_close_device_stack(dev_num)
+  t61_reclaim_device(dev_num)
+  if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)
@@ -342,20 +333,24 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
   marker@layers <- list()
   marker <- marker + ggplot2::theme(panel.background = ggplot2::element_rect(fill = marker_colour, colour = NA))
   marker <- t61_drop_e61_class(marker)
-  # See t61_render_mask()'s matching call -- these theme merges can open
-  # a stray device of their own; reclaim baseline_dev before opening ours.
-  t61_close_stray_devices(baseline_dev)
+  # See t61_render_mask()'s matching call -- these theme merges can leave
+  # some other device current; reclaim baseline_dev before opening ours.
+  t61_reclaim_device(baseline_dev)
 
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
   svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
-  # See the matching guard in t61_render_mask() -- closes the device stack
-  # if print() errors before the explicit close below gets to.
+  # See the matching guard in t61_render_mask() -- closes svg_file's own
+  # device if print() errors before the explicit close below gets to.
   dev_num <- grDevices::dev.cur()
-  on.exit(t61_close_device_stack(dev_num), add = TRUE)
+  on.exit({
+    t61_reclaim_device(dev_num)
+    if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
+  }, add = TRUE)
 
   print(marker)
-  t61_close_device_stack(dev_num)
+  t61_reclaim_device(dev_num)
+  if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)
