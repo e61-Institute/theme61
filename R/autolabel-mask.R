@@ -10,28 +10,18 @@
 # directly, so the panel's pixel bounding box is derived from the plot's
 # gtable layout instead.
 
-#' Re-select dev_num as the current device, if it still exists -- confirmed
-#' in practice (live RStudio session): a single svglite::svglite() call can
-#' leave several other devices open too (systemfonts font-metric lookups,
-#' seen as a stray "png" plus multiple "devSVG" devices), and whichever of
-#' those was opened last, not dev_num, is left as current. Drawing then
-#' silently lands on the wrong device, and dev_num's own file is never
-#' written to. Reselecting by identity (not by closing anything -- closing
-#' devices we don't recognise turned out to be actively harmful here) is
-#' safe regardless of how many other devices are floating around.
+#' Re-select dev_num as the current device, if it still exists. A device we
+#' open ourselves (e.g. via svglite::svglite()) can still be superseded by
+#' one opened as a side effect of text layout (font-metric lookups can open
+#' and abandon their own devices) -- drawing then silently lands on
+#' whichever of those is current instead of the one we actually want, and
+#' our own file is never written to. Reselecting by identity (rather than
+#' closing anything we don't recognise, which risks closing a device
+#' something else still needs) is safe regardless of how many other
+#' devices happen to be open.
 #' @noRd
 t61_reclaim_device <- function(dev_num) {
   if (dev_num %in% grDevices::dev.list()) grDevices::dev.set(dev_num)
-}
-
-#' Temporary debugging aid: t61_render_mask() has several silent
-#' "not v1 scope, keep the fallback position" bail-out points that
-#' otherwise leave every auto-positioned label at NA with no error or
-#' warning at all -- message() which one actually fired.
-#' @noRd
-t61_mask_null <- function(reason) {
-  message("t61_render_mask() bailed out: ", reason)
-  NULL
 }
 
 #' Retry a flaky file-based call, backing off further each time -- seen in
@@ -39,27 +29,13 @@ t61_mask_null <- function(reason) {
 #' that's actually complete (a transient Windows file-visibility issue,
 #' e.g. antivirus scanning a freshly-written file).
 #' @noRd
-t61_retry <- function(fn, attempts = 8, pause = 0.1, diag_file = NULL) {
+t61_retry <- function(fn, attempts = 8, pause = 0.1) {
   for (i in seq_len(attempts)) {
     result <- tryCatch(list(value = fn()), error = function(e) e)
     if (!inherits(result, "error")) return(result$value)
-    if (i == attempts) stop(t61_retry_diagnose(result, diag_file))
+    if (i == attempts) stop(result)
     Sys.sleep(pause * i)
   }
-}
-
-#' Temporary debugging aid for the "Input file is too short" rsvg failure --
-#' appends the input file's actual size and the active device to the error
-#' so a report of this in the wild carries something actionable.
-#' @noRd
-t61_retry_diagnose <- function(err, diag_file) {
-  exists <- if (is.null(diag_file)) NA else file.exists(diag_file)
-  size <- if (isTRUE(exists)) file.info(diag_file)$size else NA
-  dev <- grDevices::dev.cur()
-  paste0(conditionMessage(err), sprintf(
-    " [diag: file_exists=%s file_size=%s active_device=%d (%s)]",
-    exists, size, dev, names(dev)
-  ))
 }
 
 #' Strip the e61_ggplot class before print()-ing a throwaway render (an
@@ -155,7 +131,7 @@ t61_panel_box_cm <- function(gt, width_cm, height_cm) {
 #' Also blanks axis.title (rotated axis title text is real ink too).
 #' @noRd
 t61_strip_chrome <- function(plot) {
-  plot <- plot + ggplot2::theme(
+  plot + ggplot2::theme(
     panel.grid          = ggplot2::element_line(colour = NA),
     panel.grid.major    = ggplot2::element_line(colour = NA),
     panel.grid.minor    = ggplot2::element_line(colour = NA),
@@ -176,21 +152,6 @@ t61_strip_chrome <- function(plot) {
     plot.background     = ggplot2::element_rect(fill = "white", colour = NA),
     legend.position      = "none"
   )
-
-  # plot.subtitle may be ggtext::element_markdown() (theme_e61()'s
-  # default) -- gridtext is one more thing that can open its own device
-  # mid-render (see t61_reclaim_device()), so avoid it here regardless.
-  # Rebuilt as a real element_text() and written directly (not merged via
-  # theme(), which refuses to merge elements of different classes).
-  text_args <- names(formals(ggplot2::element_text))
-  for (el_name in c("plot.title", "plot.subtitle", "plot.caption")) {
-    el <- plot@theme[[el_name]]
-    if (inherits(el, "element_markdown")) {
-      plot@theme[[el_name]] <- do.call(ggplot2::element_text, unclass(el)[intersect(names(el), text_args)])
-    }
-  }
-
-  plot
 }
 
 #' Render a low-res occupancy mask for a plot, plus everything needed to map
@@ -226,8 +187,8 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
   svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
-  # Safety net if print() errors partway: closes svg_file's own device only
-  # if the explicit close below hasn't already run.
+  # Safety net if rendering errors partway: closes svg_file's own device
+  # only if the explicit close below hasn't already run.
   dev_num <- grDevices::dev.cur()
   on.exit({
     t61_reclaim_device(dev_num)
@@ -235,22 +196,17 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   }, add = TRUE)
 
   gt <- ggplot2::ggplotGrob(t61_strip_chrome(plot))
-  # ggplotGrob() can leave some other device current (see
-  # t61_reclaim_device()) -- reclaim ours before print() below, or the
-  # real render lands on the wrong device and svg_file stays empty.
   t61_reclaim_device(dev_num)
   # Still used for its facet bail-out (exactly one panel cell, structurally
   # checked via the gtable layout) -- but NOT for the cm box it would
   # otherwise compute; see t61_render_panel_box_px() for why.
-  if (is.null(t61_panel_box_cm(gt, width_cm, height_cm))) return(t61_mask_null("t61_panel_box_cm() found no single panel cell"))
+  if (is.null(t61_panel_box_cm(gt, width_cm, height_cm))) return(NULL)
 
-  # print() would build (resolve text-metric-dependent layout) and draw in
-  # one opaque call -- splitting them out gives a chance to reclaim our
-  # device in between, since the build half is exactly what can leave some
-  # other device current (see t61_reclaim_device()), same as ggplotGrob()
-  # above. Reclaiming only after print() returns would be too late: the
-  # draw commands landed on the wrong device before we ever got control
-  # back.
+  # Built and drawn as two explicit steps, not print(plot), so the device
+  # can be reclaimed in between: building resolves text-metric-dependent
+  # layout (where a stray device can end up current, see
+  # t61_reclaim_device()), and reclaiming only after the fact would be too
+  # late -- the draw itself would already have landed on the wrong device.
   final_gt <- ggplot2::ggplotGrob(t61_strip_chrome(t61_drop_e61_class(plot)))
   t61_reclaim_device(dev_num)
   grid::grid.newpage()
@@ -260,7 +216,7 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)
-  t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height), diag_file = svg_file)
+  t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height))
 
   img <- magick::image_read(png_file)
   raster <- as.raster(img)
@@ -278,10 +234,10 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   px_per_cm_y <- nrow(raster) / height_cm
 
   panel_px <- t61_render_panel_box_px(plot, width_cm, height_cm, px_width, px_height)
-  if (is.null(panel_px)) return(t61_mask_null("t61_render_panel_box_px() found no marker colour in the rendered raster"))
+  if (is.null(panel_px)) return(NULL)
 
   pp <- built$layout$panel_params
-  if (length(pp) != 1) return(t61_mask_null(sprintf("length(panel_params) == %d, expected 1 (faceted?)", length(pp)))) # faceted: not v1 scope
+  if (length(pp) != 1) return(NULL) # faceted: not v1 scope
 
   # panel_params$y.range is the visible viewport -- wider than the scale's
   # own hard limits whenever coord_cartesian(ylim = ...) zooms out beyond
@@ -361,16 +317,16 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
   on.exit(unlink(svg_file), add = TRUE)
   svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
   # See the matching guard in t61_render_mask() -- closes svg_file's own
-  # device if print() errors before the explicit close below gets to.
+  # device if rendering errors before the explicit close below gets to.
   dev_num <- grDevices::dev.cur()
   on.exit({
     t61_reclaim_device(dev_num)
     if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
   }, add = TRUE)
 
-  # See the matching split in t61_render_mask() -- print() builds and
-  # draws in one call, and reclaiming only afterwards is too late if the
-  # build half leaves some other device current.
+  # See the matching split in t61_render_mask() -- build (ggplotGrob()) and
+  # draw as two explicit steps, not print(marker), so the device can be
+  # reclaimed in between.
   marker_gt <- ggplot2::ggplotGrob(marker)
   t61_reclaim_device(dev_num)
   grid::grid.newpage()
@@ -380,7 +336,7 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)
-  t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height), diag_file = svg_file)
+  t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height))
 
   img <- magick::image_read(png_file)
   raster <- as.raster(img)
@@ -391,13 +347,7 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
 
   rows_with <- which(rowSums(occ) > 0)
   cols_with <- which(colSums(occ) > 0)
-  if (length(rows_with) == 0 || length(cols_with) == 0) {
-    message(sprintf(
-      "t61_render_panel_box_px(): marker not found; raster %dx%d, dominant colour %s",
-      ncol(raster), nrow(raster), names(sort(table(raster), decreasing = TRUE))[1]
-    ))
-    return(NULL)
-  }
+  if (length(rows_with) == 0 || length(cols_with) == 0) return(NULL)
 
   list(
     left_px   = min(cols_with),
