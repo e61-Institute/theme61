@@ -24,11 +24,24 @@ t61_quiet_na_removal <- function(expr) {
   )
 }
 
+#' With no device open, ggplotGrob()/ggplot_gtable() can silently open the
+#' session's default device to measure text -- left open, that can corrupt
+#' later renders (seen in practice as a corrupted svglite render on
+#' Windows). Opens a throwaway null device first only if none is open.
 #' @noRd
-t61_ggplotGrob_quiet_na <- function(plot) t61_quiet_na_removal(ggplot2::ggplotGrob(plot))
+t61_with_device <- function(expr) {
+  if (grDevices::dev.cur() == 1) {
+    grDevices::pdf(NULL)
+    on.exit(grDevices::dev.off(), add = TRUE)
+  }
+  expr
+}
 
 #' @noRd
-t61_ggplot_gtable_quiet_na <- function(build) t61_quiet_na_removal(ggplot2::ggplot_gtable(build))
+t61_ggplotGrob_quiet_na <- function(plot) t61_with_device(t61_quiet_na_removal(ggplot2::ggplotGrob(plot)))
+
+#' @noRd
+t61_ggplot_gtable_quiet_na <- function(build) t61_with_device(t61_quiet_na_removal(ggplot2::ggplot_gtable(build)))
 
 #' Helper function to actually perform the saving functionality
 #' @noRd
