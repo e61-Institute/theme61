@@ -101,25 +101,9 @@ t61_panel_box_cm <- function(gt, width_cm, height_cm) {
 #' hide gridlines/axis lines/ticks, which then rendered as mask "ink" and
 #' blocked otherwise-good label candidates near any axis break or edge.
 #' Also blanks axis.title (rotated axis title text is real ink too).
-#'
-#' Forces `family = "sans"` -- theme_e61()'s real font (PT Sans) isn't a
-#' base system font, and when svglite can't resolve it (e.g. not installed/
-#' registered on the machine), rendering this throwaway raster can fail
-#' outright rather than just substituting a fallback with a warning. This
-#' render never needs to look right, only to complete.
-#'
-#' Set on plot.title/plot.subtitle/plot.caption too, not just the generic
-#' text element -- theme_e61() doesn't set family on these directly, but
-#' plot.subtitle is a ggtext::element_markdown() (a different rendering
-#' path, via gridtext), which in practice doesn't reliably pick up family
-#' from the generic text element the way plain element_text() does.
 #' @noRd
 t61_strip_chrome <- function(plot) {
   plot + ggplot2::theme(
-    text                = ggplot2::element_text(family = "sans"),
-    plot.title          = ggplot2::element_text(family = "sans"),
-    plot.subtitle       = ggtext::element_markdown(family = "sans"),
-    plot.caption        = ggplot2::element_text(family = "sans"),
     panel.grid          = ggplot2::element_line(colour = NA),
     panel.grid.major    = ggplot2::element_line(colour = NA),
     panel.grid.minor    = ggplot2::element_line(colour = NA),
@@ -167,14 +151,11 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   # screen axes.
   flipped <- inherits(built$layout$coord, "CoordFlip")
 
-  gt <- ggplot2::ggplotGrob(t61_strip_chrome(plot))
-  # Still used for its facet bail-out (exactly one panel cell, structurally
-  # checked via the gtable layout) -- but NOT for the cm box it would
-  # otherwise compute; see t61_render_panel_box_px() for why.
-  if (is.null(t61_panel_box_cm(gt, width_cm, height_cm))) return(NULL)
-
   px_height <- round(px_width * height_cm / width_cm)
 
+  # Opened before ggplotGrob() below: with no device open yet, that call
+  # can silently open the session's own default device instead, corrupting
+  # this render (confirmed cause of "Input file is too short" on Windows).
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
   svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
@@ -183,6 +164,12 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   # doesn't leave svg_file truncated or corrupt later renders.
   dev_num <- grDevices::dev.cur()
   on.exit(if (grDevices::dev.cur() == dev_num) grDevices::dev.off(), add = TRUE)
+
+  gt <- ggplot2::ggplotGrob(t61_strip_chrome(plot))
+  # Still used for its facet bail-out (exactly one panel cell, structurally
+  # checked via the gtable layout) -- but NOT for the cm box it would
+  # otherwise compute; see t61_render_panel_box_px() for why.
+  if (is.null(t61_panel_box_cm(gt, width_cm, height_cm))) return(NULL)
 
   print(t61_strip_chrome(t61_drop_e61_class(plot)))
   grDevices::dev.off()
