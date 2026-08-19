@@ -15,13 +15,27 @@
 #' that's actually complete (a transient Windows file-visibility issue,
 #' e.g. antivirus scanning a freshly-written file).
 #' @noRd
-t61_retry <- function(fn, attempts = 8, pause = 0.1) {
+t61_retry <- function(fn, attempts = 8, pause = 0.1, diag_file = NULL) {
   for (i in seq_len(attempts)) {
     result <- tryCatch(list(value = fn()), error = function(e) e)
     if (!inherits(result, "error")) return(result$value)
-    if (i == attempts) stop(result)
+    if (i == attempts) stop(t61_retry_diagnose(result, diag_file))
     Sys.sleep(pause * i)
   }
+}
+
+#' Temporary debugging aid for the "Input file is too short" rsvg failure --
+#' appends the input file's actual size and the active device to the error
+#' so a report of this in the wild carries something actionable.
+#' @noRd
+t61_retry_diagnose <- function(err, diag_file) {
+  exists <- if (is.null(diag_file)) NA else file.exists(diag_file)
+  size <- if (isTRUE(exists)) file.info(diag_file)$size else NA
+  dev <- grDevices::dev.cur()
+  paste0(conditionMessage(err), sprintf(
+    " [diag: file_exists=%s file_size=%s active_device=%d (%s)]",
+    exists, size, dev, names(dev)
+  ))
 }
 
 #' Strip the e61_ggplot class before print()-ing a throwaway render (an
@@ -190,7 +204,7 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)
-  t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height))
+  t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height), diag_file = svg_file)
 
   img <- magick::image_read(png_file)
   raster <- as.raster(img)
@@ -296,7 +310,7 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)
-  t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height))
+  t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height), diag_file = svg_file)
 
   img <- magick::image_read(png_file)
   raster <- as.raster(img)
