@@ -21,11 +21,8 @@ ggplot <- function(data = NULL,
   # in iterate_mode, which opts out of all automatic theme61 styling.
   if (isTRUE(getOption("theme61.auto_theme", TRUE)) &&
       !isTRUE(getOption("theme61.iterate_mode", FALSE))) {
-    # Confirmed on Windows: merging theme_e61()'s plot.subtitle (a
-    # ggtext::element_markdown()) into the plot can silently open the
-    # session's default device -- here, on essentially every ggplot()
-    # call, so anything downstream inherits an already-corrupted device
-    # stack. t61_with_device() opens a safe one first if none is open.
+    # Merging theme_e61() can silently open the session's default device
+    # (confirmed on Windows) -- guard against it.
     p <- t61_with_device(p + theme_e61())
   }
 
