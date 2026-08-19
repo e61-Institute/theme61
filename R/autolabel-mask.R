@@ -10,6 +10,19 @@
 # directly, so the panel's pixel bounding box is derived from the plot's
 # gtable layout instead.
 
+#' Retry a flaky file-based call a few times with short pauses -- seen in
+#' practice as rsvg failing with "Input file is too short" on a file
+#' that's actually complete (a transient Windows file-visibility issue).
+#' @noRd
+t61_retry <- function(fn, attempts = 5, pause = 0.05) {
+  for (i in seq_len(attempts)) {
+    result <- tryCatch(list(value = fn()), error = function(e) e)
+    if (!inherits(result, "error")) return(result$value)
+    if (i == attempts) stop(result)
+    Sys.sleep(pause)
+  }
+}
+
 #' Strip the e61_ggplot class before print()-ing a throwaway render (an
 #' occupancy raster, a panel-box marker): print.e61_ggplot() has side
 #' effects (a Viewer preview, console output) meant for a plot the user is
@@ -176,7 +189,7 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)
-  rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height)
+  t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height))
 
   img <- magick::image_read(png_file)
   raster <- as.raster(img)
@@ -282,7 +295,7 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)
-  rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height)
+  t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height))
 
   img <- magick::image_read(png_file)
   raster <- as.raster(img)
