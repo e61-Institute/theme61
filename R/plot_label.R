@@ -224,23 +224,13 @@ plot_label <-
   rep(vec, len)
 }
 
-#' Detect a discrete colour/fill mapping on `plot` and return its levels and
-#' their assigned colours, in the plot's own resolved order (i.e. exactly
-#' the (level, colour) pairing a legend would show).
+#' Detect a discrete colour/fill mapping on `plot` and return its levels
+#' and their assigned colours, in the plot's resolved (legend) order.
 #'
-#' Counts any discrete scale -- manual, algorithmic (`scale_colour_e61()`,
-#' `scale_colour_brewer()`, ...), or theme61's own default auto-injected
-#' when the user supplies none at all (see `maybe_add_default_scales()`) --
-#' since all of these resolve to the same fixed break -> colour mapping once
-#' the plot is built. Discreteness is checked off the mapped data itself
-#' (`infer_aes_type()`), not the scale object, so it doesn't matter which of
-#' these ends up attached. colour is checked before fill, matching which
-#' aesthetic `t61_match_label_series()` treats as primary (autolabel-apply.R).
-#'
-#' A scale only trains its breaks/mapping once the plot is actually built,
-#' so this needs a real `ggplot2::ggplot_build()` -- paid only when the
-#' cheap pre-check (is the aesthetic mapped to something discrete at all?)
-#' passes.
+#' Counts any discrete scale -- manual, algorithmic, or theme61's own
+#' auto-injected default -- since all resolve to the same fixed break ->
+#' colour mapping once built. colour is checked before fill, matching
+#' t61_match_label_series()'s own priority (autolabel-apply.R).
 #' @return list(breaks = <chr>, colours = <chr>), same length and order, or
 #'   NULL if no discrete colour/fill mapping was found.
 #' @noRd

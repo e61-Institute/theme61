@@ -296,48 +296,14 @@ t61_print_label_positions <- function(text, x, y, is_date_x, is_date_y) {
   message(code)
 }
 
-#' Whether `plot` has at least one plot_label() row that actually depends on
-#' auto-positioning (no explicit `x`/`y` of its own). A label WITH an
-#' explicit position renders exactly as given regardless of whether the
-#' search below succeeds -- see t61_apply_autolabel()'s has_user_position
-#' branch -- so a failure only actually costs anything (a vanished label)
-#' when this is TRUE; otherwise warning about it would be pure noise.
-#'
-#' Deliberately build-free (reads x/y straight off each layer's own data),
-#' since this needs to run even when t61_collect_autolabel_targets() --
-#' which alone requires a ggplot_build() -- is itself the step that failed.
-#' @noRd
-t61_autolabel_needs_position <- function(plot) {
-  any(vapply(plot@layers, function(ly) {
-    if (is.null(ly$data) || is.null(ly$data$auto_position)) return(FALSE)
-    isTRUE(any(ly$data$auto_position & (is.na(ly$data$x) | is.na(ly$data$y))))
-  }, logical(1)))
-}
-
-#' Warn that an internal autolabel step failed and was skipped, since
-#' t61_apply_autolabel() otherwise fails silently -- a label with no
-#' explicit `x`/`y` keeps its unplaced NA position in that case, which
-#' ggplot2 then drops entirely at render time rather than drawing it
-#' imprecisely, reading as "the label just vanished" with no clue why.
-#' @noRd
-t61_warn_autolabel_failed <- function(cnd) {
-  cli::cli_warn(c(
-    "Automatic {.fn plot_label} positioning failed and was skipped: {conditionMessage(cnd)}",
-    "i" = "Any label without an explicit `x`/`y` won't be drawn at all as a result -- set `x`/`y` explicitly (or `auto_position = FALSE`) to work around this."
-  ))
-}
-
 #' Automatically reposition eligible plot_label() text away from its
 #' fallback position, using the autolabel engine. Called from
 #' save_single() once the chart's final width/height (cm) are known.
 #'
-#' Fails safe: any error anywhere in matching/placement leaves `plot`
-#' unmodified rather than breaking save_e61() for existing users -- warned
-#' (see t61_warn_autolabel_failed()) only when it's actually consequential,
-#' i.e. some label has no explicit `x`/`y` of its own and so won't render
-#' at all as a result (see t61_autolabel_needs_position()); a label WITH an
-#' explicit position renders exactly as given regardless, so the same
-#' failure there is silently harmless.
+#' Fails safe: any error leaves `plot` unmodified, with a warning only if
+#' some label actually needed the (now-failed) auto-positioning -- one
+#' with its own explicit x/y renders fine regardless, so warning there
+#' would be noise.
 #'
 #' @param print_positions Logical. If TRUE, print the final label/x/y as
 #'   copy-pasteable plot_label() arguments (see t61_print_label_positions()).
@@ -357,14 +323,21 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
   if (isFALSE(getOption("theme61.auto_label", TRUE))) return(plot)
 
   targets <- tryCatch(t61_collect_autolabel_targets(plot), error = function(e) {
-    if (t61_autolabel_needs_position(plot)) t61_warn_autolabel_failed(e)
+    # Only worth a warning if some label actually needed this (no x/y of
+    # its own to fall back on) -- read straight off the layers since
+    # `targets` itself is what just failed to build.
+    needs_pos <- any(vapply(plot@layers, function(ly) {
+      !is.null(ly$data$auto_position) && any(ly$data$auto_position & (is.na(ly$data$x) | is.na(ly$data$y)))
+    }, logical(1)))
+    if (needs_pos) {
+      cli::cli_warn("Automatic {.fn plot_label} positioning failed and was skipped ({conditionMessage(e)}) -- labels without their own `x`/`y` won't render.")
+    }
     NULL
   })
   if (is.null(targets) || nrow(targets$labels) == 0) return(plot)
 
-  # fast = TRUE means t61_place_label_fast() (no collision search) ran
-  # instead of the real search -- only worth flagging when a label actually
-  # needed that heuristic (no explicit x/y to fall back on).
+  # Only worth flagging when a label used the fast (no collision search)
+  # heuristic instead of an explicit x/y.
   if (isTRUE(fast) && getOption("theme61.autolabel_fast_msg", default = TRUE) &&
       any(is.na(targets$labels$fallback_x) | is.na(targets$labels$fallback_y))) {
     cli::cli_alert_info(
@@ -379,7 +352,9 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
   result <- tryCatch(
     t61_autolabel_plot(plot_for_mask, targets$labels, width_cm = width_cm, height_cm = height_cm, fast = fast),
     error = function(e) {
-      if (any(is.na(targets$labels$fallback_x) | is.na(targets$labels$fallback_y))) t61_warn_autolabel_failed(e)
+      if (any(is.na(targets$labels$fallback_x) | is.na(targets$labels$fallback_y))) {
+        cli::cli_warn("Automatic {.fn plot_label} positioning failed and was skipped ({conditionMessage(e)}) -- labels without their own `x`/`y` won't render.")
+      }
       NULL
     }
   )

@@ -162,14 +162,9 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
   svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
-  # A device left open by a print() that errors partway leaves an
-  # unclosed (and so unfinished/truncated) svg_file on disk -- rsvg_png()
-  # below then fails on it with an opaque "Input file is too short", and
-  # the still-open device also corrupts the graphics device stack for
-  # every render after this one. dev_num tracks whether the explicit
-  # dev.off() below already ran (the normal, successful path) so this
-  # doesn't double-close whatever device is current by the time on.exit
-  # fires.
+  # Safety net if print() errors partway: closes the device only if the
+  # explicit dev.off() below hasn't already run, so a leftover open device
+  # doesn't leave svg_file truncated or corrupt later renders.
   dev_num <- grDevices::dev.cur()
   on.exit(if (grDevices::dev.cur() == dev_num) grDevices::dev.off(), add = TRUE)
 

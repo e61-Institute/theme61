@@ -76,15 +76,9 @@ print.e61_plot <- function(x, ...) {
   x_plot <- maybe_add_default_scales(x_plot)
   class(x_plot) <- setdiff(class(x_plot), c("e61_map", "e61_plot"))
 
-  # Auto-positioned plot_label() text is otherwise left at its unplaced NA
-  # x/y here -- the Viewer preview above is the only thing that resolves a
-  # position, and only when in_rstudio -- so without this, every print()
-  # drops those labels entirely from the Plots pane (and always, in a
-  # non-RStudio session with no Viewer at all), with ggplot2's own "Removed
-  # rows containing missing values" warning as the only clue why. Uses the
-  # same cheap fast placement as the Viewer preview -- width/height are a
-  # rough estimate here (the Plots pane's real device size isn't known
-  # until drawn), same as t61_measure_label_cm()'s own defaults.
+  # Without this, auto-positioned labels stay at their NA placeholder here
+  # (only the Viewer preview above resolves one) and silently vanish.
+  # width/height are just a rough estimate for this cheap fast placement.
   x_plot <- suppressWarnings(t61_apply_autolabel(x_plot, width_cm = 16, height_cm = 12, fast = TRUE))
   print(x_plot)
 
