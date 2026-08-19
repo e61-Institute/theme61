@@ -296,13 +296,28 @@ t61_print_label_positions <- function(text, x, y, is_date_x, is_date_y) {
   message(code)
 }
 
+#' Warn that an internal autolabel step failed and was skipped, since
+#' t61_apply_autolabel() otherwise fails silently -- a label with no
+#' explicit `x`/`y` keeps its unplaced NA position in that case, which
+#' ggplot2 then drops entirely at render time rather than drawing it
+#' imprecisely, reading as "the label just vanished" with no clue why.
+#' @noRd
+t61_warn_autolabel_failed <- function(cnd) {
+  cli::cli_warn(c(
+    "Automatic {.fn plot_label} positioning failed and was skipped: {conditionMessage(cnd)}",
+    "i" = "Any label without an explicit `x`/`y` won't be drawn at all as a result -- set `x`/`y` explicitly (or `auto_position = FALSE`) to work around this."
+  ))
+}
+
 #' Automatically reposition eligible plot_label() text away from its
 #' fallback position, using the autolabel engine. Called from
 #' save_single() once the chart's final width/height (cm) are known.
 #'
 #' Fails safe: any error anywhere in matching/placement leaves `plot`
-#' unmodified (labels keep their user-supplied x/y) rather than breaking
-#' save_e61() for existing users.
+#' unmodified (with a warning -- see t61_warn_autolabel_failed()) rather
+#' than breaking save_e61() for existing users. Note this means a label
+#' with no explicit `x`/`y` of its own won't render at all, since it never
+#' gets past its initial NA placeholder position.
 #'
 #' @param print_positions Logical. If TRUE, print the final label/x/y as
 #'   copy-pasteable plot_label() arguments (see t61_print_label_positions()).
@@ -321,7 +336,10 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
   # ggplot_build()).
   if (isFALSE(getOption("theme61.auto_label", TRUE))) return(plot)
 
-  targets <- tryCatch(t61_collect_autolabel_targets(plot), error = function(e) NULL)
+  targets <- tryCatch(t61_collect_autolabel_targets(plot), error = function(e) {
+    t61_warn_autolabel_failed(e)
+    NULL
+  })
   if (is.null(targets) || nrow(targets$labels) == 0) return(plot)
 
   # fast = TRUE means t61_place_label_fast() (no collision search) ran
@@ -340,7 +358,10 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
 
   result <- tryCatch(
     t61_autolabel_plot(plot_for_mask, targets$labels, width_cm = width_cm, height_cm = height_cm, fast = fast),
-    error = function(e) NULL
+    error = function(e) {
+      t61_warn_autolabel_failed(e)
+      NULL
+    }
   )
   if (is.null(result)) return(plot)
 
