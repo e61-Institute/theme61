@@ -162,6 +162,16 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
   svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
+  # A device left open by a print() that errors partway leaves an
+  # unclosed (and so unfinished/truncated) svg_file on disk -- rsvg_png()
+  # below then fails on it with an opaque "Input file is too short", and
+  # the still-open device also corrupts the graphics device stack for
+  # every render after this one. dev_num tracks whether the explicit
+  # dev.off() below already ran (the normal, successful path) so this
+  # doesn't double-close whatever device is current by the time on.exit
+  # fires.
+  dev_num <- grDevices::dev.cur()
+  on.exit(if (grDevices::dev.cur() == dev_num) grDevices::dev.off(), add = TRUE)
 
   print(t61_strip_chrome(t61_drop_e61_class(plot)))
   grDevices::dev.off()
@@ -264,6 +274,11 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
   svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
+  # See the matching guard in t61_render_mask() -- closes the device if
+  # print() errors before the explicit dev.off() below gets to.
+  dev_num <- grDevices::dev.cur()
+  on.exit(if (grDevices::dev.cur() == dev_num) grDevices::dev.off(), add = TRUE)
+
   print(marker)
   grDevices::dev.off()
 

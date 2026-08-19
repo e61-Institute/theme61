@@ -296,6 +296,24 @@ t61_print_label_positions <- function(text, x, y, is_date_x, is_date_y) {
   message(code)
 }
 
+#' Whether `plot` has at least one plot_label() row that actually depends on
+#' auto-positioning (no explicit `x`/`y` of its own). A label WITH an
+#' explicit position renders exactly as given regardless of whether the
+#' search below succeeds -- see t61_apply_autolabel()'s has_user_position
+#' branch -- so a failure only actually costs anything (a vanished label)
+#' when this is TRUE; otherwise warning about it would be pure noise.
+#'
+#' Deliberately build-free (reads x/y straight off each layer's own data),
+#' since this needs to run even when t61_collect_autolabel_targets() --
+#' which alone requires a ggplot_build() -- is itself the step that failed.
+#' @noRd
+t61_autolabel_needs_position <- function(plot) {
+  any(vapply(plot@layers, function(ly) {
+    if (is.null(ly$data) || is.null(ly$data$auto_position)) return(FALSE)
+    isTRUE(any(ly$data$auto_position & (is.na(ly$data$x) | is.na(ly$data$y))))
+  }, logical(1)))
+}
+
 #' Warn that an internal autolabel step failed and was skipped, since
 #' t61_apply_autolabel() otherwise fails silently -- a label with no
 #' explicit `x`/`y` keeps its unplaced NA position in that case, which
@@ -314,10 +332,12 @@ t61_warn_autolabel_failed <- function(cnd) {
 #' save_single() once the chart's final width/height (cm) are known.
 #'
 #' Fails safe: any error anywhere in matching/placement leaves `plot`
-#' unmodified (with a warning -- see t61_warn_autolabel_failed()) rather
-#' than breaking save_e61() for existing users. Note this means a label
-#' with no explicit `x`/`y` of its own won't render at all, since it never
-#' gets past its initial NA placeholder position.
+#' unmodified rather than breaking save_e61() for existing users -- warned
+#' (see t61_warn_autolabel_failed()) only when it's actually consequential,
+#' i.e. some label has no explicit `x`/`y` of its own and so won't render
+#' at all as a result (see t61_autolabel_needs_position()); a label WITH an
+#' explicit position renders exactly as given regardless, so the same
+#' failure there is silently harmless.
 #'
 #' @param print_positions Logical. If TRUE, print the final label/x/y as
 #'   copy-pasteable plot_label() arguments (see t61_print_label_positions()).
@@ -337,7 +357,7 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
   if (isFALSE(getOption("theme61.auto_label", TRUE))) return(plot)
 
   targets <- tryCatch(t61_collect_autolabel_targets(plot), error = function(e) {
-    t61_warn_autolabel_failed(e)
+    if (t61_autolabel_needs_position(plot)) t61_warn_autolabel_failed(e)
     NULL
   })
   if (is.null(targets) || nrow(targets$labels) == 0) return(plot)
@@ -359,7 +379,7 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
   result <- tryCatch(
     t61_autolabel_plot(plot_for_mask, targets$labels, width_cm = width_cm, height_cm = height_cm, fast = fast),
     error = function(e) {
-      t61_warn_autolabel_failed(e)
+      if (any(is.na(targets$labels$fallback_x) | is.na(targets$labels$fallback_y))) t61_warn_autolabel_failed(e)
       NULL
     }
   )
