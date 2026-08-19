@@ -8,7 +8,7 @@ ggplot_build.e61_plot <- function(plot, ...) {
   # unaffected, since they're already part of the plot's scales/layers.
   if (isTRUE(getOption("theme61.iterate_mode", FALSE))) {
     class(plot) <- setdiff(class(plot), c("e61_map", "e61_plot"))
-    return(ggplot2::ggplot_build(plot, ...))
+    return(t61_with_device(ggplot2::ggplot_build(plot, ...)))
   }
 
   # Classify + correct defensively, in case ggplot_build() is reached
@@ -22,7 +22,11 @@ ggplot_build.e61_plot <- function(plot, ...) {
   # prevent recursion: drop our class before calling ggplot2 build
   class(plot2) <- setdiff(class(plot2), c("e61_map", "e61_plot"))
 
-  ggplot2::ggplot_build(plot2, ...)
+  # Every ggplot_build(<e61_plot>) call in the package dispatches here, so
+  # guarding this one spot covers them all: with no device open, this can
+  # otherwise silently open the session's default device (seen in practice
+  # corrupting a later svglite render on Windows).
+  t61_with_device(ggplot2::ggplot_build(plot2, ...))
 }
 
 # Helpers ----
