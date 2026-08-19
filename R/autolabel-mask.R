@@ -153,7 +153,7 @@ t61_panel_box_cm <- function(gt, width_cm, height_cm) {
 #' Also blanks axis.title (rotated axis title text is real ink too).
 #' @noRd
 t61_strip_chrome <- function(plot) {
-  plot + ggplot2::theme(
+  plot <- plot + ggplot2::theme(
     panel.grid          = ggplot2::element_line(colour = NA),
     panel.grid.major    = ggplot2::element_line(colour = NA),
     panel.grid.minor    = ggplot2::element_line(colour = NA),
@@ -174,6 +174,23 @@ t61_strip_chrome <- function(plot) {
     plot.background     = ggplot2::element_rect(fill = "white", colour = NA),
     legend.position      = "none"
   )
+
+  # plot.subtitle may be ggtext::element_markdown() (theme_e61()'s
+  # default) -- rendering markdown via gridtext confirmed (live RStudio
+  # session) to open a stray device mid-print()/ggplotGrob() that
+  # t61_close_device_stack() alone can't fully undo, leaving the mask's
+  # svg unwritten. Rebuild as a real element_text() and write it directly
+  # (not merged via theme(), which refuses to merge elements of different
+  # classes).
+  text_args <- names(formals(ggplot2::element_text))
+  for (el_name in c("plot.title", "plot.subtitle", "plot.caption")) {
+    el <- plot@theme[[el_name]]
+    if (inherits(el, "element_markdown")) {
+      plot@theme[[el_name]] <- do.call(ggplot2::element_text, unclass(el)[intersect(names(el), text_args)])
+    }
+  }
+
+  plot
 }
 
 #' Render a low-res occupancy mask for a plot, plus everything needed to map
