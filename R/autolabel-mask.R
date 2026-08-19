@@ -244,7 +244,17 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   # otherwise compute; see t61_render_panel_box_px() for why.
   if (is.null(t61_panel_box_cm(gt, width_cm, height_cm))) return(t61_mask_null("t61_panel_box_cm() found no single panel cell"))
 
-  print(t61_strip_chrome(t61_drop_e61_class(plot)))
+  # print() would build (resolve text-metric-dependent layout) and draw in
+  # one opaque call -- splitting them out gives a chance to reclaim our
+  # device in between, since the build half is exactly what can leave some
+  # other device current (see t61_reclaim_device()), same as ggplotGrob()
+  # above. Reclaiming only after print() returns would be too late: the
+  # draw commands landed on the wrong device before we ever got control
+  # back.
+  final_gt <- ggplot2::ggplotGrob(t61_strip_chrome(t61_drop_e61_class(plot)))
+  t61_reclaim_device(dev_num)
+  grid::grid.newpage()
+  grid::grid.draw(final_gt)
   t61_reclaim_device(dev_num)
   if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
 
@@ -358,7 +368,13 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
     if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
   }, add = TRUE)
 
-  print(marker)
+  # See the matching split in t61_render_mask() -- print() builds and
+  # draws in one call, and reclaiming only afterwards is too late if the
+  # build half leaves some other device current.
+  marker_gt <- ggplot2::ggplotGrob(marker)
+  t61_reclaim_device(dev_num)
+  grid::grid.newpage()
+  grid::grid.draw(marker_gt)
   t61_reclaim_device(dev_num)
   if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
 
