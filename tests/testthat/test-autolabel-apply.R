@@ -495,6 +495,7 @@ test_that("t61_apply_autolabel prefers the caller's own x/y over random empty sp
 
 test_that("t61_apply_autolabel(fast = TRUE) resolves a position without rendering a mask", {
   skip_on_cran()
+  withr::local_options(list(theme61.autolabel_fast_msg = FALSE))
 
   p <- autolabel_apply_test_setup() # no x/y given (auto_position = TRUE default)
 
@@ -512,6 +513,7 @@ test_that("t61_apply_autolabel(fast = TRUE) resolves a position without renderin
 
 test_that("save_e61(fast_labels = TRUE) skips the search but still resolves a position", {
   skip_on_cran()
+  withr::local_options(list(theme61.autolabel_fast_msg = FALSE))
 
   p <- autolabel_apply_test_setup() # no x/y given (auto_position = TRUE default)
 
@@ -538,6 +540,7 @@ test_that("save_e61(fast_labels = TRUE) skips the search but still resolves a po
 
 test_that("save_e61(preview = TRUE, fast_labels = TRUE) doesn't crash on a steeply diverging line chart", {
   skip_on_cran()
+  withr::local_options(list(theme61.autolabel_fast_msg = FALSE))
 
   # Two lines that pull apart -- an unclamped fast-mode offset could push
   # a label's y beyond the already-fixed y-axis limits, erroring at
@@ -563,6 +566,35 @@ test_that("save_e61(preview = TRUE, fast_labels = TRUE) doesn't crash on a steep
       save_e61(plot = p, preview = TRUE, format = "svg", auto_scale = TRUE, fast_labels = TRUE)
     ))
   )
+})
+
+test_that("t61_apply_autolabel(fast = TRUE) shows the fast-preview reminder once, only when a label needed it", {
+  skip_on_cran()
+
+  p <- autolabel_apply_test_setup() # no x/y given (auto_position = TRUE default)
+
+  withr::local_options(list(theme61.autolabel_fast_msg = TRUE))
+  expect_message(
+    t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = TRUE),
+    "save_e61"
+  )
+  # Fires once, then turns itself off for the rest of the session.
+  expect_false(getOption("theme61.autolabel_fast_msg"))
+  expect_no_message(t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = TRUE))
+
+  # fast = FALSE runs the real search, so there's nothing to warn about.
+  withr::local_options(list(theme61.autolabel_fast_msg = TRUE))
+  expect_no_message(t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = FALSE))
+
+  # Every label already has an explicit position: fast placement is never
+  # actually used, so the reminder would have nothing to explain.
+  p_explicit <- autolabel_apply_test_setup(auto_position = FALSE)
+  withr::local_options(list(theme61.autolabel_fast_msg = TRUE))
+  expect_no_message(t61_apply_autolabel(p_explicit, width_cm = 16, height_cm = 12, fast = TRUE))
+
+  # theme61.autolabel_fast_msg = FALSE opts out entirely.
+  withr::local_options(list(theme61.autolabel_fast_msg = FALSE))
+  expect_no_message(t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = TRUE))
 })
 
 coord_flip_apply_test <- function(p) {

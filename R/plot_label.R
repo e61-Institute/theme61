@@ -4,16 +4,16 @@
 #'   onto the graph plot. This is preferred over using legends.
 #'
 #' @param label (optional, see Details) String vector. Label text to be
-#'   displayed. If omitted, derived from a `scale_colour_manual()`/
-#'   `scale_fill_manual()` on the plot, if there is one.
+#'   displayed. If omitted, derived from a discrete `colour`/`fill` scale
+#'   on the plot, if there is one.
 #' @param x (optional, see Details) Numeric or string vector. X-axis
 #'   positions of the label text. If supplied, this exact position is
 #'   always used.
 #' @param y (optional, see Details) Numeric or string vector. Y-axis
 #'   positions of the label text. See `x`.
 #' @param colour (optional, see Details) Vector of colour names or strings.
-#'   Defaults to a `scale_colour_manual()`/`scale_fill_manual()` on the plot,
-#'   if there is one, else the e61 palette.
+#'   Defaults to a discrete `colour`/`fill` scale on the plot, if there is
+#'   one, else the e61 palette.
 #' @param size (optional) Integer. Size of the text, the default size should be
 #'   appropriate in most cases.
 #' @param hjust (optional) A numeric value from 0-1. Adjusts the alignment of
@@ -40,10 +40,15 @@
 #'
 #' @details
 #' ## Default label text and colour
-#' If the plot has a `scale_colour_manual()`/`scale_fill_manual()` (checked
-#' in that order; a theme61 wrapper that constructs one, e.g.
-#' `scale_colour_e61_aus()`, counts too), `label` and `colour` can be
-#' derived from it instead of the e61 palette:
+#' If the plot maps `colour`/`fill` to a discrete variable (checked in that
+#' order), `label` and `colour` can be derived from that scale instead of
+#' the e61 palette. This covers an explicit `scale_colour_manual()`/
+#' `scale_fill_manual()` (or a theme61 wrapper that constructs one, e.g.
+#' `scale_colour_e61_aus()`), an algorithmic discrete scale like
+#' `scale_colour_e61()`/`scale_colour_brewer()`, and simply relying on
+#' theme61's own default scale by supplying no scale at all -- once the plot
+#' is built, all of these resolve to the same thing, a fixed mapping from
+#' each level to its assigned colour:
 #' * If you omit `label` entirely, it defaults to that scale's own levels
 #'   (i.e. what a legend would show), in their resolved order -- so
 #'   `plot_label()` with no arguments at all labels every series using its
@@ -55,10 +60,8 @@
 #'   instead (rather than guessing a partial match).
 #' * An explicit `colour` always wins outright over any of the above.
 #'
-#' Only a scale with fixed, explicit values (`scale_colour_manual()`/
-#' `scale_fill_manual()`) is used this way -- an algorithmic discrete scale
-#' (e.g. `scale_colour_e61()`, `scale_colour_brewer()`) doesn't count, since
-#' it has no fixed "colours the user chose" to read.
+#' A continuous `colour`/`fill` (e.g. `scale_colour_gradient()`) doesn't
+#' count -- there's no fixed set of "levels" to derive labels from.
 #'
 #' ## Automatic positioning
 #' When `auto_position = TRUE` (the default), `save_e61()` tries to move the
@@ -196,40 +199,27 @@ plot_label <-
   rep(vec, len)
 }
 
-#' Detect a user-supplied scale_colour_manual()/scale_fill_manual() on
-#' `plot` (or a theme61 wrapper built on one, e.g. scale_colour_e61()) and
-#' return its levels and their assigned colours, in the plot's own
-#' resolved order -- i.e. exactly the (level, colour) pairing a legend
-#' would show, correctly reflecting `reverse = TRUE`, a `values` vector
-#' with more entries than actually appear in the data, etc.
+#' Detect a discrete colour/fill mapping on `plot` and return its levels
+#' and their assigned colours, in the plot's resolved (legend) order.
 #'
-#' colour is checked before fill (matches which aesthetic
-#' t61_match_label_series() treats as primary for most geoms -- see
-#' autolabel-apply.R). Returns NULL if neither aesthetic has an explicit
-#' scale: an algorithmic discrete scale (scale_colour_brewer(),
-#' scale_colour_hue(), ...) doesn't count, since there's no fixed "colours
-#' the user chose" to detect -- only a palette function to sample from.
-#'
-#' A scale's breaks/mapping aren't trained against the data until the plot
-#' is actually built, so this needs a real ggplot2::ggplot_build() to
-#' resolve correctly -- gated behind a cheap, build-free check first (the
-#' scale's own constructor call), so that cost is only paid when a manual
-#' scale is actually present.
+#' Counts any discrete scale -- manual, algorithmic, or theme61's own
+#' auto-injected default -- since all resolve to the same fixed break ->
+#' colour mapping once built. colour is checked before fill, matching
+#' t61_match_label_series()'s own priority (autolabel-apply.R).
 #' @return list(breaks = <chr>, colours = <chr>), same length and order, or
-#'   NULL if no manual colour/fill scale was found.
+#'   NULL if no discrete colour/fill mapping was found.
 #' @noRd
-.detect_manual_scale <- function(plot) {
+.detect_discrete_scale <- function(plot) {
   for (aes_name in c("colour", "fill")) {
-    sc <- plot@scales$get_scales(aes_name)
-    if (is.null(sc) || is.null(sc$call)) next
-
-    is_manual <- identical(rlang::call_name(sc$call), paste0("scale_", aes_name, "_manual"))
-    if (!is_manual) next
+    if (is.null(find_aes(plot, aes_name))) next
+    if (!identical(infer_aes_type(plot, aes_name), "discrete")) next
 
     built <- tryCatch(ggplot2::ggplot_build(plot), error = function(e) NULL)
     if (is.null(built)) next
 
     trained <- built$plot@scales$get_scales(aes_name)
+    if (is.null(trained)) next
+
     breaks <- tryCatch(trained$get_breaks(), error = function(e) NULL)
     breaks <- breaks[!is.na(breaks)]
     if (length(breaks) == 0) next
@@ -318,13 +308,13 @@ plot_label <-
   }
 
   # label and/or colour left unresolved by plot_label() (it has no access
-  # to `plot`) when either should be derived from a scale_colour_manual()/
-  # scale_fill_manual() on the plot -- see ?plot_label. Detected at most
-  # once, and only when actually needed (a real ggplot_build(), so not
-  # free -- see .detect_manual_scale()).
+  # to `plot`) when either should be derived from a discrete colour/fill
+  # scale on the plot -- see ?plot_label. Detected at most once, and only
+  # when actually needed (a real ggplot_build(), so not free -- see
+  # .detect_discrete_scale()).
   colour_is_default <- length(object$colour) == 1 && is.na(object$colour)
   scale_info <- if (is.null(object$label) || colour_is_default) {
-    .detect_manual_scale(plot)
+    .detect_discrete_scale(plot)
   } else {
     NULL
   }

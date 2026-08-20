@@ -10,6 +10,27 @@
 # directly, so the panel's pixel bounding box is derived from the plot's
 # gtable layout instead.
 
+#' Re-select dev_num as the current device, if it still exists -- text
+#' layout can open and abandon devices of its own, leaving one of those
+#' current instead, so drawing silently lands on the wrong device.
+#' @noRd
+t61_reclaim_device <- function(dev_num) {
+  if (dev_num %in% grDevices::dev.list()) grDevices::dev.set(dev_num)
+}
+
+#' Retry a flaky file-based call, backing off further each time -- rsvg can
+#' fail reading a freshly-written file on Windows (e.g. antivirus
+#' scanning it) even though it's already complete.
+#' @noRd
+t61_retry <- function(fn, attempts = 8, pause = 0.1) {
+  for (i in seq_len(attempts)) {
+    result <- tryCatch(list(value = fn()), error = function(e) e)
+    if (!inherits(result, "error")) return(result$value)
+    if (i == attempts) stop(result)
+    Sys.sleep(pause * i)
+  }
+}
+
 #' Strip the e61_ggplot class before print()-ing a throwaway render (an
 #' occupancy raster, a panel-box marker): print.e61_ggplot() has side
 #' effects (a Viewer preview, console output) meant for a plot the user is
@@ -148,24 +169,44 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   # screen axes.
   flipped <- inherits(built$layout$coord, "CoordFlip")
 
+  px_height <- round(px_width * height_cm / width_cm)
+
+  # Opened before ggplotGrob() below: with no device open yet, that call
+  # can silently open the session's own default device instead, corrupting
+  # this render (confirmed cause of "Input file is too short" on Windows).
+  svg_file <- tempfile(fileext = ".svg")
+  on.exit(unlink(svg_file), add = TRUE)
+  svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
+  # Safety net if rendering errors partway: closes svg_file's own device
+  # only if the explicit close below hasn't already run.
+  dev_num <- grDevices::dev.cur()
+  on.exit({
+    t61_reclaim_device(dev_num)
+    if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
+  }, add = TRUE)
+
   gt <- ggplot2::ggplotGrob(t61_strip_chrome(plot))
+  t61_reclaim_device(dev_num)
   # Still used for its facet bail-out (exactly one panel cell, structurally
   # checked via the gtable layout) -- but NOT for the cm box it would
   # otherwise compute; see t61_render_panel_box_px() for why.
   if (is.null(t61_panel_box_cm(gt, width_cm, height_cm))) return(NULL)
 
-  px_height <- round(px_width * height_cm / width_cm)
-
-  svg_file <- tempfile(fileext = ".svg")
-  on.exit(unlink(svg_file), add = TRUE)
-  svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
-
-  print(t61_strip_chrome(t61_drop_e61_class(plot)))
-  grDevices::dev.off()
+  # Built and drawn as two explicit steps, not print(plot), so the device
+  # can be reclaimed in between: building resolves text-metric-dependent
+  # layout (where a stray device can end up current, see
+  # t61_reclaim_device()), and reclaiming only after the fact would be too
+  # late -- the draw itself would already have landed on the wrong device.
+  final_gt <- ggplot2::ggplotGrob(t61_strip_chrome(t61_drop_e61_class(plot)))
+  t61_reclaim_device(dev_num)
+  grid::grid.newpage()
+  grid::grid.draw(final_gt)
+  t61_reclaim_device(dev_num)
+  if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)
-  rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height)
+  t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height))
 
   img <- magick::image_read(png_file)
   raster <- as.raster(img)
@@ -252,21 +293,40 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
 #' @noRd
 t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_height) {
   marker_colour <- "#FF00FF"
+  baseline_dev <- grDevices::dev.cur()
 
   marker <- t61_strip_chrome(plot)
   marker@layers <- list()
   marker <- marker + ggplot2::theme(panel.background = ggplot2::element_rect(fill = marker_colour, colour = NA))
   marker <- t61_drop_e61_class(marker)
+  # See t61_render_mask()'s matching call -- these theme merges can leave
+  # some other device current; reclaim baseline_dev before opening ours.
+  t61_reclaim_device(baseline_dev)
 
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
   svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
-  print(marker)
-  grDevices::dev.off()
+  # See the matching guard in t61_render_mask() -- closes svg_file's own
+  # device if rendering errors before the explicit close below gets to.
+  dev_num <- grDevices::dev.cur()
+  on.exit({
+    t61_reclaim_device(dev_num)
+    if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
+  }, add = TRUE)
+
+  # See the matching split in t61_render_mask() -- build (ggplotGrob()) and
+  # draw as two explicit steps, not print(marker), so the device can be
+  # reclaimed in between.
+  marker_gt <- ggplot2::ggplotGrob(marker)
+  t61_reclaim_device(dev_num)
+  grid::grid.newpage()
+  grid::grid.draw(marker_gt)
+  t61_reclaim_device(dev_num)
+  if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)
-  rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height)
+  t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height))
 
   img <- magick::image_read(png_file)
   raster <- as.raster(img)
