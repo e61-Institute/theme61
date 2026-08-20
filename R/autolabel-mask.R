@@ -10,24 +10,17 @@
 # directly, so the panel's pixel bounding box is derived from the plot's
 # gtable layout instead.
 
-#' Re-select dev_num as the current device, if it still exists. A device we
-#' open ourselves (e.g. via svglite::svglite()) can still be superseded by
-#' one opened as a side effect of text layout (font-metric lookups can open
-#' and abandon their own devices) -- drawing then silently lands on
-#' whichever of those is current instead of the one we actually want, and
-#' our own file is never written to. Reselecting by identity (rather than
-#' closing anything we don't recognise, which risks closing a device
-#' something else still needs) is safe regardless of how many other
-#' devices happen to be open.
+#' Re-select dev_num as the current device, if it still exists -- text
+#' layout can open and abandon devices of its own, leaving one of those
+#' current instead, so drawing silently lands on the wrong device.
 #' @noRd
 t61_reclaim_device <- function(dev_num) {
   if (dev_num %in% grDevices::dev.list()) grDevices::dev.set(dev_num)
 }
 
-#' Retry a flaky file-based call, backing off further each time -- seen in
-#' practice as rsvg failing with "Input file is too short" on a file
-#' that's actually complete (a transient Windows file-visibility issue,
-#' e.g. antivirus scanning a freshly-written file).
+#' Retry a flaky file-based call, backing off further each time -- rsvg can
+#' fail reading a freshly-written file on Windows (e.g. antivirus
+#' scanning it) even though it's already complete.
 #' @noRd
 t61_retry <- function(fn, attempts = 8, pause = 0.1) {
   for (i in seq_len(attempts)) {

@@ -27,10 +27,6 @@ t61_quiet_na_removal <- function(expr) {
 #' With no device open, ggplotGrob()/ggplot_gtable() can silently open the
 #' session's default device to measure text -- left open, that can corrupt
 #' later renders. Opens a throwaway device first only if none is open.
-#'
-#' svglite, not pdf(NULL): a pdf()/postscript() device only knows the base
-#' 14 PostScript fonts, so measuring theme_e61()'s "pt-sans" against it
-#' warns and silently substitutes a different font's metrics.
 #' @noRd
 t61_with_device <- function(expr) {
   if (grDevices::dev.cur() == 1) {
