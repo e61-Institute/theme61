@@ -121,61 +121,35 @@ plot_label <-
            angle = 0,
            panel = NULL,
            auto_position = TRUE,
-           print_position = FALSE,
-           facet_name = lifecycle::deprecated(),
-           facet_value = lifecycle::deprecated()) {
-
-    # Hard deprecate old args if used
-    if (lifecycle::is_present(facet_name) || lifecycle::is_present(facet_value)) {
-      lifecycle::deprecate_stop(
-        when = "0.7.1",
-        what = I("theme61::plot_label(facet_name = '', facet_value = '')"),
-        with = I("theme61::plot_label(<facet_var> = <facet_value>)"),
-        details = paste0(
-          "Facet targeting is now done using the panel argument. ",
-          "Example: ",
-          "If you have a plot where the facetting variable is 'grp' and you want a label to appear on the panel titled 'A', the correct syntax is now: ",
-          "plot_label('a point', 1.25, 1, panel = list(grp = 'A'))"
-        )
-      )
-    }
+           print_position = FALSE) {
 
     if (is.null(x) != is.null(y)) {
-      stop("`x` and `y` must be supplied together, or both omitted.")
+      cli::cli_abort("`x` and `y` must be supplied together, or both omitted.")
     }
     if (!isTRUE(auto_position) && is.null(x)) {
-      stop("`x` and `y` are required when `auto_position = FALSE` (there's no automatic positioning to fall back on).")
+      cli::cli_abort("`x` and `y` are required when `auto_position = FALSE` (there's no automatic positioning to fall back on).")
     }
     if (isTRUE(auto_position) && is.null(x) && isFALSE(getOption("theme61.auto_label", TRUE))) {
-      stop(
-        "`x`/`y` are required because automatic positioning is disabled ",
-        "(`theme61.auto_label = FALSE`) -- see `?set_t61_options`."
+      cli::cli_abort(
+        "`x`/`y` are required because automatic positioning is disabled (`theme61.auto_label = FALSE`) -- see `?set_t61_options`."
       )
     }
     if (isTRUE(auto_position) && is.null(x) && any(angle != 0)) {
-      stop(
-        "`x`/`y` are required when `angle != 0` (automatic positioning ",
-        "doesn't apply to rotated text -- see `?plot_label`)."
+      cli::cli_abort(
+        "`x`/`y` are required when `angle != 0` (automatic positioning doesn't apply to rotated text -- see `?plot_label`)."
       )
     }
-    # `label` is optional (see ?plot_label -- derived from a
-    # scale_colour_manual()/scale_fill_manual() on the plot if omitted), so
-    # its length isn't known here yet. Checked again in
-    # .build_plot_label_layer() once label is resolved, alongside the same
-    # check for a colour vector.
-    if (!is.null(x) && !is.null(label) && !all.equal(length(label), length(x), length(y))) {
-      stop("The number of x and y positions must equal the number of labels.")
+    # label/colour length checks are repeated in .build_plot_label_layer(),
+    # since label may still be unresolved here (its length isn't known until
+    # then, and colour defaulting needs `plot`, unavailable until then too).
+    if (!is.null(x) && !is.null(label) && (length(label) != length(x) || length(x) != length(y))) {
+      cli::cli_abort("The number of x and y positions must equal the number of labels.")
     }
 
     geom <- match.arg(geom)
 
-    # Colour defaulting (to the e61 palette, or to a scale_colour_manual()/
-    # scale_fill_manual() on the plot -- see ?plot_label) needs `plot`,
-    # which isn't available until .build_plot_label_layer() -- so an
-    # explicit colour is length-checked there too, once label is resolved
-    # and its length is actually known.
     if (length(colour) != 1 && !is.null(label) && length(colour) != length(label)) {
-      stop("The number of colours must equal the number of labels.")
+      cli::cli_abort("The number of colours must equal the number of labels.")
     }
 
     # Automatically convert dates to dates if specified, so the user doesn't have
@@ -187,9 +161,8 @@ plot_label <-
     # If user supplied extras, they must all be named (facet vars etc.)
     if (!is.null(panel)) {
       if (!is.list(panel) || is.null(names(panel)) || any(!nzchar(names(panel)))) {
-        stop(
-          "`panel` must be a named list.\n",
-          "Example: panel = list(grp = 'A')"
+        cli::cli_abort(
+          "`panel` must be a named list.\nExample: panel = list(grp = 'A')"
         )
       }
     }
@@ -209,7 +182,8 @@ plot_label <-
         print_position = print_position,
         # Marks whether the default size was used, so update_plot_label()
         # (aes_labs.R) can scale it with the chart's base_size -- an
-        # explicit custom size is left alone instead.
+        # explicit custom size is left alone instead. all.equal(), not
+        # identical()/==, since size is a double.
         adj_plot_label = isTRUE(all.equal(size, 3.5))
       ),
       class = "e61_plot_label"
@@ -220,7 +194,8 @@ plot_label <-
 
 .plab_len_chk <- function(vec, len) {
   if (length(vec) == len) return(vec)
-  if (length(vec) != 1) stop(deparse(substitute(vec)), " must be length ", len, " or 1.")
+  var_name <- deparse(substitute(vec))
+  if (length(vec) != 1) cli::cli_abort("{var_name} must be length {len} or 1.")
   rep(vec, len)
 }
 
@@ -327,9 +302,8 @@ plot_label <-
 
   facet_vars_chk <- .get_facet_vars(plot)
   if (is.null(object$x) && length(facet_vars_chk)) {
-    stop(
-      "`x`/`y` are required when the plot is facetted (automatic positioning ",
-      "doesn't apply to facetted plots -- see `?plot_label`)."
+    cli::cli_abort(
+      "`x`/`y` are required when the plot is facetted (automatic positioning doesn't apply to facetted plots -- see `?plot_label`)."
     )
   }
 
@@ -348,17 +322,16 @@ plot_label <-
   label <- object$label
   if (is.null(label)) {
     if (is.null(scale_info)) {
-      stop(
-        "`label` is required -- the plot has no discrete `colour`/`fill` ",
-        "mapping to derive default labels from. See `?plot_label`."
+      cli::cli_abort(
+        "`label` is required -- the plot has no scale_colour_manual()/scale_fill_manual() to derive default labels from. See `?plot_label`."
       )
     }
     label <- scale_info$breaks
   }
   n <- length(label)
 
-  if (!is.null(object$x) && !all.equal(n, length(object$x), length(object$y))) {
-    stop("The number of x and y positions must equal the number of labels.")
+  if (!is.null(object$x) && (n != length(object$x) || length(object$x) != length(object$y))) {
+    cli::cli_abort("The number of x and y positions must equal the number of labels.")
   }
 
   colour <- object$colour
@@ -375,7 +348,7 @@ plot_label <-
   } else if (length(colour) == 1) {
     colour <- rep(colour, n)
   } else if (length(colour) != n) {
-    stop("The number of colours must equal the number of labels.")
+    cli::cli_abort("The number of colours must equal the number of labels.")
   }
 
   # x/y are optional when auto_position = TRUE (see ?plot_label); NA
@@ -402,9 +375,8 @@ plot_label <-
 
   if (!is.null(panel)) {
     if (!is.list(panel) || is.null(panel_names) || any(!nzchar(panel_names))) {
-      stop(
-        "`panel` must be a named list.\n",
-        "Example: plot_label('a', 1, 1, panel = list(grp = 'A'))"
+      cli::cli_abort(
+        "`panel` must be a named list.\nExample: plot_label('a', 1, 1, panel = list(grp = 'A'))"
       )
     }
 
@@ -414,21 +386,20 @@ plot_label <-
 
       if (length(have) > 0 && length(have) < length(facet_vars)) {
         missing <- setdiff(facet_vars, have)
-        stop(
-          "This plot is facetted by: ", paste(facet_vars, collapse = ", "), "\n",
-          "To place labels in a specific panel, supply *all* facet variables in `panel`.\n",
-          "Missing: ", paste(missing, collapse = ", "), "\n",
-          "Example: plot_label('a', 1, 1, panel = list(",
-          paste0(facet_vars, " = '...'", collapse = ", "),
-          "))"
+        facet_vars_txt <- paste(facet_vars, collapse = ", ")
+        missing_txt <- paste(missing, collapse = ", ")
+        example_txt <- paste0(facet_vars, " = '...'", collapse = ", ")
+        cli::cli_abort(
+          "This plot is facetted by: {facet_vars_txt}\nTo place labels in a specific panel, supply *all* facet variables in `panel`.\nMissing: {missing_txt}\nExample: plot_label('a', 1, 1, panel = list({example_txt}))"
         )
       }
 
       # If none match, user likely supplied wrong names (or plot facet vars are nonstandard)
       if (length(have) == 0) {
-        stop(
-          "`panel` names (", paste(panel_names, collapse = ", "), ") do not match the plot's facet variables (",
-          paste(facet_vars, collapse = ", "), ")."
+        panel_names_txt <- paste(panel_names, collapse = ", ")
+        facet_vars_txt <- paste(facet_vars, collapse = ", ")
+        cli::cli_abort(
+          "`panel` names ({panel_names_txt}) do not match the plot's facet variables ({facet_vars_txt})."
         )
       }
     }
@@ -438,7 +409,7 @@ plot_label <-
       v <- panel[[nm]]
       if (length(v) == 1) v <- rep(v, n)
       if (length(v) != n) {
-        stop("`panel$", nm, "` must be length 1 or the number of labels (", n, ").")
+        cli::cli_abort("`panel${nm}` must be length 1 or the number of labels ({n}).")
       }
       plot_lab_data[[nm]] <- v
     }
@@ -451,9 +422,8 @@ plot_label <-
       for (fv in facet_vars) {
         proto <- .find_facet_proto(plot, fv)
         if (is.null(proto)) {
-          stop(
-            "Facet variable `", fv, "` was not found in the plot data.\n",
-            "Check that you used the correct facetting variable name."
+          cli::cli_abort(
+            "Facet variable `{fv}` was not found in the plot data.\nCheck that you used the correct facetting variable name."
           )
         }
         if (fv %in% names(plot_lab_data)) {
@@ -481,27 +451,16 @@ plot_label <-
   }
 
   # Create the geom
-  if (object$geom == "text") {
-    retval <- ggplot2::geom_text(
-      data = plot_lab_data,
-      mapping = ggplot2::aes(x, y, label = label),
-      colour = plot_lab_data$colour,
-      size   = plot_lab_data$size,
-      hjust  = plot_lab_data$hjust,
-      angle  = plot_lab_data$angle,
-      inherit.aes = FALSE
-    )
-  } else {
-    retval <- ggplot2::geom_label(
-      data = plot_lab_data,
-      mapping = ggplot2::aes(x, y, label = label),
-      colour = plot_lab_data$colour,
-      size   = plot_lab_data$size,
-      hjust  = plot_lab_data$hjust,
-      angle  = plot_lab_data$angle,
-      inherit.aes = FALSE
-    )
-  }
+  geom_fn <- if (object$geom == "text") ggplot2::geom_text else ggplot2::geom_label
+  retval <- geom_fn(
+    data = plot_lab_data,
+    mapping = ggplot2::aes(x, y, label = label),
+    colour = plot_lab_data$colour,
+    size   = plot_lab_data$size,
+    hjust  = plot_lab_data$hjust,
+    angle  = plot_lab_data$angle,
+    inherit.aes = FALSE
+  )
 
   if (isTRUE(object$adj_plot_label)) {
     attr(retval, "adj_plot_label") <- TRUE

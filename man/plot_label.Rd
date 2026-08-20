@@ -16,9 +16,7 @@ plot_label(
   angle = 0,
   panel = NULL,
   auto_position = TRUE,
-  print_position = FALSE,
-  facet_name = lifecycle::deprecated(),
-  facet_value = lifecycle::deprecated()
+  print_position = FALSE
 )
 
 plab(
@@ -32,9 +30,7 @@ plab(
   angle = 0,
   panel = NULL,
   auto_position = TRUE,
-  print_position = FALSE,
-  facet_name = lifecycle::deprecated(),
-  facet_value = lifecycle::deprecated()
+  print_position = FALSE
 )
 }
 \arguments{

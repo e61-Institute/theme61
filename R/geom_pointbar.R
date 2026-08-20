@@ -68,7 +68,6 @@ geom_pointbar <- function(mapping = NULL, data = NULL,
                           show.legend = NA,
                           inherit.aes = TRUE) {
 
-  # Extract additional parameters
   params <- list(...)
 
   # Create modified mappings for each geom
@@ -81,7 +80,6 @@ geom_pointbar <- function(mapping = NULL, data = NULL,
     point_mapping$ymax <- NULL
   }
 
-  # Create the layers list
   layers <- list()
 
   # Error bar layer (drawn first, behind points)
@@ -119,6 +117,5 @@ geom_pointbar <- function(mapping = NULL, data = NULL,
     params = point_params
   ))
 
-  # Return the layers
   return(layers)
 }

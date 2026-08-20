@@ -239,13 +239,55 @@ update_chart_scales <- function(plot, auto_scale, sec_axis, build = NULL){
     suppressWarnings({
       if (sec_axis) {
         plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), add_space = TRUE)
-        } else if (!sec_axis) {
+      } else {
         plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE, add_space = TRUE)
-        }
+      }
     })
   }
 
   return(plot)
+}
+
+#' Find one layer's extreme (max or min) y value, preferring the ymax/ymin
+#' aesthetic but falling back to the y aesthetic - and to whichever of the two
+#' is further in the requested direction when both exist. Shared by the
+#' max-finding and min-finding halves of get_y_minmax() below, which are
+#' otherwise mirror images of each other (max/ymax/`<` vs min/ymin/`>`).
+#' @noRd
+t61_layer_extreme <- function(layer_data, direction = c("max", "min")) {
+
+  direction <- match.arg(direction)
+  agg_fun <- if (direction == "max") max else min
+  bound_col <- if (direction == "max") "ymax" else "ymin"
+
+  result <- NA_real_
+
+  # suppress messages/warnings as this will frequently warn about no non
+  # missing values
+  suppressMessages({suppressWarnings({
+    temp_bound <- agg_fun(layer_data[[bound_col]], na.rm = TRUE)
+    temp_y <- agg_fun(layer_data$y, na.rm = TRUE)
+  })})
+
+  # if its finite then it exists (max/min of a null variable returns -Inf/Inf)
+  if (is.finite(temp_bound)) {
+
+    # if the y variable is further in this direction, then use that instead
+    beyond_bound <- if (direction == "max") temp_bound < temp_y else temp_bound > temp_y
+
+    if (is.finite(temp_y) && beyond_bound) {
+      result <- temp_y
+
+    } else {
+      result <- temp_bound
+    }
+
+    # otherwise return the max/min of the y-variable
+  } else if (is.numeric(temp_y) && is.finite(temp_y)) {
+    result <- temp_y
+  }
+
+  result
 }
 
 #' Get the minimum and maximum y-axis data in the chart data
@@ -260,55 +302,8 @@ get_y_minmax <- function(plot, build = NULL){
 
   for(i in seq_along(chart_data)){
 
-    # find the maximum y-axis variable
-    temp_max_y <- NA_real_
-
-    # suppress messages as this will frequently warn about no non missing values
-    suppressMessages({suppressWarnings({
-      temp_ymax <- max(chart_data[[i]]$ymax, na.rm = TRUE)
-      temp_y <- max(chart_data[[i]]$y, na.rm = TRUE)
-    })})
-
-    # if its finite then it it exists (max of a null variable returns -Inf)
-    if(is.finite(temp_ymax)){
-
-      # if the y variable has a higher maximum, then use that instead
-      if(is.finite(temp_y) && temp_ymax < temp_y) {
-        temp_max_y <- temp_y
-
-      } else {
-        temp_max_y <- temp_ymax
-      }
-
-      # otherwise return the max of the y-variable
-    } else if(is.numeric(temp_y) && is.finite(temp_y)){
-      temp_max_y <- temp_y
-    }
-
-    # find the minimum y-axis variable
-    temp_min_y <- NA_real_
-
-    # suppress messages as this will frequently warn about no non missing values
-    suppressMessages({suppressWarnings({
-      temp_ymin <- min(chart_data[[i]]$ymin, na.rm = TRUE)
-      temp_y <- min(chart_data[[i]]$y, na.rm = TRUE)
-    })})
-
-    # if its finite then it it exists (min of a null variable returns -Inf)
-    if(is.finite(temp_ymin)){
-
-      # if the y variable has a lower minimum, then use that instead
-      if(is.finite(temp_y) && temp_ymin > temp_y) {
-        temp_min_y <- temp_y
-
-      } else {
-        temp_min_y <- temp_ymin
-      }
-
-      # otherwise return the min of the y-variable
-    } else if(is.numeric(temp_y) && is.finite(temp_y)){
-      temp_min_y <- temp_y
-    }
+    temp_max_y <- t61_layer_extreme(chart_data[[i]], "max")
+    temp_min_y <- t61_layer_extreme(chart_data[[i]], "min")
 
     # update the current min and max values - if NA then it must be the first observation
     if(is.na(min_y) && !is.na(temp_min_y)){

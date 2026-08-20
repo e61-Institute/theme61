@@ -114,13 +114,10 @@ t61_panel_box_cm <- function(gt, width_cm, height_cm) {
 #' never element_blank() (which would collapse e.g. the axis-text column
 #' and shift the panel's offset relative to the real chart).
 #'
-#' Blanks the .major/.minor/.x/.y variants of grid/line/tick elements
-#' explicitly, not just their generic parents (panel.grid, axis.line,
-#' axis.ticks): theme_e61() sets those more specific elements directly, and
-#' ggplot2's theme merging keeps an already-explicit specific element over a
-#' later, more generic one -- so blanking only the parent silently failed to
-#' hide gridlines/axis lines/ticks, which then rendered as mask "ink" and
-#' blocked otherwise-good label candidates near any axis break or edge.
+#' Blanks the .major/.minor/.x/.y variants explicitly, not just their generic
+#' parents (panel.grid, axis.line, axis.ticks): ggplot2's theme merging keeps
+#' an already-explicit specific element (as theme_e61() sets) over a more
+#' generic one, so blanking only the parent would leave it as mask "ink".
 #' Also blanks axis.title (rotated axis title text is real ink too).
 #' @noRd
 t61_strip_chrome <- function(plot) {

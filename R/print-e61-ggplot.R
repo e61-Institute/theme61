@@ -30,11 +30,7 @@ print.e61_plot <- function(x, ...) {
     rstudioapi::isAvailable()
 
   # Alter defaults for facets with free y scales
-  if (!is.null(x@facet$params$free$y)) {
-    free_y <- x@facet$params$free$y
-  } else {
-    free_y <- FALSE
-  }
+  free_y <- isTRUE(x@facet$params$free$y)
 
   # Detect whether user supplied a y scale (pre-build)
   ys <- x@scales$get_scales("y")
@@ -135,9 +131,9 @@ activate_viewer_after_plot <- function() {
 
   # Retry a few times to win focus races
   if (requireNamespace("later", quietly = TRUE)) {
-    later::later(function() try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE), 0.05)
-    later::later(function() try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE), 0.20)
-    later::later(function() try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE), 0.50)
+    for (delay in c(0.05, 0.20, 0.50)) {
+      later::later(function() try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE), delay)
+    }
   }
 
   invisible(TRUE)

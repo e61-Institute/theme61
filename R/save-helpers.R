@@ -97,20 +97,14 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
 #' @noRd
 check_plots <- function(plots){
 
-  temp_list <- list()
+  is_valid <- vapply(plots, is_ggplot, logical(1))
 
-  for(i in seq_along(plots)){
-    temp_plot <- plots[[i]]
-
-    if(is_ggplot(temp_plot)) {
-      temp_list[[length(temp_list) + 1]] <- temp_plot
-    } else {
-
-      stop(paste0(temp_plot, " is not a valid save_e61() argument. Check that you have not supplied the wrong object to save_e61() or used an incorrect or outdated argument (use ?save_e61 to view valid arguments)."))
-    }
+  if (!all(is_valid)) {
+    bad_plot <- plots[[which(!is_valid)[1]]]
+    stop(paste0(bad_plot, " is not a valid save_e61() argument. Check that you have not supplied the wrong object to save_e61() or used an incorrect or outdated argument (use ?save_e61 to view valid arguments)."))
   }
 
-  return(temp_list)
+  plots
 }
 
 
@@ -322,7 +316,7 @@ check_plot_spelling <- function(plot) {
 #' @export
 svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
 
-  res <- res * 4 # res = 1 produces exceedingly small images now apparently
+  res <- res * 4 # res = 1 alone produces images too small to be usable
 
   if (!grepl(".*\\.svg$", file_in))
     stop("file_in must be an svg file.")
@@ -341,10 +335,6 @@ svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
     # converting it to PNG. Hence the need for temp files.
     file_temp_svg <- "intermed.svg"
     file_temp_out <- paste0("intermed.", fmt)
-
-    # For some reason this changed at some point and the scaling is fine now.
-    # Keeping this here in case it reverts back in the future.
-    # res <- res / 1.25 # For some reason any res > 1 scales 1:1.25...
 
     rsvg::rsvg_png(svg = file_in, file = file_temp_out)
 

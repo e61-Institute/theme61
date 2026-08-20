@@ -50,10 +50,11 @@ set_t61_options <- function(opt = NULL) {
     t61_set_opts <- sapply(t61_opts, options)
 
     # Print options as a pretty list displayed as 'option = value'
-    cli::cli_bullets(c("i" = "Current theme61 options:"))
-    for (opt in names(t61_set_opts)) {
-      cli::cli_bullets(c(" " = paste0(opt, " = ", t61_set_opts[[opt]])))
-    }
+    bullets <- paste0(names(t61_set_opts), " = ", t61_set_opts)
+    cli::cli_bullets(c(
+      "i" = "Current theme61 options:",
+      stats::setNames(bullets, rep(" ", length(bullets)))
+    ))
 
     return(invisible(t61_set_opts))
   } else {
