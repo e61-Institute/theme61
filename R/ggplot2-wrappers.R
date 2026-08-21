@@ -21,7 +21,9 @@ ggplot <- function(data = NULL,
   # in iterate_mode, which opts out of all automatic theme61 styling.
   if (isTRUE(getOption("theme61.auto_theme", TRUE)) &&
       !isTRUE(getOption("theme61.iterate_mode", FALSE))) {
-    p <- p + theme_e61()
+    # Merging theme_e61() can silently open the session's default device
+    # (confirmed on Windows) -- guard against it.
+    p <- t61_with_device(p + theme_e61())
   }
 
   p

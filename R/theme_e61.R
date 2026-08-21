@@ -41,6 +41,17 @@
 #'   theme_e61()
 #' }
 #'
+#' Validate a legend_position argument when legend == "inside"
+#' @noRd
+.validate_legend_position <- function(legend_position) {
+  if (!is.numeric(legend_position) || length(legend_position) != 2)
+    stop("legend_position needs to be a length two numeric vector.")
+
+  if (!(data.table::between(legend_position[[1]], 0, 1) |
+        data.table::between(legend_position[[2]], 0, 1)))
+    stop("Both legend_position values must be between 0 and 1.")
+}
+
 theme_e61 <- function(
     legend = c("none", "bottom", "top", "left", "right", "inside"),
     legend_position = NULL,
