@@ -9,3 +9,4 @@
 \description{
 Method for existing e61_map class objects
 }
+\keyword{internal}

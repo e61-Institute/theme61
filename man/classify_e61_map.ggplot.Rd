@@ -9,3 +9,4 @@
 \description{
 Method for ggplot
 }
+\keyword{internal}

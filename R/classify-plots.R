@@ -1,12 +1,14 @@
 # as_e61_plot ----
 
 #' Generic to coerce plots to e61_plot class
+#' @keywords internal
 #' @export
 as_e61_plot <- function(x, ...) {
   UseMethod("as_e61_plot")
 }
 
 #' Method for plain ggplot
+#' @keywords internal
 #' @export
 as_e61_plot.ggplot <- function(x, ...) {
   if (!inherits(x, "e61_plot")) {
@@ -16,18 +18,21 @@ as_e61_plot.ggplot <- function(x, ...) {
 }
 
 #' Method for existing e61_plot class objects
+#' @keywords internal
 #' @export
 as_e61_plot.e61_plot <- function(x, ...) {
   x
 }
 
 #' Method that works for lists of plots
+#' @keywords internal
 #' @export
 as_e61_plot.list <- function(x, ...) {
   lapply(x, as_e61_plot)
 }
 
 #' Method that fails for non-plots
+#' @keywords internal
 #' @export
 as_e61_plot.default <- function(x, ...) {
   stop(
@@ -51,12 +56,14 @@ should_be_map <- function(x, force) {
 }
 
 #' Generic to coerce plots to e61_map class
+#' @keywords internal
 #' @export
 classify_e61_map <- function(x, ..., force = NULL) {
   UseMethod("classify_e61_map")
 }
 
 #' Method for e61_plot
+#' @keywords internal
 #' @export
 classify_e61_map.e61_plot <- function(x, ..., force = NULL) {
 
@@ -68,6 +75,7 @@ classify_e61_map.e61_plot <- function(x, ..., force = NULL) {
 }
 
 #' Method for ggplot
+#' @keywords internal
 #' @export
 classify_e61_map.ggplot <- function(x, ..., force = NULL) {
 
@@ -82,6 +90,7 @@ classify_e61_map.ggplot <- function(x, ..., force = NULL) {
 }
 
 #' Method for existing e61_map class objects
+#' @keywords internal
 #' @export
 classify_e61_map.e61_map <- function(x, ...) {
 
@@ -89,12 +98,14 @@ classify_e61_map.e61_map <- function(x, ...) {
 }
 
 #' Method that works for lists of plots
+#' @keywords internal
 #' @export
 classify_e61_map.list <- function(x, ...) {
   lapply(x, classify_e61_map)
 }
 
 #' Method that fails for non-plots
+#' @keywords internal
 #' @export
 classify_e61_map.default <- function(x, ...) {
   stop(

@@ -9,3 +9,4 @@
 \description{
 Method for e61_plot
 }
+\keyword{internal}

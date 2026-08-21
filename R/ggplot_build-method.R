@@ -1,4 +1,5 @@
 #' Method for theme61 plots to add default scales at build time
+#' @keywords internal
 #' @export
 ggplot_build.e61_plot <- function(plot, ...) {
 
