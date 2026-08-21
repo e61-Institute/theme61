@@ -31,18 +31,7 @@ scale_colour_e61 <- function(reverse = FALSE,
 
   palette <- match.arg(palette)
 
-  if (discrete) {
-    retval <- discrete_scale(aesthetics, palette = get_palette, ...)
-
-  } else {
-
-    pal <- e61_pal(palette = palette, reverse = reverse)
-    retval <- ggplot2::scale_color_gradientn(colours = pal(256), ...)
-  }
-
-  class(retval) <- c(class(retval), "scale_col_e61")
-
-  return(retval)
+  .build_e61_scale(aesthetics, reverse, discrete, palette, ggplot2::scale_color_gradientn, ...)
 }
 
 #' @rdname scale_e61
@@ -55,18 +44,26 @@ scale_fill_e61 <- function(reverse = FALSE,
 
   palette <- match.arg(palette)
 
+  .build_e61_scale(aesthetics, reverse, discrete, palette, ggplot2::scale_fill_gradientn, ...)
+}
+
+#' Shared builder for scale_colour_e61()/scale_fill_e61() -- identical apart
+#' from which aesthetic and continuous gradientn function they use.
+#' @noRd
+.build_e61_scale <- function(aesthetics, reverse, discrete, palette, continuous_fn, ...) {
+
   if (discrete) {
     retval <- discrete_scale(aesthetics, palette = get_palette, ...)
 
   } else {
 
     pal <- e61_pal(palette = palette, reverse = reverse)
-    retval <- ggplot2::scale_fill_gradientn(colours = pal(256), ...)
+    retval <- continuous_fn(colours = pal(256), ...)
   }
 
   class(retval) <- c(class(retval), "scale_col_e61")
 
-  return(retval)
+  retval
 }
 
 #' A consistent set of colours for Australian states and territories for

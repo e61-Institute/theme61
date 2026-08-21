@@ -17,6 +17,10 @@ save_single <- function(
     fast_labels = FALSE
 ) {
 
+  # Several plot + theme(...) merges below (e.g. update_margins(),
+  # resolve_aspect_ratio()) can silently open the session's default device on
+  # Windows -- guard the whole function rather than each call site.
+  t61_with_device({
 
   # Plot is assumed pre-classified and prepared by save_e61()
   is_spatial_chart <- inherits(plot, "e61_map")
@@ -212,5 +216,7 @@ save_single <- function(
                  height = height)
 
   return(retval)
+
+  })
 
 }

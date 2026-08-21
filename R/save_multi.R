@@ -29,6 +29,10 @@ save_multi <-
            print_label_positions = FALSE
   ) {
 
+    # Guard the whole function: several plot + theme(...)/plot_annotation()
+    # merges below can silently open the session's default device on Windows.
+    t61_with_device({
+
     # Set width -------------------------------------------------------------
 
     default_width <- 18.59
@@ -199,11 +203,6 @@ save_multi <-
     panel_width <- free_wd / ncol # width of each panel
     panel_height <- panel_width * max_panel_asps # height of the tallest panel (width * aspect ratio)
 
-    # Calc padding between charts because the per-panel label wrapping below
-    # also needs it: each panel gets this margin applied on its own left/right
-    # via patchwork's `&` operator, so it's part of that panel's true width.
-    chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
-    chart_height_pad <- points_to_mm(5.5) + pad_height * 10
     base_margin_h <- outer_height_mm
     base_margin_w <- outer_width_mm
 
@@ -264,35 +263,17 @@ save_multi <-
       }
     }
 
-    # Padding between charts, computed here (rather than only applied to
-    # the combined multi_plot further down) so each panel already carries
-    # its real, final plot.margin before t61_apply_autolabel() measures it
-    # just below.
-    chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
-    chart_height_pad <- points_to_mm(5.5) + pad_height * 10
-
     # Auto-position eligible plot_label() text on each panel now that its
-    # final size within the grid is known. Every panel shares the same
-    # panel_width/panel_height (the flexible "null" cell computed above)
-    # and the same aggregated axis/title overhead, matching the uniform
-    # per-panel sizing the rest of this function already assumes rather
-    # than each panel's own exact geometry post-combination.
+    # final size within the grid is known (every panel shares the same
+    # panel_width/panel_height and aggregated axis/title overhead). Uses
+    # the smaller, uniform margin the combined chart actually renders with
+    # (not theme_e61()'s larger per-panel default), since positioning
+    # against the wrong margin could place a label on real content once
+    # the real panel renders.
     #
-    # Each panel's own plot.margin (theme_e61()'s larger default) is
-    # overridden here with the smaller, uniform margin the combined chart
-    # actually ends up using -- placing labels against the old, bigger
-    # margin would assume a smaller panel than the real one, letting a
-    # label sitting just outside that assumed edge land on real content
-    # once the real (larger) panel renders. No-ops on a panel with no
-    # eligible labels.
-    #
-    # The width/height passed to t61_apply_autolabel() has to be each
-    # panel's own total footprint, including that margin -- not just
-    # panel_width + axis. This matches what tot_width/ncol and (p_h)/nrow
-    # end up being further below, once title/subtitle/caption and the
-    # rest of the top-level padding are worked out, but those aren't
-    # available yet at this point in the function, so it's reconstructed
-    # directly here from the same pieces instead.
+    # panel_total_width/height reconstruct each panel's total footprint
+    # (panel + axis + margin) from the same pieces tot_width/ncol and
+    # (p_h)/nrow use further below -- those aren't available yet here.
     panel_total_width  <- panel_width + max_left_axis_width + max_right_axis_width + 2 * chart_width_pad / 10
     panel_total_height <- panel_height + known_height + 2 * chart_height_pad / 10
 
@@ -304,30 +285,24 @@ save_multi <-
         clean_plotlist[[i]], width_cm = panel_total_width, height_cm = panel_total_height,
         print_positions = print_label_positions
       )
-    }
 
+      # Set the margin each panel renders with: outer grid edges get base_margin
+      # interior-facing sides get chart_height/width_pad
+      row_i <- ceiling(i / ncol)
+      col_i <- ((i - 1) %% ncol) + 1
+
+      top_i <- if (row_i == 1) base_margin_h else chart_height_pad
+      bottom_i <- if (row_i == nrow) base_margin_h else chart_height_pad
+      left_i <- if (col_i == 1) base_margin_w else chart_width_pad
+      right_i <- if (col_i == ncol) base_margin_w else chart_width_pad
+
+      clean_plotlist[[i]] <- clean_plotlist[[i]] +
+        theme(plot.margin = margin(t = top_i, b = bottom_i, r = right_i, l = left_i, unit = "mm"))
+    }
 
     # Gather the plots ----------------------------------------------------
 
     plots <- clean_plotlist
-
-    # Only needed when auto_scale is FALSE: the loop above already applied
-    # this exact margin to every panel when auto_scale is TRUE, so re-running
-    # it here would just repeat the same theme merge for no visual effect.
-    if (!auto_scale) {
-      for (i in seq_along(plots)) {
-        row_i <- ceiling(i / ncol)
-        col_i <- ((i - 1) %% ncol) + 1
-
-        top_i <- if (row_i == 1) base_margin_h else chart_height_pad
-        bottom_i <- if (row_i == nrow) base_margin_h else chart_height_pad
-        left_i <- if (col_i == 1) base_margin_w else chart_width_pad
-        right_i <- if (col_i == ncol) base_margin_w else chart_width_pad
-
-        plots[[i]] <- plots[[i]] +
-          theme(plot.margin = margin(t = top_i, b = bottom_i, r = right_i, l = left_i, unit = "mm"))
-      }
-    }
 
     # Create the main chart
     multi_plot <- patchwork::wrap_plots(
@@ -524,4 +499,6 @@ save_multi <-
                    height = tot_height)
 
     return(retval)
+
+    })
   }

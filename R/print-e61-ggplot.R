@@ -30,11 +30,7 @@ print.e61_plot <- function(x, ...) {
     rstudioapi::isAvailable()
 
   # Alter defaults for facets with free y scales
-  if (!is.null(x@facet$params$free$y)) {
-    free_y <- x@facet$params$free$y
-  } else {
-    free_y <- FALSE
-  }
+  free_y <- isTRUE(x@facet$params$free$y)
 
   # Detect whether user supplied a y scale (pre-build)
   ys <- x@scales$get_scales("y")
@@ -75,7 +71,17 @@ print.e61_plot <- function(x, ...) {
   x_plot <- finalise_e61_plot(x)
   x_plot <- maybe_add_default_scales(x_plot)
   class(x_plot) <- setdiff(class(x_plot), c("e61_map", "e61_plot"))
+
+  # Without this, auto-positioned labels stay at their NA placeholder here
+  # (only the Viewer preview above resolves one) and silently vanish.
+  # width/height are just a rough estimate for this cheap fast placement.
+  x_plot <- suppressWarnings(t61_apply_autolabel(x_plot, width_cm = 16, height_cm = 12, fast = TRUE))
   print(x_plot)
+
+  # print(x_plot) just registered the fast-labelled x_plot as
+  # ggplot2::last_plot() -- restore the pristine plot, or a bare
+  # save_e61() call afterwards reuses those fast positions.
+  ggplot2::set_last_plot(x)
 
   # Prefer Viewer focus by default (best-effort). Users who don't want any
   # of this can use theme61.iterate_mode instead.
@@ -124,9 +130,9 @@ activate_viewer_after_plot <- function() {
 
   # Retry a few times to win focus races
   if (requireNamespace("later", quietly = TRUE)) {
-    later::later(function() try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE), 0.05)
-    later::later(function() try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE), 0.20)
-    later::later(function() try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE), 0.50)
+    for (delay in c(0.05, 0.20, 0.50)) {
+      later::later(function() try(rstudioapi::executeCommand("activateViewer", quiet = TRUE), silent = TRUE), delay)
+    }
   }
 
   invisible(TRUE)

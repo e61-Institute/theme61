@@ -9,6 +9,7 @@
 #'  \itemize{
 #'    \item \code{theme61.auto_label}: If TRUE (default), \code{plot_label()} text without an explicit `x`/`y` gets automatically positioned by \code{save_e61()} (see \code{?plot_label}). Set to FALSE to turn automatic positioning off entirely and restore the previous behaviour, where \code{x}/\code{y} are always required (\code{plot_label()} errors immediately if you omit them, regardless of \code{auto_position}) -- no auto-positioning work is attempted, so there's no performance cost from the feature at all.
 #'    \item \code{theme61.auto_theme}: If TRUE (default), \code{theme_e61()} is automatically applied whenever you call \code{ggplot()}. Set to FALSE to turn this off and apply your own theme instead.
+#'    \item \code{theme61.autolabel_fast_msg}: If TRUE (default), the first auto-positioned \code{plot_label()} text shown in the Viewer pane preview (or any \code{save_e61(fast_labels = TRUE)} call) shows a one-off reminder that the preview uses a quick placement heuristic, not the real collision-avoiding search -- labels may overlap there even when \code{save_e61()} would place them cleanly. Turns itself off after showing once; set back to TRUE to see it again.
 #'    \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
 #'    \item \code{theme61.default_save_format}: The default file save format if format is not specified in [save_e61] and the file extension is not provided in \code{filename}. This is "svg" by default.
 #'    \item \code{theme61.disable_spellcheck}: If TRUE, [save_e61]'s spell-checker is skipped entirely, regardless of its \code{spell_check} argument. This is FALSE by default.
@@ -49,10 +50,11 @@ set_t61_options <- function(opt = NULL) {
     t61_set_opts <- sapply(t61_opts, options)
 
     # Print options as a pretty list displayed as 'option = value'
-    cli::cli_bullets(c("i" = "Current theme61 options:"))
-    for (opt in names(t61_set_opts)) {
-      cli::cli_bullets(c(" " = paste0(opt, " = ", t61_set_opts[[opt]])))
-    }
+    bullets <- paste0(names(t61_set_opts), " = ", t61_set_opts)
+    cli::cli_bullets(c(
+      "i" = "Current theme61 options:",
+      stats::setNames(bullets, rep(" ", length(bullets)))
+    ))
 
     return(invisible(t61_set_opts))
   } else {

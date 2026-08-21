@@ -1,6 +1,32 @@
 # Candidate position generation, and picking the best of a set of already-
 # evaluated candidates.
 
+# Buffer multiplier by geom_type, applied to label height (cm). Shared
+# between the hard exclusion threshold (t61_place_label()'s min_buffer_cm)
+# and the soft scoring target below (t61_target_buffer_cm()). "point"
+# needs a much bigger multiplier: a scattered cluster has no single
+# direction to step away from, unlike a line.
+T61_BUFFER_MULT <- c(point = 3.4, line = 1.13)
+
+#' Base buffer multiplier (see T61_BUFFER_MULT) for a geom_type; "line" is
+#' also the fallback for column/area/pointbar.
+#' @noRd
+t61_buffer_mult <- function(geom_type) {
+  if (identical(geom_type, "point")) T61_BUFFER_MULT[["point"]] else T61_BUFFER_MULT[["line"]]
+}
+
+# How much larger t61_target_buffer_cm()'s soft target is than
+# t61_place_label()'s hard min_buffer_cm -- it must clear the minimum to
+# land inside the "near" selection group (see t61_selection_group()).
+# The two were previously independent hand-tuned literals (point: 3.4 vs
+# 3.8; line: 1.13 vs 1.27) that were close but not exactly proportional
+# (ratios 19/17 vs 127/113, ~0.6% apart) -- not the same conceptual
+# quantity, so not merged to one value, but the relationship is now a
+# single named constant. Using the exact "point" ratio (19/17) keeps the
+# point target unchanged (3.8) and shifts the line target by ~0.4% (1.27
+# -> 1.264706), a negligible adjustment given both were hand-tuned anyway.
+T61_TARGET_OVER_MIN <- 19 / 17
+
 #' A grid of candidate (x, y) anchor positions to try for a label, spread
 #' across the panel's data ranges. Anchors near the very edges are excluded
 #' -- a label anchored right at the axis limit tends to look cramped and is
@@ -97,8 +123,7 @@ t61_selection_group <- function(distance_cm, label_height_cm, geom_type = "line"
 #' would suggest.
 #' @noRd
 t61_target_buffer_cm <- function(label_height_cm, geom_type = "line") {
-  mult <- if (identical(geom_type, "point")) 3.8 else 1.27
-  mult * label_height_cm
+  t61_buffer_mult(geom_type) * T61_TARGET_OVER_MIN * label_height_cm
 }
 
 #' @noRd

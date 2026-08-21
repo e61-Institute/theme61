@@ -16,9 +16,7 @@ plot_label(
   angle = 0,
   panel = NULL,
   auto_position = TRUE,
-  print_position = FALSE,
-  facet_name = lifecycle::deprecated(),
-  facet_value = lifecycle::deprecated()
+  print_position = FALSE
 )
 
 plab(
@@ -32,15 +30,13 @@ plab(
   angle = 0,
   panel = NULL,
   auto_position = TRUE,
-  print_position = FALSE,
-  facet_name = lifecycle::deprecated(),
-  facet_value = lifecycle::deprecated()
+  print_position = FALSE
 )
 }
 \arguments{
 \item{label}{(optional, see Details) String vector. Label text to be
-displayed. If omitted, derived from a \code{scale_colour_manual()}/
-\code{scale_fill_manual()} on the plot, if there is one.}
+displayed. If omitted, derived from a discrete \code{colour}/\code{fill} scale
+on the plot, if there is one.}
 
 \item{x}{(optional, see Details) Numeric or string vector. X-axis
 positions of the label text. If supplied, this exact position is
@@ -50,8 +46,8 @@ always used.}
 positions of the label text. See \code{x}.}
 
 \item{colour}{(optional, see Details) Vector of colour names or strings.
-Defaults to a \code{scale_colour_manual()}/\code{scale_fill_manual()} on the plot,
-if there is one, else the e61 palette.}
+Defaults to a discrete \code{colour}/\code{fill} scale on the plot, if there is
+one, else the e61 palette.}
 
 \item{size}{(optional) Integer. Size of the text, the default size should be
 appropriate in most cases.}
@@ -94,10 +90,15 @@ onto the graph plot. This is preferred over using legends.
 \details{
 \subsection{Default label text and colour}{
 
-If the plot has a \code{scale_colour_manual()}/\code{scale_fill_manual()} (checked
-in that order; a theme61 wrapper that constructs one, e.g.
-\code{scale_colour_e61_aus()}, counts too), \code{label} and \code{colour} can be
-derived from it instead of the e61 palette:
+If the plot maps \code{colour}/\code{fill} to a discrete variable (checked in that
+order), \code{label} and \code{colour} can be derived from that scale instead of
+the e61 palette. This covers an explicit \code{scale_colour_manual()}/
+\code{scale_fill_manual()} (or a theme61 wrapper that constructs one, e.g.
+\code{scale_colour_e61_aus()}), an algorithmic discrete scale like
+\code{scale_colour_e61()}/\code{scale_colour_brewer()}, and simply relying on
+theme61's own default scale by supplying no scale at all -- once the plot
+is built, all of these resolve to the same thing, a fixed mapping from
+each level to its assigned colour:
 \itemize{
 \item If you omit \code{label} entirely, it defaults to that scale's own levels
 (i.e. what a legend would show), in their resolved order -- so
@@ -111,10 +112,8 @@ instead (rather than guessing a partial match).
 \item An explicit \code{colour} always wins outright over any of the above.
 }
 
-Only a scale with fixed, explicit values (\code{scale_colour_manual()}/
-\code{scale_fill_manual()}) is used this way -- an algorithmic discrete scale
-(e.g. \code{scale_colour_e61()}, \code{scale_colour_brewer()}) doesn't count, since
-it has no fixed "colours the user chose" to read.
+A continuous \code{colour}/\code{fill} (e.g. \code{scale_colour_gradient()}) doesn't
+count -- there's no fixed set of "levels" to derive labels from.
 }
 
 \subsection{Automatic positioning}{

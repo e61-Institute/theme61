@@ -11,11 +11,10 @@
 
 palette_e61 <- function(n, reverse = FALSE) {
 
-  if (n == 0) stop("You need to specify the number of colours/fills in your palette.")
-  if (n > 12) stop("You cannot request more than 12 colours, consider using a
-                   continuous colour scale or reducing the number of groups in
-                   your data.")
-
+  # n is validated inside get_palette() (broader checks - non-numeric,
+  # non-integer, length != 1, as well as range - covering both cases below
+  # plus more), so every caller gets the same clear error and it doesn't
+  # need to be duplicated here.
   palette <- get_palette(n)
 
   if (isTRUE(reverse)) {
@@ -28,11 +27,9 @@ palette_e61 <- function(n, reverse = FALSE) {
 
 #' Get colours for palette functions
 #'
-#' Validates `n` itself (rather than relying on callers to pre-check it) so
-#' that every caller - including scale_colour_e61()/scale_fill_e61(), which
-#' pass this function straight into ggplot2::discrete_scale() without any
-#' validation of their own - gets a clear error for an out-of-range `n`,
-#' rather than a cryptic "object not found" from an unmatched branch.
+#' Validates `n` itself so every caller gets a clear error for an
+#' out-of-range value, including callers (e.g. scale_colour_e61()) that pass
+#' it straight into ggplot2::discrete_scale() with no validation of their own.
 #'
 #' @param n Numeric.
 #'
@@ -42,7 +39,19 @@ palette_e61 <- function(n, reverse = FALSE) {
 
 get_palette <- function(n) {
 
-  if (!is.numeric(n) || length(n) != 1 || n != round(n) || n < 1 || n > 12) {
+  if (!is.numeric(n) || length(n) != 1 || n != round(n)) {
+    cli::cli_abort(
+      "{.arg n} must be a single whole number, not {n}."
+    )
+  }
+
+  if (n < 1) {
+    cli::cli_abort(
+      "You need to specify the number of colours/fills in your palette ({n} requested)."
+    )
+  }
+
+  if (n > 12) {
     cli::cli_abort(
       "theme61 does not support more than 12 discrete colours/fills automatically ({n} requested). Please supply your own scale (e.g. scale_colour_manual()/scale_fill_manual())."
     )

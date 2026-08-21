@@ -88,7 +88,7 @@ test_that("Multi-plot labels work with colour and fill", {
   expect_equal(l2$aes_params$colour, expected_fills)
 })
 
-test_that("plot_label() derives label/colour from a manual colour/fill scale", {
+test_that("plot_label() derives label/colour from a discrete colour/fill scale", {
 
   data <- data.frame(
     x = c(0, 1, 0, 1),
@@ -146,22 +146,42 @@ test_that("plot_label() derives label/colour from a manual colour/fill scale", {
   d6 <- p6@layers[[length(p6@layers)]]$data
   expect_equal(d6$colour, palette_e61(3))
 
-  # No manual scale, colour supplied but label omitted: no scale to
-  # derive a default label from, so this still errors
-  no_scale <- ggplot(data, aes(x, y, colour = grp)) + geom_line()
-  expect_error(
-    no_scale + plot_label(),
-    "no scale_colour_manual"
-  )
+  # No scale supplied at all: theme61 auto-injects a default discrete scale
+  # at build time (see maybe_add_default_scales()), and that now counts too
+  # -- label/colour derive from it, the same as an explicit manual scale.
+  no_scale <- ggplot(data, aes(x, y, colour = grp))
+  p8 <- no_scale + geom_line() + plot_label()
+  b8 <- ggplot_build(no_scale + geom_line())
+  sc8 <- b8@plot@scales$get_scales("colour")
+  expected8 <- unname(sc8$map(levels(data$grp)))
+  d8 <- p8@layers[[length(p8@layers)]]$data
+  expect_equal(d8$label, levels(data$grp))
+  expect_equal(d8$colour, expected8)
 
-  # An algorithmic discrete scale (not "manual") doesn't count -- colour
-  # still falls back to the e61 palette, and label is still required
+  # An algorithmic discrete scale (not "manual") counts too -- label can be
+  # omitted, and colour is matched to the scale's actual resolved colours,
+  # not an independent call to the e61 palette.
   algo_scale <- ggplot(data, aes(x, y, colour = grp)) + geom_line() + scale_colour_e61()
-  expect_error(algo_scale + plot_label(), "no scale_colour_manual")
+  p7a <- algo_scale + plot_label()
+  ba <- ggplot_build(algo_scale)
+  sca <- ba@plot@scales$get_scales("colour")
+  expected7 <- unname(sca$map(levels(data$grp)))
+  d7a <- p7a@layers[[length(p7a@layers)]]$data
+  expect_equal(d7a$label, levels(data$grp))
+  expect_equal(d7a$colour, expected7)
 
   p7 <- algo_scale + plot_label(c("Alpha", "Beta"))
   d7 <- p7@layers[[length(p7@layers)]]$data
-  expect_equal(d7$colour, palette_e61(2))
+  expect_equal(d7$colour, expected7)
+
+  # Continuous colour/fill still doesn't count -- there's no fixed set of
+  # levels to derive a default label from, so this still errors
+  data_cont <- data.frame(x = c(0, 1, 0, 1), y = c(0, 0, 1, 1), z = c(1, 2, 3, 4))
+  cont_scale <- ggplot(data_cont, aes(x, y, colour = z)) + geom_point()
+  expect_error(
+    cont_scale + plot_label(),
+    "no discrete"
+  )
 })
 
 test_that("Plots with additional aes still work", {
