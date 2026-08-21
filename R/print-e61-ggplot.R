@@ -78,10 +78,9 @@ print.e61_plot <- function(x, ...) {
   x_plot <- suppressWarnings(t61_apply_autolabel(x_plot, width_cm = 16, height_cm = 12, fast = TRUE))
   print(x_plot)
 
-  # print(x_plot) just registered x_plot (fast_labels = TRUE positions
-  # baked in) as ggplot2::last_plot(). save_e61()'s `plot` arg defaults to
-  # last_plot(), so a bare save_e61() call afterwards would otherwise
-  # silently reuse those fast positions instead of running the real search.
+  # print(x_plot) just registered the fast-labelled x_plot as
+  # ggplot2::last_plot() -- restore the pristine plot, or a bare
+  # save_e61() call afterwards reuses those fast positions.
   ggplot2::set_last_plot(x)
 
   # Prefer Viewer focus by default (best-effort). Users who don't want any

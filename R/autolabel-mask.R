@@ -186,17 +186,14 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   }, add = TRUE)
 
   gt <- ggplot2::ggplotGrob(t61_strip_chrome(plot))
-  t61_reclaim_device(dev_num)
   # Still used for its facet bail-out (exactly one panel cell, structurally
   # checked via the gtable layout) -- but NOT for the cm box it would
   # otherwise compute; see t61_render_panel_box_px() for why.
   if (is.null(t61_panel_box_cm(gt, width_cm, height_cm))) return(NULL)
 
-  # Built and drawn as two explicit steps, not print(plot), so the device
-  # can be reclaimed in between: building resolves text-metric-dependent
-  # layout (where a stray device can end up current, see
-  # t61_reclaim_device()), and reclaiming only after the fact would be too
-  # late -- the draw itself would already have landed on the wrong device.
+  # Built and drawn as two explicit steps, not print(plot): building can
+  # leave a stray device current, and reclaiming only after drawing would
+  # already be too late.
   final_gt <- ggplot2::ggplotGrob(t61_strip_chrome(t61_drop_e61_class(plot)))
   t61_reclaim_device(dev_num)
   grid::grid.newpage()
@@ -293,15 +290,11 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
 #' @noRd
 t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_height) {
   marker_colour <- "#FF00FF"
-  baseline_dev <- grDevices::dev.cur()
 
   marker <- t61_strip_chrome(plot)
   marker@layers <- list()
   marker <- marker + ggplot2::theme(panel.background = ggplot2::element_rect(fill = marker_colour, colour = NA))
   marker <- t61_drop_e61_class(marker)
-  # See t61_render_mask()'s matching call -- these theme merges can leave
-  # some other device current; reclaim baseline_dev before opening ours.
-  t61_reclaim_device(baseline_dev)
 
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
