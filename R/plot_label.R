@@ -323,7 +323,7 @@ plot_label <-
   if (is.null(label)) {
     if (is.null(scale_info)) {
       cli::cli_abort(
-        "`label` is required -- the plot has no scale_colour_manual()/scale_fill_manual() to derive default labels from. See `?plot_label`."
+        "`label` is required -- the plot has no discrete `colour`/`fill` mapping to derive default labels from. See `?plot_label`."
       )
     }
     label <- scale_info$breaks
