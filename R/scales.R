@@ -53,7 +53,7 @@ scale_fill_e61 <- function(reverse = FALSE,
 .build_e61_scale <- function(aesthetics, reverse, discrete, palette, continuous_fn, ...) {
 
   if (discrete) {
-    retval <- discrete_scale(aesthetics, palette = get_palette, ...)
+    retval <- discrete_scale(aesthetics, palette = function(n) palette_e61(n, reverse = reverse), ...)
 
   } else {
 
