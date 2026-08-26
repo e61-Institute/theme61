@@ -61,29 +61,16 @@ check_pkg_ver <- function(test = FALSE) {
 
 }
 
-#' Checks if the internet is working
+#' Register the bundled PT Sans font with sysfonts/showtext
 #'
-#' @noRd
-.t61_has_internet <- function() {
-  if (requireNamespace("curl", quietly = TRUE)) {
-    return(isTRUE(curl::has_internet()))
-  }
-
-  old_timeout <- getOption("timeout")
-  options(timeout = 1)
-  on.exit(options(timeout = old_timeout), add = TRUE)
-
-  con <- try(utils::url("https://cloud.r-project.org", open = "rb"), silent = TRUE)
-  if (inherits(con, "try-error")) return(FALSE)
-  try(close(con), silent = TRUE)
-  TRUE
-}
-
-#' Initialize theme61 fonts
-#'
+#' PT Sans ships with the package itself (inst/extdata/fonts/pt-sans, under
+#' the SIL Open Font License - see the bundled OFL.txt), so this is a local
+#' file read via sysfonts::font_add(), not a network call to Google Fonts
+#' (sysfonts::font_add_google()) - it can't fail from being offline, DNS
+#' being broken, or Google Fonts rate-limiting/being unreachable.
 #' @noRd
 .t61_init_fonts <- function() {
-  # Hard opt-out (CI / airgapped machines)
+  # Hard opt-out (e.g. don't want showtext enabled for this session at all)
   if (identical(Sys.getenv("THEME61_DISABLE_FONT_DOWNLOAD", unset = ""), "1")) {
     return(invisible(NULL))
   }
@@ -93,29 +80,30 @@ check_pkg_ver <- function(test = FALSE) {
     return(invisible(NULL))
   }
 
-  # If already registered, just enable showtext and exit
+  # If already registered (e.g. a previous library(theme61) call this
+  # session), just enable showtext and exit
   fams <- try(sysfonts::font_families(), silent = TRUE)
   if (!inherits(fams, "try-error") && "pt-sans" %in% fams) {
     try(showtext::showtext_auto(), silent = TRUE)
     return(invisible(NULL))
   }
 
-  # Skip entirely if offline / DNS broken
-  if (requireNamespace("curl", quietly = TRUE)) {
-    if (!isTRUE(curl::has_internet())) {
-      return(invisible(NULL))
-    }
-  }
+  font_dir <- system.file("extdata", "fonts", "pt-sans", package = "theme61")
 
-  # Final guard: never allow font download to abort startup
+  # Final guard: never allow font registration to abort startup
   tryCatch(
     {
-      sysfonts::font_add_google("PT Sans", "pt-sans")
+      sysfonts::font_add(
+        family = "pt-sans",
+        regular = file.path(font_dir, "PTSans-Regular.ttf"),
+        bold = file.path(font_dir, "PTSans-Bold.ttf"),
+        italic = file.path(font_dir, "PTSans-Italic.ttf"),
+        bolditalic = file.path(font_dir, "PTSans-BoldItalic.ttf")
+      )
       showtext::showtext_auto()
       invisible(NULL)
     },
-    error   = function(e) invisible(NULL),
-    warning = function(w) invisible(NULL)
+    error = function(e) invisible(NULL)
   )
 }
 

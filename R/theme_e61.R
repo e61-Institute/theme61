@@ -61,8 +61,9 @@ theme_e61 <- function(
     .validate_legend_position(legend_position)
   }
 
-  # This deals with an issue where the test environment can't install pt-sans
-  # and pollutes the test rig with a lot of unhelpful errors
+  # ggplot_build() measures theme text on a device that doesn't know
+  # "pt-sans" (unlike get_text_width()/get_text_height()'s explicit svglite
+  # device), so it warns during tests.
   base_family <- if (is_testing()) "sans" else base_family
 
   base_size <- getOption("theme61.base_size", default = 10)
@@ -194,6 +195,7 @@ theme_e61_spatial <- function(
   }
 
   base_family <- if (is_testing()) "sans" else base_family
+
   base_size <- getOption("theme61.base_size", default = 10)
   half_line <- base_size / 2
 
