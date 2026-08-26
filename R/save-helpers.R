@@ -27,6 +27,11 @@ t61_quiet_na_removal <- function(expr) {
 #' With no device open, ggplotGrob()/ggplot_gtable() can silently open the
 #' session's default device to measure text -- left open, that can corrupt
 #' later renders. Opens a throwaway device first only if none is open.
+#'
+#' Also muffles the "font family 'pt-sans' not found in PostScript font
+#' database" warning: grid's font-metric fallback doesn't know about
+#' sysfonts-registered families on some devices, but showtext still renders
+#' pt-sans correctly wherever it's actually drawn.
 #' @noRd
 t61_with_device <- function(expr) {
   if (grDevices::dev.cur() == 1) {
@@ -37,7 +42,14 @@ t61_with_device <- function(expr) {
       unlink(svg_file)
     }, add = TRUE)
   }
-  expr
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      if (grepl("not found in PostScript font database", conditionMessage(w), fixed = TRUE)) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
 }
 
 #' @noRd
@@ -105,11 +117,6 @@ check_plots <- function(plots){
   }
 
   plots
-}
-
-#' @noRd
-is_testing <- function() {
-  identical(Sys.getenv("TESTTHAT"), "true")
 }
 
 #' Create a temp SVG file to preview a graph in the Viewer pane, regardless

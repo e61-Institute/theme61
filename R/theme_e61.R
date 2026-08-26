@@ -61,9 +61,6 @@ theme_e61 <- function(
     .validate_legend_position(legend_position)
   }
 
-  # Avoids a "font not found" warning during ggplot_build() in tests.
-  base_family <- if (is_testing()) "sans" else base_family
-
   base_size <- getOption("theme61.base_size", default = 10)
 
   half_line <- base_size / 2
@@ -191,8 +188,6 @@ theme_e61_spatial <- function(
   if (legend == "inside") {
     .validate_legend_position(legend_position)
   }
-
-  base_family <- if (is_testing()) "sans" else base_family
 
   base_size <- getOption("theme61.base_size", default = 10)
   half_line <- base_size / 2

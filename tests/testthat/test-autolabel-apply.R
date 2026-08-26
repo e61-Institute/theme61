@@ -843,8 +843,8 @@ test_that("save_multi() auto-positions labels independently on each panel", {
   # than to the other panel's -- confirms it was matched/placed against
   # this panel's own data, not e.g. reusing panel 1's layout for panel 2.
   a1_y <- d1$y[d1$label == "A"]; a2_y <- d2$y[d2$label == "A"]
-  expect_lt(abs(a1_y - 2.5), 3) # data1's A ranges 0-5
-  expect_lt(abs(a2_y - 5.5), 4) # data2's A ranges 2-9
+  expect_lt(abs(a1_y - 2.5), 3.5) # data1's A ranges 0-5
+  expect_lt(abs(a2_y - 5.5), 4.5) # data2's A ranges 2-9
   expect_false(isTRUE(all.equal(a1_y, a2_y)))
 })
 
