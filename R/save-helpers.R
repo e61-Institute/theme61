@@ -107,9 +107,6 @@ check_plots <- function(plots){
   plots
 }
 
-
-#' Replication of testthat::is_testing() so we can turn off some functionality
-#' in the test env.
 #' @noRd
 is_testing <- function() {
   identical(Sys.getenv("TESTTHAT"), "true")

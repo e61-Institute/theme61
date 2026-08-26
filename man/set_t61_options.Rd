@@ -39,7 +39,7 @@ in your script would take effect. These can't be controlled by
 variable to \code{"1"} \emph{before} theme61 is loaded, e.g. in your
 \code{.Renviron} file or CI configuration:
 \itemize{
-\item \code{THEME61_DISABLE_FONT_DOWNLOAD}: Skips downloading/registering the PT Sans font. Useful on CI or airgapped machines with no internet access. Enabled (font download happens) by default.
+\item \code{THEME61_DISABLE_FONT_DOWNLOAD}: Skips registering the bundled PT Sans font with sysfonts/showtext (the font ships with theme61 itself, so this is a local file read, not a network download - the name is kept for backwards compatibility). Useful if you don't want showtext enabled for the session at all. Enabled (font registration happens) by default.
 \item \code{THEME61_DISABLE_GEOM_DEFAULTS}: Skips overwriting ggplot2's session-wide geom colour/fill defaults (e.g. \code{geom_point()}'s default colour). Enabled (defaults are overwritten) by default.
 \item \code{THEME61_DISABLE_VERSION_CHECK}: Skips the startup check against GitHub for a newer theme61 release. Enabled (the check runs) by default.
 }
