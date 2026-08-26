@@ -113,8 +113,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
       # the scale itself comfortably has room for).
       if (applied_limits[1] > data_range[1] || applied_limits[2] < data_range[2]) {
         cli::cli_abort("Supplied limits are outside the data's range. Data range: [{data_range[1]}, {data_range[2]}]; Supplied limits: [{applied_limits[1]}, {applied_limits[2]}]. Change your limits so they contain the full range of the data.",
-                       call = expr(scale_y_continuous_e61()),
-                       class = "error"
+                       call = rlang::expr(scale_y_continuous_e61())
                        )
       }
     }

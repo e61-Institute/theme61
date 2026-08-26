@@ -30,6 +30,7 @@ Imports:
     lifecycle,
     magick (>= 2.7.3),
     remotes (>= 2.4.2),
+    rlang (>= 1.1.0),
     rsvg (>= 2.4.0),
     R.devices (>= 2.17.1),
     S7 (>= 0.2.1),

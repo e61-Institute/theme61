@@ -86,15 +86,27 @@ check_for_y_var <- function(plot, build = NULL){
 
   check <- FALSE
 
-  # First check if the y-variable is a factor or a character - we can't scale those
-  y_var <- deparse(plot@mapping$y)
-  y_var <- gsub("~", "", y_var)
-
-  y_class <- class(plot@data[[y_var]])
+  # First check if the y-variable is a factor or a character - we can't scale
+  # those. plot@mapping$y is a quosure (see has_discrete_y_scale() in
+  # save-helpers.R for the same pattern), so it's evaluated directly against
+  # the plot data with rlang rather than deparse()-ing it into a column-name
+  # string and indexing plot@data with that - which broke for anything other
+  # than a plain symbol (e.g. aes(y = value / 1000)), and for a symbol that
+  # only exists in layer-level data (not plot@data). tryCatch() falls back to
+  # "not a factor/character" (like the old code implicitly did) instead of
+  # erroring, in both of those cases.
+  y_is_discrete <- FALSE
+  if (!is.null(plot@mapping$y)) {
+    y_val <- tryCatch(rlang::eval_tidy(plot@mapping$y, plot@data), error = function(e) NULL)
+    # inherits() with a vector target, not ==, since class() can return more
+    # than one element (e.g. c("ordered", "factor")), which would silently
+    # break a `!= ... && != ...` comparison.
+    y_is_discrete <- inherits(y_val, c("factor", "character"))
+  }
 
   # if the y-var is either missing, or it is not a factor/character, then
   # continue looking for whether there is a y-variable that can be used for scaling
-  if(is.null(y_class) || (y_class != "factor" && y_class != "character")){
+  if(!y_is_discrete){
 
     if (is.null(build)) build <- ggplot_build(plot)
 
