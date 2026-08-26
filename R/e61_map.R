@@ -16,7 +16,7 @@
 #' @export
 #' @family map functions
 #' @examples
-#'
+#' \dontrun{
 #' library(sf)
 #' sa3 <- strayr::read_absmap("sa32021")
 #' sa3 <- sa3[sa3$gcc_code_2021 == "1GSYD", ] # let's just look at Sydney
@@ -30,7 +30,7 @@
 #'    ) +
 #'  geom_point(aes(x = cent_long, y = cent_lat)) + #plot points
 #'  theme_e61_spatial()
-#'
+#' }
 add_map_e61 <-
   function(bbox = c(
     top = -33.757742,

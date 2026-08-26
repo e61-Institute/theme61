@@ -46,8 +46,7 @@ Suggests:
     knitr,
     rmarkdown,
     rstudioapi,
-    sf,
-    strayr
+    sf
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/e61-institute/theme61,
