@@ -335,44 +335,36 @@ svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
 
   if(grepl(".*\\.png$", file_out)) fmt <- "png" else fmt <- "jpg"
 
-  if (res != 1) {
-    # This approach to rescaling starts by saving a rescaled SVG before
-    # converting it to PNG. Hence the need for temp files.
-    file_temp_svg <- "intermed.svg"
-    file_temp_out <- paste0("intermed.", fmt)
+  # This approach to rescaling starts by saving a rescaled SVG before
+  # converting it to PNG/JPG, hence the need for temp files. This used to be
+  # gated behind `if (res != 1)`, with a direct (unscaled) render as the
+  # alternative -- but since `res` is multiplied by 4 above before this point
+  # is reached, `res != 1` is true for every res a caller can realistically
+  # pass in (the only way to reach exactly 1 here is to pass res = 0.25,
+  # which isn't a documented/supported value), so the rescale path always
+  # ran in practice anyway. Simplified to always rescale, matching that
+  # actual behaviour (#354).
+  file_temp_svg <- tempfile(fileext = ".svg")
+  file_temp_out <- tempfile(fileext = paste0(".", fmt))
+  on.exit(unlink(c(file_temp_svg, file_temp_out)), add = TRUE)
 
-    rsvg::rsvg_png(svg = file_in, file = file_temp_out)
+  rsvg::rsvg_png(svg = file_in, file = file_temp_out)
 
-    g_info <- magick::image_info(magick::image_read(file_temp_out))
+  g_info <- magick::image_info(magick::image_read(file_temp_out))
 
-    rsvg::rsvg_svg(svg = file_in,
-                   file = file_temp_svg,
-                   width = g_info$width * res,
-                   height = g_info$height * res
-    )
+  rsvg::rsvg_svg(svg = file_in,
+                 file = file_temp_svg,
+                 width = g_info$width * res,
+                 height = g_info$height * res
+  )
 
-    if(fmt == "png"){
-      rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
+  if(fmt == "png"){
+    rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
 
-    } else if(fmt == "jpg"){
-      image_temp <- magick::image_read_svg(file_temp_svg)
+  } else if(fmt == "jpg"){
+    image_temp <- magick::image_read_svg(file_temp_svg)
 
-      magick::image_write(image = image_temp, path = file_out, format = "jpg")
-    }
-
-    unlink(file_temp_svg)
-    unlink(file_temp_out)
-
-  } else {
-
-    if(fmt == "png"){
-      rsvg::rsvg_png(svg = file_in, file = file_out)
-
-    } else if(fmt == "jpg"){
-      image_temp <- magick::image_read_svg(file_in)
-
-      magick::image_write(image = image_temp, path = file_out, format = "jpg")
-    }
+    magick::image_write(image = image_temp, path = file_out, format = "jpg")
   }
 
   if (delete) unlink(file_in)
