@@ -15,6 +15,7 @@ t61_env <- NULL
 .t61_default_options <- list(
   theme61.auto_label = TRUE,
   theme61.auto_theme = TRUE,
+  theme61.autolabel_fallback_msg = TRUE,
   theme61.autolabel_fast_msg = TRUE,
   theme61.base_size = 10,
   theme61.disable_spellcheck = FALSE,
