@@ -71,8 +71,8 @@ theme_e61 <- function(
 
   ret <-
     theme(
-      line = element_line(colour = "black", linewidth = points_to_mm(0.5)),
-      rect = element_rect(fill = background, colour = NA),
+      line = element_line(colour = "black", linewidth = base_line_size),
+      rect = element_rect(fill = background, colour = NA, linewidth = base_rect_size),
       text = element_text(colour = "black", family = base_family, size = base_size),
       aspect.ratio = aspect_ratio,
 
@@ -200,6 +200,8 @@ theme_e61_spatial <- function(
   ret <-
     theme(
       aspect.ratio = aspect_ratio,
+      line = element_line(colour = "black", linewidth = base_line_size),
+      rect = element_rect(fill = background, colour = NA, linewidth = base_rect_size),
       # base text
       text = element_text(
         colour = "black",
@@ -258,13 +260,11 @@ theme_e61_spatial <- function(
     ret <- ret + theme(legend.position.inside = legend_position)
   }
 
-  # facet spacing if used
-  if (!inherits(ret$facet, "FacetNull")) {
-    ret <- ret %+replace% theme(
-      panel.spacing.x = unit(2, "lines"),
-      panel.spacing.y = unit(2, "lines")
-    )
-  }
+  # facet spacing
+  ret <- ret %+replace% theme(
+    panel.spacing.x = unit(2, "lines"),
+    panel.spacing.y = unit(2, "lines")
+  )
 
   ret
 }
@@ -404,15 +404,4 @@ in_to_cm <- function(inches, round = FALSE) {
   } else {
     cm
   }
-}
-
-#' Validate a legend_position argument when legend == "inside"
-#' @noRd
-.validate_legend_position <- function(legend_position) {
-  if (!is.numeric(legend_position) || length(legend_position) != 2)
-    stop("legend_position needs to be a length two numeric vector.")
-
-  if (!(data.table::between(legend_position[[1]], 0, 1) |
-        data.table::between(legend_position[[2]], 0, 1)))
-    stop("Both legend_position values must be between 0 and 1.")
 }

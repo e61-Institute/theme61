@@ -60,14 +60,12 @@ test_that("Y-axis label messages", {
   suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), gg)),
                    classes = c("messages", "warning"))
 
-  # No message if session option is set
-  withr::with_options(list(no_advisory = TRUE), {
-    p <- minimal_plot +
-      labs_e61(y = "Long y-axis label")
+  # No message for a long y-axis label
+  p <- minimal_plot +
+    labs_e61(y = "Long y-axis label")
 
-    suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p)),
-                     classes = c("messages", "warning"))
-  })
+  suppressWarnings(expect_no_message(save_e61(withr::local_tempfile(fileext = ".svg"), p)),
+                   classes = c("messages", "warning"))
 })
 
 test_that("Y-axis customisation options", {
