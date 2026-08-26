@@ -260,13 +260,11 @@ theme_e61_spatial <- function(
     ret <- ret + theme(legend.position.inside = legend_position)
   }
 
-  # facet spacing if used
-  if (!inherits(ret$facet, "FacetNull")) {
-    ret <- ret %+replace% theme(
-      panel.spacing.x = unit(2, "lines"),
-      panel.spacing.y = unit(2, "lines")
-    )
-  }
+  # facet spacing
+  ret <- ret %+replace% theme(
+    panel.spacing.x = unit(2, "lines"),
+    panel.spacing.y = unit(2, "lines")
+  )
 
   ret
 }
