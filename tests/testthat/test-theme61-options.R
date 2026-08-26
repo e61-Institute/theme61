@@ -101,6 +101,37 @@ test_that("set_t61_options accepts theme61.disable_spellcheck as a valid option"
   expect_true(getOption("theme61.disable_spellcheck"))
 })
 
+test_that("set_t61_options accepts theme61.max_discrete_colours and theme61.max_discrete_fills as valid options", {
+  withr::defer(options(theme61.max_discrete_colours = NULL, theme61.max_discrete_fills = NULL))
+
+  set_t61_options(list(theme61.max_discrete_colours = 20L, theme61.max_discrete_fills = 20L))
+  expect_equal(getOption("theme61.max_discrete_colours"), 20L)
+  expect_equal(getOption("theme61.max_discrete_fills"), 20L)
+})
+
+test_that("set_t61_options() validates against the fixed set of theme61 options, not whichever are currently set", {
+  # Simulate theme61 being loaded but not attached (e.g. only
+  # theme61::save_e61() used) by temporarily clearing every theme61.*
+  # option - set_t61_options() must still accept a documented option name.
+  live_opts <- names(options())
+  t61_live <- live_opts[grepl("^theme61\\.", live_opts)]
+  saved <- options()[t61_live]
+  withr::defer(options(saved))
+
+  cleared <- stats::setNames(vector("list", length(t61_live)), t61_live)
+  options(cleared)
+
+  withr::defer(options(theme61.base_size = 10))
+  expect_no_error(set_t61_options(list(theme61.base_size = 10)))
+})
+
+test_that("set_t61_options() error message is well-formed for invalid options", {
+  expect_error(
+    set_t61_options(list(not_a_real_option = TRUE)),
+    "Invalid options supplied: not_a_real_option\\. Valid options are: theme61\\."
+  )
+})
+
 test_that("labs_e61() leaves the y-axis title as a normal axis title in iterate_mode", {
   withr::local_options(list(theme61.iterate_mode = TRUE))
 
