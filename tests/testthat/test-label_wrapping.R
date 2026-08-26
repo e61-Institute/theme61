@@ -69,7 +69,7 @@ test_that("rescale_text_multi collapses manual line breaks before re-wrapping", 
 # manual width overrides, facets, and coord_flip.
 
 test_that("Single-panel graph examples", {
-  skip_on_os(c("mac", "windows"))
+  skip_snapshot_off_ci_linux()
 
   withr::local_seed(42)
 
@@ -245,7 +245,7 @@ test_that("Single-panel graph examples", {
 # the wiring works, rather than every arrangement combination.
 
 test_that("Multi-panel graph examples", {
-  skip_on_os(c("mac", "windows"))
+  skip_snapshot_off_ci_linux()
 
   withr::local_seed(42)
 
