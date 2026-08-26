@@ -15,15 +15,12 @@ Imports:
     cli (>= 3.6.0),
     patchwork (>= 1.3.1),
     data.table (>= 1.14.8),
-    ggmap (>= 3.0.0),
     ggplot2 (>= 4.0.0),
-    ggrepel (>= 0.9.2),
     ggtext (>= 0.1.2),
-    ggthemes (>= 4.2.4),
     gh (>= 1.4.0),
+    glue,
     grDevices (>= 4.2.2),
     grid (>= 4.2.2),
-    gridExtra (>= 2.3),
     here (>= 1.0.1),
     hunspell (>= 3.0.6),
     later (>= 1.4.4),
@@ -32,19 +29,26 @@ Imports:
     remotes (>= 2.4.2),
     rlang (>= 1.1.0),
     rsvg (>= 2.4.0),
-    R.devices (>= 2.17.1),
-    S7 (>= 0.2.1),
     scales (>= 1.4.0),
     showtext (>= 0.9-6),
+    stats,
     stringr (>= 1.5.0),
     svglite (>= 2.1.0),
     sysfonts (>= 0.8.8),
-    tools
+    tools,
+    utils
 Suggests:
     testthat (>= 3.1.10),
     withr (>= 2.5.0),
-    later,
-    sf
+    curl,
+    ggmap (>= 3.0.0),
+    ggrepel (>= 0.9.2),
+    knitr,
+    rmarkdown,
+    rstudioapi,
+    sf,
+    strayr
+VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/e61-institute/theme61,
      https://e61-institute.github.io/theme61/
