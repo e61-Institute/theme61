@@ -381,7 +381,7 @@ get_text_width <- function(text, font_size = 10, font_face = 1) {
 
   if (length(text) == 0) return(numeric(0))
 
-  family <- "pt-sans"
+  family <- if (is_testing()) "sans" else "pt-sans"
   face <- if (font_face == 2) "bold" else "plain"
 
   measure_device({
@@ -408,7 +408,7 @@ get_text_height <- function(text, font_size = 10) {
 
   if (length(text) == 0) return(numeric(0))
 
-  family <- "pt-sans"
+  family <- if (is_testing()) "sans" else "pt-sans"
 
   measure_device({
     grid::pushViewport(grid::viewport(
