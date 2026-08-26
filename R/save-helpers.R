@@ -150,10 +150,15 @@ has_discrete_y_scale <- function(plot) {
   # Check the y aesthetic mapping
   y_mapping <- plot@mapping$y
   if (!is.null(y_mapping)) {
-    # Get the data and check if y variable is discrete
+    # Get the data and check if y variable is discrete. y_mapping is a
+    # quosure that may reference a column only present in a layer's own
+    # data (not plot@data), or an expression that can't be evaluated
+    # against plot@data at all - eval_tidy() errors in both cases, so it's
+    # wrapped in tryCatch() and falls back to "not discrete" (see the same
+    # pattern in check_for_y_var(), aes-y-lims.R).
     plot_data <- plot@data
     if (!is.null(plot_data) && !is.null(y_mapping)) {
-      y_var <- rlang::eval_tidy(y_mapping, plot_data)
+      y_var <- tryCatch(rlang::eval_tidy(y_mapping, plot_data), error = function(e) NULL)
       if (is.factor(y_var) || is.character(y_var)) {
         return(TRUE)
       }
