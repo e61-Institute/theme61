@@ -512,6 +512,11 @@ test_that("Preview mode works", {
 test_that("set_format works", {
   p <- minimal_plot
 
+  # Guard against a leftover theme61.default_save_format option leaking into
+  # later tests if an expectation above fails and unset_format() below is
+  # never reached.
+  withr::defer(unset_format())
+
   withr::with_tempdir({
 
     set_format(c("pdf", "jpg"))
@@ -525,10 +530,19 @@ test_that("set_format works", {
     expect_true(file.exists("plot2.pdf"))
     expect_true(file.exists("plot2.jpg"))
 
+    # ... and that save_e61() does NOT also fall back to writing every
+    # format regardless of what set_format() configured (#374)
+    expect_false(file.exists("plot2.svg"))
+    expect_false(file.exists("plot2.eps"))
+    expect_false(file.exists("plot2.png"))
+
     # Check formats are used if file formats are provided in save_e61
     suppressWarnings(save_e61("plot3", p, format = c("svg", "png")))
     expect_true(file.exists("plot3.svg"))
     expect_true(file.exists("plot3.png"))
+    expect_false(file.exists("plot3.pdf"))
+    expect_false(file.exists("plot3.jpg"))
+    expect_false(file.exists("plot3.eps"))
 
     # Check unset formatting works
     unset_format()
@@ -547,10 +561,30 @@ test_that("set_format works", {
     suppressWarnings(save_e61("plot5", p))
     expect_true(file.exists("plot5.png"))
     expect_true(file.exists("plot5.svg"))
+    expect_false(file.exists("plot5.pdf"))
+    expect_false(file.exists("plot5.jpg"))
+    expect_false(file.exists("plot5.eps"))
 
+    unset_format()
   })
 
 
+})
+
+test_that("set_format() reproduction from #374 only saves the configured formats", {
+  withr::defer(unset_format())
+
+  withr::with_tempdir({
+    set_format(c("svg", "png"))
+
+    suppressWarnings(save_e61("test", minimal_plot))
+
+    expect_true(file.exists("test.svg"))
+    expect_true(file.exists("test.png"))
+    expect_false(file.exists("test.pdf"))
+    expect_false(file.exists("test.eps"))
+    expect_false(file.exists("test.jpg"))
+  })
 })
 
 test_that("Spell checker works", {
