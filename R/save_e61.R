@@ -575,7 +575,9 @@ save_e61 <- function(filename = NULL,
 
     }
 
-    if (interactive()) {
+    if (interactive() &&
+        requireNamespace("rstudioapi", quietly = TRUE) &&
+        rstudioapi::isAvailable()) {
       # Only run this in interactive mode
       # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
       # Always preview an SVG, even if the saved format(s) are not SVG
