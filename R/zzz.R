@@ -51,6 +51,7 @@ t61_env <- NULL
   op.theme61 <- list(
     theme61.auto_label = TRUE,
     theme61.auto_theme = TRUE,
+    theme61.autolabel_fallback_msg = TRUE,
     theme61.autolabel_fast_msg = TRUE,
     theme61.base_size = 10,
     theme61.default_save_format = "svg",
