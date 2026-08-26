@@ -34,9 +34,6 @@ knitr::opts_chunk$set(
   out.width = '60%'
 )
 
-# No annoying messages
-options(no_advisory = TRUE)
-
 # Prep data: US personal expenditure aggregates in US$b
 data <- USPersonalExpenditure
 data <- as.data.table(data, keep.rownames = TRUE)
