@@ -324,7 +324,7 @@ test_that("Multi-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61("plot-multi-1x2-1-title-no subtitle.svg", p1_t, p2_t,
+      save_e61("plot-multi-1x2-1-title-no-subtitle.svg", p1_t, p2_t,
                labs = list(title = "Multi-panel graph title text"))))
   })
 
