@@ -16,7 +16,6 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       THEME61_DISABLE_VERSION_CHECK: 1
-      THEME61_DISABLE_FONT_DOWNLOAD: 1
 
     steps:
       - name: Install system hunspell dictionaries
