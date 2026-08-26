@@ -38,7 +38,7 @@ test_that("check_pkg_ver() prompts when out-of-date and exits on N (test=TRUE)",
   # Force the interactive prompt path, regardless of how the test suite
   # itself is being run (interactively or not).
   local_mocked_bindings(
-    interactive = function() TRUE,
+    .t61_interactive = function() TRUE,
     .env = asNamespace("theme61")
   )
 
@@ -69,7 +69,7 @@ test_that("check_pkg_ver() does not hang and does not prompt in non-interactive 
 
   # Simulate a non-interactive session (Rscript, R CMD check, knitr/Quarto, CI)
   local_mocked_bindings(
-    interactive = function() FALSE,
+    .t61_interactive = function() FALSE,
     .env = asNamespace("theme61")
   )
 
