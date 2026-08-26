@@ -183,7 +183,6 @@ test_that("Works with e61 theme functions", {
 })
 
 test_that("geom_pointbar visual test", {
-  skip_snapshot_off_ci_linux()
 
   set.seed(1)
 

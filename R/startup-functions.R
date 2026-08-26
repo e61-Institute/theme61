@@ -111,8 +111,6 @@ check_pkg_ver <- function(test = FALSE) {
   )
 }
 
-# Needed to make sure tests work. Wrapped (rather than aliased directly to
-# base::readline) so R CMD check's .Internal() scan doesn't trip over
-# readline()'s own implementation.
-.t61_readline <- function(...) base::readline(...)
+# Needed to make sure tests work
+.t61_readline <- base::readline
 .t61_interactive <- base::interactive

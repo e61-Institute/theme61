@@ -1,5 +1,4 @@
 test_that("check_spelling() treats words in the custom dictionary as correctly spelled", {
-  skip_if_no_en_au_dictionary()
   expect_null(check_spelling("e61"))
   expect_match(check_spelling("Thsi has a typo"), "Thsi")
 })

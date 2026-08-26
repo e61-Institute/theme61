@@ -79,7 +79,6 @@ test_that("labs_e61() skips HTML/markdown subtitle styling in iterate_mode", {
 })
 
 test_that("theme61.disable_spellcheck suppresses save_e61()'s spell-checker", {
-  skip_if_no_en_au_dictionary()
   withr::local_options(list(theme61.disable_spellcheck = FALSE))
 
   p <- minimal_plot + labs_e61(title = "Thsi has a typo")
