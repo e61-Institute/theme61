@@ -71,8 +71,8 @@ theme_e61 <- function(
 
   ret <-
     theme(
-      line = element_line(colour = "black", linewidth = points_to_mm(0.5)),
-      rect = element_rect(fill = background, colour = NA),
+      line = element_line(colour = "black", linewidth = base_line_size),
+      rect = element_rect(fill = background, colour = NA, linewidth = base_rect_size),
       text = element_text(colour = "black", family = base_family, size = base_size),
       aspect.ratio = aspect_ratio,
 
@@ -200,6 +200,8 @@ theme_e61_spatial <- function(
   ret <-
     theme(
       aspect.ratio = aspect_ratio,
+      line = element_line(colour = "black", linewidth = base_line_size),
+      rect = element_rect(fill = background, colour = NA, linewidth = base_rect_size),
       # base text
       text = element_text(
         colour = "black",
