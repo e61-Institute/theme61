@@ -584,6 +584,7 @@ test_that("set_format() reproduction from #374 only saves the configured formats
 })
 
 test_that("Spell checker works", {
+  skip_if_no_en_au_dictionary()
   # Typo in various places
   plots <- list()
   plots[["title"]] <- minimal_plot + labs_e61(title = "Opertaing expenses")

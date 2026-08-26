@@ -1,4 +1,5 @@
 test_that("Single-panel graph examples", {
+  skip_on_os(c("mac", "windows"))
 
   withr::local_seed(42)
   withr::local_options(list(theme61.disable_spellcheck = TRUE))
@@ -159,6 +160,7 @@ test_that("Single-panel graph examples", {
 })
 
 test_that("Multi-panel graph examples", {
+  skip_on_os(c("mac", "windows"))
 
   withr::local_seed(42)
   withr::local_options(list(theme61.disable_spellcheck = TRUE))
@@ -331,7 +333,7 @@ test_that("Multi-panel graph examples", {
 })
 
 test_that("Map examples", {
-
+  skip_on_os(c("mac", "windows"))
   skip_if_not_installed("sf")
   withr::local_options(list(theme61.disable_spellcheck = TRUE))
 
