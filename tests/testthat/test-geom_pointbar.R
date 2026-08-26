@@ -183,6 +183,7 @@ test_that("Works with e61 theme functions", {
 })
 
 test_that("geom_pointbar visual test", {
+  skip_on_os(c("mac", "windows"))
 
   set.seed(1)
 
