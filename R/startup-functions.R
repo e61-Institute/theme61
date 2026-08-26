@@ -44,6 +44,15 @@ check_pkg_ver <- function(test = FALSE) {
   # Prompts to update the package if it is out-of-date
   if (inst_v < latest_v) {
 
+    # In non-interactive sessions (Rscript, R CMD check, knitr/Quarto, CI),
+    # readline() returns "" immediately, which would spin the prompt loop
+    # below forever. Just note it and move on instead.
+    if (!.t61_interactive()) {
+      cli::cli_alert_info(
+        "A newer version of theme61 is available. Run remotes::install_github(\"e61-institute/theme61\") to update.")
+      return(invisible(NULL))
+    }
+
     resp <- ""
     while (!resp %in% c("Y", "N")) {
       cli::cli_alert_warning(
@@ -121,3 +130,4 @@ check_pkg_ver <- function(test = FALSE) {
 
 # Needed to make sure tests work
 .t61_readline <- base::readline
+.t61_interactive <- base::interactive

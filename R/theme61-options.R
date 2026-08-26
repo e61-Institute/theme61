@@ -14,6 +14,8 @@
 #'    \item \code{theme61.default_save_format}: The default file save format if format is not specified in [save_e61] and the file extension is not provided in \code{filename}. Unset by default, in which case [save_e61]'s own default (all supported formats: svg, pdf, eps, png, jpg) is used. Set via \code{set_format()} (or this function) to restrict the default(s); clear with \code{unset_format()} to go back to saving every format.
 #'    \item \code{theme61.disable_spellcheck}: If TRUE, [save_e61]'s spell-checker is skipped entirely, regardless of its \code{spell_check} argument. This is FALSE by default.
 #'    \item \code{theme61.iterate_mode}: If TRUE, all of theme61's automatic styling and Viewer pane preview rendering is skipped, so graphs print to the Plots pane with plain ggplot2 defaults as fast as possible. This is FALSE by default. Masked functions (\code{ggsave()}, \code{labs()}, \code{facet_wrap()}, \code{facet_grid()}) also stop redirecting to their theme61 equivalents and pass straight through to the underlying ggplot2 function instead. Any theme61 functions you call explicitly (e.g. \code{scale_colour_e61()}, \code{theme_e61()}, \code{labs_e61()}) still apply as normal, since they become part of the plot object regardless of this option.
+#'    \item \code{theme61.max_discrete_colours}: The maximum number of levels a discrete colour aesthetic can have before automatic colour scale injection errors out instead of applying \code{scale_colour_e61()}. This is 12 by default.
+#'    \item \code{theme61.max_discrete_fills}: The maximum number of levels a discrete fill aesthetic can have before automatic fill scale injection errors out instead of applying \code{scale_fill_e61()}. This is 12 by default.
 #'    \item \code{theme61.open_in_browser}: If TRUE, graphs will also open in the browser in addition to the Viewer pane. This is FALSE by default.
 #'    \item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
 #'    \item \code{theme61.sec_axis_msg}: If TRUE (default), [sec_rescale_inv] shows a one-off reminder that rescaled secondary axis changes need the graph code run twice to take effect. Turns itself off after showing once; set back to TRUE to see it again.
@@ -62,12 +64,18 @@ set_t61_options <- function(opt = NULL) {
       stop("opt must be a named list of options to set.")
     }
 
-    # Make sure options supplied are valid theme61 options
-    valid_opts <- names(options())[data.table::like(names(options()), "^theme61\\..*")]
+    # Make sure options supplied are valid theme61 options. This is checked
+    # against the fixed set of documented options (.t61_default_options, see
+    # R/zzz.R), not whatever theme61.* options happen to be set already -
+    # otherwise this would wrongly reject everything when theme61 has been
+    # loaded but not attached (e.g. only theme61::save_e61() was used).
+    valid_opts <- names(.t61_default_options)
     invalid_opts <- setdiff(names(opt), valid_opts)
     if (length(invalid_opts) > 0) {
-      stop(paste0("Invalid options supplied: ", paste(invalid_opts, collapse = ",
-")), ". Valid options are: ", paste(valid_opts, collapse = ", "))
+      stop(paste0(
+        "Invalid options supplied: ", paste(invalid_opts, collapse = ", "),
+        ". Valid options are: ", paste(valid_opts, collapse = ", ")
+      ))
     }
 
     options(opt)
