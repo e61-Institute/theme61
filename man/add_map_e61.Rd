@@ -46,7 +46,6 @@ sa3 <- sa3[sa3$gcc_code_2021 == "1GSYD", ] # let's just look at Sydney
  geom_point(aes(x = cent_long, y = cent_lat)) + #plot points
  theme_e61_spatial()
 }
-
 }
 \seealso{
 Other map functions:
