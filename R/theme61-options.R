@@ -29,7 +29,7 @@
 #'   variable to \code{"1"} \emph{before} theme61 is loaded, e.g. in your
 #'   \code{.Renviron} file or CI configuration:
 #' \itemize{
-#'   \item \code{THEME61_DISABLE_FONT_DOWNLOAD}: Skips registering the bundled PT Sans font with sysfonts/showtext (the font ships with theme61 itself, so this is a local file read, not a network download - the name is kept for backwards compatibility). Useful if you don't want showtext enabled for the session at all. Enabled (font registration happens) by default.
+#'   \item \code{THEME61_DISABLE_FONT_DOWNLOAD}: Skips registering the bundled PT Sans font with sysfonts/showtext. Useful if you don't want showtext enabled for the session at all. Enabled (font registration happens) by default.
 #'   \item \code{THEME61_DISABLE_GEOM_DEFAULTS}: Skips overwriting ggplot2's session-wide geom colour/fill defaults (e.g. \code{geom_point()}'s default colour). Enabled (defaults are overwritten) by default.
 #'   \item \code{THEME61_DISABLE_VERSION_CHECK}: Skips the startup check against GitHub for a newer theme61 release. Enabled (the check runs) by default.
 #' }
@@ -65,11 +65,8 @@ set_t61_options <- function(opt = NULL) {
       stop("opt must be a named list of options to set.")
     }
 
-    # Make sure options supplied are valid theme61 options. This is checked
-    # against the fixed set of documented options (.t61_default_options, see
-    # R/zzz.R), not whatever theme61.* options happen to be set already -
-    # otherwise this would wrongly reject everything when theme61 has been
-    # loaded but not attached (e.g. only theme61::save_e61() was used).
+    # Validate against the fixed option set (R/zzz.R), not whatever
+    # theme61.* options happen to be set already.
     valid_opts <- names(.t61_default_options)
     invalid_opts <- setdiff(names(opt), valid_opts)
     if (length(invalid_opts) > 0) {

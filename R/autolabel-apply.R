@@ -383,15 +383,8 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
   )
   if (is.null(result)) return(plot)
 
-  # Every internal degrade tier (t61_place_label()'s own buffered/gridline
-  # relaxation, the coord_flip()+area/pointbar bypass, the "any empty
-  # spot" fallback, and the panel-centre last resort) is otherwise silent,
-  # even when it "succeeds" by quietly settling for a worse spot than the
-  # real, collision-checked search would have found -- see
-  # t61_autolabel_plot()'s `degrade_reason` column, set wherever that
-  # happens. One-off-per-session, same self-silencing pattern as
-  # theme61.autolabel_fast_msg above and theme61.sec_axis_msg (see
-  # sec_axes_rescale.R).
+  # Warn once per session when a label settled for a fallback position
+  # instead of a real, collision-checked placement.
   if (getOption("theme61.autolabel_fallback_msg", default = TRUE)) {
     degraded <- which(!is.na(result$degrade_reason))
     if (length(degraded) > 0) {

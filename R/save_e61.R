@@ -369,13 +369,8 @@ save_e61 <- function(filename = NULL,
       # Strip file extension from filename
       filename <- gsub("^(.*)\\..{3}$", "\\1", filename)
     } else if (missing(format) && !is.null(getOption("theme61.default_save_format"))) {
-      # `format` has a default value in the function signature (all 5
-      # formats), so it is never NULL here unless the caller explicitly
-      # passes format = NULL - checking is.null(format) meant this branch
-      # (and therefore the set_format()/theme61.default_save_format option)
-      # was never actually reached. missing() distinguishes "caller didn't
-      # supply format at all" from "caller explicitly supplied a value",
-      # which is what should defer to the option (#374).
+      # missing(), not is.null() - format always has a default value, so
+      # is.null(format) is never true and this branch was unreachable.
       format <- getOption("theme61.default_save_format")
     } else {
       format <- match.arg(format, several.ok = TRUE)

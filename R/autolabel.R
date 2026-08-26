@@ -287,8 +287,8 @@ t61_place_label_fast <- function(own, geom_type, index = 1, hjust = 0,
 #'   (NA_character_ unless an "area" label got placed inside its band, in
 #'   which case it holds the contrast colour to render it in), and a
 #'   `degrade_reason` character column (NA_character_ unless the label
-#'   settled for something worse than a real, collision-checked placement
-#'   -- see t61_apply_autolabel(), which warns on this).
+#'   settled for a worse-than-real placement -- see t61_apply_autolabel(),
+#'   which warns on this).
 #' @noRd
 t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400L, fast = FALSE) {
 
@@ -296,13 +296,8 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
   labels$y <- labels$fallback_y
   labels$placed <- FALSE
   labels$colour <- NA_character_
-  # NA unless a label settled for something worse than a real,
-  # collision-checked placement -- either the coord_flip()+area/pointbar
-  # bypass below, or one of the two generic fallback tiers (any
-  # collision-free spot, then the panel centre). Read by
-  # t61_apply_autolabel() to decide whether to warn. Always present (even
-  # on the early `mask`-is-NULL return above) since it's set here, before
-  # that check runs.
+  # NA unless the label settled for a worse-than-real placement; read by
+  # t61_apply_autolabel() to decide whether to warn.
   labels$degrade_reason <- NA_character_
 
   mask <- NULL

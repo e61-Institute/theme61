@@ -110,9 +110,7 @@ test_that("set_t61_options accepts theme61.max_discrete_colours and theme61.max_
 })
 
 test_that("set_t61_options() validates against the fixed set of theme61 options, not whichever are currently set", {
-  # Simulate theme61 being loaded but not attached (e.g. only
-  # theme61::save_e61() used) by temporarily clearing every theme61.*
-  # option - set_t61_options() must still accept a documented option name.
+  # Simulate theme61 loaded but not attached by clearing every theme61.* option.
   live_opts <- names(options())
   t61_live <- live_opts[grepl("^theme61\\.", live_opts)]
   saved <- options()[t61_live]

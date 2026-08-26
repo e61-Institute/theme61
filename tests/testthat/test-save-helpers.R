@@ -82,9 +82,6 @@ test_that("svg_to_bitmap() rescales output regardless of the res argument passed
     save_graph(graph = g, format = "svg", filename = "plot",
                 width = 10, height = 10, bg_colour = "white", res = 1)
 
-    # res = 1 used to skip the rescale step entirely (the `res != 1` check
-    # was always TRUE in practice since res is multiplied by 4 beforehand,
-    # but this pins down that res = 1 still produces a rescaled image).
     out_default <- svg_to_bitmap("plot.svg", "default.png", res = 1)
     out_double <- svg_to_bitmap("plot.svg", "double.png", res = 2)
 

@@ -601,10 +601,8 @@ test_that("t61_apply_autolabel(fast = TRUE) shows the fast-preview reminder once
 test_that("t61_apply_autolabel warns once when a label settles for a fallback position instead of a real placement", {
   skip_on_cran()
 
-  # coord_flip() + pointbar: t61_autolabel_plot() bypasses the series
-  # match entirely for this combination (not yet flip-aware), so the label
-  # falls straight through to the generic fallback tiers -- exactly the
-  # "worse than a real placement, no signal" gap this warning closes.
+  # coord_flip() + pointbar isn't flip-aware, so it bypasses the series
+  # match and falls through to a fallback position.
   data <- data.frame(x = 2000:2010, y = seq(0, 5, length.out = 11))
   data$ymin <- data$y - 1
   data$ymax <- data$y + 1
@@ -614,10 +612,7 @@ test_that("t61_apply_autolabel warns once when a label settles for a fallback po
     theme_bw(base_size = 10) +
     plot_label("Series A", colour = "#e57200")
 
-  # cli may soft-wrap the message across lines depending on console width,
-  # so match against the warning text with whitespace collapsed rather
-  # than relying on a multi-word regexp (expect_warning()'s "." doesn't
-  # match "\n").
+  # Collapse whitespace since cli may soft-wrap the message across lines.
   withr::local_options(list(theme61.autolabel_fallback_msg = TRUE))
   w <- testthat::capture_warnings(t61_apply_autolabel(p_bypass, width_cm = 16, height_cm = 12))
   expect_length(w, 1)
@@ -629,9 +624,7 @@ test_that("t61_apply_autolabel warns once when a label settles for a fallback po
   expect_false(getOption("theme61.autolabel_fallback_msg"))
   expect_no_warning(t61_apply_autolabel(p_bypass, width_cm = 16, height_cm = 12))
 
-  # A label whose colour matches no series, with no x/y of its own, has
-  # nothing to score a search against -- straight to the same generic
-  # fallback tiers, with the other reason text.
+  # An unmatched label with no x/y falls back for a different reason.
   data2 <- data.frame(x = 2000:2020, y = seq(0, 5, length.out = 21))
   p_unmatched <- ggplot(data2, aes(x, y)) +
     geom_line(colour = "#e57200", linewidth = 1) +
@@ -755,12 +748,6 @@ test_that("t61_apply_autolabel falls back (doesn't crash or misplace) for a geom
   search_ran <- FALSE
   testthat::local_mocked_bindings(t61_place_label = function(...) { search_ran <<- TRUE; NULL })
 
-  # The coord_flip()+pointbar bypass silently discards the series match --
-  # see the theme61.autolabel_fallback_msg tests below for the dedicated
-  # coverage of that warning; this just confirms it fires here too. Matched
-  # on a single space-free token ("coord_flip") since cli may soft-wrap the
-  # full message across lines, which a multi-word regexp (no "." doesn't
-  # match "\n") could miss depending on console width.
   result <- NULL
   expect_warning(
     result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12),

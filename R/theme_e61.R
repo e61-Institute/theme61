@@ -61,9 +61,7 @@ theme_e61 <- function(
     .validate_legend_position(legend_position)
   }
 
-  # ggplot_build() measures theme text on a device that doesn't know
-  # "pt-sans" (unlike get_text_width()/get_text_height()'s explicit svglite
-  # device), so it warns during tests.
+  # Avoids a "font not found" warning during ggplot_build() in tests.
   base_family <- if (is_testing()) "sans" else base_family
 
   base_size <- getOption("theme61.base_size", default = 10)

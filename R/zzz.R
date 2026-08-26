@@ -7,11 +7,7 @@
 # Required to setup an empty environment with this name
 t61_env <- NULL
 
-# The full set of theme61.* options and their defaults. This is the single
-# source of truth used both to set defaults at load time (.onLoad(), below)
-# and to validate option names in set_t61_options() (see
-# R/theme61-options.R) - so it must be kept in sync with every documented
-# option in ?set_t61_options.
+# Default theme61.* options - keep in sync with ?set_t61_options.
 .t61_default_options <- list(
   theme61.auto_label = TRUE,
   theme61.auto_theme = TRUE,
@@ -27,13 +23,11 @@ t61_env <- NULL
   theme61.sec_axis_msg = TRUE
 )
 
-# Code inside here runs when the package is loaded, including via
-# namespace-qualified use (e.g. theme61::save_e61()) that never attaches the
-# package with library()/require()
+# Runs on load, including namespace-qualified use (theme61::save_e61())
+# that never attaches the package via library()/require()
 .onLoad <- function(libname, pkgname) {
 
-  # Set default options, without clobbering anything the user already set
-  # (e.g. via options() before theme61 was loaded)
+  # Set default options without clobbering anything the user already set
   op <- options()
   to_set <- !(names(.t61_default_options) %in% names(op))
   if (any(to_set)) {

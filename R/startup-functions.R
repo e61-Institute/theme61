@@ -44,9 +44,7 @@ check_pkg_ver <- function(test = FALSE) {
   # Prompts to update the package if it is out-of-date
   if (inst_v < latest_v) {
 
-    # In non-interactive sessions (Rscript, R CMD check, knitr/Quarto, CI),
-    # readline() returns "" immediately, which would spin the prompt loop
-    # below forever. Just note it and move on instead.
+    # Non-interactive sessions would spin the readline() prompt forever.
     if (!.t61_interactive()) {
       cli::cli_alert_info(
         "A newer version of theme61 is available. Run remotes::install_github(\"e61-institute/theme61\") to update.")
@@ -72,11 +70,9 @@ check_pkg_ver <- function(test = FALSE) {
 
 #' Register the bundled PT Sans font with sysfonts/showtext
 #'
-#' PT Sans ships with the package itself (inst/extdata/fonts/pt-sans, under
-#' the SIL Open Font License - see the bundled OFL.txt), so this is a local
-#' file read via sysfonts::font_add(), not a network call to Google Fonts
-#' (sysfonts::font_add_google()) - it can't fail from being offline, DNS
-#' being broken, or Google Fonts rate-limiting/being unreachable.
+#' Registers from the ttf files shipped in inst/extdata/fonts/pt-sans
+#' (SIL OFL license) instead of downloading from Google Fonts, so it can't
+#' fail from being offline or rate-limited.
 #' @noRd
 .t61_init_fonts <- function() {
   # Hard opt-out (e.g. don't want showtext enabled for this session at all)
@@ -89,8 +85,7 @@ check_pkg_ver <- function(test = FALSE) {
     return(invisible(NULL))
   }
 
-  # If already registered (e.g. a previous library(theme61) call this
-  # session), just enable showtext and exit
+  # Already registered (e.g. a previous library(theme61) call this session)
   fams <- try(sysfonts::font_families(), silent = TRUE)
   if (!inherits(fams, "try-error") && "pt-sans" %in% fams) {
     try(showtext::showtext_auto(), silent = TRUE)
@@ -99,7 +94,7 @@ check_pkg_ver <- function(test = FALSE) {
 
   font_dir <- system.file("extdata", "fonts", "pt-sans", package = "theme61")
 
-  # Final guard: never allow font registration to abort startup
+  # Never allow font registration to abort startup
   tryCatch(
     {
       sysfonts::font_add(

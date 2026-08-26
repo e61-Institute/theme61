@@ -510,9 +510,7 @@ test_that("Preview mode works", {
 test_that("set_format works", {
   p <- minimal_plot
 
-  # Guard against a leftover theme61.default_save_format option leaking into
-  # later tests if an expectation above fails and unset_format() below is
-  # never reached.
+  # Guard against a leftover option if an expectation below fails first.
   withr::defer(unset_format())
 
   withr::with_tempdir({

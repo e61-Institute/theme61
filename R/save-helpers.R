@@ -147,12 +147,8 @@ has_discrete_y_scale <- function(plot) {
   # Check the y aesthetic mapping
   y_mapping <- plot@mapping$y
   if (!is.null(y_mapping)) {
-    # Get the data and check if y variable is discrete. y_mapping is a
-    # quosure that may reference a column only present in a layer's own
-    # data (not plot@data), or an expression that can't be evaluated
-    # against plot@data at all - eval_tidy() errors in both cases, so it's
-    # wrapped in tryCatch() and falls back to "not discrete" (see the same
-    # pattern in check_for_y_var(), aes-y-lims.R).
+    # y_mapping may reference a layer-only column or an unevaluable
+    # expression - fall back to "not discrete" instead of erroring.
     plot_data <- plot@data
     if (!is.null(plot_data) && !is.null(y_mapping)) {
       y_var <- tryCatch(rlang::eval_tidy(y_mapping, plot_data), error = function(e) NULL)
@@ -332,15 +328,7 @@ svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
 
   if(grepl(".*\\.png$", file_out)) fmt <- "png" else fmt <- "jpg"
 
-  # This approach to rescaling starts by saving a rescaled SVG before
-  # converting it to PNG/JPG, hence the need for temp files. This used to be
-  # gated behind `if (res != 1)`, with a direct (unscaled) render as the
-  # alternative -- but since `res` is multiplied by 4 above before this point
-  # is reached, `res != 1` is true for every res a caller can realistically
-  # pass in (the only way to reach exactly 1 here is to pass res = 0.25,
-  # which isn't a documented/supported value), so the rescale path always
-  # ran in practice anyway. Simplified to always rescale, matching that
-  # actual behaviour (#354).
+  # Rescale by re-rendering the SVG at the target size, via temp files.
   file_temp_svg <- tempfile(fileext = ".svg")
   file_temp_out <- tempfile(fileext = paste0(".", fmt))
   on.exit(unlink(c(file_temp_svg, file_temp_out)), add = TRUE)

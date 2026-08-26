@@ -87,20 +87,12 @@ check_for_y_var <- function(plot, build = NULL){
   check <- FALSE
 
   # First check if the y-variable is a factor or a character - we can't scale
-  # those. plot@mapping$y is a quosure (see has_discrete_y_scale() in
-  # save-helpers.R for the same pattern), so it's evaluated directly against
-  # the plot data with rlang rather than deparse()-ing it into a column-name
-  # string and indexing plot@data with that - which broke for anything other
-  # than a plain symbol (e.g. aes(y = value / 1000)), and for a symbol that
-  # only exists in layer-level data (not plot@data). tryCatch() falls back to
-  # "not a factor/character" (like the old code implicitly did) instead of
-  # erroring, in both of those cases.
+  # those. Evaluate the mapping quosure directly rather than deparse()-ing it
+  # into a column name, since y can be an expression or only exist in
+  # layer-level data.
   y_is_discrete <- FALSE
   if (!is.null(plot@mapping$y)) {
     y_val <- tryCatch(rlang::eval_tidy(plot@mapping$y, plot@data), error = function(e) NULL)
-    # inherits() with a vector target, not ==, since class() can return more
-    # than one element (e.g. c("ordered", "factor")), which would silently
-    # break a `!= ... && != ...` comparison.
     y_is_discrete <- inherits(y_val, c("factor", "character"))
   }
 
