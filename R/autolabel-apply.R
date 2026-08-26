@@ -252,7 +252,7 @@ t61_collect_autolabel_targets <- function(plot) {
 }
 
 #' Cheap check: does this plot have any plot_label() layer with
-#' print_position = TRUE? Used to gate print.e61_ggplot()'s console-print
+#' print_position = TRUE? Used to gate print.e61_plot()'s console-print
 #' path so printing a plot doesn't pay for a full save_single() resolve
 #' unless the user actually asked for the positions.
 #' @noRd
@@ -302,7 +302,7 @@ t61_format_label_vec <- function(x) {
 #'
 #' Emitted as a message (not printed/returned), so it's a side effect of
 #' rendering the plot rather than part of any return value -- the caller
-#' (t61_apply_autolabel(), and in turn save_single()/print.e61_ggplot())
+#' (t61_apply_autolabel(), and in turn save_single()/print.e61_plot())
 #' still returns the plot itself either way.
 #' @noRd
 t61_print_label_positions <- function(text, x, y, is_date_x, is_date_y) {

@@ -40,3 +40,27 @@ test_that("get_lines does not split a single line of text that already fits", {
   expect_equal(nrow(lines), 1)
   expect_equal(lines$collapsed_text, text)
 })
+
+# Tests of update_plot_label() (#356) ----------------------------------------
+
+test_that("update_plot_label() rescales a default-sized plot_label() layer", {
+  p <- minimal_plot_label +
+    plot_label(label = "A", x = 1, y = 1, auto_position = FALSE)
+
+  base_size <- 20
+  updated <- theme61:::update_plot_label(p, chart_type = "normal", base_size = base_size)
+
+  last_layer <- updated@layers[[length(updated@layers)]]
+  expect_equal(last_layer$aes_params$size, 3.5 * base_size / 10)
+})
+
+test_that("update_plot_label() leaves an explicitly-sized plot_label() layer alone", {
+  p <- minimal_plot_label +
+    plot_label(label = "A", x = 1, y = 1, size = 6, auto_position = FALSE)
+
+  base_size <- 20
+  updated <- theme61:::update_plot_label(p, chart_type = "normal", base_size = base_size)
+
+  last_layer <- updated@layers[[length(updated@layers)]]
+  expect_equal(last_layer$aes_params$size, 6)
+})
