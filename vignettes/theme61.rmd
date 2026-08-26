@@ -22,7 +22,7 @@ resource_files:
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 library(ggplot2)
 library(data.table)
-devtools::load_all()
+library(theme61)
 
 knitr::opts_chunk$set(
   echo = TRUE,
