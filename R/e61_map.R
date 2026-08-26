@@ -41,6 +41,15 @@ add_map_e61 <-
   adjust = 0,
   maptype = "stamen_toner_lite") {
 
+    # ggmap is a Suggests, not a hard dependency - fail clearly rather than
+    # letting packageVersion() below error obscurely when it isn't installed
+    if (!requireNamespace("ggmap", quietly = TRUE)) {
+      cli::cli_abort(c(
+        "The {.pkg ggmap} package is required to use {.fn add_map_e61}.",
+        "i" = "Install it with {.code install.packages(\"ggmap\")}."
+      ))
+    }
+
     # Check if req version of ggmap is installed
     inst_v <- packageVersion("ggmap")
     if (inst_v < "3.0.2") {
@@ -111,6 +120,15 @@ add_map_e61 <-
 #' @export
 #' @family map functions
 setup_stadia_maps <- function(api_key = NULL, update_ggmap = NA) {
+
+  # ggmap is a Suggests, not a hard dependency - fail clearly rather than
+  # letting packageVersion() below error obscurely when it isn't installed
+  if (!requireNamespace("ggmap", quietly = TRUE)) {
+    cli::cli_abort(c(
+      "The {.pkg ggmap} package is required to use {.fn setup_stadia_maps}.",
+      "i" = "Install it with {.code install.packages(\"ggmap\")}."
+    ))
+  }
 
   # Check if ggmap package version has the required functions, install from Github if it doesn't
   inst_v <- packageVersion("ggmap")
