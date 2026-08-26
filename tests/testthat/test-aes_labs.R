@@ -64,3 +64,34 @@ test_that("update_plot_label() leaves an explicitly-sized plot_label() layer alo
   last_layer <- updated@layers[[length(updated@layers)]]
   expect_equal(last_layer$aes_params$size, 6)
 })
+
+# Tests of update_labs() (#358) -----------------------------------------------
+
+test_that("update_labs() doesn't drop labels it doesn't itself manage", {
+  p <- minimal_plot_label +
+    ggplot2::labs(
+      title = "My title", subtitle = "My sub", caption = "My cap",
+      x = "X axis", y = "Y axis", tag = "A", alt = "accessibility text"
+    )
+
+  updated <- update_labs(p, plot_width = 10)
+
+  # title/subtitle/caption are the fields update_labs() itself computes
+  expect_false(is.null(updated@labels$title))
+  expect_false(is.null(updated@labels$subtitle))
+  expect_false(is.null(updated@labels$caption))
+
+  # everything else should pass through untouched
+  expect_equal(updated@labels$x, "X axis")
+  expect_equal(updated@labels$y, "Y axis")
+  expect_equal(updated@labels$tag, "A")
+  expect_equal(updated@labels$alt, "accessibility text")
+})
+
+test_that("update_labs() doesn't introduce a stray fill entry when fill isn't set", {
+  p <- minimal_plot_label + ggplot2::labs(title = "T")
+
+  updated <- update_labs(p, plot_width = 10)
+
+  expect_false("fill" %in% names(updated@labels))
+})

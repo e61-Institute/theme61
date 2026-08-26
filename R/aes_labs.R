@@ -58,16 +58,20 @@ update_labs <- function(plot, plot_width){
     plot <- plot + theme(axis.title.x = element_blank())
   }
 
-  # add a new labs function to override the old one
+  # Update only the title/subtitle/caption text this function actually
+  # (re)computes above. This used to also re-set x/y/colour/fill here, to
+  # their own current plot@labels values - a redundant no-op that only
+  # listed a handful of the labels ggplot2 tracks (nothing for alpha, size,
+  # shape, linetype, linewidth, weight, tag, alt/SVG-accessibility-text,
+  # etc.), so a caller relying on that pattern to preserve a label not in
+  # this list was one ggplot2 label-merging behaviour change away from
+  # having it silently dropped instead. It also produced a stray
+  # `fill: NULL` entry in plot@labels whenever fill wasn't otherwise set.
   plot_new <- plot +
     ggplot2::labs(
       title = title_text,
       subtitle = subtitle_text,
-      caption = caption_text,
-      x = plot@labels$x,
-      y = plot@labels$y,
-      colour = plot@labels$colour,
-      fill = plot@labels$fill
+      caption = caption_text
     )
 
   return(plot_new)
