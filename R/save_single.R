@@ -168,6 +168,16 @@ save_single <- function(
 
     known_ht <- sum(grid::convertHeight(p$heights, "cm", valueOnly = TRUE))
 
+    # Re-measure known_wd from this same, post-update_labs()/update_plot_label()
+    # grob. The known_wd computed further up is measured before those calls
+    # mutate the plot; pairing that stale width budget with an up-to-date
+    # known_ht here would feed the aspect-ratio lock inconsistent numbers,
+    # which it silently resolves by squeezing/inflating margins instead of
+    # erroring.
+    known_wd <- get_grob_width(p, grob_name = "axis-r") +
+      get_grob_width(p, grob_name = "axis-l") +
+      get_margin_dim(p, "width")
+
     # calculate the total free width and height we have to play with
     if(is.null(max_height)) max_height <- 100
 
