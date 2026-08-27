@@ -67,15 +67,15 @@ save_multi <-
     # outer_width/outer_height override the margin at the outer edge of the
     # whole figure (as opposed to pad_width/pad_height, which only add space
     # *between* panels). NULL (the default) keeps the built-in margin, kept
-    # small at the top (~2px) and a bit more generous at the bottom, which
+    # small at the top (~1px) and a bit more generous at the bottom, which
     # lowers the risk of axis-label clipping there. An explicit outer_height
     # still applies symmetrically to both sides. Kept in both mm (for the
     # per-panel plot.margin, which is set in mm) and points (for the
     # title/subtitle/caption plot_annotation margins below, which - like the
     # rest of ggplot2 - are in points) so neither needs a unit conversion at
     # the point of use.
-    outer_top_mm <- if (is.null(outer_height)) points_to_mm(1.5) else outer_height
-    outer_top_pt <- if (is.null(outer_height)) 1.5 else mm_to_points(outer_height)
+    outer_top_mm <- if (is.null(outer_height)) points_to_mm(0.75) else outer_height
+    outer_top_pt <- if (is.null(outer_height)) 0.75 else mm_to_points(outer_height)
     outer_bottom_mm <- if (is.null(outer_height)) points_to_mm(4) else outer_height
     outer_bottom_pt <- if (is.null(outer_height)) 4 else mm_to_points(outer_height)
     outer_width_mm <- if (is.null(outer_width)) 1 else outer_width
@@ -478,10 +478,13 @@ save_multi <-
     }
 
     # Space for title if required
+    # 0.1cm here is an empirical fudge for real vs estimated text-measurement
+    # variance, not the outer margin - keep it fixed even as outer_top_mm
+    # is tuned for the figure's actual outer edge.
     if(!is.null(title)){
       t_h <- get_text_height(text = title, font_size = title_text_size) +
         points_to_mm(5.5) / 10 + points_to_mm(title_subtitle_spacing) / 10 +
-        outer_top_mm / 10
+        0.1
     } else {
       t_h <- 0
     }
@@ -490,7 +493,7 @@ save_multi <-
     if(!is.null(subtitle)){
       s_h <- get_text_height(text = subtitle, font_size = subtitle_text_size) +
         points_to_mm(subtitle_charts_spacing) / 10 +
-        outer_top_mm / 10
+        0.1
     } else {
       s_h <- 0
     }
