@@ -135,10 +135,7 @@ save_single <- function(
   right_axis_width <- get_grob_width(p, grob_name = "axis-r")
   left_axis_width <- get_grob_width(p, grob_name = "axis-l")
 
-  # Plot margin also eats into the panel's free width but isn't an axis grob -
-  # omitting it overstates free_wd, which (since the panel is aspect-locked)
-  # makes grid shrink the panel below budget and centre the leftover as
-  # unaccounted blank space.
+  # Margin eats into the panel's free width too, but isn't an axis grob.
   known_wd <- right_axis_width + left_axis_width + get_margin_dim(p, "width")
 
   tot_panel_width <- width - known_wd
@@ -168,12 +165,9 @@ save_single <- function(
 
     known_ht <- sum(grid::convertHeight(p$heights, "cm", valueOnly = TRUE))
 
-    # Re-measure known_wd from this same, post-update_labs()/update_plot_label()
-    # grob. The known_wd computed further up is measured before those calls
-    # mutate the plot; pairing that stale width budget with an up-to-date
-    # known_ht here would feed the aspect-ratio lock inconsistent numbers,
-    # which it silently resolves by squeezing/inflating margins instead of
-    # erroring.
+    # Re-measure against this same post-mutation grob, not the earlier
+    # (pre-update_labs/update_plot_label) known_wd - pairing a stale width
+    # with a fresh known_ht feeds the aspect lock inconsistent numbers.
     known_wd <- get_grob_width(p, grob_name = "axis-r") +
       get_grob_width(p, grob_name = "axis-l") +
       get_margin_dim(p, "width")

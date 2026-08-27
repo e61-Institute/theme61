@@ -457,13 +457,8 @@ save_multi <-
       height <- (known_height + panel_height) * nrow
     }
 
-    # Space for title if required - text height, plus its own element margin
-    # (top = 5.5pt, bottom = title_subtitle_spacing, set on plot.title below)
-    # and the plot.margin added on *both* top and bottom of the title's own
-    # annotation row (see plot.margin = margin(t = outer_height_pt, b =
-    # outer_height_pt, ...) below) - omitting either understates the row's
-    # real height, and since the panel is aspect-locked, grid then squeezes
-    # the shortfall out of the panel instead of erroring.
+    # Space for title if required - text height, its own top/bottom element
+    # margin, and its plot.margin (matches the theme set on plot.title below).
     if(!is.null(title)){
       t_h <- get_text_height(text = title, font_size = title_text_size) +
         points_to_mm(5.5) / 10 + points_to_mm(title_subtitle_spacing) / 10 +
