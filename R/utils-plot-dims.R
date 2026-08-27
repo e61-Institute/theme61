@@ -7,6 +7,7 @@
 get_grob_dim <- function(grob, dim){
 
   convert <- if(dim == "width") grid::convertWidth else grid::convertHeight
+  grob_dim <- if(dim == "width") grid::grobWidth else grid::grobHeight
   plural <- paste0(dim, "s")
 
   dim_of <- function(g){
@@ -20,7 +21,10 @@ get_grob_dim <- function(grob, dim){
       sum(convert(g[[plural]], "cm", valueOnly = TRUE), na.rm = T)
 
     } else {
-      0
+      # richtext_grob (ggtext's element_markdown(), used for every
+      # title/subtitle/caption) has neither field; fall back to grid's
+      # generic size dispatch.
+      convert(grob_dim(g), "cm", valueOnly = TRUE)
     }
   }
 
