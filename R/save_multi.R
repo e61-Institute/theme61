@@ -457,8 +457,7 @@ save_multi <-
       height <- (known_height + panel_height) * nrow
     }
 
-    # Space for title if required - text height, its own top/bottom element
-    # margin, and its plot.margin (matches the theme set on plot.title below).
+    # Space for title if required
     if(!is.null(title)){
       t_h <- get_text_height(text = title, font_size = title_text_size) +
         points_to_mm(5.5) / 10 + points_to_mm(title_subtitle_spacing) / 10 +
@@ -467,8 +466,7 @@ save_multi <-
       t_h <- 0
     }
 
-    # Space for subtitle if required - text height, its own bottom element
-    # margin (top = 0), and the plot.margin.
+    # Space for subtitle if required
     if(!is.null(subtitle)){
       s_h <- get_text_height(text = subtitle, font_size = subtitle_text_size) +
         points_to_mm(subtitle_charts_spacing) / 10 +
@@ -477,9 +475,7 @@ save_multi <-
       s_h <- 0
     }
 
-    # Adjust the footer height depending on how much text there is - text
-    # height, its own top (caption_spacing) and bottom (5.5pt) element
-    # margins, and the plot.margin.
+    # Adjust the footer height depending on how much text there is
     if(!is.null(caption)){
       f_h <- get_text_height(text = caption, font_size = footer_text_size) +
         points_to_mm(caption_spacing) / 10 + points_to_mm(5.5) / 10 +

@@ -53,11 +53,7 @@ save_single <- function(
       plot <- plot + theme(legend.position = legendPosition)
     }
 
-    # Axis text is vjust-centred on its break, so the top/bottom-most y-axis
-    # labels overhang the panel by roughly half their own height. If
-    # plot.margin's t/b is smaller than that, the label gets clipped by the
-    # device edge (most visible when there's no x-axis row below to absorb
-    # the overhang, e.g. a bare continuous y-scale).
+    # Ensure top/bottom margin can fit an axis label's vjust-centred overhang.
     current_margin <- plot@theme$plot.margin
     if (!is.null(current_margin)) {
       min_margin_pt <- mm_to_points(get_text_height(text = "0", font_size = base_size * 0.9) / 2 * 10)
@@ -187,9 +183,7 @@ save_single <- function(
 
     known_ht <- sum(grid::convertHeight(p$heights, "cm", valueOnly = TRUE))
 
-    # Re-measure against this same post-mutation grob, not the earlier
-    # (pre-update_labs/update_plot_label) known_wd - pairing a stale width
-    # with a fresh known_ht feeds the aspect lock inconsistent numbers.
+    # Re-measure known_wd from this same, up-to-date grob.
     known_wd <- get_grob_width(p, grob_name = "axis-r") +
       get_grob_width(p, grob_name = "axis-l") +
       get_margin_dim(p, "width")
