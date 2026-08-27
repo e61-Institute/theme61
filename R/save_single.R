@@ -135,7 +135,11 @@ save_single <- function(
   right_axis_width <- get_grob_width(p, grob_name = "axis-r")
   left_axis_width <- get_grob_width(p, grob_name = "axis-l")
 
-  known_wd <- right_axis_width + left_axis_width
+  # Plot margin also eats into the panel's free width but isn't an axis grob -
+  # omitting it overstates free_wd, which (since the panel is aspect-locked)
+  # makes grid shrink the panel below budget and centre the leftover as
+  # unaccounted blank space.
+  known_wd <- right_axis_width + left_axis_width + get_margin_dim(p, "width")
 
   tot_panel_width <- width - known_wd
 
