@@ -254,25 +254,10 @@ save_multi <-
         # save the plot
         clean_plotlist[[i]] <- temp_plot
 
-        # Calculate the known height of the chart (named grobs only, as in
-        # the first pass above -- summing every row would also count the
-        # panel's own null row)
+        # Calculate the known height of the chart
         p <- t61_ggplotGrob_quiet_na(temp_plot)
 
-        t_ht <- get_grob_height(p, grob_name = "title")
-        st_ht <- get_grob_height(p, grob_name = "subtitle")
-        cap_ht <- get_grob_height(p, grob_name = "caption")
-
-        xlt_ht <- get_grob_height(p, grob_name = "xlab-t")
-        xlb_ht <- get_grob_height(p, grob_name = "xlab-b")
-
-        axb_ht <- get_grob_height(p, grob_name = "axis-b")
-        axt_ht <- get_grob_height(p, grob_name = "axis-t")
-
-        gbxt_ht <- get_grob_height(p, grob_name = "guide-box-top")
-        gbxb_ht <- get_grob_height(p, grob_name = "guide-box-bottom")
-
-        temp_height <- sum(t_ht, st_ht, cap_ht, xlt_ht, xlb_ht, axb_ht, axt_ht, gbxt_ht, gbxb_ht)
+        temp_height <- sum(grid::convertHeight(p$heights, "cm", valueOnly = TRUE))
 
         known_height <- pmax(known_height, temp_height)
       }
