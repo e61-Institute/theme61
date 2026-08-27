@@ -72,12 +72,16 @@ t61_panel_box_cm <- function(gt, width_cm, height_cm) {
   col_widths_cm  <- rep(0, length(gt$widths))
   row_heights_cm <- rep(0, length(gt$heights))
 
-  col_widths_cm[is_fixed_w] <- vapply(
-    gt$widths[is_fixed_w], grid::convertWidth, numeric(1), unitTo = "cm", valueOnly = TRUE
-  )
-  row_heights_cm[is_fixed_h] <- vapply(
-    gt$heights[is_fixed_h], grid::convertHeight, numeric(1), unitTo = "cm", valueOnly = TRUE
-  )
+  # Needs a real device open, or grid falls back to the PostScript font
+  # database for text-height conversions, which doesn't know theme61's fonts.
+  t61_with_device({
+    col_widths_cm[is_fixed_w] <- vapply(
+      gt$widths[is_fixed_w], grid::convertWidth, numeric(1), unitTo = "cm", valueOnly = TRUE
+    )
+    row_heights_cm[is_fixed_h] <- vapply(
+      gt$heights[is_fixed_h], grid::convertHeight, numeric(1), unitTo = "cm", valueOnly = TRUE
+    )
+  })
 
   null_col_weight <- ifelse(is_fixed_w, 0, as.numeric(gt$widths))
   null_row_weight <- ifelse(is_fixed_h, 0, as.numeric(gt$heights))
