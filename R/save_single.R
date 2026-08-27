@@ -52,6 +52,28 @@ save_single <- function(
     if(!is.null(legendPosition)){
       plot <- plot + theme(legend.position = legendPosition)
     }
+
+    # Axis text is vjust-centred on its break, so the top/bottom-most y-axis
+    # labels overhang the panel by roughly half their own height. If
+    # plot.margin's t/b is smaller than that, the label gets clipped by the
+    # device edge (most visible when there's no x-axis row below to absorb
+    # the overhang, e.g. a bare continuous y-scale).
+    current_margin <- plot@theme$plot.margin
+    if (!is.null(current_margin)) {
+      min_margin_pt <- mm_to_points(get_text_height(text = "0", font_size = base_size * 0.9) / 2 * 10)
+      top_pt <- grid::convertHeight(current_margin[1], "pt", valueOnly = TRUE)
+      bottom_pt <- grid::convertHeight(current_margin[3], "pt", valueOnly = TRUE)
+
+      if (top_pt < min_margin_pt || bottom_pt < min_margin_pt) {
+        plot <- plot + theme(plot.margin = margin(
+          t = max(top_pt, min_margin_pt),
+          r = grid::convertWidth(current_margin[2], "pt", valueOnly = TRUE),
+          b = max(bottom_pt, min_margin_pt),
+          l = grid::convertWidth(current_margin[4], "pt", valueOnly = TRUE),
+          unit = "pt"
+        ))
+      }
+    }
   }
 
   # Update plot background --------------------------------------------------
