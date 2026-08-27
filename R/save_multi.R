@@ -66,14 +66,16 @@ save_multi <-
 
     # outer_width/outer_height override the whole figure's outer margin
     # (pad_width/pad_height only add space *between* panels). Default keeps
-    # the top and sides small (~1px) and the bottom a bit larger for
-    # clipping safety; an explicit outer_height/outer_width still applies
+    # the top small (~1px) and the bottom a bit larger for clipping safety -
+    # both are vjust-centred content with real overhang risk. The sides are
+    # plain left/right-aligned axis text with no such overhang, so they
+    # default to 0. An explicit outer_height/outer_width still applies
     # symmetrically to both sides of that dimension.
     outer_top_mm <- if (is.null(outer_height)) points_to_mm(0.75) else outer_height
     outer_top_pt <- if (is.null(outer_height)) 0.75 else mm_to_points(outer_height)
     outer_bottom_mm <- if (is.null(outer_height)) points_to_mm(4) else outer_height
     outer_bottom_pt <- if (is.null(outer_height)) 4 else mm_to_points(outer_height)
-    outer_width_mm <- if (is.null(outer_width)) points_to_mm(0.75) else outer_width
+    outer_width_mm <- if (is.null(outer_width)) 0 else outer_width
 
     # Format each plot in the plotlist and get dimensions ----------------------------------------
 
