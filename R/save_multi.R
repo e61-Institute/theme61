@@ -362,7 +362,7 @@ save_multi <-
               family = theme61_settings$text$family,
               hjust = 0,
               vjust = 0.5,
-              margin = margin(t = 5.5, b = title_subtitle_spacing, l = 0, r = 0)
+              margin = margin(t = 0, b = title_subtitle_spacing, l = 0, r = 0)
             ),
             # Zero out l/r so the text can use the full internal_width.
             plot.margin = margin(t = outer_top_pt, r = 0, b = outer_bottom_pt, l = 0)
@@ -453,7 +453,7 @@ save_multi <-
     # variance - kept fixed, independent of outer_top_mm.
     if(!is.null(title)){
       t_h <- get_text_height(text = title, font_size = title_text_size) +
-        points_to_mm(5.5) / 10 + points_to_mm(title_subtitle_spacing) / 10 +
+        points_to_mm(title_subtitle_spacing) / 10 +
         0.1
     } else {
       t_h <- 0
