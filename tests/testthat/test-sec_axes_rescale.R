@@ -80,7 +80,7 @@ test_that("a plot with the default secondary axis renders an axis-r grob", {
     geom_point() +
     scale_y_continuous_e61(limits = c(0, 5, 1))
 
-  grobs <- ggplot2::ggplotGrob(p)
+  grobs <- quiet_ggplotGrob(p)
 
   expect_gt(get_grob_width(grobs, grob_name = "axis-r"), 0)
 })
@@ -90,7 +90,7 @@ test_that("sec_axis = FALSE suppresses the axis-r grob", {
     geom_point() +
     scale_y_continuous_e61(limits = c(0, 5, 1), sec_axis = FALSE)
 
-  grobs <- ggplot2::ggplotGrob(p)
+  grobs <- quiet_ggplotGrob(p)
 
   width <- get_grob_width(grobs, grob_name = "axis-r")
   expect_true(is.null(width) || width == 0)
@@ -109,7 +109,7 @@ test_that("a rescaled secondary axis on a real plot also renders an axis-r grob"
     ) +
     labs_e61(y = "%")
 
-  grobs <- ggplot2::ggplotGrob(p)
+  grobs <- quiet_ggplotGrob(p)
 
   expect_gt(get_grob_width(grobs, grob_name = "axis-r"), 0)
 })
@@ -138,7 +138,7 @@ test_that("faceted plots with a secondary axis build and render without error", 
     labs_e61(y = "y", x = "x")
 
   expect_no_error(ggplot_build(p))
-  expect_no_error(ggplot2::ggplotGrob(p))
+  expect_no_error(quiet_ggplotGrob(p))
 
   # theme61's facet_wrap() defaults to axes = "all", which should widen the
   # panel spacing set by maybe_adjust_facet_spacing()
