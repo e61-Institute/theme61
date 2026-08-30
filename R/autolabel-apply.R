@@ -383,17 +383,16 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
   )
   if (is.null(result)) return(plot)
 
-  # Warn once per session when a label settled for a fallback position
-  # instead of a real, collision-checked placement.
+  # Inform when a label settled for a fallback position instead of a real,
+  # collision-checked placement.
   if (getOption("theme61.autolabel_fallback_msg", default = TRUE)) {
     degraded <- which(!is.na(result$degrade_reason))
     if (length(degraded) > 0) {
       detail <- paste0(sprintf('"%s" (%s)', result$text[degraded], result$degrade_reason[degraded]),
                         collapse = "; ")
-      cli::cli_warn(
-        "Auto-positioned {.fn plot_label} text settled for a fallback position instead of the real, collision-checked placement: {detail}. This message appears once per session; to see it again, run {.code options(theme61.autolabel_fallback_msg = TRUE)}."
+      cli::cli_inform(
+        "Auto-positioned {.fn plot_label} text settled for a fallback position instead of the real, collision-checked placement: {detail}. To turn off this message, run {.code options(theme61.autolabel_fallback_msg = FALSE)}."
       )
-      options(theme61.autolabel_fallback_msg = FALSE)
     }
   }
 

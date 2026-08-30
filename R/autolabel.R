@@ -395,7 +395,10 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
         result <- list(x = fp$x, y = fp$y, box = NULL)
       } else {
         centre <- get_fast_panel_centre()
-        if (!anyNA(unlist(centre))) result <- list(x = centre$x, y = centre$y, box = NULL)
+        if (!anyNA(unlist(centre))) {
+          result <- list(x = centre$x, y = centre$y, box = NULL)
+          labels$degrade_reason[i] <- "no good spot found, used a fallback position"
+        }
       }
 
     } else {
