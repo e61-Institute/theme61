@@ -1,7 +1,0 @@
-# Snapshot SVGs are regenerated wholesale on every change (coordinates,
-# ids, etc. all shift), so a line-by-line diff is noise. -diff makes local
-# git tooling (git diff/log -p) treat them as opaque binaries; GitHub's web
-# UI doesn't honour -diff (it diffs anything that looks like text), so
-# linguist-generated also collapses them behind a "Load diff" toggle there
-# and drops them from the PR's diff stats.
-tests/testthat/_snaps/**/*.svg -diff linguist-generated=true
