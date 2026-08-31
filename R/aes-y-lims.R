@@ -86,15 +86,19 @@ check_for_y_var <- function(plot, build = NULL){
 
   check <- FALSE
 
-  # First check if the y-variable is a factor or a character - we can't scale those
-  y_var <- deparse(plot@mapping$y)
-  y_var <- gsub("~", "", y_var)
-
-  y_class <- class(plot@data[[y_var]])
+  # First check if the y-variable is a factor or a character - we can't scale
+  # those. Evaluate the mapping quosure directly rather than deparse()-ing it
+  # into a column name, since y can be an expression or only exist in
+  # layer-level data.
+  y_is_discrete <- FALSE
+  if (!is.null(plot@mapping$y)) {
+    y_val <- tryCatch(rlang::eval_tidy(plot@mapping$y, plot@data), error = function(e) NULL)
+    y_is_discrete <- inherits(y_val, c("factor", "character"))
+  }
 
   # if the y-var is either missing, or it is not a factor/character, then
   # continue looking for whether there is a y-variable that can be used for scaling
-  if(is.null(y_class) || (y_class != "factor" && y_class != "character")){
+  if(!y_is_discrete){
 
     if (is.null(build)) build <- ggplot_build(plot)
 

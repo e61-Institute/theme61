@@ -51,7 +51,7 @@ test_that("Automatic secondary y-axis scales work", {
                  info = paste("Expected secondary axis for", nm))
 
     # and it should actually manifest as a right axis grob with non-zero width
-    g <- ggplotGrob(b@plot)
+    g <- quiet_ggplotGrob(b@plot)
     axis_r_w <- theme61:::get_grob_width(g, grob_name = "axis-r")
     expect_false(is.null(axis_r_w) || axis_r_w == 0, info = paste("No right axis grob for", nm))
   }
@@ -90,7 +90,7 @@ test_that("Auto y-axis does not apply if you override with ggplot2 scale functio
   expect_false(is.null(y_auto))
   expect_false(inherits(y_auto$secondary.axis, "waiver") || is.null(y_auto$secondary.axis))
 
-  g_auto <- ggplotGrob(b_auto@plot)
+  g_auto <- quiet_ggplotGrob(b_auto@plot)
   axis_r_w_auto <- theme61:::get_grob_width(g_auto, grob_name = "axis-r")
   expect_false(is.null(axis_r_w_auto) || axis_r_w_auto == 0)
 
@@ -103,7 +103,7 @@ test_that("Auto y-axis does not apply if you override with ggplot2 scale functio
     # ggplot2::scale_y_continuous default secondary axis is waiver()
     expect_true(inherits(ysc$secondary.axis, "waiver") || is.null(ysc$secondary.axis))
 
-    g <- ggplotGrob(b@plot)
+    g <- quiet_ggplotGrob(b@plot)
     axis_r_w <- theme61:::get_grob_width(g, grob_name = "axis-r")
     expect_true(is.null(axis_r_w) || axis_r_w == 0)
   }

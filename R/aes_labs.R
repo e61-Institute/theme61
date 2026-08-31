@@ -58,16 +58,14 @@ update_labs <- function(plot, plot_width){
     plot <- plot + theme(axis.title.x = element_blank())
   }
 
-  # add a new labs function to override the old one
+  # Only set the labels this function computes - re-setting every other
+  # label (x/y/colour/fill/...) to itself is a no-op at best and drops any
+  # label not listed at worst.
   plot_new <- plot +
     ggplot2::labs(
       title = title_text,
       subtitle = subtitle_text,
-      caption = caption_text,
-      x = plot@labels$x,
-      y = plot@labels$y,
-      colour = plot@labels$colour,
-      fill = plot@labels$fill
+      caption = caption_text
     )
 
   return(plot_new)
@@ -383,7 +381,7 @@ get_text_width <- function(text, font_size = 10, font_face = 1) {
 
   if (length(text) == 0) return(numeric(0))
 
-  family <- if (is_testing()) "sans" else "pt-sans"
+  family <- "pt-sans"
   face <- if (font_face == 2) "bold" else "plain"
 
   measure_device({
@@ -410,7 +408,7 @@ get_text_height <- function(text, font_size = 10) {
 
   if (length(text) == 0) return(numeric(0))
 
-  family <- if (is_testing()) "sans" else "pt-sans"
+  family <- "pt-sans"
 
   measure_device({
     grid::pushViewport(grid::viewport(
@@ -473,10 +471,9 @@ update_plot_label <- function(plot, chart_type, base_size){
       # 2 - check whether it is an plot_label that can be adjusted
       label <- plot@layers[[i]]$aes_params$label
 
-      label_size <- plot@layers[[i]]$aes_params$size
-
-      # 3 - check that it has the adjustment attribute
-      if(!is.null(attr(label, "adj_plot_label"))){
+      # 3 - check that it has the adjustment attribute (set on the layer
+      # object itself by .build_plot_label_layer(), not on the label mapping)
+      if(!is.null(attr(plot@layers[[i]], "adj_plot_label"))){
 
         # 4 - update the size - this will depend on the chart width and base text size
         plot@layers[[i]]$aes_params$size <- 3.5 * base_size / 10

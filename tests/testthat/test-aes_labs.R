@@ -40,3 +40,58 @@ test_that("get_lines does not split a single line of text that already fits", {
   expect_equal(nrow(lines), 1)
   expect_equal(lines$collapsed_text, text)
 })
+
+# Tests of update_plot_label() (#356) ----------------------------------------
+
+test_that("update_plot_label() rescales a default-sized plot_label() layer", {
+  p <- minimal_plot_label +
+    plot_label(label = "A", x = 1, y = 1, auto_position = FALSE)
+
+  base_size <- 20
+  updated <- theme61:::update_plot_label(p, chart_type = "normal", base_size = base_size)
+
+  last_layer <- updated@layers[[length(updated@layers)]]
+  expect_equal(last_layer$aes_params$size, 3.5 * base_size / 10)
+})
+
+test_that("update_plot_label() leaves an explicitly-sized plot_label() layer alone", {
+  p <- minimal_plot_label +
+    plot_label(label = "A", x = 1, y = 1, size = 6, auto_position = FALSE)
+
+  base_size <- 20
+  updated <- theme61:::update_plot_label(p, chart_type = "normal", base_size = base_size)
+
+  last_layer <- updated@layers[[length(updated@layers)]]
+  expect_equal(last_layer$aes_params$size, 6)
+})
+
+# Tests of update_labs() (#358) -----------------------------------------------
+
+test_that("update_labs() doesn't drop labels it doesn't itself manage", {
+  p <- minimal_plot_label +
+    ggplot2::labs(
+      title = "My title", subtitle = "My sub", caption = "My cap",
+      x = "X axis", y = "Y axis", tag = "A", alt = "accessibility text"
+    )
+
+  updated <- update_labs(p, plot_width = 10)
+
+  # title/subtitle/caption are the fields update_labs() itself computes
+  expect_false(is.null(updated@labels$title))
+  expect_false(is.null(updated@labels$subtitle))
+  expect_false(is.null(updated@labels$caption))
+
+  # everything else should pass through untouched
+  expect_equal(updated@labels$x, "X axis")
+  expect_equal(updated@labels$y, "Y axis")
+  expect_equal(updated@labels$tag, "A")
+  expect_equal(updated@labels$alt, "accessibility text")
+})
+
+test_that("update_labs() doesn't introduce a stray fill entry when fill isn't set", {
+  p <- minimal_plot_label + ggplot2::labs(title = "T")
+
+  updated <- update_labs(p, plot_width = 10)
+
+  expect_false("fill" %in% names(updated@labels))
+})

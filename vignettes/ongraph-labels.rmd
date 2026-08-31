@@ -17,7 +17,7 @@ resource_files:
 library(ggplot2)
 library(ggrepel)
 library(data.table)
-devtools::load_all()
+library(theme61)
 
 set.seed(42)
 

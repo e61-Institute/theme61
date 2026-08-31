@@ -283,9 +283,12 @@ t61_place_label_fast <- function(own, geom_type, index = 1, hjust = 0,
 #' @return `labels` with x/y columns added (resolved position), a `placed`
 #'   logical column (FALSE only when the resolved position is exactly the
 #'   caller's own unchanged fallback_x/fallback_y, so the caller can skip a
-#'   redundant write-back), and a `colour` character column
+#'   redundant write-back), a `colour` character column
 #'   (NA_character_ unless an "area" label got placed inside its band, in
-#'   which case it holds the contrast colour to render it in).
+#'   which case it holds the contrast colour to render it in), and a
+#'   `degrade_reason` character column (NA_character_ unless the label
+#'   settled for a worse-than-real placement -- see t61_apply_autolabel(),
+#'   which warns on this).
 #' @noRd
 t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400L, fast = FALSE) {
 
@@ -293,6 +296,9 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
   labels$y <- labels$fallback_y
   labels$placed <- FALSE
   labels$colour <- NA_character_
+  # NA unless the label settled for a worse-than-real placement; read by
+  # t61_apply_autolabel() to decide whether to warn.
+  labels$degrade_reason <- NA_character_
 
   mask <- NULL
   area_mask <- NULL
@@ -349,6 +355,7 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
     geom_type <- labels$geom_type[i]
     if (!fast && flipped && geom_type %in% c("area", "pointbar")) {
       own <- list(); geom_type <- NA_character_
+      labels$degrade_reason[i] <- "not yet supported for coord_flip() + area/pointbar"
     }
     # series = list() (geom_type = NA) is the "no series matched" sentinel
     # -- nothing to place a "good" spot against, so skip straight to the
@@ -388,7 +395,10 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
         result <- list(x = fp$x, y = fp$y, box = NULL)
       } else {
         centre <- get_fast_panel_centre()
-        if (!anyNA(unlist(centre))) result <- list(x = centre$x, y = centre$y, box = NULL)
+        if (!anyNA(unlist(centre))) {
+          result <- list(x = centre$x, y = centre$y, box = NULL)
+          labels$degrade_reason[i] <- "no good spot found, used a fallback position"
+        }
       }
 
     } else {
@@ -459,6 +469,11 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
         if (!is.null(result)) {
           xy <- to_data(result$x, result$y)
           result$x <- xy$x; result$y <- xy$y
+          # Don't clobber a more specific reason (e.g. the coord_flip()
+          # bypass above) already recorded for this label.
+          if (is.na(labels$degrade_reason[i])) {
+            labels$degrade_reason[i] <- "no good spot found, used a fallback position"
+          }
         }
       }
 
@@ -469,6 +484,9 @@ t61_autolabel_plot <- function(plot, labels, width_cm, height_cm, px_width = 400
         box <- t61_text_box_px(cx, cy, label_cm, mask, hjust = labels$hjust[i])
         xy <- to_data(cx, cy)
         result <- list(x = xy$x, y = xy$y, box = box)
+        if (is.na(labels$degrade_reason[i])) {
+          labels$degrade_reason[i] <- "no good spot found, used a fallback position"
+        }
       }
     }
 

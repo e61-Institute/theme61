@@ -252,7 +252,7 @@ t61_collect_autolabel_targets <- function(plot) {
 }
 
 #' Cheap check: does this plot have any plot_label() layer with
-#' print_position = TRUE? Used to gate print.e61_ggplot()'s console-print
+#' print_position = TRUE? Used to gate print.e61_plot()'s console-print
 #' path so printing a plot doesn't pay for a full save_single() resolve
 #' unless the user actually asked for the positions.
 #' @noRd
@@ -302,7 +302,7 @@ t61_format_label_vec <- function(x) {
 #'
 #' Emitted as a message (not printed/returned), so it's a side effect of
 #' rendering the plot rather than part of any return value -- the caller
-#' (t61_apply_autolabel(), and in turn save_single()/print.e61_ggplot())
+#' (t61_apply_autolabel(), and in turn save_single()/print.e61_plot())
 #' still returns the plot itself either way.
 #' @noRd
 t61_print_label_positions <- function(text, x, y, is_date_x, is_date_y) {
@@ -361,13 +361,13 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
 
   # Only worth flagging when a label used the fast (no collision search)
   # heuristic instead of an explicit x/y.
-  if (isTRUE(fast) && getOption("theme61.autolabel_fast_msg", default = TRUE) &&
-      any(is.na(targets$labels$fallback_x) | is.na(targets$labels$fallback_y))) {
+  if (isTRUE(fast) &&
+      any(is.na(targets$labels$fallback_x) | is.na(targets$labels$fallback_y)) &&
+      t61_should_show_cooldown_msg("theme61.autolabel_fast_msg")) {
     cli::cli_alert_info(
-      "Auto-positioned {.fn plot_label} text in this preview uses a quick placement heuristic, not the real collision-avoiding search -- labels may overlap here even when {.fn save_e61} would place them cleanly. Save the graph with {.fn save_e61} to see (and use) the actual auto-positioned labels. This message appears once per session; to see it again, run {.code options(theme61.autolabel_fast_msg = TRUE)}.",
+      "Auto-positioned {.fn plot_label} text in this preview uses a quick placement heuristic, not the real collision-avoiding search -- labels may overlap here even when {.fn save_e61} would place them cleanly. Save the graph with {.fn save_e61} to see (and use) the actual auto-positioned labels. This message appears once every 30 minutes by default; run {.code options(theme61.autolabel_fast_msg = TRUE)} to see it every time, or {.code FALSE} to turn it off.",
       wrap = TRUE
     )
-    options(theme61.autolabel_fast_msg = FALSE)
   }
 
   plot_for_mask <- t61_strip_autolabel_layers(plot)
@@ -382,6 +382,19 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
     }
   )
   if (is.null(result)) return(plot)
+
+  # Inform when a label settled for a fallback position instead of a real,
+  # collision-checked placement.
+  if (getOption("theme61.autolabel_fallback_msg", default = TRUE)) {
+    degraded <- which(!is.na(result$degrade_reason))
+    if (length(degraded) > 0) {
+      detail <- paste0(sprintf('"%s" (%s)', result$text[degraded], result$degrade_reason[degraded]),
+                        collapse = "; ")
+      cli::cli_warn(
+        "Auto-positioned {.fn plot_label} text settled for a fallback position instead of the real, collision-checked placement: {detail}. To turn off this message, run {.code options(theme61.autolabel_fallback_msg = FALSE)}."
+      )
+    }
+  }
 
   # A ggplot2 Layer is a ggproto object, i.e. an environment -- writing
   # `plot@layers[[i]]$data <- ...` mutates that shared environment in

@@ -27,6 +27,11 @@ t61_quiet_na_removal <- function(expr) {
 #' With no device open, ggplotGrob()/ggplot_gtable() can silently open the
 #' session's default device to measure text -- left open, that can corrupt
 #' later renders. Opens a throwaway device first only if none is open.
+#'
+#' Also muffles the "font family 'pt-sans' not found in PostScript font
+#' database" warning: grid's font-metric fallback doesn't know about
+#' sysfonts-registered families on some devices, but showtext still renders
+#' pt-sans correctly wherever it's actually drawn.
 #' @noRd
 t61_with_device <- function(expr) {
   if (grDevices::dev.cur() == 1) {
@@ -37,7 +42,14 @@ t61_with_device <- function(expr) {
       unlink(svg_file)
     }, add = TRUE)
   }
-  expr
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      if (grepl("not found in PostScript font database", conditionMessage(w), fixed = TRUE)) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
 }
 
 #' @noRd
@@ -107,14 +119,6 @@ check_plots <- function(plots){
   plots
 }
 
-
-#' Replication of testthat::is_testing() so we can turn off some functionality
-#' in the test env.
-#' @noRd
-is_testing <- function() {
-  identical(Sys.getenv("TESTTHAT"), "true")
-}
-
 #' Create a temp SVG file to preview a graph in the Viewer pane, regardless
 #' of which format(s) were saved to disk
 #' @noRd
@@ -150,10 +154,11 @@ has_discrete_y_scale <- function(plot) {
   # Check the y aesthetic mapping
   y_mapping <- plot@mapping$y
   if (!is.null(y_mapping)) {
-    # Get the data and check if y variable is discrete
+    # y_mapping may reference a layer-only column or an unevaluable
+    # expression - fall back to "not discrete" instead of erroring.
     plot_data <- plot@data
     if (!is.null(plot_data) && !is.null(y_mapping)) {
-      y_var <- rlang::eval_tidy(y_mapping, plot_data)
+      y_var <- tryCatch(rlang::eval_tidy(y_mapping, plot_data), error = function(e) NULL)
       if (is.factor(y_var) || is.character(y_var)) {
         return(TRUE)
       }
@@ -330,44 +335,28 @@ svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
 
   if(grepl(".*\\.png$", file_out)) fmt <- "png" else fmt <- "jpg"
 
-  if (res != 1) {
-    # This approach to rescaling starts by saving a rescaled SVG before
-    # converting it to PNG. Hence the need for temp files.
-    file_temp_svg <- "intermed.svg"
-    file_temp_out <- paste0("intermed.", fmt)
+  # Rescale by re-rendering the SVG at the target size, via temp files.
+  file_temp_svg <- tempfile(fileext = ".svg")
+  file_temp_out <- tempfile(fileext = paste0(".", fmt))
+  on.exit(unlink(c(file_temp_svg, file_temp_out)), add = TRUE)
 
-    rsvg::rsvg_png(svg = file_in, file = file_temp_out)
+  rsvg::rsvg_png(svg = file_in, file = file_temp_out)
 
-    g_info <- magick::image_info(magick::image_read(file_temp_out))
+  g_info <- magick::image_info(magick::image_read(file_temp_out))
 
-    rsvg::rsvg_svg(svg = file_in,
-                   file = file_temp_svg,
-                   width = g_info$width * res,
-                   height = g_info$height * res
-    )
+  rsvg::rsvg_svg(svg = file_in,
+                 file = file_temp_svg,
+                 width = g_info$width * res,
+                 height = g_info$height * res
+  )
 
-    if(fmt == "png"){
-      rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
+  if(fmt == "png"){
+    rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
 
-    } else if(fmt == "jpg"){
-      image_temp <- magick::image_read_svg(file_temp_svg)
+  } else if(fmt == "jpg"){
+    image_temp <- magick::image_read_svg(file_temp_svg)
 
-      magick::image_write(image = image_temp, path = file_out, format = "jpg")
-    }
-
-    unlink(file_temp_svg)
-    unlink(file_temp_out)
-
-  } else {
-
-    if(fmt == "png"){
-      rsvg::rsvg_png(svg = file_in, file = file_out)
-
-    } else if(fmt == "jpg"){
-      image_temp <- magick::image_read_svg(file_in)
-
-      magick::image_write(image = image_temp, path = file_out, format = "jpg")
-    }
+    magick::image_write(image = image_temp, path = file_out, format = "jpg")
   }
 
   if (delete) unlink(file_in)

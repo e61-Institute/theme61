@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh --version)",
+      "Bash(Rscript --version)",
+      "Bash(where R)"
+    ]
+  }
+}

@@ -31,14 +31,14 @@ t61_retry <- function(fn, attempts = 8, pause = 0.1) {
   }
 }
 
-#' Strip the e61_ggplot class before print()-ing a throwaway render (an
-#' occupancy raster, a panel-box marker): print.e61_ggplot() has side
+#' Strip the e61_plot class before print()-ing a throwaway render (an
+#' occupancy raster, a panel-box marker): print.e61_plot() has side
 #' effects (a Viewer preview, console output) meant for a plot the user is
 #' actually looking at, not an internal measurement render -- dispatching
 #' to it here would fire those side effects once per panel, per mask
 #' render, stomping on the real preview/save this call is itself part of.
 #'
-#' ggplot_build.e61_ggplot() (see ggplot_build-method.R) applies its own
+#' ggplot_build.e61_plot() (see ggplot_build-method.R) applies its own
 #' mutations -- default scales, facet spacing, discrete y-text alignment --
 #' before building, and every other read of this plot (e.g. t61_render_mask()'s
 #' own ggplot_build() call for panel_params) goes through that dispatch.
@@ -47,11 +47,11 @@ t61_retry <- function(fn, attempts = 8, pause = 0.1) {
 #' silently reverting to plain ggplot2 defaults for this render alone.
 #' @noRd
 t61_drop_e61_class <- function(plot) {
-  if (inherits(plot, "e61_ggplot")) {
+  if (inherits(plot, "e61_plot")) {
     plot <- maybe_add_default_scales(plot)
     plot <- maybe_adjust_facet_spacing(plot)
     plot <- maybe_leftalign_discrete_y_text(plot)
-    class(plot) <- setdiff(class(plot), "e61_ggplot")
+    class(plot) <- setdiff(class(plot), "e61_plot")
   }
   plot
 }
@@ -72,12 +72,16 @@ t61_panel_box_cm <- function(gt, width_cm, height_cm) {
   col_widths_cm  <- rep(0, length(gt$widths))
   row_heights_cm <- rep(0, length(gt$heights))
 
-  col_widths_cm[is_fixed_w] <- vapply(
-    gt$widths[is_fixed_w], grid::convertWidth, numeric(1), unitTo = "cm", valueOnly = TRUE
-  )
-  row_heights_cm[is_fixed_h] <- vapply(
-    gt$heights[is_fixed_h], grid::convertHeight, numeric(1), unitTo = "cm", valueOnly = TRUE
-  )
+  # Needs a real device open, or grid falls back to the PostScript font
+  # database for text-height conversions, which doesn't know theme61's fonts.
+  t61_with_device({
+    col_widths_cm[is_fixed_w] <- vapply(
+      gt$widths[is_fixed_w], grid::convertWidth, numeric(1), unitTo = "cm", valueOnly = TRUE
+    )
+    row_heights_cm[is_fixed_h] <- vapply(
+      gt$heights[is_fixed_h], grid::convertHeight, numeric(1), unitTo = "cm", valueOnly = TRUE
+    )
+  })
 
   null_col_weight <- ifelse(is_fixed_w, 0, as.numeric(gt$widths))
   null_row_weight <- ifelse(is_fixed_h, 0, as.numeric(gt$heights))

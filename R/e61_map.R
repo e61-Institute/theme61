@@ -16,7 +16,7 @@
 #' @export
 #' @family map functions
 #' @examples
-#'
+#' \dontrun{
 #' library(sf)
 #' sa3 <- strayr::read_absmap("sa32021")
 #' sa3 <- sa3[sa3$gcc_code_2021 == "1GSYD", ] # let's just look at Sydney
@@ -30,7 +30,7 @@
 #'    ) +
 #'  geom_point(aes(x = cent_long, y = cent_lat)) + #plot points
 #'  theme_e61_spatial()
-#'
+#' }
 add_map_e61 <-
   function(bbox = c(
     top = -33.757742,
@@ -40,6 +40,15 @@ add_map_e61 <-
   ),
   adjust = 0,
   maptype = "stamen_toner_lite") {
+
+    # ggmap is a Suggests, not a hard dependency - fail clearly rather than
+    # letting packageVersion() below error obscurely when it isn't installed
+    if (!requireNamespace("ggmap", quietly = TRUE)) {
+      cli::cli_abort(c(
+        "The {.pkg ggmap} package is required to use {.fn add_map_e61}.",
+        "i" = "Install it with {.code install.packages(\"ggmap\")}."
+      ))
+    }
 
     # Check if req version of ggmap is installed
     inst_v <- packageVersion("ggmap")
@@ -111,6 +120,15 @@ add_map_e61 <-
 #' @export
 #' @family map functions
 setup_stadia_maps <- function(api_key = NULL, update_ggmap = NA) {
+
+  # ggmap is a Suggests, not a hard dependency - fail clearly rather than
+  # letting packageVersion() below error obscurely when it isn't installed
+  if (!requireNamespace("ggmap", quietly = TRUE)) {
+    cli::cli_abort(c(
+      "The {.pkg ggmap} package is required to use {.fn setup_stadia_maps}.",
+      "i" = "Install it with {.code install.packages(\"ggmap\")}."
+    ))
+  }
 
   # Check if ggmap package version has the required functions, install from Github if it doesn't
   inst_v <- packageVersion("ggmap")

@@ -368,7 +368,9 @@ save_e61 <- function(filename = NULL,
 
       # Strip file extension from filename
       filename <- gsub("^(.*)\\..{3}$", "\\1", filename)
-    } else if (is.null(format) && !is.null(getOption("theme61.default_save_format"))) {
+    } else if (missing(format) && !is.null(getOption("theme61.default_save_format"))) {
+      # missing(), not is.null() - format always has a default value, so
+      # is.null(format) is never true and this branch was unreachable.
       format <- getOption("theme61.default_save_format")
     } else {
       format <- match.arg(format, several.ok = TRUE)
@@ -575,7 +577,9 @@ save_e61 <- function(filename = NULL,
 
     }
 
-    if (interactive()) {
+    if (interactive() &&
+        requireNamespace("rstudioapi", quietly = TRUE) &&
+        rstudioapi::isAvailable()) {
       # Only run this in interactive mode
       # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
       # Always preview an SVG, even if the saved format(s) are not SVG

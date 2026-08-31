@@ -80,7 +80,7 @@ test_that("a plot with the default secondary axis renders an axis-r grob", {
     geom_point() +
     scale_y_continuous_e61(limits = c(0, 5, 1))
 
-  grobs <- ggplot2::ggplotGrob(p)
+  grobs <- quiet_ggplotGrob(p)
 
   expect_gt(get_grob_width(grobs, grob_name = "axis-r"), 0)
 })
@@ -90,7 +90,7 @@ test_that("sec_axis = FALSE suppresses the axis-r grob", {
     geom_point() +
     scale_y_continuous_e61(limits = c(0, 5, 1), sec_axis = FALSE)
 
-  grobs <- ggplot2::ggplotGrob(p)
+  grobs <- quiet_ggplotGrob(p)
 
   width <- get_grob_width(grobs, grob_name = "axis-r")
   expect_true(is.null(width) || width == 0)
@@ -109,9 +109,41 @@ test_that("a rescaled secondary axis on a real plot also renders an axis-r grob"
     ) +
     labs_e61(y = "%")
 
-  grobs <- ggplot2::ggplotGrob(p)
+  grobs <- quiet_ggplotGrob(p)
 
   expect_gt(get_grob_width(grobs, grob_name = "axis-r"), 0)
+})
+
+test_that("sec_rescale_inv()'s weirdness reminder respects the theme61.sec_axis_msg tri-state", {
+  # TRUE shows every time.
+  withr::local_options(list(theme61.sec_axis_msg = TRUE))
+  expect_message(sec_rescale_inv(c(1, 2, 3), scale = 1), "run the graph code twice")
+  expect_message(sec_rescale_inv(c(1, 2, 3), scale = 1), "run the graph code twice")
+
+  # FALSE opts out entirely.
+  withr::local_options(list(theme61.sec_axis_msg = FALSE))
+  expect_no_message(sec_rescale_inv(c(1, 2, 3), scale = 1))
+})
+
+test_that("sec_rescale_inv()'s weirdness reminder defaults to a 30-minute cooldown", {
+  withr::local_options(list(theme61.sec_axis_msg = NULL))
+  t61_env <- theme61:::t61_env
+  clear_last_shown <- function() {
+    if (exists("theme61.sec_axis_msg_last_shown", envir = t61_env, inherits = FALSE)) {
+      rm(list = "theme61.sec_axis_msg_last_shown", envir = t61_env, inherits = FALSE)
+    }
+  }
+  clear_last_shown()
+  withr::defer(clear_last_shown())
+
+  expect_message(sec_rescale_inv(c(1, 2, 3), scale = 1), "run the graph code twice")
+  # Same session, well within the cooldown window: stays quiet.
+  expect_no_message(sec_rescale_inv(c(1, 2, 3), scale = 1))
+
+  # Backdate the last-shown time past the cooldown window: fires again.
+  t61_env <- theme61:::t61_env
+  t61_env$theme61.sec_axis_msg_last_shown <- Sys.time() - 31 * 60
+  expect_message(sec_rescale_inv(c(1, 2, 3), scale = 1), "run the graph code twice")
 })
 
 test_that("faceted plots with a secondary axis build and render without error", {
@@ -138,7 +170,7 @@ test_that("faceted plots with a secondary axis build and render without error", 
     labs_e61(y = "y", x = "x")
 
   expect_no_error(ggplot_build(p))
-  expect_no_error(ggplot2::ggplotGrob(p))
+  expect_no_error(quiet_ggplotGrob(p))
 
   # theme61's facet_wrap() defaults to axes = "all", which should widen the
   # panel spacing set by maybe_adjust_facet_spacing()

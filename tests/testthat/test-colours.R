@@ -39,6 +39,18 @@ test_that("scale_colour_e61()/scale_fill_e61() surface get_palette()'s validatio
   expect_error(ggplot_build(p), "does not support")
 })
 
+test_that("scale_colour_e61(reverse = TRUE) reverses discrete colours (#355)", {
+  df <- data.frame(x = 1:3, y = 1:3, g = factor(1:3))
+
+  p_fwd <- ggplot(df, aes(x, y, colour = g)) + geom_point() + scale_colour_e61()
+  p_rev <- ggplot(df, aes(x, y, colour = g)) + geom_point() + scale_colour_e61(reverse = TRUE)
+
+  cols_fwd <- ggplot_build(p_fwd)$data[[1]]$colour
+  cols_rev <- ggplot_build(p_rev)$data[[1]]$colour
+
+  expect_equal(cols_rev, rev(cols_fwd))
+})
+
 test_that("e61_pal() returns a palette-generating function", {
   pal_fun <- theme61:::e61_pal(palette = "light")
   expect_type(pal_fun, "closure")
