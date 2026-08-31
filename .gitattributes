@@ -1,0 +1,4 @@
+# Snapshot SVGs are regenerated wholesale on every change (coordinates,
+# ids, etc. all shift), so a line-by-line diff is noise -- treat them as
+# opaque binaries in diffs/PRs instead of expanding into thousands of lines.
+tests/testthat/_snaps/**/*.svg -diff
