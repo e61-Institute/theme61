@@ -6,42 +6,48 @@
 \title{Add on-graph labels to graphs}
 \usage{
 plot_label(
-  label,
-  x,
-  y,
+  label = NULL,
+  x = NULL,
+  y = NULL,
   colour = NA,
   size = 3.5,
   hjust = 0,
   geom = c("text", "label"),
   angle = 0,
   panel = NULL,
-  facet_name = lifecycle::deprecated(),
-  facet_value = lifecycle::deprecated()
+  auto_position = TRUE,
+  print_position = FALSE
 )
 
 plab(
-  label,
-  x,
-  y,
+  label = NULL,
+  x = NULL,
+  y = NULL,
   colour = NA,
   size = 3.5,
   hjust = 0,
   geom = c("text", "label"),
   angle = 0,
   panel = NULL,
-  facet_name = lifecycle::deprecated(),
-  facet_value = lifecycle::deprecated()
+  auto_position = TRUE,
+  print_position = FALSE
 )
 }
 \arguments{
-\item{label}{String vector. Label text to be displayed.}
+\item{label}{(optional, see Details) String vector. Label text to be
+displayed. If omitted, derived from a discrete \code{colour}/\code{fill} scale
+on the plot, if there is one.}
 
-\item{x}{Numeric or string vector. X-axis positions of the label text.}
+\item{x}{(optional, see Details) Numeric or string vector. X-axis
+positions of the label text. If supplied, this exact position is
+always used.}
 
-\item{y}{Numeric or string vector. Y-axis positions of the label text.}
+\item{y}{(optional, see Details) Numeric or string vector. Y-axis
+positions of the label text. See \code{x}.}
 
-\item{colour}{(optional) Vector of colour names or strings. Default uses the
-e61 palette.}
+\item{colour}{(optional, see Details) Vector of colour names or strings.
+Defaults to a discrete \code{colour}/\code{fill} scale on the plot, if there is
+one, else the e61 palette.}
 
 \item{size}{(optional) Integer. Size of the text, the default size should be
 appropriate in most cases.}
@@ -53,11 +59,24 @@ the text. 0 left-aligns (default), 0.5 centre-aligns and 1 right-aligns.}
 adds a white box around the text which could be useful sometimes.}
 
 \item{angle}{(optional) Numeric. Rotate the labels. Defaults to 0 which is
-normal left-to-right text.}
+normal left-to-right text. See Details for how this interacts with \code{x}/\code{y}.}
 
 \item{panel}{Optional named list. If the plot is facetted, you can restrict
 the label(s) to a specific panel by supplying the facetting variable(s) as
-a named list, see the Details for the syntax.}
+a named list, see Details for the syntax.}
+
+\item{auto_position}{Logical. If TRUE (default), \code{save_e61()} will try to
+automatically reposition the label to a nearby, non-overlapping spot on
+the chart. See Details for exactly when this applies and how positions
+are chosen. Set to FALSE to always use the exact \code{x}/\code{y} you supply --
+\code{x} and \code{y} are then required.}
+
+\item{print_position}{Logical. If TRUE, print the plot's final
+(auto-positioned) label \code{label}/\code{x}/\code{y} to the console, as copy-pasteable
+\code{plot_label()} arguments, whenever the plot is displayed -- no need to
+call \code{save_e61()} first. Useful for grabbing the chosen positions once
+so you can pin them (or hand-tweak just one or two) instead of
+auto-positioning every time. Defaults to FALSE.}
 
 \item{facet_name, facet_value}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }
@@ -69,8 +88,68 @@ Add text labels for lines, columns or other elements directly
 onto the graph plot. This is preferred over using legends.
 }
 \details{
-The syntax for getting labels to appear on certain facet panels is
-as follows.
+\subsection{Default label text and colour}{
+
+If the plot maps \code{colour}/\code{fill} to a discrete variable (checked in that
+order), \code{label} and \code{colour} can be derived from that scale instead of
+the e61 palette. This covers an explicit \code{scale_colour_manual()}/
+\code{scale_fill_manual()} (or a theme61 wrapper that constructs one, e.g.
+\code{scale_colour_e61_aus()}), an algorithmic discrete scale like
+\code{scale_colour_e61()}/\code{scale_colour_brewer()}, and simply relying on
+theme61's own default scale by supplying no scale at all -- once the plot
+is built, all of these resolve to the same thing, a fixed mapping from
+each level to its assigned colour:
+\itemize{
+\item If you omit \code{label} entirely, it defaults to that scale's own levels
+(i.e. what a legend would show), in their resolved order -- so
+\code{plot_label()} with no arguments at all labels every series using its
+exact data value and assigned colour.
+\item If you supply \code{label} but omit \code{colour}, each label's colour is taken
+from the scale in the same order -- this assumes \code{label} is written in
+the same order as the scale's levels. If \code{label} has more entries than
+the scale has levels for, this is skipped and the e61 palette is used
+instead (rather than guessing a partial match).
+\item An explicit \code{colour} always wins outright over any of the above.
+}
+
+A continuous \code{colour}/\code{fill} (e.g. \code{scale_colour_gradient()}) doesn't
+count -- there's no fixed set of "levels" to derive labels from.
+}
+
+\subsection{Automatic positioning}{
+
+When \code{auto_position = TRUE} (the default), \code{save_e61()} tries to move the
+label to a nearby, non-overlapping spot -- but only for single-panel
+(unfacetted) charts where the label's colour matches a
+line/point/column/area/\code{geom_pointbar()} series in the plot (\code{colour} for
+lines, points and \code{geom_pointbar()}, \code{fill} for columns and areas), and
+only for unrotated text (\code{angle = 0}). For an area series, the label is
+placed fully inside the band where there's room, recoloured to contrast
+with the fill, or outside it (in the fill's own colour) where the band is
+too narrow. For a \code{geom_pointbar()} series, the buffer accounts for the
+full error-bar extent, not just the point.
+
+If you supply \code{x}/\code{y}, that position is always used exactly as given --
+the placement algorithm never runs for that label. If you don't, the
+fallback order is: (1) a good spot found by the placement algorithm; (2)
+any collision-free spot on the chart (i.e. empty space), even if it's not
+a particularly good one; (3) the centre of the panel, so the label stays
+visible rather than vanishing.
+
+A facetted plot, or rotated text (\code{angle != 0}), has no automatic
+positioning to fall back on, so \code{x}/\code{y} are required in those cases (as
+they are whenever \code{auto_position = FALSE}).
+
+Set \code{theme61.auto_label = FALSE} (see \code{\link[=set_t61_options]{set_t61_options()}}) to turn
+automatic positioning off globally -- \code{x}/\code{y} are then always required,
+the same as \code{auto_position = FALSE}, and no auto-positioning work is
+attempted at all (no performance cost from the feature).
+}
+
+\subsection{Facet targeting}{
+
+The syntax for getting labels to appear on certain facet panels is as
+follows.
 
 For facet wraps, supply a named list with the facetting variable name(s)
 and the facet value(s) you want the labels to appear on. For example, to
@@ -83,4 +162,5 @@ facet variables are \code{r} and \code{c}, use \code{panel = list(r = "A", c = "
 get the labels to appear on the panel at row \code{A} and column \code{1}. If you
 have 2 labels you want to appear on panel \code{A1} and \code{B2}, use
 \code{panel = list(r = c("A", "B"), c = c("1", "2"))}.
+}
 }

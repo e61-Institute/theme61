@@ -22,7 +22,7 @@ resource_files:
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 library(ggplot2)
 library(data.table)
-devtools::load_all()
+library(theme61)
 
 knitr::opts_chunk$set(
   echo = TRUE,
@@ -33,9 +33,6 @@ knitr::opts_chunk$set(
   fig.align = 'center', 
   out.width = '60%'
 )
-
-# No annoying messages
-options(no_advisory = TRUE)
 
 # Prep data: US personal expenditure aggregates in US$b
 data <- USPersonalExpenditure
@@ -245,10 +242,9 @@ g <- ggplot(data_col, aes(x = category, y = value, fill = factor(year))) +
               c(1.8, 2.2),
               c(15, 50)) +
   labs_e61(
-    title = "1940 to 1960 Change", 
+    title = "1940 to 1960 Change",
     y = "US$ billions"
-  ) +
-  format_flip()
+  )
 
 save_e61("../man/figures/g-flip.svg")
 ```
@@ -416,9 +412,11 @@ Then we use `save_e61()` to put the graphs together.
 save_e61(
     g1, g2, g3, g4,
     filename = "../man/figures/g-multi.svg",
-    title = "US Personal Expenditures*",
-    footnotes = "Data comes from the built-in USPersonalExpenditure dataset.",
-    sources = c("e61 Institute", "'datasets' package")
+    labs = list(
+      title = "US Personal Expenditures*",
+      footnotes = "Data comes from the built-in USPersonalExpenditure dataset.",
+      sources = c("e61 Institute", "'datasets' package")
+    )
 )
 ```
 

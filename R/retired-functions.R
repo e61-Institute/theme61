@@ -4,71 +4,16 @@
 # message code entirely from v0.4 onwards, as users have had ample warning to
 # fix their code.
 
-# Remove entirely from v0.8 -------------------------------------------------------
+# Remove entirely from v0.9 --------------------------------------------------
 
 #' Defunct
 #' @export
 #' @noRd
-e61_map <- function(...) {
-  lifecycle::deprecate_stop(when = "0.6.1",
-                            what = "e61_map()",
-                            with = "add_map_e61()")
-}
-
-#' Defunct
-#' @export
-#' @noRd
-add_zeroline <- function(...) {
-  lifecycle::deprecate_stop(when = "0.6.0",
-                            what = "add_zeroline()",
-                            with = "add_baseline()")
-}
-
-#' Defunct
-#' @export
-#' @noRd
-e61_palette <- function(...) {
-  lifecycle::deprecate_stop(when = "0.6.0",
-                            what = "e61_palette()",
-                            with = "palette_e61()")
-}
-
-#' Defunct
-#' @export
-#' @noRd
-set_open_graph <- function(...) {
-  lifecycle::deprecate_stop(when = "0.6.1",
-                            what = "set_open_graph()",
-                            with = "set_open_graph_browser()",
-                            details = "Graphs now automatically appear in the Viewer pane when saved with save_e61(), so setting the option to open in the browser is now unnecessary."
-                            )
-}
-
-#' Defunct
-#' @export
-#' @noRd
-mpanel_e61 <- function(...) {
+e61_chart_maker <- function(...) {
   lifecycle::deprecate_stop(
-    when = "0.6.0", what = "mpanel_e61()",
-    details = "You no longer need to use mpanel_e61() when making multi-panel graphs. Instead, individual panels are directly supplied to save_e61(). See the documentation for save_e61() for more information."
-    )
-}
-
-# Deprecate indefinitely ----------------------------------------------
-
-#' Defunct
-#' @export
-#' @noRd
-mplot_label <- function(...) {
-  lifecycle::deprecate_stop(when = "0.6.0",
-                            what = "mplot_label()",
-                            with = "plot_label()")
-}
-
-mplab <- function(...) {
-  lifecycle::deprecate_stop(when = "0.6.0",
-                            what = "mplab()",
-                            with = "plab()")
+    when = "0.8.0", what = "e61_chart_maker()",
+    details = "Please use the theme61 Claude skill for assistance in making graphs instead."
+  )
 }
 
 # # Keep this as an example of a defunct function

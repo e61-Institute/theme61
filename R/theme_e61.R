@@ -1,9 +1,6 @@
-#' e61 themed graph options
+#' theme61 theme
 #'
-#' Applies the e61 theme to ggplot graphs and provides arguments to adjust graph
-#' appearance. If you are looking to change the appearance of titles or labels,
-#' check the arguments in [labs_e61], which are probably what you are looking
-#' for.
+#' Returns a ggplot2 theme with e61 Institute styling applied.
 #'
 #' @param legend Character. Legend position, "none" (default) hides the legend.
 #' @param legend_position A numeric vector of length two setting the placement
@@ -30,7 +27,20 @@
 #'   theme_e61()
 #' }
 #'
-
+#' \dontrun{
+#' library(sf)
+#'
+#' sa3_shp <- strayr::read_absmap("sa32016")
+#'
+#' sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
+#'
+#' # Spatial styling (blank axes/gridlines) is applied automatically on
+#' # save/print, so theme_e61() alone is enough here too.
+#' ggplot(data = sydney_map) +
+#'   geom_sf(aes(fill = sa3_code_2016), colour = "black") +
+#'   theme_e61()
+#' }
+#'
 theme_e61 <- function(
     legend = c("none", "bottom", "top", "left", "right", "inside"),
     legend_position = NULL,
@@ -40,28 +50,25 @@ theme_e61 <- function(
     base_family = "pt-sans",
     base_line_size = points_to_mm(0.75),
     base_rect_size = points_to_mm(1)
-    ) {
+) {
 
-  legend <- match.arg(legend)
+  legend <- match.arg(
+    legend,
+    choices = c("none", "bottom", "top", "left", "right", "inside")
+  )
 
   if (legend == "inside") {
-    if (!is.numeric(legend_position) || length(legend_position) != 2)
-      stop("legend_position needs to be a length two numeric vector.")
-
-    if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
-      stop("Both legend_position values must be between 0 and 1.")
+    .validate_legend_position(legend_position)
   }
 
-  base_family <- if (is_testing()) "sans" else "pt-sans"
-
-  base_size <- getOption("t61_base_size", default = 10)
+  base_size <- getOption("theme61.base_size", default = 10)
 
   half_line <- base_size / 2
 
   ret <-
     theme(
-      line = element_line(colour = "black", linewidth = points_to_mm(0.5)),
-      rect = element_rect(fill = background, colour = NA),
+      line = element_line(colour = "black", linewidth = base_line_size),
+      rect = element_rect(fill = background, colour = NA, linewidth = base_rect_size),
       text = element_text(colour = "black", family = base_family, size = base_size),
       aspect.ratio = aspect_ratio,
 
@@ -108,19 +115,22 @@ theme_e61 <- function(
         hjust = 0,
         margin = margin(t = 12)
       ),
-      plot.margin = margin(t = 14, r = 8, b = 8, l = 8),
+      plot.margin = margin(t = 4, r = 2, b = 2, l = 2),
 
       # Strip (facets)
       strip.background = element_blank(),
       strip.text = element_text(size = rel(1), face = "bold")
     )
 
-  # add the basics of the legend
-  ret <- ret +
-    theme(
-      legend.position = legend,
-      legend.title = element_blank()
-    )
+  # set legend position
+  ret <- ret + theme(legend.position = legend)
+
+  # set legend title existence
+  if (legend_title) {
+    ret <- ret + theme(legend.title = element_text(size = rel(0.9)))
+  } else {
+    ret <- ret + theme(legend.title = element_blank())
+  }
 
   # add legend position if inside
   if (legend == "inside") {
@@ -131,74 +141,62 @@ theme_e61 <- function(
   }
 
   # adjust legend direction based on legend position
-  if (data.table::like(legend, "bottom|top", ignore.case = TRUE)) {
+  if (grepl("bottom|top", legend)) {
     ret <- ret + theme(legend.direction = "horizontal")
   }
 
   # Adds a grey background option
-  if (background == "grey" |  background == "box") {
+  if (background %in% c("grey", "box")) {
     ret <- ret + theme(rect = element_rect(fill = e61_greylight6))
   }
 
-  # Add attribute to identify it as a theme61 object
-  class(ret) <- c("theme_e61", class(ret))
-  attr(ret, "t61_obj") <- TRUE
-
-  return(ret)
+  ret
 }
 
-#' e61 themed spatial maps options
+#' e61 theme for spatial maps
 #'
-#' Applies the e61 theme to ggplot spatial maps to adjust graph appearance. If
-#' you are looking to change the appearance of titles or labels, check the
-#' arguments in [theme61::labs_e61()], which are probably what you are looking
-#' for.
+#' `r lifecycle::badge("deprecated")`
+#'
+#' Map-specific axis/gridline styling is now applied automatically on
+#' save/print based on whether a plot contains a spatial layer - use
+#' [theme_e61()] for both regular and spatial plots.
 #'
 #' @inheritParams theme_e61
-#' @return \code{theme_e61_spatial} returns a ggplot2 object.
-#' @import ggplot2
 #' @export
-#' @family map functions
-#'
-#' @examples
-#'
-#' \dontrun{
-#' library(sf)
-#'
-#' sa3_shp <- strayr::read_absmap("sa32016")
-#'
-#' sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
-#'
-#' ggplot(data = sydney_map) +
-#'   geom_sf(aes(fill = sa3_code_2016), colour = "black") +
-#'   theme_e61_spatial()
-#' }
-#'
 theme_e61_spatial <- function(
     legend = c("none", "bottom", "top", "left", "right", "inside"),
     legend_position = NULL,
     legend_title = FALSE,
     base_family = "pt-sans",
-    aspect_ratio = NULL
+    aspect_ratio = NULL,
+    background = "white",
+    base_line_size = points_to_mm(0.75),
+    base_rect_size = points_to_mm(1)
 ) {
-  legend <- match.arg(legend)
+  lifecycle::deprecate_warn(
+    "0.8.0", "theme_e61_spatial()", "theme_e61()",
+    details = "Spatial styling is now applied automatically on save/print."
+  )
+
+  legend <- match.arg(
+    legend,
+    choices = c("none", "bottom", "top", "left", "right", "inside")
+  )
+
+  aspect_ratio <- if (is.null(aspect_ratio)) 0.75 else aspect_ratio
 
   if (legend == "inside") {
-    if (!is.numeric(legend_position) || length(legend_position) != 2) {
-      stop("legend_position needs to be a length two numeric vector.")
-
-    if (!(data.table::between(legend_position[[1]], 0, 1) | data.table::between(legend_position[[2]], 0, 1)))
-      stop("Both legend_position values must be between 0 and 1.")
-    }
+    .validate_legend_position(legend_position)
   }
 
-  base_family <- if (is_testing()) "sans" else base_family
-  base_size <- getOption("t61_base_size", default = 10)
+  base_size <- getOption("theme61.base_size", default = 10)
   half_line <- base_size / 2
 
   ret <-
     theme(
       aspect.ratio = aspect_ratio,
+      line = element_line(colour = "black", linewidth = base_line_size),
+      rect = element_rect(fill = background, colour = NA, linewidth = base_rect_size),
       # base text
       text = element_text(
         colour = "black",
@@ -233,8 +231,10 @@ theme_e61_spatial <- function(
       axis.ticks.x = element_blank(),
       axis.line.x = element_blank(),
 
-      # grid
-      panel.grid.major = element_blank(),
+      # child keys, not the parent panel.grid.major - a child key always
+      # wins over a parent-level override regardless of add order
+      panel.grid.major.x = element_blank(),
+      panel.grid.major.y = element_blank(),
       panel.grid.minor = element_blank(),
 
       # legend
@@ -255,19 +255,13 @@ theme_e61_spatial <- function(
     ret <- ret + theme(legend.position.inside = legend_position)
   }
 
-  # facet spacing if used
-  if (!inherits(ret$facet, "FacetNull")) {
-    ret <- ret %+replace% theme(
-      panel.spacing.x = unit(2, "lines"),
-      panel.spacing.y = unit(2, "lines")
-    )
-  }
+  # facet spacing
+  ret <- ret %+replace% theme(
+    panel.spacing.x = unit(2, "lines"),
+    panel.spacing.y = unit(2, "lines")
+  )
 
-  # Add attribute to identify it as a theme61 object
-  class(ret) <- c("theme_e61", class(ret))
-  attr(ret, "t61_obj") <- TRUE
-
-  return(ret)
+  ret
 }
 
 #' Converts all legend colours to squares
@@ -291,40 +285,59 @@ theme_e61_spatial <- function(
 #'   square_legend_symbols()
 #'
 square_legend_symbols <- function(size = 6) {
-  guides(colour = guide_legend(override.aes = list(alpha = 1, size = size, shape = 15)))
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = size, shape = 15)),
+         fill = guide_legend(override.aes = list(alpha = 1, size = size, shape = 15)))
 }
 
 #' Applies changes to the theme for horizontal bar graphs
 #'
 #' Horizontal bar graphs made with `coord_flip()` require some changes to
-#' the `theme()` in order to look proper. This function wraps those changes
-#' up in a convenient function that should be appended at the end of the graph
-#' code, after theming functions such as `theme_e61()` have been called.
+#' the `theme()` in order to look proper. theme61 detects `coord_flip()`
+#' automatically and applies these changes for you (without overriding any
+#' element you've customised away from the `theme_e61()` default), so in
+#' most cases you don't need to call this function yourself. It's still
+#' exported for the one thing auto-detection can't do: adjusting `x_adj`,
+#' or for manual use outside the normal save/print pipeline.
 #'
 #' @param x_adj Numeric. Adjusts the vertical position of the x-axis title,
 #' the default works for most graphs. A negative value moves the
 #' title up, a positive value moves the title down.
+#' @param current_theme The plot's current theme, used internally to skip
+#' any element the user has already customised away from the `theme_e61()`
+#' default. Leave as `NULL` for normal manual use.
 #'
 #' @return ggplot object
 #' @export
 
-format_flip <- function(x_adj = 0) {
+format_flip <- function(x_adj = 0, current_theme = NULL) {
 
-  retval <-
-    theme(
-      panel.grid.major.x = element_line(colour = e61_greylight6, linewidth = points_to_mm(0.5)),
-      panel.grid.major.y = element_blank(),
-      axis.text.x.top = element_blank(),
-      axis.ticks.x.top = element_blank(),
-      axis.title.x.top = element_blank(),
-      plot.title.position = "plot",
-      plot.caption.position = "plot",
-      axis.title.x.bottom = element_text(
-        margin = margin(t = 0, b = 5),
-        hjust = 0.5, angle = 0)
-    )
+  flip_args <- list(
+    panel.grid.major.x = element_line(colour = e61_greylight6, linewidth = points_to_mm(0.5)),
+    panel.grid.major.y = element_blank(),
+    axis.text.x.top = element_blank(),
+    axis.ticks.x.top = element_blank(),
+    axis.title.x.top = element_blank(),
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    axis.title.x.bottom = element_text(
+      margin = margin(t = x_adj, b = 5),
+      hjust = 0.5, angle = 0)
+  )
 
-  return(retval)
+  # When called internally by save_e61(), skip any element the user has
+  # already customised away from the theme_e61() default, rather than
+  # silently overriding it.
+  if (!is.null(current_theme)) {
+    baseline <- theme_e61()
+
+    unchanged <- vapply(names(flip_args), function(el) {
+      identical(current_theme[[el]], baseline[[el]])
+    }, logical(1))
+
+    flip_args <- flip_args[unchanged]
+  }
+
+  do.call(theme, flip_args)
 
 }
 
@@ -342,15 +355,30 @@ set_base_size <- function(base_size) {
     stop("base_size must be a single positive number.")
   }
 
-  options(t61_base_size = base_size)
+  options(theme61.base_size = base_size)
   invisible()
 }
 
 # Internal helper functions ----
 
+#' Validate a legend_position argument when legend == "inside"
+#' @noRd
+.validate_legend_position <- function(legend_position) {
+  if (!is.numeric(legend_position) || length(legend_position) != 2)
+    stop("legend_position needs to be a length two numeric vector.")
+
+  if (!(data.table::between(legend_position[[1]], 0, 1) |
+        data.table::between(legend_position[[2]], 0, 1)))
+    stop("Both legend_position values must be between 0 and 1.")
+}
+
 # Dimensioning functions
 points_to_mm <- function(points) {
   as.numeric(grid::convertX(ggplot2::unit(points, "points"), "mm"))[1]
+}
+
+mm_to_points <- function(mm) {
+  as.numeric(grid::convertX(ggplot2::unit(mm, "mm"), "points"))[1]
 }
 
 cm_to_in <- function(cm, round = FALSE) {
@@ -372,18 +400,3 @@ in_to_cm <- function(inches, round = FALSE) {
     cm
   }
 }
-
-#' Tell ggplot2 what to do when someone does + theme_e61()
-#' @method ggplot_add theme_e61
-#' @keywords internal
-#' @export
-ggplot_add.theme_e61 <- function(object, plot, object_name, ...) {
-  # 1) Run the normal ggplot2 theme logic for this object
-  plot <- NextMethod()  # dispatches to ggplot_add.theme()
-
-  # 2) Copy your custom attribute from the theme onto the plot
-  attr(plot, "t61_obj") <- attr(object, "t61_obj")
-
-  plot
-}
-

@@ -11,62 +11,66 @@ save_single <- function(
     format,
     base_size,
     pad_width,
-    bg_colour
-    ) {
+    pad_height,
+    bg_colour,
+    print_label_positions = FALSE,
+    fast_labels = FALSE
+) {
 
+  # Several plot + theme(...) merges below (e.g. update_margins(),
+  # resolve_aspect_ratio()) can silently open the session's default device on
+  # Windows -- guard the whole function rather than each call site.
+  t61_with_device({
 
-  # Check for special graph types -------------------------------------------
+  # Plot is assumed pre-classified and prepared by save_e61()
+  is_spatial_chart <- inherits(plot, "e61_map")
 
-  ## Check if we have a spatial chart, if we do save without editing ----
-
-  is_spatial_chart <- FALSE
-
-  for(i in seq_along(plot@layers)){
-
-    layer_class <- class(plot@layers[[i]]$geom)
-
-    if(any(data.table::like(layer_class, "*Sf"))) {
-      is_spatial_chart <- TRUE
-
-      break
-    }
-  }
-
-  # if it's a spatial plot, turn of autoscaling
-  if(is_spatial_chart) auto_scale <- FALSE
-
-  ## Check if discrete y-axis (e.g. ridgeline) ----
-
+  # Discrete y-axis (e.g. ridgeline)
   discrete_y <- has_discrete_y_scale(plot)
 
-  # Set maximum width based on output type ----------------------------------
-
-  if(is.null(chart_type)) chart_type <- "normal"
-
+  # Set maximum width based on output type
+  if (is.null(chart_type)) chart_type <- "normal"
   max_width <- 18.59
 
   # update the base size without removing the legend
   legendTitle <- plot@theme$legend.title
   legendPosition <- plot@theme$legend.position
 
-  if (is_spatial_chart && !attr(plot, "t61_obj")){
-    plot <- plot + theme_e61_spatial()
+  # Maps already have their axis chrome/gridlines corrected by
+  # finalise_e61_plot() (see classify-plots.R), so there's nothing left to
+  # do here - the text sizing/margin logic below is for non-map plots only.
+  if (!is_spatial_chart) {
 
-  } else if (is_spatial_chart && attr(plot, "t61_obj")) {
-    plot
-  } else {
+    resolved_size <- resolve_text_size(plot, base_size)
+    plot <- resolved_size$plot
+    base_size <- resolved_size$base_size
 
-    plot <- plot + theme(text = element_text(size = base_size))
-    plot <- plot + update_margins(base_size = base_size,
+    plot <- plot + update_margins(current_theme = plot@theme,
+                                  base_size = base_size,
                                   legend_title = legendTitle)
 
     if(!is.null(legendPosition)){
       plot <- plot + theme(legend.position = legendPosition)
     }
+
+    # Ensure top/bottom margin can fit an axis label's vjust-centred overhang.
+    current_margin <- plot@theme$plot.margin
+    if (!is.null(current_margin)) {
+      min_margin_pt <- mm_to_points(get_text_height(text = "0", font_size = base_size * 0.9) / 2 * 10)
+      top_pt <- grid::convertHeight(current_margin[1], "pt", valueOnly = TRUE)
+      bottom_pt <- grid::convertHeight(current_margin[3], "pt", valueOnly = TRUE)
+
+      if (top_pt < min_margin_pt || bottom_pt < min_margin_pt) {
+        plot <- plot + theme(plot.margin = margin(
+          t = max(top_pt, min_margin_pt),
+          r = grid::convertWidth(current_margin[2], "pt", valueOnly = TRUE),
+          b = max(bottom_pt, min_margin_pt),
+          l = grid::convertWidth(current_margin[4], "pt", valueOnly = TRUE),
+          unit = "pt"
+        ))
+      }
+    }
   }
-
-  plot_build <- ggplot_build(plot)
-
 
   # Update plot background --------------------------------------------------
 
@@ -84,15 +88,7 @@ save_single <- function(
   # override chart type if the graph is a map
   if (is_spatial_chart) chart_type <- "custom"
 
-  if (chart_type == "normal") {
-    plot <- plot + theme(aspect.ratio = 0.75)
-
-  } else if(chart_type == "square") {
-    plot <- plot + theme(aspect.ratio = 1)
-
-  } else if(chart_type == "wide") {
-    plot <- plot + theme(aspect.ratio = 0.5)
-  }
+  plot <- resolve_aspect_ratio(plot, chart_type)
 
   # Update y-axis limits ----------------------------------------------------
 
@@ -103,6 +99,9 @@ save_single <- function(
 
   # Get facet dimensions if applicable
   if (length(plot@facet$params) != 0) {
+
+    # Only build when actually needed - most theme61 charts are single-panel
+    plot_build <- ggplot_build(plot)
 
     n_panel_cols <- max(plot_build$layout$layout$COL)
     n_panel_rows <- max(plot_build$layout$layout$ROW)
@@ -122,14 +121,13 @@ save_single <- function(
   # check whether the user has supplied a given width first (i.e. different to the default 8.5cm)
   if(is.null(width)) {
 
-    # When coord_flip() is used to make a plot horizontal, the default dims are too small
-    if (isTRUE("CoordFlip" %in% class(ggplot_build(plot)$layout$coord))) {
+    # When coord_flip() is used to make a plot horizontal, the default dims
+    # are too small. (The flipped-coord theme changes themselves are already
+    # applied by finalise_e61_plot() before save_single() is ever called.)
+    if (isTRUE("CoordFlip" %in% class(plot@coordinates))) {
 
       width <- max_width
       max_panel_width <- max_width / 2 # only allow the panel to be at most half the column consistent with other chart types
-
-      # Format the flipped coords axes
-      plot <- plot + format_flip()
 
       # If it's only one panel, set the chart width to 1/2 of the max-width
     } else if(n_panel_cols == 1){
@@ -149,13 +147,14 @@ save_single <- function(
   # Update labels -----------------------------------------------------------
 
   # Update the size of the text used for titles, footnotes, axes etc.
-  p <- ggplotGrob(plot)
+  p <- t61_ggplotGrob_quiet_na(plot)
 
   # allow charts to be the width of the panels
-  right_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-r"), get_grob_width(p, grob_name = "axis-r"))
-  left_axis_width <- pmax(get_grob_width(p, grob_name = "ylab-l"), get_grob_width(p, grob_name = "axis-l"))
+  right_axis_width <- get_grob_width(p, grob_name = "axis-r")
+  left_axis_width <- get_grob_width(p, grob_name = "axis-l")
 
-  known_wd <- right_axis_width + left_axis_width
+  # Margin eats into the panel's free width too, but isn't an axis grob.
+  known_wd <- right_axis_width + left_axis_width + get_margin_dim(p, "width")
 
   tot_panel_width <- width - known_wd
 
@@ -165,13 +164,7 @@ save_single <- function(
   # update the width after this check
   width <- tot_panel_width + known_wd
 
-  # If the chart has had the coords flipped, then allow the labels (titles, footnotes etc.) to be the width of the panel + left axis
-  if (isTRUE("CoordFlip" %in% class(ggplot_build(plot)$layout$coord))){
-    plot <- update_labs(plot, tot_panel_width + 0.85 * left_axis_width)
-
-  } else {
-    plot <- update_labs(plot, tot_panel_width)
-  }
+  plot <- update_labs(plot, width)
 
   if(!is_spatial_chart){
 
@@ -186,9 +179,14 @@ save_single <- function(
   if(is.null(height)){
 
     # Step 1 - Get the amount of free height and width we have to play with (what is not already used up by the set elements)
-    p <- ggplotGrob(plot)
+    p <- t61_ggplotGrob_quiet_na(plot)
 
     known_ht <- sum(grid::convertHeight(p$heights, "cm", valueOnly = TRUE))
+
+    # Re-measure known_wd from this same, up-to-date grob.
+    known_wd <- get_grob_width(p, grob_name = "axis-r") +
+      get_grob_width(p, grob_name = "axis-l") +
+      get_margin_dim(p, "width")
 
     # calculate the total free width and height we have to play with
     if(is.null(max_height)) max_height <- 100
@@ -226,8 +224,15 @@ save_single <- function(
     }
   }
 
-  # Add width padding
-  width <- width + pad_width
+  # Add width padding - note it comes in mm and we will want to convert to cm
+  width <- width + pad_width / 10
+  height <- height + pad_height / 10
+
+  # Auto-position eligible plot_label() text now that the final chart size
+  # is known (see autolabel-apply.R). No-ops when there are no eligible
+  # labels.
+  plot <- t61_apply_autolabel(plot, width_cm = width, height_cm = height,
+                              print_positions = print_label_positions, fast = fast_labels)
 
   # Return objects needed to save the graph ----
   retval <- list(graph = plot,
@@ -235,5 +240,7 @@ save_single <- function(
                  height = height)
 
   return(retval)
+
+  })
 
 }

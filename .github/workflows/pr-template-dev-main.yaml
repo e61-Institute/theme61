@@ -1,0 +1,30 @@
+on:
+  pull_request:
+    types: [opened]
+    branches: [main]
+
+name: Apply dev-to-main PR template
+
+permissions:
+  pull-requests: write
+
+jobs:
+  apply-template:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.ref == 'dev'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Overwrite PR body with new_version_pr.md template
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          CURRENT_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          DEFAULT_BODY=$(cat .github/PULL_REQUEST_TEMPLATE.md)
+          if [ "$CURRENT_BODY" != "$DEFAULT_BODY" ]; then
+            echo "PR body has been customised, leaving it alone."
+            exit 0
+          fi
+          gh pr edit "$PR_NUMBER" --repo "$REPO" --body-file .github/PULL_REQUEST_TEMPLATE/new_version_pr.md

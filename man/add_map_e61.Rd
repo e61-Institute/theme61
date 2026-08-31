@@ -31,7 +31,7 @@ map) is designed to be unintrusive so the focus remains on the data being
 visualised.
 }
 \examples{
-
+\dontrun{
 library(sf)
 sa3 <- strayr::read_absmap("sa32021")
 sa3 <- sa3[sa3$gcc_code_2021 == "1GSYD", ] # let's just look at Sydney
@@ -45,12 +45,11 @@ sa3 <- sa3[sa3$gcc_code_2021 == "1GSYD", ] # let's just look at Sydney
    ) +
  geom_point(aes(x = cent_long, y = cent_lat)) + #plot points
  theme_e61_spatial()
-
+}
 }
 \seealso{
-Other map functions: 
-\code{\link{crop_aus_coord}()},
-\code{\link{setup_stadia_maps}()},
-\code{\link{theme_e61_spatial}()}
+Other map functions:
+\code{\link[=crop_aus_coord]{crop_aus_coord()}},
+\code{\link[=setup_stadia_maps]{setup_stadia_maps()}}
 }
 \concept{map functions}

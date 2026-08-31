@@ -1,155 +1,132 @@
-test_that("square_legend_symbols is working", {
-  # Points
-  p <-
-    ggplot(data.frame(x = 1:3, y = 1:3, colour = 1:3),
-           aes(x, y, colour = colour)) +
+test_that("square_legend_symbols sets guide override.aes correctly", {
+
+  p <- ggplot(
+    data.frame(x = 1:3, y = 1:3, grp = factor(1:3)),
+    aes(x, y, colour = grp)
+  ) +
     geom_point() +
-    theme_e61(legend = "top", legend_title = TRUE) +
-    square_legend_symbols()
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("square-legend-point.svg", p)))
-  })
-
-  # Lines
-  p <-
-    ggplot(data.frame(x = 1:3, y = 1:3, colour = 1:3),
-           aes(x, y, colour = colour)) +
-    geom_line() +
-    geom_point(alpha = 0) + # The required "invisible points"
-    theme_e61(legend = "top", legend_title = TRUE) +
-    square_legend_symbols()
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("square-legend-line.svg", p)))
-  })
-
-  # Pointrange (testing ymin/ymax)
-  p <-
-    ggplot(data.frame(x = 1:3, y = 1:3, ymin = 0:2, ymax = 2:4, colour = 1:3),
-           aes(x, y, ymin = ymin, ymax = ymax, colour = colour)) +
-    geom_pointrange() +
     theme_e61(legend = "top", legend_title = TRUE) +
     square_legend_symbols(size = 1.2)
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("square-legend-pointrange.svg", p)))
-  })
+  g <- p@guides$guides$colour
+  expect_s3_class(g, "GuideLegend")
+  expect_equal(g$params$override.aes$shape, 15)
+  expect_equal(g$params$override.aes$alpha, 1)
+  expect_equal(g$params$override.aes$size, 1.2)
 
-  # Column
-  p <-
-    ggplot(data.frame(x = 1:3, y = 1:3, colour = 1:3),
-           aes(x, y, fill = factor(colour))) +
+  p2 <- ggplot(
+    data.frame(x = 1:3, y = 1:3, grp = factor(1:3)),
+    aes(x, y, fill = grp)
+  ) +
     geom_col() +
     theme_e61(legend = "top", legend_title = TRUE) +
     square_legend_symbols()
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("square-legend-col.svg", p)))
-  })
-
+  g2 <- p2@guides$guides$fill
+  expect_s3_class(g2, "GuideLegend")
+  expect_equal(g2$params$override.aes$shape, 15)
+  expect_equal(g2$params$override.aes$size, 6)
 })
 
 test_that("Legend position can be adjusted", {
-  p <-
-    ggplot(data.frame(x = 1:3, y = 1:3, colour = 1:3),
-           aes(x, y, colour = colour)) +
+
+  p <- ggplot(
+    data.frame(x = 1:3, y = 1:3, colour = 1:3),
+    aes(x, y, colour = colour)
+  ) +
     geom_point()
 
-  p1 <- p +
-    theme_e61(legend = "top")
+  p_top <- p + theme_e61(legend = "top")
+  expect_equal(p_top@theme$legend.position, "top")
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("legend-chk-1.svg", p1)))
-  })
+  p_bottom <- p + theme_e61(legend = "bottom")
+  expect_equal(p_bottom@theme$legend.position, "bottom")
 
-  p1 <- p +
-    theme_e61(legend = "bottom")
+  expect_error({ p + theme_e61(legend = "inside") })
+  expect_error({ p + theme_e61(legend = "inside", legend_position = c(20, 245)) })
+  expect_error({ p + theme_e61(legend = "inside", legend_position = 20) })
+  expect_error({ p + theme_e61(legend = "inside", legend_position = c("a", "b")) })
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("legend-chk-2.svg", p1)))
-  })
-
-  expect_error({p + theme_e61(legend = "inside")})
-  expect_error({p + theme_e61(legend = "inside", legend_position = c(20, 245))})
-  expect_error({p + theme_e61(legend = "inside", legend_position = 20)})
-  expect_error({p + theme_e61(legend = "inside", legend_position = c("a", "b"))})
-
-  p1 <- p +
-    theme_e61(legend = "inside", legend_position = c(0.9, 0.85))
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("legend-chk-3.svg", p1)))
-  })
-
+  p_inside <- p + theme_e61(legend = "inside", legend_position = c(0.9, 0.85))
+  expect_equal(p_inside@theme$legend.position, "inside")
+  expect_equal(p_inside@theme$legend.position.inside, c(0.9, 0.85))
 })
 
 test_that("Aspect ratio can be changed", {
-  p <-
-    ggplot(data.frame(x = 1:10, y = (1:10)^2),
-           aes(x, y)) +
+
+  p <- ggplot(
+    data.frame(x = 1:10, y = (1:10)^2),
+    aes(x, y)
+  ) +
     geom_point() +
     theme_e61()
 
-  p1 <- p +
-    theme_e61(aspect_ratio = 1)
+  p1 <- p + theme_e61(aspect_ratio = 1)
+  expect_equal(p1@theme$aspect.ratio, 1)
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("aspect-ratio-1.svg", p1, chart_type = "custom")))
-  })
+  p2 <- p + theme_e61(aspect_ratio = 0.5)
+  expect_equal(p2@theme$aspect.ratio, 0.5)
 
-  p2 <- p +
-    theme_e61(aspect_ratio = 0.5)
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("aspect-ratio-5.svg", p2, chart_type = "custom")))
-  })
-
-  p3 <- p +
-    theme_e61(aspect_ratio = 3)
-
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("aspect-ratio-3.svg", p3, chart_type = "custom")))
-  })
-
+  p3 <- p + theme_e61(aspect_ratio = 3)
+  expect_equal(p3@theme$aspect.ratio, 3)
 })
 
-test_that("Spatial plots preserve the original aspect ratios", {
+test_that("Spatial plots preserve aspect ratios", {
 
-  skip_if_not_installed("strayr")
   skip_if_not_installed("sf")
 
-  sa4 <- strayr::read_absmap("sa42021")
-
-  bbox <- sf::st_bbox(c(xmin = 145, xmax = 155, ymin = -35, ymax = -30),
-                      crs = sf::st_crs(4326))
-  sa4_syd <- sf::st_crop(sa4, bbox)
-
-  plotdata <- rbind(
-    transform(sa4_syd, property_type = "House"),
-    transform(sa4_syd, property_type = "Unit")
+  # A single rectangle spanning both windows tested below (inland VIC-sized
+  # extent) is enough to exercise coord_sf()'s aspect calculation - it only
+  # depends on the requested xlim/ylim and CRS, not the drawn geometry, so
+  # there's no need for real ABS boundaries here.
+  sa4_vic <- sf::st_sf(
+    geometry = sf::st_sfc(
+      sf::st_polygon(list(matrix(
+        c(142.0, -38.0,
+          145.0, -38.0,
+          145.0, -37.0,
+          142.0, -37.0,
+          142.0, -38.0),
+        ncol = 2, byrow = TRUE
+      ))),
+      crs = 4326
+    )
   )
 
-  p1 <- ggplot(plotdata) +
-      geom_sf(fill = "grey90", colour = "grey40", linewidth = 0.1) +
-      coord_sf(xlim = c(150.95, 151.30), ylim = c(-34.05, -33.70)) +
-      facet_wrap(~ property_type) +
-      theme_e61_spatial() +
-      labs_e61(
-        title = "MWE: faceted ABS SA4 map (strayr::read_absmaps)",
-        footnotes = "Constant fill; geometry from ABS via strayr."
-      )
+  plotdata <- rbind(
+    transform(sa4_vic, property_type = "House"),
+    transform(sa4_vic, property_type = "Unit")
+  )
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("map-aspect-ratio-1.svg", p1)))
-  })
+  p_base <- ggplot(plotdata) +
+    geom_sf(fill = "grey90", colour = "grey40", linewidth = 0.1) +
+    facet_wrap(~ property_type)
 
-  # See if it preserves weirdly wide graphs
-  p2 <- p1 +
-    coord_sf(xlim = c(150.5, 151.30), ylim = c(-34.05, -33.70))
+  # inland VIC windows (avoid ocean cropping)
+  xlim1 <- c(143.55, 144.15)
+  ylim1 <- c(-37.65, -37.15)
+  p1 <- p_base + coord_sf(xlim = xlim1, ylim = ylim1)
 
-  withr::with_tempdir({
-    expect_snapshot_file(suppressWarnings(save_e61("map-aspect-ratio-2.svg", p2)))
-  })
+  # wider window, same height -> aspect should increase
+  xlim2 <- c(142.95, 144.15)
+  ylim2 <- c(-37.65, -37.15)
+  p2 <- p_base + coord_sf(xlim = xlim2, ylim = ylim2)
 
+  get_coord_sf_aspect <- function(p) {
+    b <- ggplot_build(p)
+
+    coord <- b@layout$coord          # ggproto (use $ below)
+    pp <- b@layout$panel_params[[1]] # list of panel params (S7 build object uses @)
+
+    a <- coord$aspect(pp)
+
+    if (!is.numeric(a) || length(a) != 1L || !is.finite(a)) NA_real_ else a
+  }
+
+  a1 <- get_coord_sf_aspect(p1)
+  a2 <- get_coord_sf_aspect(p2)
+
+  expect_true(is.finite(a1))
+  expect_true(is.finite(a2))
+  expect_gt(a1, a2)
 })

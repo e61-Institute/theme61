@@ -1,3 +1,48 @@
+#' Get the width/height of a single grob (or list of grobs, for faceted
+#' ggplots) along the given dimension - shared implementation for
+#' get_grob_width()/get_grob_height().
+#' grob - A single grob, or a list of grobs (faceted ggplots).
+#' dim - "width" or "height".
+#' @noRd
+get_grob_dim <- function(grob, dim){
+
+  convert <- if(dim == "width") grid::convertWidth else grid::convertHeight
+  plural <- paste0(dim, "s")
+
+  dim_of <- function(g){
+    if(g$name == "NULL") {
+      0
+
+    } else if(!is.null(g[[dim]])){
+      sum(convert(g[[dim]], "cm", valueOnly = TRUE), na.rm = T)
+
+    } else if(!is.null(g[[plural]])){
+      sum(convert(g[[plural]], "cm", valueOnly = TRUE), na.rm = T)
+
+    } else {
+      0
+    }
+  }
+
+  # if it is a single grob - non faceted ggplots
+  if(!is.null(grob$name)){
+    return(dim_of(grob))
+  }
+
+  # if it is a faceted ggplot, then return the first non-zero dimension - to avoid double counting
+  if(is.list(grob)) {
+
+    for(i in seq_along(grob)){
+      val <- dim_of(grob[[i]])
+      if(val != 0) return(val)
+    }
+
+    return(0)
+  }
+
+  0
+}
+
 #' Get the widths of non-zero, non-NULL grobs
 #' ggplotGrob - The set of grobs for the plot we want to find widths for
 #' grob_name - The name of the grob you want to find the width of
@@ -6,50 +51,7 @@ get_grob_width <- function(ggplotGrob, grob_name){
 
   grob <- ggplotGrob$grobs[which(stringr::str_detect(ggplotGrob$layout$name, paste0("^", grob_name)))]
 
-  # if it is a single grob - non faceted ggplots
-  if(!is.null(grob$name)){
-
-    if(grob$name == "NULL") {
-      width <- 0
-
-    } else if(!is.null(grob$width)){
-      width <- sum(grid::convertWidth(grob$width, "cm", valueOnly = TRUE), na.rm = T)
-
-    } else if(!is.null(grob$widths)){
-      width <- sum(grid::convertWidth(grob$widths, "cm", valueOnly = TRUE), na.rm = T)
-
-    } else {
-      width <- 0
-    }
-
-  # if it is a faceted ggplot, then return the first non-zero width - to avoid double counting
-  } else if(is.list(grob)) {
-
-    width <- 0
-
-    for(i in seq_along(grob)){
-
-      temp_grob <- grob[[i]]
-
-      if(temp_grob$name == "NULL") {
-        width <- 0
-
-      } else if(!is.null(temp_grob$width)){
-        width <- sum(grid::convertWidth(temp_grob$width, "cm", valueOnly = TRUE), na.rm = T)
-
-      } else if(!is.null(temp_grob$widths)){
-        width <- sum(grid::convertWidth(temp_grob$widths, "cm", valueOnly = TRUE), na.rm = T)
-
-      } else {
-        width <- 0
-      }
-
-      # return the first non-zero width
-      if(width != 0) break
-    }
-  }
-
-  return(width)
+  get_grob_dim(grob, "width")
 }
 
 #' Get the heighs of non-zero, non-NULL grobs
@@ -60,48 +62,17 @@ get_grob_height <- function(ggplotGrob, grob_name){
 
   grob <- ggplotGrob$grobs[which(stringr::str_detect(ggplotGrob$layout$name, paste0("^", grob_name)))]
 
-  # if it is a single grob - non faceted ggplots
-  if(!is.null(grob$name)){
+  get_grob_dim(grob, "height")
+}
 
-    if(grob$name == "NULL") {
-      height <- 0
+#' Get a ggplotGrob's outer plot.margin along the given dimension - this is
+#' always the first and last row (height) or column (width) of the gtable.
+#' dim - "width" or "height".
+#' @noRd
+get_margin_dim <- function(ggplotGrob, dim){
 
-    } else if(!is.null(grob$height)){
-      height <- sum(grid::convertHeight(grob$height, "cm", valueOnly = TRUE), na.rm = T)
+  convert <- if(dim == "width") grid::convertWidth else grid::convertHeight
+  vec <- if(dim == "width") ggplotGrob$widths else ggplotGrob$heights
 
-    } else if(!is.null(grob$heights)){
-      height <- sum(grid::convertHeight(grob$heights, "cm", valueOnly = TRUE), na.rm = T)
-
-    } else {
-      height <- 0
-    }
-
-  # if it is a faceted ggplot, then return the first non-zero height - to avoid double counting
-  } else if(is.list(grob)) {
-
-    height <- 0
-
-    for(i in seq_along(grob)){
-
-      temp_grob <- grob[[i]]
-
-      if(temp_grob$name == "NULL") {
-        height <- 0
-
-      } else if(!is.null(temp_grob$height)){
-        height <- sum(grid::convertHeight(temp_grob$height, "cm", valueOnly = TRUE), na.rm = T)
-
-      } else if(!is.null(temp_grob$heights)){
-        height <- sum(grid::convertHeight(temp_grob$heights, "cm", valueOnly = TRUE), na.rm = T)
-
-      } else {
-        height <- 0
-      }
-
-      # return the first non-zero height
-      if(height != 0) break
-    }
-  }
-
-  return(height)
+  sum(convert(vec[c(1, length(vec))], "cm", valueOnly = TRUE))
 }

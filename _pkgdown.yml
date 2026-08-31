@@ -10,6 +10,7 @@ reference:
   - labs_e61
   - plot_label
   - geom_pointbar
+  - geom_col_label
 
 - title: Formatting
   contents:
@@ -29,7 +30,7 @@ reference:
 
 - title: Miscellaneous
   contents:
-  - e61_chart_maker
+  - set_t61_options
   - set_open_graph_browser
   - unset_open_graph_browser
   - set_format

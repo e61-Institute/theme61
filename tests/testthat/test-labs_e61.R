@@ -1,3 +1,25 @@
+test_that("Title stays NULL when not supplied, so no space is reserved for it", {
+  lab <- labs_e61(subtitle = "Subtitle")
+  expect_null(lab$title)
+
+  lab <- labs_e61(title = NULL, subtitle = "Subtitle", title_wrap = 50L)
+  expect_null(lab$title)
+})
+
+test_that("y-axis title (y_top = TRUE) doesn't get an empty leading line when no subtitle is supplied", {
+  lab <- labs_e61(y = "Y label")
+  expect_equal(lab$subtitle, "<span style='font-size:9pt'>Y label</span>", ignore_attr = TRUE)
+  expect_false(grepl("^<span[^>]*></span><br>", lab$subtitle))
+
+  # subtitle actually supplied - should still combine subtitle + y-axis title
+  lab <- labs_e61(subtitle = "Subtitle", y = "Y label")
+  expect_equal(
+    lab$subtitle,
+    "<span style='font-size:10pt'>Subtitle</span><br><span style='font-size:9pt'>Y label</span>",
+    ignore_attr = TRUE
+  )
+})
+
 test_that("Users should not be able to supply a caption if footnotes or sources are supplied", {
   expect_error(
     labs_e61(title = "Something", footnotes = "Test", caption = "Fail")
@@ -44,6 +66,18 @@ test_that("Other labels (x, y, fill) are passed through correctly", {
     compare_lab,
     ignore_attr = TRUE
   )
+})
+
+test_that("y_top moves y-axis title into the subtitle", {
+  lab <- labs_e61(title = "Test", subtitle = "Sub", y = "Y title", y_top = TRUE)
+
+  expect_null(lab$y)
+  expect_true(grepl("Y title", lab$subtitle, fixed = TRUE))
+})
+
+test_that("Caption is NULL when no footnotes or sources are provided", {
+  lab <- labs_e61(title = "Test", subtitle = "Sub")
+  expect_null(lab$caption)
 })
 
 test_that("Footnote and source text wrapping works sensibly", {

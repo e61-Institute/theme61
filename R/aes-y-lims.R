@@ -1,11 +1,41 @@
+#' "Nice" numbers used to pick aesthetically-spaced axis break increments.
+#' Shared by get_aes_num() and get_aes_pair().
+#' @noRd
+t61_nice_breaks <- c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100)
+
+#' Name of the transformation applied to the plot's y-scale, or "identity"
+#' @noRd
+get_y_transform_name <- function(plot){
+
+  y_scale <- layer_scales(plot)$y
+
+  if (is.null(y_scale)) return("identity")
+
+  transform <- tryCatch(y_scale$get_transformation(), error = function(e) NULL)
+
+  if (is.null(transform) || is.null(transform$name)) return("identity")
+
+  transform$name
+}
+
 #' Given a ggplot object, update the y-axis scales
 #' plot - ggplot object. This is the plot whose scales we want to update.
 #' auto_scale - should the chart be auto-scaled or should we leave it as is
 #' @noRd
 update_scales <- function(plot, auto_scale){
 
+  # Skip auto-scaling for transformed y-scales (e.g. trans = "log10") - our
+  # aesthetic limit calculations assume a linear scale.
+  if (!identical(get_y_transform_name(plot), "identity")) {
+    return(plot)
+  }
+
+  # Build once and share it with check_for_y_var()/the sec-axis check/
+  # get_y_minmax() below - plot isn't mutated until update_chart_scales() returns.
+  build <- ggplot_build(plot)
+
   # check if we have a numeric y-variable
-  check_y_var <- check_for_y_var(plot)
+  check_y_var <- check_for_y_var(plot, build)
 
   # if we don't have a numeric y-variable then check whether the plot contains geom_density or geom_histogram (GeomBar without a y-variable)
   if (!check_y_var) {
@@ -27,7 +57,8 @@ update_scales <- function(plot, auto_scale){
   }
 
   # check if we want to include a second y-axis or not (check by looking at whether it has a non-zero width grob)
-  grobs <- ggplotGrob(plot)
+  # ggplot_gtable(build) == ggplotGrob(plot), reusing the build above
+  grobs <- t61_ggplot_gtable_quiet_na(build)
 
   test_sec_axis <- get_grob_width(grobs, grob_name = "axis-r")
 
@@ -36,7 +67,7 @@ update_scales <- function(plot, auto_scale){
   # if the y-variable class is numeric, or the plot is a density or histogram, then update the chart scales
   if (check_y_var){
 
-    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis)})
+    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis, build)})
 
     # if the y-var class is NULL, send a warning message about the auto updating of chart scales
   } else if (!check_y_var & is.null(getOption("warn_y_var"))){
@@ -49,22 +80,29 @@ update_scales <- function(plot, auto_scale){
 }
 
 #' Check whether the dataset has a y-variable that can be used for scaling
+#' build - optional, reuse an existing ggplot_build(plot) instead of rebuilding
 #'@noRd
-check_for_y_var <- function(plot){
+check_for_y_var <- function(plot, build = NULL){
 
   check <- FALSE
 
-  # First check if the y-variable is a factor or a character - we can't scale those
-  y_var <- deparse(plot@mapping$y)
-  y_var <- gsub("~", "", y_var)
-
-  y_class <- class(plot@data[[y_var]])
+  # First check if the y-variable is a factor or a character - we can't scale
+  # those. Evaluate the mapping quosure directly rather than deparse()-ing it
+  # into a column name, since y can be an expression or only exist in
+  # layer-level data.
+  y_is_discrete <- FALSE
+  if (!is.null(plot@mapping$y)) {
+    y_val <- tryCatch(rlang::eval_tidy(plot@mapping$y, plot@data), error = function(e) NULL)
+    y_is_discrete <- inherits(y_val, c("factor", "character"))
+  }
 
   # if the y-var is either missing, or it is not a factor/character, then
   # continue looking for whether there is a y-variable that can be used for scaling
-  if(is.null(y_class) || (y_class != "factor" && y_class != "character")){
+  if(!y_is_discrete){
 
-    chart_data <- ggplot_build(plot)$data
+    if (is.null(build)) build <- ggplot_build(plot)
+
+    chart_data <- build$data
 
     # check whether there are any non-missing values for y, ymax and ymin. Note min will return -Inf if the variable doesn't exist or is all missing
     for (i in seq_along(chart_data)){
@@ -95,17 +133,32 @@ check_for_y_var <- function(plot){
 }
 
 #' Aesthetically update the y-axis scales and labels
+#' build - optional, reuse an existing ggplot_build(plot) instead of rebuilding
 #' @noRd
-update_chart_scales <- function(plot, auto_scale, sec_axis){
+update_chart_scales <- function(plot, auto_scale, sec_axis, build = NULL){
+
+  y_scale <- layer_scales(plot)$y
 
   # Returns the order of the first scale function used - how do we determine this
-  y_scale_lims <- layer_scales(plot)$y$limits
+  y_scale_lims <- y_scale$limits
+
+  # Preserve user-supplied breaks if they have been explicitly provided.
+  custom_breaks <- NULL
+  if (!is.null(y_scale$breaks) &&
+      !inherits(y_scale$breaks, "waiver") &&
+      !is.function(y_scale$breaks)) {
+    custom_breaks <- y_scale$breaks
+  }
+
+  # Only assigned below if one of the auto_scale branches runs; falls back to
+  # y_scale_lims via the is.null() check further down otherwise.
+  aes_lims <- NULL
 
   # If no y-axis scale is present and y is numeric, then add a default aesthetic scale
   if(is.null(y_scale_lims) && auto_scale){
 
     # get the minimum and maximum y-axis values from the chart data
-    minmax <- get_y_minmax(plot)
+    minmax <- get_y_minmax(plot, build)
 
     min_y <- minmax[[1]]
     max_y <- minmax[[2]]
@@ -138,7 +191,7 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
 
     # Step 2 - find the maximum y-value in the data - we want to make sure we don't
     # adjust down and chop off some data
-    max_y_data <- get_y_minmax(plot)[[2]]
+    max_y_data <- get_y_minmax(plot, build)[[2]]
 
     # Step 3 - Check that with the new upper limit we have asethetic ticks (this suggests it
     # was overwritten), and check that the new upper limit is greater than the maximum value
@@ -163,13 +216,34 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   }
 
   # rescale the axis and apply requested customisations
-  lims <- if (exists("aes_lims")) aes_lims else y_scale_lims
+  # If breaks were explicitly provided and are evenly spaced, encode them as
+  # a 3-value limits vector so scale_y_continuous_e61() preserves the interval
+  # without changing its user-facing API.
+  custom_lims <- NULL
+  if (!is.null(custom_breaks) && is.numeric(custom_breaks) && length(custom_breaks) >= 2) {
+    diffs <- unique(round(diff(custom_breaks), 10))
+    diffs <- diffs[is.finite(diffs) & diffs > 0]
+
+    if (length(diffs) == 1) {
+      custom_lims <- c(min(custom_breaks, na.rm = TRUE),
+                       max(custom_breaks, na.rm = TRUE),
+                       diffs[[1]])
+    }
+  }
+
+  lims <- if (!is.null(custom_lims)) {
+    custom_lims
+  } else if (!is.null(aes_lims)) {
+    aes_lims
+  } else {
+    y_scale_lims
+  }
 
   if(auto_scale){
     suppressWarnings({
       if (sec_axis) {
         plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), add_space = TRUE)
-      } else if (!sec_axis) {
+      } else {
         plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE, add_space = TRUE)
       }
     })
@@ -178,65 +252,62 @@ update_chart_scales <- function(plot, auto_scale, sec_axis){
   return(plot)
 }
 
-#' Get the minimum and maximum y-axis data in the chart data
+#' Find one layer's extreme (max or min) y value, preferring the ymax/ymin
+#' aesthetic but falling back to the y aesthetic - and to whichever of the two
+#' is further in the requested direction when both exist. Shared by the
+#' max-finding and min-finding halves of get_y_minmax() below, which are
+#' otherwise mirror images of each other (max/ymax/`<` vs min/ymin/`>`).
 #' @noRd
-get_y_minmax <- function(plot){
+t61_layer_extreme <- function(layer_data, direction = c("max", "min")) {
+
+  direction <- match.arg(direction)
+  agg_fun <- if (direction == "max") max else min
+  bound_col <- if (direction == "max") "ymax" else "ymin"
+
+  result <- NA_real_
+
+  # suppress messages/warnings as this will frequently warn about no non
+  # missing values
+  suppressMessages({suppressWarnings({
+    temp_bound <- agg_fun(layer_data[[bound_col]], na.rm = TRUE)
+    temp_y <- agg_fun(layer_data$y, na.rm = TRUE)
+  })})
+
+  # if its finite then it exists (max/min of a null variable returns -Inf/Inf)
+  if (is.finite(temp_bound)) {
+
+    # if the y variable is further in this direction, then use that instead
+    beyond_bound <- if (direction == "max") temp_bound < temp_y else temp_bound > temp_y
+
+    if (is.finite(temp_y) && beyond_bound) {
+      result <- temp_y
+
+    } else {
+      result <- temp_bound
+    }
+
+    # otherwise return the max/min of the y-variable
+  } else if (is.numeric(temp_y) && is.finite(temp_y)) {
+    result <- temp_y
+  }
+
+  result
+}
+
+#' Get the minimum and maximum y-axis data in the chart data
+#' build - optional, reuse an existing ggplot_build(plot) instead of rebuilding
+#' @noRd
+get_y_minmax <- function(plot, build = NULL){
 
   min_y <- NA_real_
   max_y <- NA_real_
-  chart_data <- ggplot_build(plot)$data
+  if (is.null(build)) build <- ggplot_build(plot)
+  chart_data <- build$data
 
   for(i in seq_along(chart_data)){
 
-    # find the maximum y-axis variable
-    temp_max_y <- NA_real_
-
-    # suppress messages as this will frequently warn about no non missing values
-    suppressMessages({suppressWarnings({
-      temp_ymax <- max(chart_data[[i]]$ymax, na.rm = TRUE)
-      temp_y <- max(chart_data[[i]]$y, na.rm = TRUE)
-    })})
-
-    # if its finite then it it exists (max of a null variable returns -Inf)
-    if(is.finite(temp_ymax)){
-
-      # if the y variable has a higher maximum, then use that instead
-      if(is.finite(temp_y) && temp_ymax < temp_y) {
-        temp_max_y <- temp_y
-
-      } else {
-        temp_max_y <- temp_ymax
-      }
-
-      # otherwise return the max of the y-variable
-    } else if(is.numeric(temp_y) && is.finite(temp_y)){
-      temp_max_y <- temp_y
-    }
-
-    # find the minimum y-axis variable
-    temp_min_y <- NA_real_
-
-    # suppress messages as this will frequently warn about no non missing values
-    suppressMessages({suppressWarnings({
-      temp_ymin <- min(chart_data[[i]]$ymin, na.rm = TRUE)
-      temp_y <- min(chart_data[[i]]$y, na.rm = TRUE)
-    })})
-
-    # if its finite then it it exists (min of a null variable returns -Inf)
-    if(is.finite(temp_ymin)){
-
-      # if the y variable has a lower minimum, then use that instead
-      if(is.finite(temp_y) && temp_ymin > temp_y) {
-        temp_min_y <- temp_y
-
-      } else {
-        temp_min_y <- temp_ymin
-      }
-
-      # otherwise return the min of the y-variable
-    } else if(is.numeric(temp_y) && is.finite(temp_y)){
-      temp_min_y <- temp_y
-    }
+    temp_max_y <- t61_layer_extreme(chart_data[[i]], "max")
+    temp_min_y <- t61_layer_extreme(chart_data[[i]], "min")
 
     # update the current min and max values - if NA then it must be the first observation
     if(is.na(min_y) && !is.na(temp_min_y)){
@@ -295,7 +366,7 @@ get_aes_num <- function(y_val, diff, type = c("next_largest", "next_smallest")) 
   # set the adjustment factor based on whether we are looking at a value above or below 1
   adj <- if (y_val > 0) 1 else -1
 
-  aes_y_points <- data.table::data.table(points = c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100))
+  aes_y_points <- data.table::data.table(points = t61_nice_breaks)
   aes_y_points[, points_adj := adj * points]
 
   order_mag <- ceiling(log10(adj * y_val))
@@ -579,7 +650,7 @@ get_aes_pair <- function(y_val_1, y_val_2){
   while(keep_going == T){
 
     # 2 - Then find all the aesthetic pairs
-    aes_y_points <- c(seq(10, 50, 5), 60, 70, 75, 80, 90, 100)
+    aes_y_points <- t61_nice_breaks
 
     # adjust to the right order of magnitude for the second value
     order_mag_first <- ceiling(log10(abs(aes_first_value)))
