@@ -365,7 +365,7 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
       any(is.na(targets$labels$fallback_x) | is.na(targets$labels$fallback_y)) &&
       t61_should_show_cooldown_msg("theme61.autolabel_fast_msg")) {
     cli::cli_alert_info(
-      "Auto-positioned {.fn plot_label} text in this preview uses a quick placement heuristic, not the real collision-avoiding search -- labels may overlap here even when {.fn save_e61} would place them cleanly. Save the graph with {.fn save_e61} to see (and use) the actual auto-positioned labels. By default this message appears at most once every 30 minutes; run {.code options(theme61.autolabel_fast_msg = TRUE)} to see it every time, or {.code options(theme61.autolabel_fast_msg = FALSE)} to turn it off.",
+      "Auto-positioned {.fn plot_label} text in this preview uses a quick placement heuristic, not the real collision-avoiding search -- labels may overlap here even when {.fn save_e61} would place them cleanly. Save the graph with {.fn save_e61} to see (and use) the actual auto-positioned labels. This message appears once every 30 minutes by default; run {.code options(theme61.autolabel_fast_msg = TRUE)} to see it every time, or {.code FALSE} to turn it off.",
       wrap = TRUE
     )
   }
