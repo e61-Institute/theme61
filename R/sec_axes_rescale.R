@@ -53,7 +53,7 @@ sec_rescale_inv <- function(values, scale = 1, shift = 0) {
 
   # Inform the user of the weirdness
   if (t61_should_show_cooldown_msg("theme61.sec_axis_msg")) {
-    cli::cli_alert_info("Did your graph not show any change to the secondary axis? Due to weirdness, you need to run the graph code twice after making changes to the secondary axis rescaling. By default this message appears at most once every 30 minutes; run `options(theme61.sec_axis_msg = TRUE)` to see it every time, or `options(theme61.sec_axis_msg = FALSE)` to turn it off.",
+    cli::cli_alert_info("Did your graph not show any change to the secondary axis? Due to weirdness, you need to run the graph code twice after making changes to the secondary axis rescaling. This message appears every 30 minutes by default; run {.code options(theme61.sec_axis_msg = TRUE)} to see it every time, or {.code FALSE} to turn it off.",
                         wrap = TRUE)
   }
 
