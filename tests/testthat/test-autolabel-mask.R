@@ -53,7 +53,7 @@ test_that("t61_panel_box_cm returns NULL for faceted plots (not v1 scope)", {
   data <- data.frame(x = 1:4, y = 1:4, f = rep(c("a", "b"), 2))
   p <- ggplot(data, aes(x, y)) + geom_point() + facet_wrap(~f)
 
-  gt <- ggplot2::ggplotGrob(p)
+  gt <- quiet_ggplotGrob(p)
   expect_null(t61_panel_box_cm(gt, width_cm = 16, height_cm = 12))
 })
 
@@ -103,8 +103,8 @@ test_that("t61_strip_chrome preserves the gtable layout of the real chart", {
   skip_on_cran()
 
   p <- mask_test_plot()
-  gt_real <- ggplot2::ggplotGrob(p)
-  gt_mask <- ggplot2::ggplotGrob(t61_strip_chrome(p))
+  gt_real <- quiet_ggplotGrob(p)
+  gt_mask <- quiet_ggplotGrob(t61_strip_chrome(p))
 
   widths_real <- vapply(gt_real$widths, grid::convertWidth, numeric(1), unitTo = "cm", valueOnly = TRUE)
   widths_mask <- vapply(gt_mask$widths, grid::convertWidth, numeric(1), unitTo = "cm", valueOnly = TRUE)

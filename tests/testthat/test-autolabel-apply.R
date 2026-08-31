@@ -569,28 +569,28 @@ test_that("save_e61(preview = TRUE, fast_labels = TRUE) doesn't crash on a steep
   )
 })
 
-test_that("t61_apply_autolabel(fast = TRUE) shows the fast-preview reminder once, only when a label needed it", {
+test_that("t61_apply_autolabel(fast = TRUE) shows the fast-preview reminder, only when a label needed it", {
   skip_on_cran()
 
   p <- autolabel_apply_test_setup() # no x/y given (auto_position = TRUE default)
 
+  # theme61.autolabel_fast_msg = TRUE shows it every time.
   withr::local_options(list(theme61.autolabel_fast_msg = TRUE))
   expect_message(
     t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = TRUE),
     "save_e61"
   )
-  # Fires once, then turns itself off for the rest of the session.
-  expect_false(getOption("theme61.autolabel_fast_msg"))
-  expect_no_message(t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = TRUE))
+  expect_message(
+    t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = TRUE),
+    "save_e61"
+  )
 
   # fast = FALSE runs the real search, so there's nothing to warn about.
-  withr::local_options(list(theme61.autolabel_fast_msg = TRUE))
   expect_no_message(t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = FALSE))
 
   # Every label already has an explicit position: fast placement is never
   # actually used, so the reminder would have nothing to explain.
   p_explicit <- autolabel_apply_test_setup(auto_position = FALSE)
-  withr::local_options(list(theme61.autolabel_fast_msg = TRUE))
   expect_no_message(t61_apply_autolabel(p_explicit, width_cm = 16, height_cm = 12, fast = TRUE))
 
   # theme61.autolabel_fast_msg = FALSE opts out entirely.
@@ -598,7 +598,37 @@ test_that("t61_apply_autolabel(fast = TRUE) shows the fast-preview reminder once
   expect_no_message(t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = TRUE))
 })
 
-test_that("t61_apply_autolabel warns once when a label settles for a fallback position instead of a real placement", {
+test_that("t61_apply_autolabel(fast = TRUE) reminder defaults to a 30-minute cooldown", {
+  skip_on_cran()
+
+  p <- autolabel_apply_test_setup() # no x/y given (auto_position = TRUE default)
+
+  withr::local_options(list(theme61.autolabel_fast_msg = NULL))
+  t61_env <- theme61:::t61_env
+  clear_last_shown <- function() {
+    if (exists("theme61.autolabel_fast_msg_last_shown", envir = t61_env, inherits = FALSE)) {
+      rm(list = "theme61.autolabel_fast_msg_last_shown", envir = t61_env, inherits = FALSE)
+    }
+  }
+  clear_last_shown()
+  withr::defer(clear_last_shown())
+
+  expect_message(
+    t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = TRUE),
+    "save_e61"
+  )
+  # Same session, well within the cooldown window: stays quiet.
+  expect_no_message(t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = TRUE))
+
+  # Backdate the last-shown time past the cooldown window: fires again.
+  t61_env$theme61.autolabel_fast_msg_last_shown <- Sys.time() - 31 * 60
+  expect_message(
+    t61_apply_autolabel(p, width_cm = 16, height_cm = 12, fast = TRUE),
+    "save_e61"
+  )
+})
+
+test_that("t61_apply_autolabel informs every time a label settles for a fallback position instead of a real placement", {
   skip_on_cran()
 
   # coord_flip() + pointbar isn't flip-aware, so it bypasses the series
@@ -620,9 +650,9 @@ test_that("t61_apply_autolabel warns once when a label settles for a fallback po
   expect_match(msg, "Series A", fixed = TRUE)
   expect_match(msg, "not yet supported for coord_flip() + area/pointbar", fixed = TRUE)
 
-  # Fires once, then turns itself off for the rest of the session.
-  expect_false(getOption("theme61.autolabel_fallback_msg"))
-  expect_no_warning(t61_apply_autolabel(p_bypass, width_cm = 16, height_cm = 12))
+  # Fires every time, not just once per session.
+  w_again <- testthat::capture_warnings(t61_apply_autolabel(p_bypass, width_cm = 16, height_cm = 12))
+  expect_length(w_again, 1)
 
   # An unmatched label with no x/y falls back for a different reason.
   data2 <- data.frame(x = 2000:2020, y = seq(0, 5, length.out = 21))
@@ -631,7 +661,6 @@ test_that("t61_apply_autolabel warns once when a label settles for a fallback po
     theme_bw(base_size = 10) +
     plot_label("Unrelated", colour = "#123456")
 
-  withr::local_options(list(theme61.autolabel_fallback_msg = TRUE))
   w2 <- testthat::capture_warnings(t61_apply_autolabel(p_unmatched, width_cm = 16, height_cm = 12))
   expect_length(w2, 1)
   msg2 <- gsub("\\s+", " ", w2)
@@ -642,6 +671,26 @@ test_that("t61_apply_autolabel warns once when a label settles for a fallback po
   withr::local_options(list(theme61.autolabel_fallback_msg = FALSE))
   expect_no_warning(t61_apply_autolabel(p_bypass, width_cm = 16, height_cm = 12))
   expect_no_warning(t61_apply_autolabel(p_unmatched, width_cm = 16, height_cm = 12))
+})
+
+test_that("t61_apply_autolabel informs on a fallback position under fast = TRUE too", {
+  skip_on_cran()
+
+  # No series matches this label's colour, and fast mode has no mask to
+  # fall back to a collision-free spot with -- it settles for the panel
+  # centre, which should still be reported as a degraded placement.
+  data <- data.frame(x = 2000:2020, y = seq(0, 5, length.out = 21))
+  p_unmatched <- ggplot(data, aes(x, y)) +
+    geom_line(colour = "#e57200", linewidth = 1) +
+    theme_bw(base_size = 10) +
+    plot_label("Unrelated", colour = "#123456")
+
+  withr::local_options(list(theme61.autolabel_fallback_msg = TRUE, theme61.autolabel_fast_msg = FALSE))
+  w <- testthat::capture_warnings(t61_apply_autolabel(p_unmatched, width_cm = 16, height_cm = 12, fast = TRUE))
+  expect_length(w, 1)
+  msg <- gsub("\\s+", " ", w)
+  expect_match(msg, "Unrelated", fixed = TRUE)
+  expect_match(msg, "no good spot found, used a fallback position", fixed = TRUE)
 })
 
 coord_flip_apply_test <- function(p) {

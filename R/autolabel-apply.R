@@ -361,13 +361,13 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
 
   # Only worth flagging when a label used the fast (no collision search)
   # heuristic instead of an explicit x/y.
-  if (isTRUE(fast) && getOption("theme61.autolabel_fast_msg", default = TRUE) &&
-      any(is.na(targets$labels$fallback_x) | is.na(targets$labels$fallback_y))) {
+  if (isTRUE(fast) &&
+      any(is.na(targets$labels$fallback_x) | is.na(targets$labels$fallback_y)) &&
+      t61_should_show_cooldown_msg("theme61.autolabel_fast_msg")) {
     cli::cli_alert_info(
-      "Auto-positioned {.fn plot_label} text in this preview uses a quick placement heuristic, not the real collision-avoiding search -- labels may overlap here even when {.fn save_e61} would place them cleanly. Save the graph with {.fn save_e61} to see (and use) the actual auto-positioned labels. This message appears once per session; to see it again, run {.code options(theme61.autolabel_fast_msg = TRUE)}.",
+      "Auto-positioned {.fn plot_label} text in this preview uses a quick placement heuristic, not the real collision-avoiding search -- labels may overlap here even when {.fn save_e61} would place them cleanly. Save the graph with {.fn save_e61} to see (and use) the actual auto-positioned labels. This message appears once every 30 minutes by default; run {.code options(theme61.autolabel_fast_msg = TRUE)} to see it every time, or {.code FALSE} to turn it off.",
       wrap = TRUE
     )
-    options(theme61.autolabel_fast_msg = FALSE)
   }
 
   plot_for_mask <- t61_strip_autolabel_layers(plot)
@@ -383,17 +383,16 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
   )
   if (is.null(result)) return(plot)
 
-  # Warn once per session when a label settled for a fallback position
-  # instead of a real, collision-checked placement.
+  # Inform when a label settled for a fallback position instead of a real,
+  # collision-checked placement.
   if (getOption("theme61.autolabel_fallback_msg", default = TRUE)) {
     degraded <- which(!is.na(result$degrade_reason))
     if (length(degraded) > 0) {
       detail <- paste0(sprintf('"%s" (%s)', result$text[degraded], result$degrade_reason[degraded]),
                         collapse = "; ")
       cli::cli_warn(
-        "Auto-positioned {.fn plot_label} text settled for a fallback position instead of the real, collision-checked placement: {detail}. This message appears once per session; to see it again, run {.code options(theme61.autolabel_fallback_msg = TRUE)}."
+        "Auto-positioned {.fn plot_label} text settled for a fallback position instead of the real, collision-checked placement: {detail}. To turn off this message, run {.code options(theme61.autolabel_fallback_msg = FALSE)}."
       )
-      options(theme61.autolabel_fallback_msg = FALSE)
     }
   }
 

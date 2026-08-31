@@ -55,6 +55,19 @@ print.e61_plot <- function(x, ...) {
     }
   }
 
+  # Plots pane render (must include theme61 defaults)
+  x_plot <- finalise_e61_plot(x)
+  x_plot <- maybe_add_default_scales(x_plot)
+  class(x_plot) <- setdiff(class(x_plot), c("e61_map", "e61_plot"))
+
+  # Without this, auto-positioned labels stay at their NA placeholder here
+  # (only the Viewer preview below resolves one) and silently vanish.
+  # width/height are just a rough estimate for this cheap fast placement.
+  # Runs before the Viewer preview below (which suppresses its own
+  # equivalent pass's messages) so theme61.autolabel_fast_msg gets a
+  # chance to actually reach the console.
+  x_plot <- suppressWarnings(t61_apply_autolabel(x_plot, width_cm = 16, height_cm = 12, fast = TRUE))
+
   # Viewer preview (render in background). Auto-positioned plot_label()
   # text without an explicit x/y uses the cheap, render-free fast
   # placement here (see t61_place_label_fast()) rather than the full
@@ -66,16 +79,6 @@ print.e61_plot <- function(x, ...) {
       suppressMessages(save_e61(plot = x, preview = TRUE, format = "svg", auto_scale = auto_scale_preview, fast_labels = TRUE))
       )
   }
-
-  # Plots pane render (must include theme61 defaults)
-  x_plot <- finalise_e61_plot(x)
-  x_plot <- maybe_add_default_scales(x_plot)
-  class(x_plot) <- setdiff(class(x_plot), c("e61_map", "e61_plot"))
-
-  # Without this, auto-positioned labels stay at their NA placeholder here
-  # (only the Viewer preview above resolves one) and silently vanish.
-  # width/height are just a rough estimate for this cheap fast placement.
-  x_plot <- suppressWarnings(t61_apply_autolabel(x_plot, width_cm = 16, height_cm = 12, fast = TRUE))
   print(x_plot)
 
   # print(x_plot) just registered the fast-labelled x_plot as

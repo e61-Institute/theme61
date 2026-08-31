@@ -1,3 +1,26 @@
+#' Gate a message behind a three-state theme61.* option
+#'
+#' `TRUE` shows every time, `FALSE` never shows, and the default (`NA`)
+#' shows at most once every `cooldown_mins` minutes. The last-shown time is
+#' session state kept in `t61_env` (not the option itself), so cooldown mode
+#' survives however many times the caller is invoked.
+#'
+#' @noRd
+t61_should_show_cooldown_msg <- function(opt_name, cooldown_mins = 30) {
+  opt <- getOption(opt_name, default = NA)
+  if (isFALSE(opt)) return(FALSE)
+  if (isTRUE(opt)) return(TRUE)
+
+  key <- paste0(opt_name, "_last_shown")
+  last_shown <- t61_env[[key]]
+  if (!is.null(last_shown) && difftime(Sys.time(), last_shown, units = "mins") < cooldown_mins) {
+    return(FALSE)
+  }
+
+  t61_env[[key]] <- Sys.time()
+  TRUE
+}
+
 #' Set various options in the theme61 package
 #'
 #' To see the list of available options, just run the function in the console
@@ -9,8 +32,8 @@
 #'  \itemize{
 #'    \item \code{theme61.auto_label}: If TRUE (default), \code{plot_label()} text without an explicit `x`/`y` gets automatically positioned by \code{save_e61()} (see \code{?plot_label}). Set to FALSE to turn automatic positioning off entirely and restore the previous behaviour, where \code{x}/\code{y} are always required (\code{plot_label()} errors immediately if you omit them, regardless of \code{auto_position}) -- no auto-positioning work is attempted, so there's no performance cost from the feature at all.
 #'    \item \code{theme61.auto_theme}: If TRUE (default), \code{theme_e61()} is automatically applied whenever you call \code{ggplot()}. Set to FALSE to turn this off and apply your own theme instead.
-#'    \item \code{theme61.autolabel_fallback_msg}: If TRUE (default), the first auto-positioned \code{plot_label()} text that settles for a fallback position -- rather than a real, collision-checked placement -- shows a one-off warning naming the label and the reason (e.g. not yet supported under \code{coord_flip()} with an area/pointbar series, or no good spot was found). Turns itself off after showing once; set back to TRUE to see it again.
-#'    \item \code{theme61.autolabel_fast_msg}: If TRUE (default), the first auto-positioned \code{plot_label()} text shown in the Viewer pane preview (or any \code{save_e61(fast_labels = TRUE)} call) shows a one-off reminder that the preview uses a quick placement heuristic, not the real collision-avoiding search -- labels may overlap there even when \code{save_e61()} would place them cleanly. Turns itself off after showing once; set back to TRUE to see it again.
+#'    \item \code{theme61.autolabel_fallback_msg}: If TRUE (default), every time an auto-positioned \code{plot_label()} text settles for a fallback position -- rather than a real, collision-checked placement -- a message names the label and the reason (e.g. not yet supported under \code{coord_flip()} with an area/pointbar series, or no good spot was found). Set to FALSE to turn it off.
+#'    \item \code{theme61.autolabel_fast_msg}: Controls the reminder that auto-positioned \code{plot_label()} text shown in the Viewer pane preview (or any \code{save_e61(fast_labels = TRUE)} call) uses a quick placement heuristic, not the real collision-avoiding search -- labels may overlap there even when \code{save_e61()} would place them cleanly. By default (unset), it appears at most once every 30 minutes. Set to TRUE to show it every time, or FALSE to turn it off entirely.
 #'    \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
 #'    \item \code{theme61.default_save_format}: The default file save format if format is not specified in [save_e61] and the file extension is not provided in \code{filename}. Unset by default, in which case [save_e61]'s own default (all supported formats: svg, pdf, eps, png, jpg) is used. Set via \code{set_format()} (or this function) to restrict the default(s); clear with \code{unset_format()} to go back to saving every format.
 #'    \item \code{theme61.disable_spellcheck}: If TRUE, [save_e61]'s spell-checker is skipped entirely, regardless of its \code{spell_check} argument. This is FALSE by default.
@@ -19,7 +42,7 @@
 #'    \item \code{theme61.max_discrete_fills}: The maximum number of levels a discrete fill aesthetic can have before automatic fill scale injection errors out instead of applying \code{scale_fill_e61()}. This is 12 by default.
 #'    \item \code{theme61.open_in_browser}: If TRUE, graphs will also open in the browser in addition to the Viewer pane. This is FALSE by default.
 #'    \item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
-#'    \item \code{theme61.sec_axis_msg}: If TRUE (default), [sec_rescale_inv] shows a one-off reminder that rescaled secondary axis changes need the graph code run twice to take effect. Turns itself off after showing once; set back to TRUE to see it again.
+#'    \item \code{theme61.sec_axis_msg}: Controls the reminder from [sec_rescale_inv] that rescaled secondary axis changes need the graph code run twice to take effect. By default (unset), it appears at most once every 30 minutes. Set to TRUE to show it every time, or FALSE to turn it off entirely.
 #'  }
 #'
 #' @section Environment variables: A few behaviours run once, when theme61 is

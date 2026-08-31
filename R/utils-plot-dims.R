@@ -64,3 +64,15 @@ get_grob_height <- function(ggplotGrob, grob_name){
 
   get_grob_dim(grob, "height")
 }
+
+#' Get a ggplotGrob's outer plot.margin along the given dimension - this is
+#' always the first and last row (height) or column (width) of the gtable.
+#' dim - "width" or "height".
+#' @noRd
+get_margin_dim <- function(ggplotGrob, dim){
+
+  convert <- if(dim == "width") grid::convertWidth else grid::convertHeight
+  vec <- if(dim == "width") ggplotGrob$widths else ggplotGrob$heights
+
+  sum(convert(vec[c(1, length(vec))], "cm", valueOnly = TRUE))
+}

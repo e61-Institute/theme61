@@ -64,18 +64,18 @@ save_multi <-
     chart_width_pad <- points_to_mm(5.5) + pad_width * 10 # Convert width padding back to mm for now
     chart_height_pad <- points_to_mm(5.5) + pad_height * 10
 
-    # outer_width/outer_height override the margin at the outer edge of the
-    # whole figure (as opposed to pad_width/pad_height, which only add space
-    # *between* panels). NULL (the default) keeps the built-in margin, which
-    # is 0 - tested against every sample-graphs/label_wrapping stress case
-    # (long titles/subtitles/footnotes, all panel layouts) with no clipping.
-    # Kept in both mm (for the per-panel plot.margin, which is set in mm) and
-    # points (for the title/subtitle/caption plot_annotation margins below,
-    # which - like the rest of ggplot2 - are in points) so neither needs a
-    # unit conversion at the point of use.
-    outer_height_mm <- if (is.null(outer_height)) 1 else outer_height
-    outer_height_pt <- if (is.null(outer_height)) mm_to_points(1) else mm_to_points(outer_height)
-    outer_width_mm <- if (is.null(outer_width)) 1 else outer_width
+    # outer_width/outer_height override the whole figure's outer margin
+    # (pad_width/pad_height only add space *between* panels). Default keeps
+    # the top small (~1px) and the bottom a bit larger for clipping safety -
+    # both are vjust-centred content with real overhang risk. The sides are
+    # plain left/right-aligned axis text with no such overhang, so they
+    # default to 0. An explicit outer_height/outer_width still applies
+    # symmetrically to both sides of that dimension.
+    outer_top_mm <- if (is.null(outer_height)) points_to_mm(0.75) else outer_height
+    outer_top_pt <- if (is.null(outer_height)) 0.75 else mm_to_points(outer_height)
+    outer_bottom_mm <- if (is.null(outer_height)) points_to_mm(4) else outer_height
+    outer_bottom_pt <- if (is.null(outer_height)) 4 else mm_to_points(outer_height)
+    outer_width_mm <- if (is.null(outer_width)) 0 else outer_width
 
     # Format each plot in the plotlist and get dimensions ----------------------------------------
 
@@ -203,8 +203,16 @@ save_multi <-
     panel_width <- free_wd / ncol # width of each panel
     panel_height <- panel_width * max_panel_asps # height of the tallest panel (width * aspect ratio)
 
-    base_margin_h <- outer_height_mm
+    base_margin_top <- outer_top_mm
+    base_margin_bottom <- outer_bottom_mm
     base_margin_w <- outer_width_mm
+
+    # With no title/subtitle, base_margin_top sits right above the panel's
+    # own top axis label, which overhangs by about half its line height.
+    if (is.null(title) && is.null(subtitle)) {
+      min_margin_mm <- get_text_height(text = "0", font_size = base_size * 0.9) / 2 * 10
+      base_margin_top <- max(base_margin_top, min_margin_mm)
+    }
 
     # calc nrow so the per-panel margin - and therefore known_height, measured
     # from each panel's own rendered grob below - reflects the margin the panel
@@ -224,14 +232,9 @@ save_multi <-
 
         temp_plot <- clean_plotlist[[i]]
 
-        # update labels - the wrap limit is this panel's share of width and
-        # axes. Deliberately excludes chart_width_pad: that margin isn't
-        # available to this panel's own text (it's outside the panel's
-        # rendered cell). 0.9 buffer matches internal_width below - text
-        # width is measured on a throwaway device that doesn't necessarily
-        # use the exact font metrics of the final render, so wrapping against
-        # the full available width leaves no room for that mismatch and can
-        # let a panel's own title/subtitle bleed into the next panel.
+        # Wrap limit is this panel's share of width+axes (chart_width_pad is
+        # excluded - it sits outside the panel's own cell). 0.9 buffer covers
+        # font-metric mismatch between the measuring device and final render.
         temp_plot <- update_labs(temp_plot, 0.9 * (panel_width + known_width / ncol))
 
         # update any plot label sizes
@@ -243,8 +246,8 @@ save_multi <-
         row_i <- ceiling(i / ncol)
         col_i <- ((i - 1) %% ncol) + 1
 
-        top_i <- if (row_i == 1) base_margin_h else chart_height_pad
-        bottom_i <- if (row_i == nrow) base_margin_h else chart_height_pad
+        top_i <- if (row_i == 1) base_margin_top else chart_height_pad
+        bottom_i <- if (row_i == nrow) base_margin_bottom else chart_height_pad
         left_i <- if (col_i == 1) base_margin_w else chart_width_pad
         right_i <- if (col_i == ncol) base_margin_w else chart_width_pad
 
@@ -263,17 +266,9 @@ save_multi <-
       }
     }
 
-    # Auto-position eligible plot_label() text on each panel now that its
-    # final size within the grid is known (every panel shares the same
-    # panel_width/panel_height and aggregated axis/title overhead). Uses
-    # the smaller, uniform margin the combined chart actually renders with
-    # (not theme_e61()'s larger per-panel default), since positioning
-    # against the wrong margin could place a label on real content once
-    # the real panel renders.
-    #
-    # panel_total_width/height reconstruct each panel's total footprint
-    # (panel + axis + margin) from the same pieces tot_width/ncol and
-    # (p_h)/nrow use further below -- those aren't available yet here.
+    # Position plot_label() against the panel's final shared size and the
+    # smaller margin it actually renders with, not theme_e61()'s larger
+    # per-panel default - the wrong margin risks placing a label on real content.
     panel_total_width  <- panel_width + max_left_axis_width + max_right_axis_width + 2 * chart_width_pad / 10
     panel_total_height <- panel_height + known_height + 2 * chart_height_pad / 10
 
@@ -291,8 +286,8 @@ save_multi <-
       row_i <- ceiling(i / ncol)
       col_i <- ((i - 1) %% ncol) + 1
 
-      top_i <- if (row_i == 1) base_margin_h else chart_height_pad
-      bottom_i <- if (row_i == nrow) base_margin_h else chart_height_pad
+      top_i <- if (row_i == 1) base_margin_top else chart_height_pad
+      bottom_i <- if (row_i == nrow) base_margin_bottom else chart_height_pad
       left_i <- if (col_i == 1) base_margin_w else chart_width_pad
       right_i <- if (col_i == ncol) base_margin_w else chart_width_pad
 
@@ -311,16 +306,12 @@ save_multi <-
         nrow = nrow
       )
 
-    # Update width/height to take into account margins actually applied
-    # above: chart_width_pad/chart_height_pad only on the interior edges
-    # between panels ((ncol - 1) column gaps, (nrow - 1) row gaps), plus the
-    # baseline margin on the outer edges of the grid.
+    # Add back the margins applied above: interior gaps between panels,
+    # plus the outer edge margin.
     tot_width_pad <- (2 * base_margin_w + (ncol - 1) * 2 * chart_width_pad) / 10
-    tot_height_pad <- (2 * base_margin_h + (nrow - 1) * 2 * chart_height_pad) / 10
+    tot_height_pad <- (base_margin_top + base_margin_bottom + (nrow - 1) * 2 * chart_height_pad) / 10
 
-    # Interior width available to the title/subtitle/caption text: total
-    # width minus the (baseline-only) outer margins, since those aren't
-    # usable content space either.
+    # Title/subtitle/caption text gets the total width minus the outer margins.
     tot_width <- width + tot_width_pad
     # 0.9 buffer keeps title/subtitle/caption text clear of the panel axes
     internal_width <- 0.9 * (tot_width - 2 * base_margin_w / 10)
@@ -341,6 +332,13 @@ save_multi <-
     title_subtitle_spacing <- 5.5
     subtitle_charts_spacing <- 11
     caption_spacing <- 16.5
+
+    # patchwork's annotation rows default to a hardcoded 5.5pt margin unless
+    # overridden - assert ours even with no title/subtitle/caption.
+    multi_plot <- multi_plot +
+      patchwork::plot_annotation(theme = theme(
+        plot.margin = margin(t = outer_top_pt, r = 0, b = outer_bottom_pt, l = 0)
+      ))
 
     # title
     if(!is.null(title)){
@@ -367,13 +365,10 @@ save_multi <-
               family = theme61_settings$text$family,
               hjust = 0,
               vjust = 0.5,
-              margin = margin(t = 5.5, b = title_subtitle_spacing, l = 0, r = 0)
+              margin = margin(t = 0, b = title_subtitle_spacing, l = 0, r = 0)
             ),
-            # patchwork sizes this row with a throwaway ggplot using its own
-            # default plot.margin, adding columns outside where the text is
-            # placed. Zero out l/r (keeping t/b, used by the height
-            # calculations below) so the text can use the full internal_width.
-            plot.margin = margin(t = outer_height_pt, r = 0, b = outer_height_pt, l = 0)
+            # Zero out l/r so the text can use the full internal_width.
+            plot.margin = margin(t = outer_top_pt, r = 0, b = outer_bottom_pt, l = 0)
           )
         )
     }
@@ -404,7 +399,7 @@ save_multi <-
               vjust = 0.5,
               margin = margin(t = 0, b = subtitle_charts_spacing, l = 0, r = 0)
             ),
-            plot.margin = margin(t = outer_height_pt, r = 0, b = outer_height_pt, l = 0)
+            plot.margin = margin(t = outer_top_pt, r = 0, b = outer_bottom_pt, l = 0)
           )
         )
     }
@@ -442,7 +437,7 @@ save_multi <-
               vjust = 0.5,
               margin = margin(b = 5.5, t = caption_spacing, l = 0, r = 0)
             ),
-            plot.margin = margin(t = outer_height_pt, r = 0, b = outer_height_pt, l = 0)
+            plot.margin = margin(t = outer_top_pt, r = 0, b = outer_bottom_pt, l = 0)
           )
         )
     }
@@ -457,23 +452,30 @@ save_multi <-
       height <- (known_height + panel_height) * nrow
     }
 
-    # Space for title if required - size of text, plus a buffer based on the margin added above
+    # Space for title if required. 0.1cm fudges real vs estimated text-height
+    # variance - kept fixed, independent of outer_top_mm.
     if(!is.null(title)){
-      t_h <- get_text_height(text = title, font_size = title_text_size) + points_to_mm(title_subtitle_spacing) / 10 + outer_height_mm / 10
+      t_h <- get_text_height(text = title, font_size = title_text_size) +
+        points_to_mm(title_subtitle_spacing) / 10 +
+        0.1
     } else {
       t_h <- 0
     }
 
-    # Space for subtitle if required - size of text, plus a buffer based on the margin added above
+    # Space for subtitle if required
     if(!is.null(subtitle)){
-      s_h <- get_text_height(text = subtitle, font_size = subtitle_text_size) + points_to_mm(subtitle_charts_spacing) / 10
+      s_h <- get_text_height(text = subtitle, font_size = subtitle_text_size) +
+        points_to_mm(subtitle_charts_spacing) / 10 +
+        0.1
     } else {
       s_h <- 0
     }
 
     # Adjust the footer height depending on how much text there is
     if(!is.null(caption)){
-      f_h <- get_text_height(text = caption, font_size = footer_text_size) + points_to_mm(caption_spacing) / 10 + outer_height_mm / 10
+      f_h <- get_text_height(text = caption, font_size = footer_text_size) +
+        points_to_mm(caption_spacing) / 10 + points_to_mm(5.5) / 10 +
+        outer_bottom_mm / 10
     } else {
       f_h <- 0
     }
