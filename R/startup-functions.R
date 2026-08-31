@@ -68,11 +68,21 @@ check_pkg_ver <- function(test = FALSE) {
 
 }
 
-#' Register the bundled PT Sans font with sysfonts/showtext
+#' Register the bundled PT Sans font with sysfonts/showtext and systemfonts
 #'
 #' Registers from the ttf files shipped in inst/extdata/fonts/pt-sans
 #' (SIL OFL license) instead of downloading from Google Fonts, so it can't
 #' fail from being offline or rate-limited.
+#'
+#' Registered with both sysfonts (for showtext, which does the actual
+#' on-screen/on-device rendering) and systemfonts (which is what svglite
+#' consults for glyph metrics in get_text_width()/get_text_height()'s
+#' title-wrapping calculations). Without the systemfonts registration,
+#' "pt-sans" isn't a real installed font name on most systems, so metric
+#' lookups silently fall back to whatever font that name happens to
+#' resolve to there -- a different, usually wider or narrower, substitute
+#' on each OS -- which is why title wrapping used to look fine on one
+#' machine and too conservative on another.
 #' @noRd
 .t61_init_fonts <- function() {
   # Hard opt-out (e.g. don't want showtext enabled for this session at all)
@@ -85,14 +95,30 @@ check_pkg_ver <- function(test = FALSE) {
     return(invisible(NULL))
   }
 
-  # Already registered (e.g. a previous library(theme61) call this session)
+  font_dir <- system.file("extdata", "fonts", "pt-sans", package = "theme61")
+
+  # Idempotent regardless of prior registration state, so this always runs
+  # (cheap either way) rather than needing an "already done" check.
+  if (requireNamespace("systemfonts", quietly = TRUE)) {
+    try(
+      systemfonts::register_font(
+        name = "pt-sans",
+        plain = file.path(font_dir, "PTSans-Regular.ttf"),
+        bold = file.path(font_dir, "PTSans-Bold.ttf"),
+        italic = file.path(font_dir, "PTSans-Italic.ttf"),
+        bolditalic = file.path(font_dir, "PTSans-BoldItalic.ttf")
+      ),
+      silent = TRUE
+    )
+  }
+
+  # Already registered with sysfonts (e.g. a previous library(theme61) call
+  # this session)
   fams <- try(sysfonts::font_families(), silent = TRUE)
   if (!inherits(fams, "try-error") && "pt-sans" %in% fams) {
     try(showtext::showtext_auto(), silent = TRUE)
     return(invisible(NULL))
   }
-
-  font_dir <- system.file("extdata", "fonts", "pt-sans", package = "theme61")
 
   # Never allow font registration to abort startup
   tryCatch(
