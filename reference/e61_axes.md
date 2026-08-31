@@ -114,6 +114,11 @@ scale_x_continuous_e61(
       [`guides()`](https://ggplot2.tidyverse.org/reference/guides.html)
       for more information.
 
+  `position`
+
+  :   For position scales, The position of the axis. `left` or `right`
+      for y axes, `top` or `bottom` for x axes.
+
 - expand_left, expand_right:
 
   Numeric. Add extra space between data points and the left/right of the

@@ -60,6 +60,7 @@ ggplot2 object
 ## Examples
 
 ``` r
+
 graph_data <- data.frame(
   state = c("AUS", "ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"),
   value = runif(9)

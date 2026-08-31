@@ -1,10 +1,6 @@
-# e61 themed spatial maps options
+# e61 theme for spatial maps
 
-Applies the e61 theme to ggplot spatial maps to adjust graph appearance.
-If you are looking to change the appearance of titles or labels, check
-the arguments in
-[`labs_e61()`](https://e61-institute.github.io/theme61/reference/labs_e61.md),
-which are probably what you are looking for.
+**\[deprecated\]**
 
 ## Usage
 
@@ -14,7 +10,10 @@ theme_e61_spatial(
   legend_position = NULL,
   legend_title = FALSE,
   base_family = "pt-sans",
-  aspect_ratio = NULL
+  aspect_ratio = NULL,
+  background = "white",
+  base_line_size = points_to_mm(0.75),
+  base_rect_size = points_to_mm(1)
 )
 ```
 
@@ -41,29 +40,23 @@ theme_e61_spatial(
 
   Numeric. Sets the aspect ratio of the graph panel.
 
-## Value
+- background:
 
-`theme_e61_spatial` returns a ggplot2 object.
+  Character. Default is "white". For all graphs that you save, you
+  should control the background colour using the `bg_colour` argument in
+  `save_e61`, not here.
 
-## See also
+- base_line_size:
 
-Other map functions:
-[`add_map_e61()`](https://e61-institute.github.io/theme61/reference/add_map_e61.md),
-[`crop_aus_coord()`](https://e61-institute.github.io/theme61/reference/crop_aus_coord.md),
-[`setup_stadia_maps()`](https://e61-institute.github.io/theme61/reference/setup_stadia_maps.md)
+  Numeric. Default line width.
 
-## Examples
+- base_rect_size:
 
-``` r
-if (FALSE) { # \dontrun{
-library(sf)
+  Numeric. Default rect width.
 
-sa3_shp <- strayr::read_absmap("sa32016")
+## Details
 
-sydney_map <- filter(sa3_shp, gcc_code_2016 == "1GSYD")
-
-ggplot(data = sydney_map) +
-  geom_sf(aes(fill = sa3_code_2016), colour = "black") +
-  theme_e61_spatial()
-} # }
-```
+Map-specific axis/gridline styling is now applied automatically on
+save/print based on whether a plot contains a spatial layer - use
+[`theme_e61()`](https://e61-institute.github.io/theme61/reference/theme_e61.md)
+for both regular and spatial plots.

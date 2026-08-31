@@ -16,8 +16,7 @@ crop_aus_coord()
 
 Other map functions:
 [`add_map_e61()`](https://e61-institute.github.io/theme61/reference/add_map_e61.md),
-[`setup_stadia_maps()`](https://e61-institute.github.io/theme61/reference/setup_stadia_maps.md),
-[`theme_e61_spatial()`](https://e61-institute.github.io/theme61/reference/theme_e61_spatial.md)
+[`setup_stadia_maps()`](https://e61-institute.github.io/theme61/reference/setup_stadia_maps.md)
 
 ## Examples
 

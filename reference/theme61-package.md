@@ -19,6 +19,8 @@ Useful links:
 
 Authors:
 
+- Aaron Wong <aaron.wong@e61.in>
+
 - Elyse Dwyer <elyse.dwyer@e61.in>
 
 - Jack Buckley <jack.buckley@e61.in>

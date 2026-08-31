@@ -42,18 +42,15 @@ A ggmap object
 
 Other map functions:
 [`crop_aus_coord()`](https://e61-institute.github.io/theme61/reference/crop_aus_coord.md),
-[`setup_stadia_maps()`](https://e61-institute.github.io/theme61/reference/setup_stadia_maps.md),
-[`theme_e61_spatial()`](https://e61-institute.github.io/theme61/reference/theme_e61_spatial.md)
+[`setup_stadia_maps()`](https://e61-institute.github.io/theme61/reference/setup_stadia_maps.md)
 
 ## Examples
 
 ``` r
+if (FALSE) { # \dontrun{
 library(sf)
-#> Error in library(sf): there is no package called ‘sf’
 sa3 <- strayr::read_absmap("sa32021")
-#> Error in loadNamespace(x): there is no package called ‘strayr’
 sa3 <- sa3[sa3$gcc_code_2021 == "1GSYD", ] # let's just look at Sydney
-#> Error: object 'sa3' not found
 
  ggplot(sa3) +
  add_map_e61(bbox = c(
@@ -64,5 +61,5 @@ sa3 <- sa3[sa3$gcc_code_2021 == "1GSYD", ] # let's just look at Sydney
    ) +
  geom_point(aes(x = cent_long, y = cent_lat)) + #plot points
  theme_e61_spatial()
-#> Error: object 'sa3' not found
+} # }
 ```

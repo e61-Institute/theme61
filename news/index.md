@@ -1,5 +1,61 @@
 # Changelog
 
+## theme61 0.8.0
+
+##### New and changed features
+
+- Automatic plot labelling!
+  [`plot_label()`](https://e61-institute.github.io/theme61/reference/plot_label.md)
+  now has an algorithm that attempts to automatically position plot
+  labels in sensible locations for most common geom types. See the
+  documentation for more information:
+  [plot_label()](https://e61-institute.github.io/theme61/reference/plot_label.html)
+  or `?plot_label()`.
+- New function to set session-wide options for the package:
+  [`set_t61_options()`](https://e61-institute.github.io/theme61/reference/set_t61_options.md).
+  This allows you to alter various functionality in theme61, see the
+  documentation for the options
+  ([set_t61_options()](https://e61-institute.github.io/theme61/reference/set_t61_options.html)
+  or `?set_t61_options()`). Some of the key new options include:
+  `theme61.auto_theme` controls whether
+  [`ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html)
+  automatically applies
+  [`theme_e61()`](https://e61-institute.github.io/theme61/reference/theme_e61.md);
+  and `theme61.iterate_mode`, which skips all of theme61’s automatic
+  styling and rendering, printing graphs with plain ggplot2 defaults.
+- Multi-panel graphs can be returned as a plot object using a new
+  `return_plot_obj` argument to
+  [`save_e61()`](https://e61-institute.github.io/theme61/reference/save_e61.md).
+  This is useful for printing in the Plots pane, or for use in a Shiny
+  app.
+- Added a `build_up` argument to
+  [`save_e61()`](https://e61-institute.github.io/theme61/reference/save_e61.md)
+  for single-panel graphs. When `TRUE`, saves a sequence of files
+  (`filename_1`, `filename_2`, …, `filename_N`) that each reveal one
+  more category/series/stack than the last, for stepping a chart across
+  several PowerPoint slides.
+- The arguments available in
+  [`save_e61()`](https://e61-institute.github.io/theme61/reference/save_e61.md)
+  became increasingly cluttered and complicated as new features were
+  added. So ~30 top-level arguments have now been grouped into four
+  named lists to make it easier to use.
+- Y-axis text now defaults to left-aligned when the y-axis is
+  categorical (e.g. horizontal bar charts), instead of hugging the axis
+  line, so it lines up with the left-aligned plot title/subtitle/y-axis
+  title.
+- Use the new theme61 Claude skill for assistance in making graphs,
+  `e61_chart_maker()` has been removed.
+
+##### Performance improvements and bug fixes
+
+- Graphs should save faster thanks to internal improvements to
+  save_e61().
+- Fixed an issue where `labs_e61` would leave whitespace above subtitles
+  and y-axis titles when a plot had a subtitle but no title.
+- Improvements to margins, text wrapping, whitespace and text
+  overlap/clipping issues.
+- Fixed issue with PDFs not rendering as previews in Viewer.
+
 ## theme61 0.7.1
 
 09 Jan 2026
@@ -34,6 +90,10 @@
   graphs.
 - Fix issue with facet panel spacing when axes do not appear on all
   panels.
+- Fix error when using a transformed y-axis
+  (e.g. `scale_y_continuous(trans = "log10")`), where the automatic
+  aesthetic scaling would replace the transformed scale and compare its
+  limits against the untransformed data.
 
 ## theme61 0.7.0
 

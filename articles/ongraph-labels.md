@@ -43,6 +43,7 @@ ordered factor, and calling the label names using
 `levels(data$col_name)`.
 
 ``` r
+
 # Mock data
 graph_data <- CJ(
   x = 2000:2020,
@@ -79,6 +80,7 @@ default unless you use the `panel` argument to specify which panels you
 want the labels to appear on.
 
 ``` r
+
 data <- data.frame(
   x = rep(c(1, 2), 2),
   y = rep(c(1, 2), 2),
@@ -109,6 +111,7 @@ vector of panels in `panel` with which facet you want each label to
 appear in.
 
 ``` r
+
 p2 <- ggplot(data, aes(x, y, colour = group)) +
   facet_wrap(~f_var) +
   geom_point() +
@@ -135,6 +138,7 @@ could use `geom_text_repel()` to add appropriately coloured text labels
 for each colour/fill aesthetic.
 
 ``` r
+
 # Mock data
 graph_data <- CJ(
   year = 2000:2020,

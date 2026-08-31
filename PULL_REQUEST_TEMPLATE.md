@@ -27,7 +27,7 @@ I have ensured the `_pkgdown.yml` file is correctly built by running
 [`pkgdown::check_pkgdown()`](https://pkgdown.r-lib.org/reference/check_pkgdown.html).
 
 I have run
-[`devtools::build_readme()`](https://devtools.r-lib.org/reference/build_rmd.html)
+[`devtools::build_readme()`](https://devtools.r-lib.org/reference/build_readme.html)
 to update `README.md`.
 
 I have updated the package website with

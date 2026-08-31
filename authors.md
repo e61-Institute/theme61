@@ -11,16 +11,16 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/e61-institute/theme61/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/e61-institute/theme61/blob/v0.8.0/DESCRIPTION)
 
 Wong A, Dwyer E, Buckley J (2026). *theme61: Create Graphs in the e61
-Institute Style*. R package version 0.7.1,
+Institute Style*. R package version 0.8.0,
 <https://github.com/e61-institute/theme61>.
 
     @Manual{,
       title = {theme61: Create Graphs in the e61 Institute Style},
       author = {Aaron Wong and Elyse Dwyer and Jack Buckley},
       year = {2026},
-      note = {R package version 0.7.1},
+      note = {R package version 0.8.0},
       url = {https://github.com/e61-institute/theme61},
     }

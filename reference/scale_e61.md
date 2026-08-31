@@ -87,6 +87,7 @@ ggplot2 object
 ## Examples
 
 ``` r
+
 ggplot(data = mtcars, aes(x = wt, y = mpg, col = factor(cyl))) +
    geom_point() +
    scale_colour_e61() +

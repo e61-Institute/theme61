@@ -1,8 +1,7 @@
 # Save graphs with theme61 styles and defaults
 
-Saves ggplot2 graphs made with using theme61. Using `save_e61()` is
-required to ensure graphs are consistent with the e61 style and
-formatting.
+Saves ggplot2 graphs made using theme61. Using `save_e61()` is required
+to ensure graphs are consistent with the e61 style and formatting.
 
 ## Usage
 
@@ -11,31 +10,43 @@ save_e61(
   filename = NULL,
   ...,
   plot = last_plot(),
+  plotlist = NULL,
+  labs = list(title = NULL, subtitle = NULL, footnotes = NULL, sources = NULL),
+  layout = list(ncol = 2, nrow = NULL, align = "v", axis = "none"),
+  spacing = list(pad_width = 0, pad_height = 0, outer_width = NULL, outer_height = NULL,
+    height_adj = NULL, rel_heights = NULL, title = 1, subtitle = 1),
+  dim = list(height = NULL, width = NULL),
   format = c("svg", "pdf", "eps", "png", "jpg"),
   chart_type = NULL,
   auto_scale = TRUE,
-  dim = list(height = NULL, width = NULL),
-  pad_width = 0,
   max_height = NULL,
-  preview = FALSE,
   save_data = FALSE,
   print_info = FALSE,
+  print_label_positions = FALSE,
+  fast_labels = FALSE,
   spell_check = TRUE,
+  preview = FALSE,
   base_size = 10,
   res = 1,
   bg_colour = "white",
-  plotlist = NULL,
-  title = NULL,
-  subtitle = NULL,
-  footnotes = NULL,
-  sources = NULL,
-  spacing_adj = list(title = 1, subtitle = 1),
-  height_adj = NULL,
-  ncol = 2,
-  nrow = NULL,
-  align = c("v", "none", "h", "hv"),
-  axis = c("none", "l", "r", "t", "b", "lr", "tb", "tblr"),
-  rel_heights = NULL
+  build_up = FALSE,
+  build_up_n = NULL,
+  return_plot_obj = FALSE,
+  title = lifecycle::deprecated(),
+  subtitle = lifecycle::deprecated(),
+  footnotes = lifecycle::deprecated(),
+  sources = lifecycle::deprecated(),
+  ncol = lifecycle::deprecated(),
+  nrow = lifecycle::deprecated(),
+  align = lifecycle::deprecated(),
+  axis = lifecycle::deprecated(),
+  pad_width = lifecycle::deprecated(),
+  pad_height = lifecycle::deprecated(),
+  outer_width = lifecycle::deprecated(),
+  outer_height = lifecycle::deprecated(),
+  height_adj = lifecycle::deprecated(),
+  rel_heights = lifecycle::deprecated(),
+  spacing_adj = lifecycle::deprecated()
 )
 ```
 
@@ -57,6 +68,66 @@ save_e61(
   (single-panel specific) Name of the plot object to save. Defaults to
   the last plot displayed so usually you do not need to provide this
   argument explicitly.
+
+- plotlist:
+
+  (multi-panel specific) List of plots to combine as an multi-panel and
+  save. You can also enter the charts individually as arguments to the
+  function.
+
+- labs:
+
+  (multi-panel specific) A named list specifying the shared `title`,
+  `subtitle`, `footnotes` and `sources` to place around the multi-panel
+  figure. Defaults to `NULL` for each.
+
+- layout:
+
+  (multi-panel specific) A named list specifying the panel grid: `ncol`,
+  `nrow`, `align` and `axis`. See
+  [`patchwork::plot_layout()`](https://patchwork.data-imaginist.com/reference/plot_layout.html)
+  for what `align` and `axis` do. Defaults to
+  `list(ncol = 2, nrow = NULL, align = "v", axis = "none")`.
+
+- spacing:
+
+  (multi-panel specific) A named list controlling whitespace and
+  relative sizing:
+
+  - `pad_width`, `pad_height`: Numeric (mm). Adds horizontal/vertical
+    whitespace to the sides of all graphs. If saving multiple charts
+    this will add the same spacing to all charts. Defaults to no
+    additional padding.
+
+  - `outer_width`: Numeric (mm). Overrides the margin between the
+    left/right edges of the figure and the outermost panels. Defaults to
+    NULL, which uses the built-in margin (0mm). Set higher to add
+    whitespace around the outer edge of the figure; unlike `pad_width`,
+    this does not affect the gap between panels.
+
+  - `outer_height`: Numeric (mm). Overrides the margin between the
+    top/bottom edges of the figure (i.e. above the title and below the
+    footnotes/sources) and the panels. Defaults to NULL, which uses the
+    built-in margin (0mm). Set higher to add whitespace around the outer
+    edge of the figure; unlike `pad_height`, this does not affect the
+    gap between panel rows.
+
+  - `height_adj`: Rescales the height of the multi-panel. The function
+    sets sensible defaults but this provides you with manual control if
+    you need it.
+
+  - `rel_heights`: A numeric vector giving the relative proportions of
+    each graph component (title, plots, footer).
+
+  - `title`, `subtitle`: Rescales the size of the space given to the
+    multi-panel title/subtitle. Use if you think the title looks too
+    cramped on the chart. Both default to 1.
+
+- dim:
+
+  An optional named list specifying the plot height and width. Defaults
+  to NULL which means the graph dimensions will be calculated
+  automatically.
 
 - format:
 
@@ -86,28 +157,12 @@ save_e61(
 
   Logical. Scale the y-axis automatically. Default is TRUE.
 
-- dim:
-
-  An optional named list specifying the plot height and width. Defaults
-  to NULL which means the graph dimensions will be calculated
-  automatically.
-
-- pad_width:
-
-  Numeric. Add horizontal whitespace to the sides of the graph. Defaults
-  to no additional padding.
-
 - max_height:
 
   Numeric. The maximum height of your plot in cm. This is used to
   constrain the plot resizing algorithm in cases where you want to limit
   the height of your charts. Defaults to NULL which does not restrict
   the height.
-
-- preview:
-
-  Logical. Set to TRUE to show a preview of the graph in the Viewer pane
-  but not save to disk. Defaults to FALSE.
 
 - save_data:
 
@@ -120,10 +175,40 @@ save_e61(
   Logical. Set to TRUE if you want graph dimensions and other
   information printed to the console. Defaults to FALSE.
 
+- print_label_positions:
+
+  (single-panel specific) Logical. Set to TRUE to print the final
+  `label`/`x`/`y` of any auto-positioned
+  [`plot_label()`](https://e61-institute.github.io/theme61/reference/plot_label.md)
+  text to the console as copy-pasteable arguments, so you can pin the
+  chosen positions (or hand-tweak just one or two) instead of leaving
+  them to auto-position again next time. Defaults to FALSE.
+
+- fast_labels:
+
+  (single-panel specific) Logical. Set to TRUE to skip the
+  auto-positioning search for any
+  [`plot_label()`](https://e61-institute.github.io/theme61/reference/plot_label.md)
+  without an explicit `x`/`y` and use a cheap, render-free approximate
+  position instead (near the label's own series, not collision-checked
+  against other content). Much faster, at the cost of placement quality
+  – intended for quick previews while iterating, not the version you'd
+  actually publish. Explicit `x`/`y` positions are unaffected either
+  way. Defaults to FALSE.
+
 - spell_check:
 
   Logical. Check spelling of words in the title and caption. Defaults to
-  TRUE. Set to FALSE to turn off.
+  TRUE. Set to FALSE to turn off, or set the
+  `theme61.disable_spellcheck` option to skip it session-wide (see
+  [set_t61_options](https://e61-institute.github.io/theme61/reference/set_t61_options.md)).
+  Words listed in `inst/extdata/custom_dictionary.txt` are skipped - add
+  words to that file if they should not be flagged.
+
+- preview:
+
+  Logical. Set to TRUE to show a preview of the graph in the Viewer pane
+  but not save to disk. Defaults to FALSE.
 
 - base_size:
 
@@ -140,71 +225,42 @@ save_e61(
   theme61 colour object name. Defaults to "white". For graphs used in
   research note boxes, set the colour to `e61_boxback`.
 
-- plotlist:
+- build_up:
 
-  (multi-panel specific) List of plots to combine as an multi-panel and
-  save. You can also enter the charts individually as arguments to the
-  function.
+  (single-panel specific) Logical. Save a sequence of files that each
+  reveal one more category/series than the last, with a `_1`, `_2`, ...,
+  `_N` suffix added to `filename`. See Details. Defaults to FALSE.
 
-- title:
+- build_up_n:
 
-  The text for the title.
+  (single-panel specific) Numeric. Only used by `build_up` for a single,
+  ungrouped line or area series, where there's no existing category to
+  step through and the x-axis instead needs to be divided into steps.
+  Defaults to the number of unique x-values, capped at 10.
 
-- subtitle:
+- return_plot_obj:
 
-  The text for the subtitle.
+  (multi-panel specific) Logical. If TRUE, skips saving entirely and
+  returns the composed multi-panel plot object instead (e.g. to print it
+  in the Plots pane, or use it in a Shiny app). Only supported for
+  multi-panel graphs - for a single plot, just print the ggplot object
+  directly. Defaults to FALSE. Note that the returned object's layout
+  (text sizes, panel spacing) is computed for a fixed target size
+  (`dim`, or the same defaults `save_e61` would otherwise use) - it
+  won't reflow if you resize the device afterwards.
 
-- footnotes:
+- title, subtitle, footnotes, sources:
 
-  A vector of footnote text strings. Each new string will be prepended
-  with \*, \*\*, \*\*\*, etc. Note you'll need to include the asterisks
-  in the title/subtitle yourself. Please be sensible with the number of
-  separate points you include in the graph.
+  **\[deprecated\]** Use `labs` instead.
 
-- sources:
+- ncol, nrow, align, axis:
 
-  String vector providing the names of sources for the graph.
+  **\[deprecated\]** Use `layout` instead.
 
-- spacing_adj:
+- pad_width, pad_height, outer_width, outer_height, height_adj,
+  rel_heights, spacing_adj:
 
-  (multi-panel specific) A named list specifying the adjustment to the
-  title and subtitle. Rescales the size of the space given to the
-  multi-panel title/subtitle. Use if you think the title looks too
-  cramped on the chart.
-
-- height_adj:
-
-  (multi-panel specific) Rescales the height of the multi-panel. The
-  function sets sensible defaults but this provides you with manual
-  control if you need it.
-
-- ncol:
-
-  (optional) Number of columns in the plot grid.
-
-- nrow:
-
-  (optional) Number of rows in the plot grid.
-
-- align:
-
-  (optional) Specifies whether graphs in the grid should be horizontally
-  ("h") or vertically ("v") aligned. Options are "none" (default), "hv"
-  (align in both directions), "h", and "v".
-
-- axis:
-
-  (optional) Specifies whether graphs should be aligned by the left
-  ("l"), right ("r"), top ("t"), or bottom ("b") margins. Options are
-  "none" (default), or a string of any combination of l, r, t, and b in
-  any order (e.g. "tblr" or "rlbt" for aligning all margins). Must be
-  specified if any of the graphs are complex (e.g. faceted) and
-  alignment is specified and desired. See `align_plots()` for details.
-
-- rel_heights:
-
-  (multi-panel specific) A numeric vector giving the relative
-  proportions of each graph component (title, plots, footer).
+  **\[deprecated\]** Use `spacing` instead.
 
 ## Value
 
@@ -216,3 +272,35 @@ Use PDF in all notes and SVG in PowerPoint presentations. PDFs and SVGs
 are better as they are modern vector graphics file formats which can be
 scaled up and down in size without blurring or becoming pixelated. PNG
 should only be used when required for compatibility reasons.
+
+`build_up = TRUE` saves a sequence of files (`filename_1`, `filename_2`,
+..., `filename_N`) that each reveal one more category/series than the
+last, for stepping a chart across several PowerPoint slides. Categories
+not yet revealed are blanked (zeroed, or set to missing) rather than
+removed from the data, so the axes, scales and dimensions are identical
+across every step. Supported chart types:
+
+- bar/column charts
+  ([`geom_col()`](https://ggplot2.tidyverse.org/reference/geom_bar.html)/[`geom_bar()`](https://ggplot2.tidyverse.org/reference/geom_bar.html)):
+  reveals the x-axis categories left to right;
+
+- stacked area/ribbon charts
+  ([`geom_area()`](https://ggplot2.tidyverse.org/reference/geom_ribbon.html)/[`geom_ribbon()`](https://ggplot2.tidyverse.org/reference/geom_ribbon.html)):
+  reveals the stacked groups bottom to top;
+
+- grouped line/point charts
+  ([`geom_line()`](https://ggplot2.tidyverse.org/reference/geom_path.html)/[`geom_path()`](https://ggplot2.tidyverse.org/reference/geom_path.html)/[`geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html)/
+  [`geom_pointbar()`](https://e61-institute.github.io/theme61/reference/geom_pointbar.md)):
+  reveals one colour/fill group (e.g. one line) at a time;
+
+- a single, ungrouped line or area series: reveals progressively along
+  the x-axis instead (see `build_up_n`).
+
+[`plot_label()`](https://e61-institute.github.io/theme61/reference/plot_label.md)
+labels are also synced to the reveal sequence, if the label's `colour`
+matches the rendered colour of a category/group (the usual way to label
+a line/bar instead of using a legend) - a label whose colour doesn't
+match any category (e.g. a source note) is left alone.
+
+`build_up` is not supported for multi-panel graphs, faceted graphs,
+`preview = TRUE` or `return_plot_obj = TRUE`.

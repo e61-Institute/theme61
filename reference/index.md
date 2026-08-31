@@ -13,6 +13,8 @@
   : Add on-graph labels to graphs
 - [`geom_pointbar()`](https://e61-institute.github.io/theme61/reference/geom_pointbar.md)
   : Custom geom combining points and error bars
+- [`geom_col_label()`](https://e61-institute.github.io/theme61/reference/geom_col_label.md)
+  : Add automatic percentage labels to column charts
 
 ## Formatting
 
@@ -24,9 +26,9 @@
   : Converts all legend colours to squares
 - [`theme_e61()`](https://e61-institute.github.io/theme61/reference/theme_e61.md)
   [`set_base_size()`](https://e61-institute.github.io/theme61/reference/theme_e61.md)
-  : e61 themed graph options
+  : theme61 theme
 - [`theme_e61_spatial()`](https://e61-institute.github.io/theme61/reference/theme_e61_spatial.md)
-  : e61 themed spatial maps options
+  **\[deprecated\]** : e61 theme for spatial maps
 
 ## Scales
 
@@ -40,6 +42,9 @@
   [`scale_fill_e61_aus()`](https://e61-institute.github.io/theme61/reference/scale_e61_aus.md)
   : A consistent set of colours for Australian states and territories
   for graphing
+- [`scale_colour_e61_highlight()`](https://e61-institute.github.io/theme61/reference/scale_e61_highlight.md)
+  [`scale_fill_e61_highlight()`](https://e61-institute.github.io/theme61/reference/scale_e61_highlight.md)
+  : Highlight one or more groups in a colour or fill scale
 - [`sec_rescale_inv()`](https://e61-institute.github.io/theme61/reference/dual_y_axis.md)
   [`sec_rescale()`](https://e61-institute.github.io/theme61/reference/dual_y_axis.md)
   : Dual y-axis graphing functions
@@ -52,16 +57,14 @@
   : Crops maps of Australia to exclude outlying territories
 - [`setup_stadia_maps()`](https://e61-institute.github.io/theme61/reference/setup_stadia_maps.md)
   : Setup Stadia Maps API
-- [`theme_e61_spatial()`](https://e61-institute.github.io/theme61/reference/theme_e61_spatial.md)
-  : e61 themed spatial maps options
 
 ## Miscellaneous
 
-- [`e61_chart_maker()`](https://e61-institute.github.io/theme61/reference/e61_chart_maker.md)
-  : An add-in to easily create plots with ggplot2
+- [`set_t61_options()`](https://e61-institute.github.io/theme61/reference/set_t61_options.md)
+  : Set various options in the theme61 package
 - [`set_open_graph_browser()`](https://e61-institute.github.io/theme61/reference/open_graph_browser.md)
   [`unset_open_graph_browser()`](https://e61-institute.github.io/theme61/reference/open_graph_browser.md)
-  : Set option to open graphs in the browser instead of the Viewer pane
+  : Set option to also open graphs in the browser
 - [`set_format()`](https://e61-institute.github.io/theme61/reference/set_format.md)
   [`unset_format()`](https://e61-institute.github.io/theme61/reference/set_format.md)
   : Sets the default file save format if format is not specified

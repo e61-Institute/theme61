@@ -55,6 +55,7 @@ after you change it before the changes will show up.
 ## Examples
 
 ``` r
+
 if (FALSE) { # \dontrun{
 library(ggplot2)
 data <- data.frame(x = 1:5, y1 = 1:5 * 10, y2 = 5:1 - 5)
