@@ -644,15 +644,15 @@ test_that("t61_apply_autolabel informs every time a label settles for a fallback
 
   # Collapse whitespace since cli may soft-wrap the message across lines.
   withr::local_options(list(theme61.autolabel_fallback_msg = TRUE))
-  m <- testthat::capture_messages(t61_apply_autolabel(p_bypass, width_cm = 16, height_cm = 12))
-  expect_length(m, 1)
-  msg <- gsub("\\s+", " ", m)
+  w <- testthat::capture_warnings(t61_apply_autolabel(p_bypass, width_cm = 16, height_cm = 12))
+  expect_length(w, 1)
+  msg <- gsub("\\s+", " ", w)
   expect_match(msg, "Series A", fixed = TRUE)
   expect_match(msg, "not yet supported for coord_flip() + area/pointbar", fixed = TRUE)
 
   # Fires every time, not just once per session.
-  m_again <- testthat::capture_messages(t61_apply_autolabel(p_bypass, width_cm = 16, height_cm = 12))
-  expect_length(m_again, 1)
+  w_again <- testthat::capture_warnings(t61_apply_autolabel(p_bypass, width_cm = 16, height_cm = 12))
+  expect_length(w_again, 1)
 
   # An unmatched label with no x/y falls back for a different reason.
   data2 <- data.frame(x = 2000:2020, y = seq(0, 5, length.out = 21))
@@ -661,16 +661,16 @@ test_that("t61_apply_autolabel informs every time a label settles for a fallback
     theme_bw(base_size = 10) +
     plot_label("Unrelated", colour = "#123456")
 
-  m2 <- testthat::capture_messages(t61_apply_autolabel(p_unmatched, width_cm = 16, height_cm = 12))
-  expect_length(m2, 1)
-  msg2 <- gsub("\\s+", " ", m2)
+  w2 <- testthat::capture_warnings(t61_apply_autolabel(p_unmatched, width_cm = 16, height_cm = 12))
+  expect_length(w2, 1)
+  msg2 <- gsub("\\s+", " ", w2)
   expect_match(msg2, "Unrelated", fixed = TRUE)
   expect_match(msg2, "no good spot found, used a fallback position", fixed = TRUE)
 
   # theme61.autolabel_fallback_msg = FALSE opts out entirely.
   withr::local_options(list(theme61.autolabel_fallback_msg = FALSE))
-  expect_no_message(t61_apply_autolabel(p_bypass, width_cm = 16, height_cm = 12))
-  expect_no_message(t61_apply_autolabel(p_unmatched, width_cm = 16, height_cm = 12))
+  expect_no_warning(t61_apply_autolabel(p_bypass, width_cm = 16, height_cm = 12))
+  expect_no_warning(t61_apply_autolabel(p_unmatched, width_cm = 16, height_cm = 12))
 })
 
 test_that("t61_apply_autolabel informs on a fallback position under fast = TRUE too", {
@@ -686,9 +686,9 @@ test_that("t61_apply_autolabel informs on a fallback position under fast = TRUE 
     plot_label("Unrelated", colour = "#123456")
 
   withr::local_options(list(theme61.autolabel_fallback_msg = TRUE, theme61.autolabel_fast_msg = FALSE))
-  m <- testthat::capture_messages(t61_apply_autolabel(p_unmatched, width_cm = 16, height_cm = 12, fast = TRUE))
-  expect_length(m, 1)
-  msg <- gsub("\\s+", " ", m)
+  w <- testthat::capture_warnings(t61_apply_autolabel(p_unmatched, width_cm = 16, height_cm = 12, fast = TRUE))
+  expect_length(w, 1)
+  msg <- gsub("\\s+", " ", w)
   expect_match(msg, "Unrelated", fixed = TRUE)
   expect_match(msg, "no good spot found, used a fallback position", fixed = TRUE)
 })
@@ -798,7 +798,7 @@ test_that("t61_apply_autolabel falls back (doesn't crash or misplace) for a geom
   testthat::local_mocked_bindings(t61_place_label = function(...) { search_ran <<- TRUE; NULL })
 
   result <- NULL
-  expect_message(
+  expect_warning(
     result <- t61_apply_autolabel(p, width_cm = 16, height_cm = 12),
     "coord_flip"
   )
