@@ -390,7 +390,7 @@ t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FAL
     if (length(degraded) > 0) {
       detail <- paste0(sprintf('"%s" (%s)', result$text[degraded], result$degrade_reason[degraded]),
                         collapse = "; ")
-      cli::cli_inform(
+      cli::cli_warn(
         "Auto-positioned {.fn plot_label} text settled for a fallback position instead of the real, collision-checked placement: {detail}. To turn off this message, run {.code options(theme61.autolabel_fallback_msg = FALSE)}."
       )
     }
