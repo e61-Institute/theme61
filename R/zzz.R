@@ -12,7 +12,7 @@ t61_env <- NULL
   theme61.auto_label = TRUE,
   theme61.auto_theme = TRUE,
   theme61.autolabel_fallback_msg = TRUE,
-  theme61.autolabel_fast_msg = TRUE,
+  theme61.autolabel_fast_msg = NA,
   theme61.base_size = 10,
   theme61.disable_spellcheck = FALSE,
   theme61.iterate_mode = FALSE,
@@ -20,7 +20,7 @@ t61_env <- NULL
   theme61.max_discrete_fills = 12L,
   theme61.open_in_browser = FALSE,
   theme61.preview_on_print = TRUE,
-  theme61.sec_axis_msg = TRUE
+  theme61.sec_axis_msg = NA
 )
 
 # Runs on load, including namespace-qualified use (theme61::save_e61())
