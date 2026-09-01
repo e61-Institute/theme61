@@ -129,31 +129,18 @@ labs_e61 <- function(title = NULL,
   # subtitle_text as plain text and y as a normal y-axis title instead
   # (rendered wherever ggplot2 would normally put it).
   if (!iterate_mode) {
-    if (y_top) {
 
-      if (is.null(y)) {
-        subtitle_text <- glue::glue(
-          "<span style='font-size:{primary_size}pt'>{subtitle_text}</span>"
-        )
-      } else if (subtitle_text == "") {
-        # No subtitle: show the y-axis title on its own line rather than
-        # prefixing it with an empty line, which would still reserve a
-        # blank line's worth of height above it.
-        subtitle_text <- glue::glue(
-          "<span style='font-size:{secondary_size}pt'>{y}</span>"
-        )
+    subtitle_text <- render_subtitle_markup(list(
+      subtitle = subtitle_text,
+      ytitle = if (y_top) y else NULL,
+      primary_size = primary_size,
+      secondary_size = secondary_size,
+      subtitle_wrapped = wrap_subtitle_trk,
+      ytitle_wrapped = wrap_ytitle_trk
+    ))
 
-        y <- NULL
-      } else {
-        subtitle_text <- glue::glue(
-          "<span style='font-size:{primary_size}pt'>{subtitle_text}</span><br><span style='font-size:{secondary_size}pt'>{y}</span>"
-        )
-
-        y <- NULL
-      }
-    } else {
-      subtitle_text <- glue::glue("<span style='font-size:{primary_size}pt'>{subtitle_text}</span>")
-    }
+    # The y-axis title now lives in the subtitle row instead
+    if (y_top) y <- NULL
   }
 
   # add to a ggplot object and return
@@ -170,10 +157,71 @@ labs_e61 <- function(title = NULL,
   return(label)
 }
 
+#' Render the subtitle row (subtitle and, when `y_top`, the y-axis title) as
+#' the HTML/markdown ggtext draws.
+#'
+#' The structured parts ride along on the returned string as the
+#' "t61_subtitle" attribute, so re-wrapping at draw time (once the final plot
+#' width is known) re-renders from those parts rather than parsing this
+#' markup back apart. `parts` holds: subtitle, ytitle (or NULL),
+#' primary_size, secondary_size, and whether each was wrapped by the user.
+#' @noRd
+render_subtitle_markup <- function(parts) {
+
+  sub_text <- parts$subtitle
+  y_text <- parts$ytitle
+  primary_size <- parts$primary_size
+  secondary_size <- parts$secondary_size
+
+  markup <- if (is.null(y_text)) {
+    glue::glue("<span style='font-size:{primary_size}pt'>{sub_text}</span>")
+
+  } else if (sub_text == "") {
+    # No subtitle: show the y-axis title on its own line rather than
+    # prefixing it with an empty line, which would still reserve a blank
+    # line's worth of height above it.
+    glue::glue("<span style='font-size:{secondary_size}pt'>{y_text}</span>")
+
+  } else {
+    glue::glue("<span style='font-size:{primary_size}pt'>{sub_text}</span><br><span style='font-size:{secondary_size}pt'>{y_text}</span>")
+  }
+
+  attr(markup, "t61_subtitle") <- parts
+
+  markup
+}
+
+#' Prefix a source list with "Source: "/"Sources: ", in alphabetical order.
+#' Shared by caption_wrap() and the draw-time caption re-wrap.
+#' @noRd
+format_sources <- function(sources) {
+
+  sources <- sort(sources)
+
+  paste0(
+    if (length(sources) > 1) "Sources: " else "Source: ",
+    paste(sources, collapse = "; ")
+  )
+}
+
+#' Number footnotes with the *, **, *** prefixes. Footnotes that are blank
+#' are dropped so they don't consume an asterisk level.
+#' @noRd
+number_footnotes <- function(footnotes) {
+
+  footnotes <- footnotes[nzchar(trimws(footnotes))]
+
+  if (length(footnotes) == 0) return(character(0))
+
+  paste0(strrep("*", seq_along(footnotes)), " ", footnotes)
+}
+
 #' Caption text wrapper
 #'
 #' This is an internal function that supplies the functionality to wrap title
-#' text manually.
+#' text manually. The footnotes and sources are also kept, unmodified, on the
+#' returned string as the "t61_caption" attribute so the draw-time re-wrap
+#' can work from them instead of splitting this combined string back apart.
 #'
 #' @noRd
 caption_wrap <- function(
@@ -183,42 +231,36 @@ caption_wrap <- function(
     caption_wrap = TRUE
 ){
 
+  # Sense check inputs
+  if (!is.null(footnotes) && (!is.vector(footnotes) || !is.character(footnotes)))
+    stop("footnotes must be a vector of strings.")
+
+  if (!is.null(sources) && (!is.vector(sources) || !is.character(sources)))
+    stop("sources must be a vector of strings.")
+
+  parts <- list(footnotes = footnotes, sources = sources)
+
   # Footnotes
   if (!is.null(footnotes)) {
-
-    # Sense check inputs
-    if (!is.vector(footnotes) || !is.character(footnotes))
-      stop("footnotes must be a vector of strings.")
 
     # Stops footnote text from spilling over the RHS of graphs if they are lengthy
     if(caption_wrap){
       footnotes <-
-        sapply(
+        vapply(
           footnotes,
-          function(x) paste(strwrap(x, width = max_char), collapse = "\n")
+          function(x) paste(strwrap(x, width = max_char), collapse = "\n"),
+          character(1),
+          USE.NAMES = FALSE
         )
     }
 
-    # Creates the correct number of asterisks
-    footnotes <- data.frame(n = seq(1, length(footnotes)), text = footnotes)
-    footnotes$n <- strrep("*", footnotes$n)
-    footnotes <- paste0(footnotes$n, " ", footnotes$text)
+    footnotes <- number_footnotes(footnotes)
   }
 
   # Sources
   if (!is.null(sources)) {
 
-    # Sense check inputs
-    if (!is.vector(sources) || !is.character(sources))
-      stop("sources must be a vector of strings.")
-
-    # Source list should be in alphabetical order
-    sources <- sort(sources)
-
-    # Construct the list of sources
-    source_list <- paste(sources, collapse = "; ")
-    sources <-
-      paste0(ifelse(length(sources) > 1, "Sources: ", "Source: "), source_list)
+    sources <- format_sources(sources)
 
     # Stops sources text from spilling over the RHS of graphs if they are
     # lengthy
@@ -229,7 +271,9 @@ caption_wrap <- function(
 
   # Put the footer text together
   caption <- paste0(c(footnotes, sources), collapse = "\n")
-  if (caption == "") caption <- NULL # Return NULL caption if blank
+  if (caption == "") return(NULL) # Return NULL caption if blank
+
+  attr(caption, "t61_caption") <- parts
 
   return(caption)
 }

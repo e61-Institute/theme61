@@ -15,6 +15,7 @@
 * Graphs should save faster thanks to internal improvements to save_e61().
 * Fixed an issue where `labs_e61` would leave whitespace above subtitles and y-axis titles when a plot had a subtitle but no title.
 * Improvements to margins, text wrapping, whitespace and text overlap/clipping issues.
+* Fixed footnotes, sources and titles being mangled when their text happened to look like the formatting theme61 adds around them. Footnotes containing the word "Source" (or a colon) are no longer mistaken for the sources line, and titles, subtitles and y-axis titles containing HTML-like text are no longer garbled, because `labs_e61()` now keeps each piece of text separate instead of splitting the formatted text back apart when it wraps your graph's labels.
 * Fixed issue with PDFs not rendering as previews in Viewer.
 
 # theme61 0.7.1
