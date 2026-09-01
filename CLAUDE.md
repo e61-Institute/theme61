@@ -11,3 +11,8 @@
   changes. Prioritise running only the tests affected by the code actually
   changed. Only run the full suite when a major change has been made, or a
   significant task has reached completion.
+- Protected branches: never push directly to `dev` or `main`, even if the
+  connected GitHub credentials would technically permit bypassing the
+  pull-request-required ruleset on those branches. Always commit to a
+  separate branch and open a PR instead, exactly as if the bypass were not
+  available.
