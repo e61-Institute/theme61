@@ -1,0 +1,52 @@
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+name: Close milestone on release
+
+# Closes the milestone matching DESCRIPTION's Version (e.g. "0.8.1" -> the
+# "v0.8.1" milestone) once the dev-to-main release PR merges. This is the
+# "actually shipped" signal, separate from an issue's own open/closed state
+# (which close-issues-on-dev-merge.yaml already sets when the fix lands in
+# dev) -- an issue can be closed for a while, under an open milestone,
+# waiting on the next release.
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  close-milestone:
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'dev'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const description = fs.readFileSync('DESCRIPTION', 'utf8');
+            const match = description.match(/^Version:\s*(\S+)/m);
+            if (!match) {
+              core.warning('No Version field found in DESCRIPTION.');
+              return;
+            }
+            const title = `v${match[1]}`;
+
+            const milestones = await github.paginate(github.rest.issues.listMilestones, {
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open',
+            });
+            const milestone = milestones.find(ms => ms.title === title);
+            if (!milestone) {
+              core.notice(`No open milestone titled "${title}" -- nothing to close.`);
+              return;
+            }
+
+            await github.rest.issues.updateMilestone({
+              owner: context.repo.owner, repo: context.repo.repo,
+              milestone_number: milestone.number, state: 'closed',
+            });
+            core.notice(`Closed milestone "${title}" (released in #${context.payload.pull_request.number}).`);
