@@ -51,7 +51,9 @@ t61_drop_e61_class <- function(plot) {
     plot <- maybe_add_default_scales(plot)
     plot <- maybe_adjust_facet_spacing(plot)
     plot <- maybe_leftalign_discrete_y_text(plot)
-    class(plot) <- setdiff(class(plot), "e61_plot")
+    # Both tags go: leaving e61_map behind would keep dispatching theme61
+    # methods this render is trying to opt out of.
+    class(plot) <- setdiff(class(plot), c("e61_map", "e61_plot"))
   }
   plot
 }
