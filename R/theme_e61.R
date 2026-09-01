@@ -343,14 +343,22 @@ format_flip <- function(x_adj = 0, current_theme = NULL) {
 
 #' Sets the base size for the theme
 #'
-#' \code{set_base_size} sets the base size for the theme to be used in
-#' \code{theme_e61()}. This needs to be set outside of the function because it
+#' `r lifecycle::badge("deprecated")`
+#'
+#' Use [set_t61_options()] to set the base size via the `theme61.base_size`
+#' option instead. This needs to be set outside of the function because it
 #' is called by other functions as part of the graph rendering process.
+#'
 #' @param base_size Numeric. Graph font size. Default is 10.
 #' @return \code{set_base_size} is used for its side effects.
 #' @rdname theme_e61
 #' @export
 set_base_size <- function(base_size) {
+  lifecycle::deprecate_warn(
+    "0.8.0", "set_base_size()", "set_t61_options(list(theme61.base_size = ...))",
+    details = "Use set_t61_options() to set the theme61.base_size option instead."
+  )
+
   if (!is.numeric(base_size) || length(base_size) != 1 || base_size <= 0) {
     stop("base_size must be a single positive number.")
   }

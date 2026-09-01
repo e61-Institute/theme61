@@ -17,6 +17,10 @@
 * Improvements to margins, text wrapping, whitespace and text overlap/clipping issues.
 * Fixed issue with PDFs not rendering as previews in Viewer.
 
+#### Deprecated features
+
+* `set_base_size()` is now deprecated. Use `set_t61_options(list(theme61.base_size = ...))` instead.
+
 # theme61 0.7.1
 
 09 Jan 2026
