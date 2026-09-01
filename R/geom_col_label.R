@@ -214,11 +214,14 @@ col_label_n_group <- function(data) {
 }
 
 col_label_percent <- function(y, total, accuracy) {
-  # Guard against zero or near-zero totals to avoid Inf/-Inf labels
-  if (is.na(total) || total == 0) {
-    return(rep("", length(y)))
-  }
-  scales::label_percent(accuracy = accuracy)(y / total)
+  # total is one value per row (e.g. per-stack panel total), not a single
+  # scalar, so the zero/NA guard has to be applied elementwise - a panel can
+  # mix a zero-sum stack with a nonzero one.
+  bad <- is.na(total) | total == 0
+  labels <- rep("", length(y))
+  ok <- !bad
+  labels[ok] <- scales::label_percent(accuracy = accuracy)(y[ok] / total[ok])
+  labels
 }
 
 .resolve_col_label_align <- function(align) {

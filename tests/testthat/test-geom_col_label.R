@@ -352,3 +352,27 @@ test_that("Zero-sum panels render blank labels, not Inf/-Inf", {
   # Positions should still be set (even if not meaningful) and not contain Inf
   expect_true(all(is.finite(label_data$y)))
 })
+
+test_that("A zero-sum stack next to a nonzero stack blanks only the zero one", {
+  # Regression test for a Codex finding on #387: col_label_percent()'s zero
+  # guard used `||` on `total`, a per-row vector (one stack total per x), so
+  # only the first row's total was ever checked. In a panel mixing a
+  # zero-sum stack ("A") with a nonzero one ("B"), the zero stack must still
+  # blank regardless of row order, and the nonzero stack must still show its
+  # real percentages rather than being blanked by the other stack's total.
+  data <- data.frame(
+    grp = c("A", "A", "B", "B"),
+    fill = c("g1", "g2", "g1", "g2"),
+    value = c(10, -10, 30, 10)
+  )
+
+  p <- ggplot(data, aes(grp, value, fill = fill)) +
+    geom_col() +
+    geom_col_label()
+
+  label_data <- get_label_data(ggplot_build(p))
+  by_grp <- split(label_data$label, label_data$x)
+
+  expect_true(all(unlist(by_grp[names(by_grp) == "1"]) == ""))
+  expect_setequal(unlist(by_grp[names(by_grp) == "2"]), c("75%", "25%"))
+})
