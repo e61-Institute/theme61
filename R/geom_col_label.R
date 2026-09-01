@@ -214,6 +214,10 @@ col_label_n_group <- function(data) {
 }
 
 col_label_percent <- function(y, total, accuracy) {
+  # Guard against zero or near-zero totals to avoid Inf/-Inf labels
+  if (is.na(total) || total == 0) {
+    return(rep("", length(y)))
+  }
   scales::label_percent(accuracy = accuracy)(y / total)
 }
 

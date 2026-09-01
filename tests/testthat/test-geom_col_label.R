@@ -334,3 +334,21 @@ test_that("A single column's own gap respects an explicit tight limit too", {
   label_data_room <- get_label_data(ggplot_build(p_room))
   expect_gt(label_data_room$y, 100)
 })
+
+test_that("Zero-sum panels render blank labels, not Inf/-Inf", {
+  # Regression test for #380: when a panel's values sum to zero (e.g. 10 and -10),
+  # the division in col_label_percent() would produce Inf/-Inf text labels.
+  # Instead, labels should be blank (empty strings).
+  data <- data.frame(grp = c("A", "B"), value = c(10, -10))
+
+  p <- ggplot(data, aes(grp, value)) +
+    geom_col() +
+    geom_col_label()
+
+  label_data <- get_label_data(ggplot_build(p))
+
+  # Labels should be empty strings, not "Inf"/"-Inf"
+  expect_true(all(label_data$label == ""))
+  # Positions should still be set (even if not meaningful) and not contain Inf
+  expect_true(all(is.finite(label_data$y)))
+})
