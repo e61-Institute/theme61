@@ -320,6 +320,65 @@ test_that("user-specified y-axis text alignment is not overridden (#298)", {
   expect_equal(th$axis.text.y$hjust, 1)
 })
 
+test_that("coord_flip() with discrete x is left-aligned on the flipped y-axis (#382)", {
+
+  df <- data.frame(category = c("A", "B", "C"), value = c(3, 1, 2))
+
+  p <- ggplot(df, aes(x = category, y = value)) +
+    geom_col() +
+    coord_flip()
+
+  b <- ggplot_build(p)
+  th <- b@plot@theme
+
+  expect_equal(th$axis.text.y$hjust, 0)
+  expect_equal(th$axis.text.y.right$hjust, 0)
+})
+
+test_that("coord_flip() with continuous x/y is not left-aligned (#382)", {
+
+  df <- data.frame(x = 1:5, y = (1:5)^2)
+
+  p <- ggplot(df, aes(x, y)) +
+    geom_point() +
+    coord_flip()
+
+  built <- maybe_add_default_scales(p)
+  built <- maybe_adjust_facet_spacing(built)
+
+  expect_identical(maybe_leftalign_discrete_y_text(built), built)
+})
+
+test_that("discrete x without coord_flip is not left-aligned (#382)", {
+
+  df <- data.frame(category = c("A", "B", "C"), value = c(3, 1, 2))
+
+  p <- ggplot(df, aes(x = category, y = value)) +
+    geom_col()
+
+  built <- maybe_add_default_scales(p)
+  built <- maybe_adjust_facet_spacing(built)
+
+  expect_identical(maybe_leftalign_discrete_y_text(built), built)
+})
+
+test_that("layer-level y aes mapping is left-aligned (#382)", {
+
+  df <- data.frame(
+    category = c("Short", "A much longer category label"),
+    value = c(1, 2)
+  )
+
+  p <- ggplot(df, aes(x = value)) +
+    geom_col(aes(y = category))
+
+  b <- ggplot_build(p)
+  th <- b@plot@theme
+
+  expect_equal(th$axis.text.y$hjust, 0)
+  expect_equal(th$axis.text.y.right$hjust, 0)
+})
+
 testthat::test_that("ggplot2::facet_wrap is not auto-adjusted (facet not tagged)", {
 
   old <- options(quiet_mask = TRUE)

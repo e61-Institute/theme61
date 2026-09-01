@@ -16,6 +16,7 @@
 * Fixed an issue where `labs_e61` would leave whitespace above subtitles and y-axis titles when a plot had a subtitle but no title.
 * Improvements to margins, text wrapping, whitespace and text overlap/clipping issues.
 * Fixed issue with PDFs not rendering as previews in Viewer.
+* Fixed left-aligned categorical y-axis text not triggering for `coord_flip()` horizontal bar charts, or when the y aesthetic was mapped inside a layer (e.g. `geom_col(aes(y = ...))`) rather than in `ggplot()` itself (#382).
 
 # theme61 0.7.1
 

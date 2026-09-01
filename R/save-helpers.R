@@ -151,19 +151,33 @@ has_discrete_y_scale <- function(plot) {
     return(FALSE)
   }
 
-  # Check the y aesthetic mapping
-  y_mapping <- plot@mapping$y
-  if (!is.null(y_mapping)) {
-    # y_mapping may reference a layer-only column or an unevaluable
-    # expression - fall back to "not discrete" instead of erroring.
-    plot_data <- plot@data
-    if (!is.null(plot_data) && !is.null(y_mapping)) {
-      y_var <- tryCatch(rlang::eval_tidy(y_mapping, plot_data), error = function(e) NULL)
-      if (is.factor(y_var) || is.character(y_var)) {
-        return(TRUE)
-      }
+  # coord_flip() swaps the visual axes, so a discrete *x* mapping ends up
+  # drawn on the visual y-axis, and any explicit x scale is what governs it.
+  is_flipped <- inherits(plot@coordinates, "CoordFlip")
+
+  # Is aes_name mapped (plot-level, else any layer's own mapping) to a
+  # discrete variable? A mapping may reference a layer-only column or an
+  # unevaluable expression - fall back to "not discrete" instead of erroring.
+  aes_is_discrete <- function(aes_name) {
+    mappings <- list(list(quo = plot@mapping[[aes_name]], data = plot@data))
+    for (layer in plot@layers) {
+      layer_quo <- layer$mapping[[aes_name]]
+      if (is.null(layer_quo)) next
+      layer_data <- layer$data
+      if (is.null(layer_data) || inherits(layer_data, "waiver")) layer_data <- plot@data
+      mappings <- c(mappings, list(list(quo = layer_quo, data = layer_data)))
     }
+
+    for (m in mappings) {
+      if (is.null(m$quo) || is.null(m$data)) next
+      val <- tryCatch(rlang::eval_tidy(m$quo, m$data), error = function(e) NULL)
+      if (is.factor(val) || is.character(val)) return(TRUE)
+    }
+    FALSE
   }
+
+  if (aes_is_discrete("y")) return(TRUE)
+  if (is_flipped && aes_is_discrete("x")) return(TRUE)
 
   # Alternative check: look for geom_density_ridges
   layers <- plot@layers
@@ -176,9 +190,11 @@ has_discrete_y_scale <- function(plot) {
     }
   }
 
-  # Check if scale_y_discrete has been explicitly added
+  # Check if scale_y_discrete (or, under coord_flip, scale_x_discrete - the
+  # scale that ends up on the visual y-axis) has been explicitly added
   if (!is.null(plot@scales)) {
-    y_scale <- plot@scales$get_scales("y")
+    visual_y_scale_aes <- if (is_flipped) "x" else "y"
+    y_scale <- plot@scales$get_scales(visual_y_scale_aes)
     if (!is.null(y_scale) && inherits(y_scale, "ScaleDiscrete")) {
       return(TRUE)
     }
