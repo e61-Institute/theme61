@@ -55,7 +55,11 @@ print.e61_plot <- function(x, ...) {
     }
   }
 
-  # Plots pane render (must include theme61 defaults)
+  # Plots pane render (must include theme61 defaults). Called explicitly
+  # rather than left to ggplot_build.e61_plot() dispatch: the autolabel step
+  # below needs x_plot back as a real plot object (to feed save_e61()/
+  # save_single() for label positioning), not just built data, and dispatch
+  # never fires anyway once the e61_plot class is stripped for print() below.
   x_plot <- finalise_e61_plot(x)
   x_plot <- maybe_add_default_scales(x_plot)
   class(x_plot) <- setdiff(class(x_plot), c("e61_map", "e61_plot"))

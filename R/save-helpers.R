@@ -79,6 +79,11 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
       if (!closed) try(grDevices::dev.off(), silent = TRUE)
     }, add = TRUE)
 
+    # Explicit, not dispatch: the e61_plot class is stripped below so this
+    # print() never fires ggplot_build.e61_plot(), and save_single()/
+    # save_multi() never bake default x/colour/fill scales into `graph`
+    # itself (only into a build-only copy) - so this is the only place they
+    # reach the actual rendered output.
     graph_i <- maybe_add_default_scales(graph)
     class(graph_i) <- setdiff(class(graph_i), "e61_plot")
 
