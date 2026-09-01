@@ -176,7 +176,10 @@ has_discrete_y_scale <- function(plot) {
     FALSE
   }
 
-  if (aes_is_discrete("y")) return(TRUE)
+  # Under coord_flip(), the y aesthetic ends up on the visual x-axis, so a
+  # discrete y mapping (even a layer-only one) must NOT trigger left-align -
+  # it's the x mapping that lands on the visual y-axis in that case.
+  if (!is_flipped && aes_is_discrete("y")) return(TRUE)
   if (is_flipped && aes_is_discrete("x")) return(TRUE)
 
   # Alternative check: look for geom_density_ridges

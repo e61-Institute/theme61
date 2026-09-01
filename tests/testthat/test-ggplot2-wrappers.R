@@ -379,6 +379,27 @@ test_that("layer-level y aes mapping is left-aligned (#382)", {
   expect_equal(th$axis.text.y.right$hjust, 0)
 })
 
+test_that("layer-level y aes mapping under coord_flip() is not left-aligned (#382 Codex finding)", {
+  # coord_flip() puts the y aesthetic on the visual x-axis, so a layer-only
+  # discrete y mapping must not trigger left-align here - the continuous x
+  # mapping is what ends up on the visual y-axis instead. Regression test for
+  # a Codex finding on PR #389: the layer-level y check used to run
+  # unconditionally, before the flip-aware check, and fired regardless.
+  df <- data.frame(
+    category = c("Short", "A much longer category label"),
+    value = c(1, 2)
+  )
+
+  p <- ggplot(df, aes(x = value)) +
+    geom_col(aes(y = category)) +
+    coord_flip()
+
+  b <- ggplot_build(p)
+  th <- b@plot@theme
+
+  expect_equal(th$axis.text.y$hjust, 1)
+})
+
 testthat::test_that("ggplot2::facet_wrap is not auto-adjusted (facet not tagged)", {
 
   old <- options(quiet_mask = TRUE)
