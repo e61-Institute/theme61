@@ -3,7 +3,7 @@
 #### New and changed features
 
 * New function `sec_rescale_axis()` builds a rescaled secondary y-axis directly from the `scale` and `shift` you supply, e.g. `scale_y_continuous_e61(limits = c(0, 100, 25), sec_axis = sec_rescale_axis(scale = 0.1, shift = 0, name = "%"))`. Use it in place of hand-writing `sec_axis(~sec_rescale(.))`.
-* The `rescale_sec` argument of `scale_y_continuous_e61()` is deprecated. Replace `sec_axis = sec_axis(~sec_rescale(.)), rescale_sec = TRUE` with `sec_axis = sec_rescale_axis(scale, shift, name)`, using the same `scale` and `shift` values you pass to `sec_rescale_inv()`.
+* **Breaking change:** the `rescale_sec` argument of `scale_y_continuous_e61()` has been removed outright, rather than soft-deprecated. Its `t61_env`-based implementation was fundamentally broken (see Bug fixes below), so there was no working behaviour worth preserving for a deprecation cycle. Replace `sec_axis = sec_axis(~sec_rescale(.)), rescale_sec = TRUE` with `sec_axis = sec_rescale_axis(scale, shift, name)`, using the same `scale` and `shift` values you pass to `sec_rescale_inv()`. `sec_rescale()` also now requires explicit `scale`/`shift` arguments rather than falling back to shared session state.
 * Removed the `theme61.sec_axis_msg` option, along with the reminder it controlled, as the secondary axis code no longer needs to be run twice.
 
 #### Bug fixes

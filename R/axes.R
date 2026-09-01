@@ -10,10 +10,6 @@
 #'   and right. Set to FALSE to hide the secondary axis, or supply
 #'   [sec_rescale_axis()] to put the secondary axis on a different scale to the
 #'   primary axis.
-#' @param rescale_sec `r lifecycle::badge("deprecated")` Use
-#'   `sec_axis = sec_rescale_axis(scale, shift, name)` instead, which takes the
-#'   rescaling directly rather than relying on values stashed by a previous
-#'   call to [sec_rescale_inv()].
 #' @param expand_left,expand_right Numeric. Add extra space between data points
 #'   and the left/right of the graph. See [expansion][ggplot2::expansion] for
 #'   details.
@@ -36,21 +32,10 @@
 
 scale_y_continuous_e61 <- function(limits = NULL,
                                    sec_axis = ggplot2::dup_axis(),
-                                   rescale_sec = lifecycle::deprecated(),
                                    expand_bottom = 0,
                                    expand_top = 0,
                                    add_space = FALSE,
                                    ...) {
-
-  if (lifecycle::is_present(rescale_sec)) {
-    lifecycle::deprecate_warn(
-      when = "0.8.1",
-      what = "scale_y_continuous_e61(rescale_sec)",
-      details = "Build the secondary axis with `sec_rescale_axis()` instead, e.g. `sec_axis = sec_rescale_axis(scale = 0.1, shift = 0, name = \"%\")`."
-    )
-  } else {
-    rescale_sec <- FALSE
-  }
 
   # Set sec_axis to default behaviour if we don't want it
   if (isFALSE(sec_axis)) sec_axis <- ggplot2::waiver()
@@ -59,11 +44,10 @@ scale_y_continuous_e61 <- function(limits = NULL,
   breaks <- resolve_breaks_e61(limits)
 
   # sec_rescale_axis() carries its scale/shift with it, so the secondary breaks
-  # can be lined up with the primary ones here rather than being read back out
-  # of t61_env (which is not yet populated on a plot's first build).
+  # can be lined up with the primary ones here without any shared session state.
   rescale <- attr(sec_axis, "t61_rescale")
 
-  is_rescaled <- !is.null(rescale) || isTRUE(rescale_sec)
+  is_rescaled <- !is.null(rescale)
 
   if (!is.null(rescale)) {
 
@@ -76,16 +60,6 @@ scale_y_continuous_e61 <- function(limits = NULL,
       breaks = sec$breaks,
       labels = sec$labels
     )
-
-  } else if (isTRUE(rescale_sec)) {
-
-    # Deprecated path: scale/shift come from whatever sec_rescale_inv() last
-    # stashed in t61_env, hence the historical need to run the code twice.
-    sec_breaks <- sec_rescale(breaks)
-    sec_labels <- sec_breaks
-    sec_labels[is.na(sec_labels)] <- ""
-    sec_axis$breaks <- sec_breaks
-    sec_axis$labels <- sec_labels
   }
 
   if (!is.null(limits) && add_space) {

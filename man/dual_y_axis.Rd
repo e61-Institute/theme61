@@ -8,11 +8,7 @@
 \usage{
 sec_rescale_inv(values, scale = 1, shift = 0)
 
-sec_rescale(
-  values,
-  scale = t61_env$sec_axis_scale,
-  shift = t61_env$sec_axis_shift
-)
+sec_rescale(values, scale, shift)
 
 sec_rescale_axis(scale = 1, shift = 0, name = ggplot2::waiver())
 }

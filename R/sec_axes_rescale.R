@@ -55,18 +55,16 @@ sec_rescale_inv <- function(values, scale = 1, shift = 0) {
   check_rescale_arg(scale, "scale")
   check_rescale_arg(shift, "shift")
 
-  # Stashed only so the deprecated scale_y_continuous_e61(rescale_sec = TRUE)
-  # path keeps working - sec_rescale_axis() takes scale/shift directly. Remove
-  # this along with that argument.
-  assign("sec_axis_scale", scale, envir = t61_env)
-  assign("sec_axis_shift", shift, envir = t61_env)
-
   return ((values + shift) / scale)
 }
 
 #' @rdname dual_y_axis
 #' @export
-sec_rescale <- function(values, scale = t61_env$sec_axis_scale, shift = t61_env$sec_axis_shift) {
+sec_rescale <- function(values, scale, shift) {
+
+  check_rescale_arg(scale, "scale")
+  check_rescale_arg(shift, "shift")
+
   return (values * scale - shift)
 }
 

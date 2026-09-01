@@ -1,11 +1,3 @@
-# Removes the scale/shift that sec_rescale_inv() stashes in t61_env, so a test
-# starts from the same state as a fresh R session.
-clear_sec_stash <- function() {
-  rm(list = intersect(c("sec_axis_scale", "sec_axis_shift"),
-                      ls(envir = theme61:::t61_env, all.names = TRUE)),
-     envir = theme61:::t61_env)
-}
-
 # The secondary axis breaks/labels the scale will actually draw with.
 sec_axis_of <- function(scale) scale$secondary.axis
 
@@ -95,7 +87,6 @@ test_that("sec_rescale_axis() gets the right breaks with no scale/shift stashed 
   # The bug in #352: scale_y_continuous_e61() used to read the scale/shift out
   # of t61_env at `+` time, before sec_rescale_inv() had ever run, so nothing
   # was there to read on a graph's first build.
-  clear_sec_stash()
 
   sc <- scale_y_continuous_e61(
     limits = c(0, 50, 10),
@@ -121,7 +112,6 @@ test_that("sec_rescale_axis() gets the right breaks with no scale/shift stashed 
 test_that("two dual-axis graphs in one session each get their own breaks", {
   # The other half of #352: the second graph used to be formatted with the
   # first graph's scale/shift, because that is what was left in t61_env.
-  clear_sec_stash()
 
   make_plot <- function(scale, shift, limits) {
     ggplot(data.frame(x = 1, y1 = mean(limits[1:2]), y2 = 1), aes(x)) +
@@ -204,27 +194,18 @@ test_that("faceted plots with a rescaled secondary axis build and render without
   expect_equal(grid::convertUnit(th$panel.spacing.y, "lines", valueOnly = TRUE), 2)
 })
 
-test_that("the deprecated rescale_sec argument warns but still works", {
-  # sec_rescale_inv() stashes the scale/shift the deprecated path reads back
-  sec_rescale_inv(c(10, 20), scale = 10, shift = 0)
-
-  expect_warning(
-    sc <- scale_y_continuous_e61(
+test_that("scale_y_continuous_e61() no longer accepts rescale_sec", {
+  # Hard-deprecated (not soft-deprecated): the old t61_env-based path was
+  # dysfunctional enough that it was removed outright rather than kept
+  # around for two releases. Passing it now just becomes a stray `...` arg
+  # forwarded to ggplot2::scale_y_continuous(), which errors on it.
+  expect_error(
+    scale_y_continuous_e61(
       limits = c(0, 25, 5),
-      sec_axis = ggplot2::sec_axis(~sec_rescale(.), name = "%"),
+      sec_axis = ggplot2::sec_axis(~sec_rescale(., scale = 10, shift = 0)),
       rescale_sec = TRUE
-    ),
-    class = "lifecycle_warning_deprecated"
+    )
   )
-
-  expect_equal(sec_axis_of(sc)$breaks, seq(0, 25, 5) * 10)
-})
-
-test_that("sec_rescale() falls back to values stashed by sec_rescale_inv() via t61_env", {
-  # Retained for the deprecated rescale_sec = TRUE path.
-  sec_rescale_inv(c(10, 20), scale = 5, shift = 1)
-
-  expect_equal(sec_rescale(c(2, 4)), c(2, 4) * 5 - 1)
 })
 
 test_that("a plot with the default secondary axis renders an axis-r grob", {
