@@ -189,16 +189,17 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
     if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
   }, add = TRUE)
 
-  gt <- ggplot2::ggplotGrob(t61_strip_chrome(plot))
-  # Still used for its facet bail-out (exactly one panel cell, structurally
-  # checked via the gtable layout) -- but NOT for the cm box it would
-  # otherwise compute; see t61_render_panel_box_px() for why.
-  if (is.null(t61_panel_box_cm(gt, width_cm, height_cm))) return(NULL)
-
   # Built and drawn as two explicit steps, not print(plot): building can
   # leave a stray device current, and reclaiming only after drawing would
   # already be too late.
   final_gt <- ggplot2::ggplotGrob(t61_strip_chrome(t61_drop_e61_class(plot)))
+
+  # Facet bail-out (exactly one panel cell, structurally checked via the
+  # gtable layout) -- NOT for the cm box it would otherwise compute; see
+  # t61_render_panel_box_px() for why. Checked against the gtable that
+  # actually gets drawn, so it can share that build.
+  if (is.null(t61_panel_box_cm(final_gt, width_cm, height_cm))) return(NULL)
+
   t61_reclaim_device(dev_num)
   grid::grid.newpage()
   grid::grid.draw(final_gt)

@@ -13,6 +13,7 @@
 #### Performance improvements and bug fixes
 
 * Graphs should save faster thanks to internal improvements to save_e61().
+* Saving to several file formats at once (e.g. `format = c("svg", "pdf", "png")`) is now considerably faster: the graph is drawn once and every other format is converted from that single render, rather than being redrawn from scratch per format. Saved files are unchanged.
 * Fixed an issue where `labs_e61` would leave whitespace above subtitles and y-axis titles when a plot had a subtitle but no title.
 * Improvements to margins, text wrapping, whitespace and text overlap/clipping issues.
 * Fixed issue with PDFs not rendering as previews in Viewer.

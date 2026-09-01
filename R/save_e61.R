@@ -422,67 +422,44 @@ save_e61 <- function(filename = NULL,
 
   # Make graph to save --------------------------------
 
-  # Check whether to save an mpanel or a single planel chart - these require
-  # different approaches
-  if (length(plots) > 1) {
-    save_input <- save_multi(
-      filename = filename,
-      format = format,
-      plots = plots,
-      chart_type = chart_type,
-      title = labs$title,
-      subtitle = labs$subtitle,
-      footnotes = labs$footnotes,
-      sources = labs$sources,
-      width = dim$width, # control width of the chart
-      height = dim$height, # control height of the chart
-      auto_scale = auto_scale,
-      title_spacing_adj = spacing$title, # adjust the amount of space given to the title
-      subtitle_spacing_adj = spacing$subtitle, # adjust the amount of space given to the subtitle
-      height_adj = spacing$height_adj, # adjust the vertical spacing of the mpanel charts
-      base_size = base_size,
-      print_label_positions = print_label_positions,
-      pad_width = spacing$pad_width,
-      pad_height = spacing$pad_height,
-      outer_width = spacing$outer_width,
-      outer_height = spacing$outer_height,
-      ncol = layout$ncol,
-      nrow = layout$nrow,
-      align = layout$align,
-      axis = layout$axis,
-      rel_heights = spacing$rel_heights,
-      bg_colour = bg_colour
-    )
+  # One measurement pass for the whole call (multi-panel and single-panel
+  # need different measurement logic, but both resolve to the same
+  # graph/width/height spec that render_e61() below draws from).
+  save_input <- resolve_e61_spec(
+    plots = plots,
+    filename = filename,
+    format = format,
+    chart_type = chart_type,
+    auto_scale = auto_scale,
+    dim = dim,
+    max_height = max_height,
+    base_size = base_size,
+    bg_colour = bg_colour,
+    labs = labs,
+    layout = layout,
+    spacing = spacing,
+    print_label_positions = print_label_positions,
+    fast_labels = fast_labels
+  )
 
-    # Short-circuit: return the composed plot object instead of saving it
-    if (return_plot_obj) return(save_input$graph)
-
-  } else {
-
-    save_input <- save_single(
-      filename = filename,
-      plot = plots[[1]],
-      chart_type = chart_type,
-      auto_scale = auto_scale, # control whether y-axis is scaled
-      width = dim$width, # control width
-      height = dim$height, # control height
-      max_height = max_height, # control max height
-      format = format,
-      base_size = base_size,
-      print_label_positions = print_label_positions,
-      fast_labels = fast_labels,
-      pad_width = spacing$pad_width,
-      pad_height = spacing$pad_height,
-      bg_colour = bg_colour
-    )
-  }
-
+  # Short-circuit: return the composed plot object instead of saving it
+  if (return_plot_obj) return(save_input$graph)
 
   # Save --------------------------------------------------------------------
 
+  # Whether the Viewer preview below will be needed, decided before
+  # rendering so render_e61() can hand over its SVG instead of the preview
+  # costing another render.
+  preview_wanted <- !build_up &&
+    interactive() &&
+    requireNamespace("rstudioapi", quietly = TRUE) &&
+    rstudioapi::isAvailable()
+
+  rendered_svg <- NULL
+
   if (build_up) {
 
-    # The expensive layout/scaling work above (save_single()) was done once,
+    # The expensive layout/scaling work above (resolve_e61_spec()) was done once,
     # using the complete data, so every step below shares identical
     # dimensions and axis limits - all that's left is a cheap re-render per
     # step with some rows blanked out.
@@ -497,7 +474,7 @@ save_e61 <- function(filename = NULL,
         step_plot@layers[[build_up_result$targets[j]]]$data <- build_up_result$steps[[k]][[j]]
       }
 
-      save_graph(
+      render_e61(
         graph = step_plot,
         format = format,
         filename = step_filenames[k],
@@ -512,14 +489,15 @@ save_e61 <- function(filename = NULL,
 
   } else {
 
-    save_graph(
+    rendered_svg <- render_e61(
       graph = save_input$graph,
       format = format,
       filename = filename,
       width = save_input$width,
       height = save_input$height,
       bg_colour = bg_colour,
-      res = res
+      res = res,
+      keep_svg = preview_wanted
     )
   }
 
@@ -577,9 +555,7 @@ save_e61 <- function(filename = NULL,
 
     }
 
-    if (interactive() &&
-        requireNamespace("rstudioapi", quietly = TRUE) &&
-        rstudioapi::isAvailable()) {
+    if (preview_wanted) {
       # Only run this in interactive mode
       # rstudioapi::viewer will only open temp files in the Viewer pane for some reason
       # Always preview an SVG, even if the saved format(s) are not SVG
@@ -590,7 +566,8 @@ save_e61 <- function(filename = NULL,
         width = save_input$width,
         height = save_input$height,
         bg_colour = bg_colour,
-        res = res
+        res = res,
+        svg_file = rendered_svg
       )
 
       out <- try(rstudioapi::viewer(preview_svg))

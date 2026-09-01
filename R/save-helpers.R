@@ -58,51 +58,143 @@ t61_ggplotGrob_quiet_na <- function(plot) t61_with_device(t61_quiet_na_removal(g
 #' @noRd
 t61_ggplot_gtable_quiet_na <- function(build) t61_with_device(t61_quiet_na_removal(ggplot2::ggplot_gtable(build)))
 
-#' Helper function to actually perform the saving functionality
+#' Resolve a plot (or list of panels) to the graph object plus the exact
+#' width/height it will be rendered at - the single measurement pass in
+#' front of render_e61(). Everything that needs to build a gtable to
+#' measure something (axis widths, aspect ratios, title/axis heights,
+#' auto-positioned label placement) happens in here, once, so rendering
+#' afterwards is pure output.
+#'
+#' @return A plain list: graph (the resolved plot), width, height (cm).
 #' @noRd
-save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
-  lapply(format, function(fmt) {
+resolve_e61_spec <- function(plots,
+                             filename,
+                             format,
+                             chart_type,
+                             auto_scale,
+                             dim,
+                             max_height,
+                             base_size,
+                             bg_colour,
+                             labs,
+                             layout,
+                             spacing,
+                             print_label_positions = FALSE,
+                             fast_labels = FALSE) {
+
+  if (length(plots) > 1) {
+    save_multi(
+      filename = filename,
+      format = format,
+      plots = plots,
+      chart_type = chart_type,
+      title = labs$title,
+      subtitle = labs$subtitle,
+      footnotes = labs$footnotes,
+      sources = labs$sources,
+      width = dim$width,
+      height = dim$height,
+      auto_scale = auto_scale,
+      title_spacing_adj = spacing$title,
+      subtitle_spacing_adj = spacing$subtitle,
+      height_adj = spacing$height_adj,
+      base_size = base_size,
+      print_label_positions = print_label_positions,
+      pad_width = spacing$pad_width,
+      pad_height = spacing$pad_height,
+      outer_width = spacing$outer_width,
+      outer_height = spacing$outer_height,
+      ncol = layout$ncol,
+      nrow = layout$nrow,
+      align = layout$align,
+      axis = layout$axis,
+      rel_heights = spacing$rel_heights,
+      bg_colour = bg_colour
+    )
+
+  } else {
+    save_single(
+      filename = filename,
+      plot = plots[[1]],
+      chart_type = chart_type,
+      auto_scale = auto_scale,
+      width = dim$width,
+      height = dim$height,
+      max_height = max_height,
+      format = format,
+      base_size = base_size,
+      print_label_positions = print_label_positions,
+      fast_labels = fast_labels,
+      pad_width = spacing$pad_width,
+      pad_height = spacing$pad_height,
+      bg_colour = bg_colour
+    )
+  }
+}
+
+#' Draw a resolved graph to one SVG file. The only place the package
+#' actually renders a chart for output.
+#' @noRd
+t61_draw_svg <- function(graph, file, width, height, bg_colour) {
+
+  svglite::svglite(filename = file, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
+
+  closed <- FALSE
+  on.exit({
+    if (!closed) try(grDevices::dev.off(), silent = TRUE)
+  }, add = TRUE)
+
+  graph <- maybe_add_default_scales(graph)
+  class(graph) <- setdiff(class(graph), "e61_plot")
+
+  print(graph)
+
+  grDevices::dev.off()
+  closed <- TRUE
+
+  invisible(file)
+}
+
+#' Write a resolved graph out in every requested format.
+#'
+#' png/jpg/eps/pdf are all produced by rsvg/magick from an SVG, so the
+#' graph is drawn exactly once and every other format is converted from
+#' that same SVG - rendering per format would redraw an identical gtable
+#' N times for byte-identical rsvg input.
+#'
+#' @param keep_svg Keep (and return the path to) the intermediate SVG even
+#'   when "svg" wasn't a requested format, so the caller can reuse it for
+#'   the Viewer preview instead of paying for another render.
+#' @return Invisibly, the path to the rendered SVG.
+#' @noRd
+render_e61 <- function(graph, format, filename, width, height, bg_colour, res,
+                       keep_svg = FALSE) {
+
+  # add very slight width buffer
+  width <- width + 0.1
+
+  save_svg <- "svg" %in% format
+  svg_file <- if (save_svg) paste0(filename, ".svg") else tempfile(fileext = ".svg")
+  if (!save_svg && !keep_svg) on.exit(unlink(svg_file), add = TRUE)
+
+  t61_draw_svg(graph, file = svg_file, width = width, height = height, bg_colour = bg_colour)
+
+  for (fmt in setdiff(format, "svg")) {
 
     file_i <- paste0(filename, ".", fmt)
 
-    # png/jpg/eps/pdf are all produced by rendering an SVG first and then converting it with rsvg
-    needs_temp_svg <- fmt %in% c("png", "jpg", "eps", "pdf")
-    file_name_i <- if (needs_temp_svg) tempfile(fileext = ".svg") else file_i
-
-    # add very slight width buffer
-    width <- width + 0.1
-
-    svglite::svglite(filename = file_name_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
-
-    closed <- FALSE
-    on.exit({
-      if (!closed) try(grDevices::dev.off(), silent = TRUE)
-    }, add = TRUE)
-
-    graph_i <- maybe_add_default_scales(graph)
-    class(graph_i) <- setdiff(class(graph_i), "e61_plot")
-
-    print(graph_i)
-
-    grDevices::dev.off()
-    closed <- TRUE
-
-    # Convert the rendered SVG into the requested format
-    if (fmt == "png") {
-      svg_to_bitmap(file_name_i, paste0(filename, ".png"), delete = TRUE, res = res)
-
-    } else if (fmt == "jpg") {
-      svg_to_bitmap(file_name_i, paste0(filename, ".jpg"), delete = TRUE, res = res)
+    if (fmt == "png" || fmt == "jpg") {
+      svg_to_bitmap(svg_file, file_i, res = res)
 
     } else if (fmt == "pdf") {
-      rsvg::rsvg_pdf(svg = file_name_i, file = file_i)
-      unlink(file_name_i)
+      rsvg::rsvg_pdf(svg = svg_file, file = file_i)
 
     } else if (fmt == "eps") {
-      rsvg::rsvg_eps(svg = file_name_i, file = file_i)
-      unlink(file_name_i)
+      rsvg::rsvg_eps(svg = svg_file, file = file_i)
     }
-  })
+  }
+
+  invisible(svg_file)
 }
 
 #' Check plots are ggplot objects and return a list of only ggplot objects
@@ -121,15 +213,29 @@ check_plots <- function(plots){
 
 #' Create a temp SVG file to preview a graph in the Viewer pane, regardless
 #' of which format(s) were saved to disk
+#'
+#' @param svg_file Path to an SVG render of this same graph that
+#'   render_e61() already produced, if there is one - reused instead of
+#'   rendering the graph a second time.
 #' @noRd
-make_preview_svg <- function(graph, format, filename, width, height, bg_colour, res) {
+make_preview_svg <- function(graph, format, filename, width, height, bg_colour, res,
+                             svg_file = NULL) {
 
   preview_svg <- tempfile(fileext = ".svg")
 
-  if ("svg" %in% format) {
+  if (!is.null(svg_file) && file.exists(svg_file)) {
+    # rstudioapi::viewer() only opens temp files, so an SVG saved to the
+    # user's own path still has to be copied into tempdir() first; one
+    # render_e61() already left in tempdir() can be shown as-is.
+    if (startsWith(normalizePath(svg_file), normalizePath(tempdir()))) {
+      return(invisible(svg_file))
+    }
+    file.copy(svg_file, preview_svg, overwrite = TRUE)
+
+  } else if ("svg" %in% format) {
     file.copy(paste0(filename, ".svg"), preview_svg, overwrite = TRUE)
   } else {
-    save_graph(
+    render_e61(
       graph = graph,
       format = "svg",
       filename = tools::file_path_sans_ext(preview_svg),
