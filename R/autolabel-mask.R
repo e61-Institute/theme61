@@ -38,20 +38,18 @@ t61_retry <- function(fn, attempts = 8, pause = 0.1) {
 #' to it here would fire those side effects once per panel, per mask
 #' render, stomping on the real preview/save this call is itself part of.
 #'
-#' ggplot_build.e61_plot() (see ggplot_build-method.R) applies its own
-#' mutations -- default scales, facet spacing, discrete y-text alignment --
-#' before building, and every other read of this plot (e.g. t61_render_mask()'s
-#' own ggplot_build() call for panel_params) goes through that dispatch.
-#' Applying the same mutations here before stripping the class keeps this
-#' raster's coordinate system consistent with those reads, rather than
-#' silently reverting to plain ggplot2 defaults for this render alone.
+#' Must mirror ggplot_build.e61_plot()'s mutations exactly (incl.
+#' finalise_e61_plot() - format_flip()/map_axis_correction() change axis
+#' text/gridlines, which changes the panel's own pixel box), or this read
+#' disagrees with the plot's normal build on panel geometry.
 #' @noRd
 t61_drop_e61_class <- function(plot) {
   if (inherits(plot, "e61_plot")) {
+    plot <- finalise_e61_plot(plot)
     plot <- maybe_add_default_scales(plot)
     plot <- maybe_adjust_facet_spacing(plot)
     plot <- maybe_leftalign_discrete_y_text(plot)
-    class(plot) <- setdiff(class(plot), "e61_plot")
+    class(plot) <- setdiff(class(plot), c("e61_map", "e61_plot"))
   }
   plot
 }
@@ -162,7 +160,10 @@ t61_strip_chrome <- function(plot) {
 #' @noRd
 t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
 
-  built <- ggplot2::ggplot_build(plot)
+  # One build of the class-stripped, fully-mutated plot serves both
+  # panel_params (below) and the drawn gtable, instead of two separate builds.
+  final_plot <- t61_strip_chrome(t61_drop_e61_class(plot))
+  built <- ggplot2::ggplot_build(final_plot)
 
   # panel_params (used below for x_range/y_range/breaks) already reflects
   # coord_flip() -- it describes the screen's rendered axes, not the raw
@@ -175,7 +176,7 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
 
   px_height <- round(px_width * height_cm / width_cm)
 
-  # Opened before ggplotGrob() below: with no device open yet, that call
+  # Opened before ggplot_gtable() below: with no device open yet, that call
   # can silently open the session's own default device instead, corrupting
   # this render (confirmed cause of "Input file is too short" on Windows).
   svg_file <- tempfile(fileext = ".svg")
@@ -192,7 +193,7 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   # Built and drawn as two explicit steps, not print(plot): building can
   # leave a stray device current, and reclaiming only after drawing would
   # already be too late.
-  final_gt <- ggplot2::ggplotGrob(t61_strip_chrome(t61_drop_e61_class(plot)))
+  final_gt <- ggplot2::ggplot_gtable(built)
 
   # Facet bail-out (exactly one panel cell, structurally checked via the
   # gtable layout) -- NOT for the cm box it would otherwise compute; see
