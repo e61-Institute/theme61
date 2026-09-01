@@ -7,17 +7,20 @@
 #' uses and the following functions enable this with as little fiddliness as
 #' possible.
 #'
-#' `sec_rescale_inv` is used in the geom that will be displayed on the
-#' secondary axis. `sec_rescale` is used in the `sec_axis` argument of
-#' `scale_y_continuous_e61`.
+#' Two functions are needed to make a rescaled secondary axis:
 #'
-#' See the examples for how to use the two functions to manipulate the secondary
-#' axis. Trial and error will be needed to select appropriate scale and shift
-#' values.
+#' * `sec_rescale_inv()` transforms the y aesthetic of the series that is to be
+#'   plotted against the secondary axis, so it is drawn in the units of the
+#'   primary axis.
+#' * `sec_rescale_axis()` builds the secondary axis itself, and is passed to the
+#'   `sec_axis` argument of [scale_y_continuous_e61()].
 #'
-#' **Note:** Due to the way that ggplot functions interact with the R
-#' environment, you have to run the code that generates the graph **twice**
-#' after you change it before the changes will show up.
+#' Give both functions the same `scale` and `shift` values. Trial and error will
+#' be needed to select appropriate values.
+#'
+#' `sec_rescale()` converts values from the primary axis back into the secondary
+#' axis units. It is used internally by `sec_rescale_axis()` and is exported for
+#' users who want to do the conversion themselves.
 #'
 #' @param values Vector of data that would normally be passed as the y aesthetic
 #'   in the graph.
@@ -37,25 +40,26 @@
 #'
 #' ggplot(data, aes(x)) +
 #'   geom_col(aes(y = y1)) +
+#'   # Rescale the secondary series into primary axis units...
 #'   geom_point(aes(y = sec_rescale_inv(y2, scale = 0.1, shift = 5))) +
-#'   # Some extra arguments are required to correctly format the secondary axis:
-#'   # Set rescaled_sec = TRUE in scale_y_continuous_e61() to format the breaks correctly.
-#'   # The secondary y-axis label (name = "%") needs to be explicitly specified otherwise it will not appear.
-#'   scale_y_continuous_e61(limits = c(0, 60, 10), sec_axis = sec_axis(~sec_rescale(.), name = "%"), rescale_sec = TRUE) +
+#'   # ... and give the secondary axis the same scale and shift.
+#'   scale_y_continuous_e61(
+#'     limits = c(0, 60, 10),
+#'     sec_axis = sec_rescale_axis(scale = 0.1, shift = 5, name = "%")
+#'   ) +
 #'   labs_e61(y = "%")
 #' }
 #'
 sec_rescale_inv <- function(values, scale = 1, shift = 0) {
 
-  # Store scale and shift vars to supply to sec_rescale()
+  check_rescale_arg(scale, "scale")
+  check_rescale_arg(shift, "shift")
+
+  # Stashed only so the deprecated scale_y_continuous_e61(rescale_sec = TRUE)
+  # path keeps working - sec_rescale_axis() takes scale/shift directly. Remove
+  # this along with that argument.
   assign("sec_axis_scale", scale, envir = t61_env)
   assign("sec_axis_shift", shift, envir = t61_env)
-
-  # Inform the user of the weirdness
-  if (t61_should_show_cooldown_msg("theme61.sec_axis_msg")) {
-    cli::cli_alert_info("Did your graph not show any change to the secondary axis? Due to weirdness, you need to run the graph code twice after making changes to the secondary axis rescaling. This message appears every 30 minutes by default; run {.code options(theme61.sec_axis_msg = TRUE)} to see it every time, or {.code FALSE} to turn it off.",
-                        wrap = TRUE)
-  }
 
   return ((values + shift) / scale)
 }
@@ -64,4 +68,54 @@ sec_rescale_inv <- function(values, scale = 1, shift = 0) {
 #' @export
 sec_rescale <- function(values, scale = t61_env$sec_axis_scale, shift = t61_env$sec_axis_shift) {
   return (values * scale - shift)
+}
+
+#' @param name Character. Title for the secondary axis. Defaults to
+#'   [waiver()][ggplot2::waiver], which reuses the primary axis title.
+#' @returns `sec_rescale_axis()` returns a secondary axis object that can be
+#'   passed to the `sec_axis` argument of [scale_y_continuous_e61()] (or to
+#'   `sec.axis` in [ggplot2::scale_y_continuous()]).
+#' @rdname dual_y_axis
+#' @export
+sec_rescale_axis <- function(scale = 1, shift = 0, name = ggplot2::waiver()) {
+
+  check_rescale_arg(scale, "scale")
+  check_rescale_arg(shift, "shift")
+
+  new_sec_rescale_axis(scale = scale, shift = shift, name = name)
+}
+
+#' Build the secondary axis object used by sec_rescale_axis(). Carries the
+#' scale/shift in an attribute so scale_y_continuous_e61() can align the
+#' secondary breaks with the primary ones without any shared session state.
+#' @noRd
+new_sec_rescale_axis <- function(scale, shift, name = ggplot2::waiver(),
+                                 breaks = ggplot2::waiver(),
+                                 labels = ggplot2::waiver()) {
+
+  axis <- ggplot2::sec_axis(
+    transform = function(x) sec_rescale(x, scale = scale, shift = shift),
+    name = name,
+    breaks = breaks,
+    labels = labels
+  )
+
+  attr(axis, "t61_rescale") <- list(scale = scale, shift = shift, name = name)
+
+  axis
+}
+
+#' Validate a scale/shift argument.
+#' @noRd
+check_rescale_arg <- function(x, arg) {
+
+  if (!is.numeric(x) || length(x) != 1 || !is.finite(x)) {
+    cli::cli_abort("{.arg {arg}} must be a single finite number.")
+  }
+
+  if (identical(arg, "scale") && x == 0) {
+    cli::cli_abort("{.arg scale} must not be 0, as the secondary axis would collapse to a single value.")
+  }
+
+  invisible(x)
 }

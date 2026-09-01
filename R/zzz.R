@@ -19,8 +19,7 @@ t61_env <- NULL
   theme61.max_discrete_colours = 12L,
   theme61.max_discrete_fills = 12L,
   theme61.open_in_browser = FALSE,
-  theme61.preview_on_print = TRUE,
-  theme61.sec_axis_msg = NA
+  theme61.preview_on_print = TRUE
 )
 
 # Runs on load, including namespace-qualified use (theme61::save_e61())

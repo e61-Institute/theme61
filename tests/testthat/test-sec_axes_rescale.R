@@ -1,6 +1,15 @@
-test_that("Test the function works in isolation", {
-  withr::local_options(list(theme61.sec_axis_msg = FALSE))
+# Removes the scale/shift that sec_rescale_inv() stashes in t61_env, so a test
+# starts from the same state as a fresh R session.
+clear_sec_stash <- function() {
+  rm(list = intersect(c("sec_axis_scale", "sec_axis_shift"),
+                      ls(envir = theme61:::t61_env, all.names = TRUE)),
+     envir = theme61:::t61_env)
+}
 
+# The secondary axis breaks/labels the scale will actually draw with.
+sec_axis_of <- function(scale) scale$secondary.axis
+
+test_that("Test the function works in isolation", {
   expect_equal(sec_rescale_inv(c(10, 20, 30), scale = 0.1),
                c(100, 200, 300))
 
@@ -14,35 +23,7 @@ test_that("Test the function works in isolation", {
                c(10, 20, 30))
 })
 
-
-test_that("Graphs produced with manipulated secondary axes work", {
-  p_scale <- ggplot(data.frame(x = 1, y1 = 10, y2 = 200), aes(x)) +
-    geom_point(aes(y = y1), colour = "red") +
-    geom_point(aes(y = sec_rescale_inv(y2, scale = 10))) +
-    scale_y_continuous_e61(
-      limits = c(0, 25, 5),
-      sec_axis = sec_axis(~sec_rescale(.), name = "%"),
-      rescale_sec = TRUE
-    ) +
-    labs_e61(y = "%")
-
-  p_shift <- ggplot(data.frame(x = 1, y1 = 10, y2 = 30), aes(x)) +
-    geom_point(aes(y = y1), colour = "red") +
-    geom_point(aes(y = sec_rescale_inv(y2, shift = -10))) +
-    scale_y_continuous_e61(
-      limits = c(0, 25, 5),
-      sec_axis = sec_axis(~sec_rescale(.), name = "%"),
-      rescale_sec = TRUE
-    ) +
-    labs_e61(y = "%")
-
-  expect_no_error(ggplot_build(p_scale))
-  expect_no_error(ggplot_build(p_shift))
-})
-
 test_that("sec_rescale()/sec_rescale_inv() edge cases", {
-  withr::local_options(list(theme61.sec_axis_msg = FALSE))
-
   # identity: scale = 1, shift = 0 leaves values unchanged
   expect_equal(sec_rescale_inv(c(1, 2, 3)), c(1, 2, 3))
   expect_equal(sec_rescale(c(1, 2, 3), scale = 1, shift = 0), c(1, 2, 3))
@@ -63,11 +44,184 @@ test_that("sec_rescale()/sec_rescale_inv() edge cases", {
   expect_equal(sec_rescale(c(1, NA, 3), scale = 1, shift = 0), c(1, NA, 3))
 })
 
-test_that("sec_rescale() falls back to values stashed by sec_rescale_inv() via t61_env", {
-  withr::local_options(list(theme61.sec_axis_msg = FALSE))
+test_that("sec_rescale_axis()/sec_rescale_inv() reject invalid scale/shift", {
+  expect_error(sec_rescale_axis(scale = 0), "must not be 0")
+  expect_error(sec_rescale_axis(scale = c(1, 2)), "single finite number")
+  expect_error(sec_rescale_axis(scale = "a"), "single finite number")
+  expect_error(sec_rescale_axis(shift = NA_real_), "single finite number")
+  expect_error(sec_rescale_axis(shift = Inf), "single finite number")
 
-  # Calling sec_rescale_inv() stashes scale/shift in the package environment,
-  # which sec_rescale()'s default arguments then pick up.
+  expect_error(sec_rescale_inv(1:3, scale = 0), "must not be 0")
+  expect_error(sec_rescale_inv(1:3, shift = c(1, 2)), "single finite number")
+})
+
+test_that("sec_rescale_axis() returns a usable secondary axis object", {
+  ax <- sec_rescale_axis(scale = 0.1, shift = 5, name = "%")
+
+  # Same object type ggplot2::sec_axis() produces, so it can be handed to
+  # ggplot2's own scales as well as to scale_y_continuous_e61()
+  expect_s3_class(ax, "AxisSecondary")
+  expect_identical(ax$name, "%")
+
+  p <- ggplot(data.frame(x = 1:3, y = 1:3), aes(x, y)) +
+    geom_point() +
+    ggplot2::scale_y_continuous(sec.axis = ax)
+
+  expect_no_error(ggplot2::ggplot_build(p))
+})
+
+test_that("sec_rescale_axis() lines the secondary breaks up with the primary breaks", {
+  sc <- scale_y_continuous_e61(
+    limits = c(0, 25, 5),
+    sec_axis = sec_rescale_axis(scale = 10, shift = 0, name = "%")
+  )
+
+  breaks <- seq(0, 25, 5)
+
+  expect_equal(sec_axis_of(sc)$breaks, sec_rescale(breaks, scale = 10, shift = 0))
+  expect_equal(as.numeric(sec_axis_of(sc)$labels),
+               sec_rescale(breaks, scale = 10, shift = 0))
+  expect_identical(sec_axis_of(sc)$name, "%")
+
+  # shift as well as scale
+  sc_shift <- scale_y_continuous_e61(
+    limits = c(0, 25, 5),
+    sec_axis = sec_rescale_axis(scale = 1, shift = 10)
+  )
+  expect_equal(sec_axis_of(sc_shift)$breaks, breaks - 10)
+})
+
+test_that("sec_rescale_axis() gets the right breaks with no scale/shift stashed (fresh session)", {
+  # The bug in #352: scale_y_continuous_e61() used to read the scale/shift out
+  # of t61_env at `+` time, before sec_rescale_inv() had ever run, so nothing
+  # was there to read on a graph's first build.
+  clear_sec_stash()
+
+  sc <- scale_y_continuous_e61(
+    limits = c(0, 50, 10),
+    sec_axis = sec_rescale_axis(scale = 0.1, shift = 0, name = "%")
+  )
+
+  expect_equal(sec_axis_of(sc)$breaks, seq(0, 50, 10) * 0.1)
+
+  # And a whole graph built exactly once renders that axis
+  p <- ggplot(data.frame(x = 1, y1 = 10, y2 = 2), aes(x)) +
+    geom_point(aes(y = y1)) +
+    geom_point(aes(y = sec_rescale_inv(y2, scale = 0.1, shift = 0))) +
+    scale_y_continuous_e61(
+      limits = c(0, 50, 10),
+      sec_axis = sec_rescale_axis(scale = 0.1, shift = 0, name = "%")
+    ) +
+    labs_e61(y = "$")
+
+  expect_no_error(ggplot_build(p))
+  expect_gt(get_grob_width(quiet_ggplotGrob(p), grob_name = "axis-r"), 0)
+})
+
+test_that("two dual-axis graphs in one session each get their own breaks", {
+  # The other half of #352: the second graph used to be formatted with the
+  # first graph's scale/shift, because that is what was left in t61_env.
+  clear_sec_stash()
+
+  make_plot <- function(scale, shift, limits) {
+    ggplot(data.frame(x = 1, y1 = mean(limits[1:2]), y2 = 1), aes(x)) +
+      geom_point(aes(y = y1)) +
+      geom_point(aes(y = sec_rescale_inv(y2, scale = scale, shift = shift))) +
+      scale_y_continuous_e61(
+        limits = limits,
+        sec_axis = sec_rescale_axis(scale = scale, shift = shift, name = "%")
+      )
+  }
+
+  # y2 = 1 must land inside the [0, 25] primary limits once rescaled, i.e.
+  # (1 + shift) / scale in [0, 25]
+  p1 <- make_plot(scale = 10, shift = 0, limits = c(0, 25, 5))
+  p2 <- make_plot(scale = 0.1, shift = 0.5, limits = c(0, 25, 5))
+
+  sec_breaks <- function(p) {
+    built <- ggplot2::ggplot_build(p)
+    built$plot@scales$get_scales("y")$secondary.axis$breaks
+  }
+
+  # Build in both orders: neither graph picks up the other's rescaling
+  expect_equal(sec_breaks(p1), seq(0, 25, 5) * 10)
+  expect_equal(sec_breaks(p2), seq(0, 25, 5) * 0.1 - 0.5)
+  expect_equal(sec_breaks(p1), seq(0, 25, 5) * 10)
+})
+
+test_that("sec_rescale_axis() objects can be reused across graphs without being mutated", {
+  ax <- sec_rescale_axis(scale = 2, shift = 0)
+
+  sc1 <- scale_y_continuous_e61(limits = c(0, 10, 5), sec_axis = ax)
+  sc2 <- scale_y_continuous_e61(limits = c(0, 100, 50), sec_axis = ax)
+
+  expect_equal(sec_axis_of(sc1)$breaks, c(0, 5, 10) * 2)
+  expect_equal(sec_axis_of(sc2)$breaks, c(0, 50, 100) * 2)
+
+  # The user's own object is untouched by either call
+  expect_true(inherits(ax$breaks, "waiver"))
+})
+
+test_that("a rescaled secondary axis without explicit break increments still builds", {
+  # No length-3 limits means there are no explicit primary breaks to rescale,
+  # so ggplot2 derives the secondary breaks from the transform instead.
+  p <- ggplot(data.frame(x = 1:3, y1 = c(1, 5, 9), y2 = c(2, 4, 6)), aes(x)) +
+    geom_point(aes(y = y1)) +
+    geom_point(aes(y = sec_rescale_inv(y2, scale = 0.5, shift = 0))) +
+    scale_y_continuous_e61(sec_axis = sec_rescale_axis(scale = 0.5, shift = 0))
+
+  expect_no_error(ggplot_build(p))
+})
+
+test_that("faceted plots with a rescaled secondary axis build and render without error", {
+  # Regression test for NEWS 0.7.1: "Fix issue with facet panel spacing when
+  # axes do not appear on all panels."
+  df <- data.frame(
+    x = rep(1:3, 2),
+    y1 = c(1, 2, 3, 4, 5, 6),
+    y2 = c(10, 20, 30, 40, 50, 60),
+    g = rep(c("A", "B"), each = 3)
+  )
+
+  p <- ggplot(df, aes(x)) +
+    geom_point(aes(y = y1)) +
+    geom_point(aes(y = sec_rescale_inv(y2, scale = 10))) +
+    scale_y_continuous_e61(
+      limits = c(0, 10, 2),
+      sec_axis = sec_rescale_axis(scale = 10, name = "%")
+    ) +
+    facet_wrap(~g) +
+    labs_e61(y = "y", x = "x")
+
+  expect_no_error(ggplot_build(p))
+  expect_no_error(quiet_ggplotGrob(p))
+
+  # theme61's facet_wrap() defaults to axes = "all", which should widen the
+  # panel spacing set by maybe_adjust_facet_spacing()
+  built <- ggplot2::ggplot_build(p)
+  th <- built$plot@theme
+  expect_equal(grid::convertUnit(th$panel.spacing.x, "lines", valueOnly = TRUE), 2)
+  expect_equal(grid::convertUnit(th$panel.spacing.y, "lines", valueOnly = TRUE), 2)
+})
+
+test_that("the deprecated rescale_sec argument warns but still works", {
+  # sec_rescale_inv() stashes the scale/shift the deprecated path reads back
+  sec_rescale_inv(c(10, 20), scale = 10, shift = 0)
+
+  expect_warning(
+    sc <- scale_y_continuous_e61(
+      limits = c(0, 25, 5),
+      sec_axis = ggplot2::sec_axis(~sec_rescale(.), name = "%"),
+      rescale_sec = TRUE
+    ),
+    class = "lifecycle_warning_deprecated"
+  )
+
+  expect_equal(sec_axis_of(sc)$breaks, seq(0, 25, 5) * 10)
+})
+
+test_that("sec_rescale() falls back to values stashed by sec_rescale_inv() via t61_env", {
+  # Retained for the deprecated rescale_sec = TRUE path.
   sec_rescale_inv(c(10, 20), scale = 5, shift = 1)
 
   expect_equal(sec_rescale(c(2, 4)), c(2, 4) * 5 - 1)
@@ -94,88 +248,4 @@ test_that("sec_axis = FALSE suppresses the axis-r grob", {
 
   width <- get_grob_width(grobs, grob_name = "axis-r")
   expect_true(is.null(width) || width == 0)
-})
-
-test_that("a rescaled secondary axis on a real plot also renders an axis-r grob", {
-  withr::local_options(list(theme61.sec_axis_msg = FALSE))
-
-  p <- ggplot(data.frame(x = 1, y1 = 10, y2 = 200), aes(x)) +
-    geom_point(aes(y = y1)) +
-    geom_point(aes(y = sec_rescale_inv(y2, scale = 10))) +
-    scale_y_continuous_e61(
-      limits = c(0, 25, 5),
-      sec_axis = sec_axis(~sec_rescale(.), name = "%"),
-      rescale_sec = TRUE
-    ) +
-    labs_e61(y = "%")
-
-  grobs <- quiet_ggplotGrob(p)
-
-  expect_gt(get_grob_width(grobs, grob_name = "axis-r"), 0)
-})
-
-test_that("sec_rescale_inv()'s weirdness reminder respects the theme61.sec_axis_msg tri-state", {
-  # TRUE shows every time.
-  withr::local_options(list(theme61.sec_axis_msg = TRUE))
-  expect_message(sec_rescale_inv(c(1, 2, 3), scale = 1), "run the graph code twice")
-  expect_message(sec_rescale_inv(c(1, 2, 3), scale = 1), "run the graph code twice")
-
-  # FALSE opts out entirely.
-  withr::local_options(list(theme61.sec_axis_msg = FALSE))
-  expect_no_message(sec_rescale_inv(c(1, 2, 3), scale = 1))
-})
-
-test_that("sec_rescale_inv()'s weirdness reminder defaults to a 30-minute cooldown", {
-  withr::local_options(list(theme61.sec_axis_msg = NULL))
-  t61_env <- theme61:::t61_env
-  clear_last_shown <- function() {
-    if (exists("theme61.sec_axis_msg_last_shown", envir = t61_env, inherits = FALSE)) {
-      rm(list = "theme61.sec_axis_msg_last_shown", envir = t61_env, inherits = FALSE)
-    }
-  }
-  clear_last_shown()
-  withr::defer(clear_last_shown())
-
-  expect_message(sec_rescale_inv(c(1, 2, 3), scale = 1), "run the graph code twice")
-  # Same session, well within the cooldown window: stays quiet.
-  expect_no_message(sec_rescale_inv(c(1, 2, 3), scale = 1))
-
-  # Backdate the last-shown time past the cooldown window: fires again.
-  t61_env <- theme61:::t61_env
-  t61_env$theme61.sec_axis_msg_last_shown <- Sys.time() - 31 * 60
-  expect_message(sec_rescale_inv(c(1, 2, 3), scale = 1), "run the graph code twice")
-})
-
-test_that("faceted plots with a secondary axis build and render without error", {
-  # Regression test for NEWS 0.7.1: "Fix issue with facet panel spacing when
-  # axes do not appear on all panels."
-  withr::local_options(list(theme61.sec_axis_msg = FALSE))
-
-  df <- data.frame(
-    x = rep(1:3, 2),
-    y1 = c(1, 2, 3, 4, 5, 6),
-    y2 = c(10, 20, 30, 40, 50, 60),
-    g = rep(c("A", "B"), each = 3)
-  )
-
-  p <- ggplot(df, aes(x)) +
-    geom_point(aes(y = y1)) +
-    geom_point(aes(y = sec_rescale_inv(y2, scale = 10))) +
-    scale_y_continuous_e61(
-      limits = c(0, 10, 2),
-      sec_axis = sec_axis(~sec_rescale(.), name = "%"),
-      rescale_sec = TRUE
-    ) +
-    facet_wrap(~g) +
-    labs_e61(y = "y", x = "x")
-
-  expect_no_error(ggplot_build(p))
-  expect_no_error(quiet_ggplotGrob(p))
-
-  # theme61's facet_wrap() defaults to axes = "all", which should widen the
-  # panel spacing set by maybe_adjust_facet_spacing()
-  built <- ggplot2::ggplot_build(p)
-  th <- built$plot@theme
-  expect_equal(grid::convertUnit(th$panel.spacing.x, "lines", valueOnly = TRUE), 2)
-  expect_equal(grid::convertUnit(th$panel.spacing.y, "lines", valueOnly = TRUE), 2)
 })

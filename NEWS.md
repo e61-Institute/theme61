@@ -1,3 +1,15 @@
+# theme61 0.8.1
+
+#### New and changed features
+
+* New function `sec_rescale_axis()` builds a rescaled secondary y-axis directly from the `scale` and `shift` you supply, e.g. `scale_y_continuous_e61(limits = c(0, 100, 25), sec_axis = sec_rescale_axis(scale = 0.1, shift = 0, name = "%"))`. Use it in place of hand-writing `sec_axis(~sec_rescale(.))`.
+* The `rescale_sec` argument of `scale_y_continuous_e61()` is deprecated. Replace `sec_axis = sec_axis(~sec_rescale(.)), rescale_sec = TRUE` with `sec_axis = sec_rescale_axis(scale, shift, name)`, using the same `scale` and `shift` values you pass to `sec_rescale_inv()`.
+* Removed the `theme61.sec_axis_msg` option, along with the reminder it controlled, as the secondary axis code no longer needs to be run twice.
+
+#### Bug fixes
+
+* Rescaled secondary y-axes no longer need the graph code to be run twice, and no longer silently draw stale breaks. `sec_rescale_inv()` (evaluated when the graph is built) used to stash the scale and shift for `scale_y_continuous_e61(rescale_sec = TRUE)` (evaluated when the scale is added to the graph) to read back, so the axis was always formatted using the values from the *previous* graph: a fresh session, or a second dual-axis graph in the same session, got the wrong breaks with no warning. `sec_rescale_axis()` carries the scale and shift itself, so the breaks are correct the first time.
+
 # theme61 0.8.0
 
 #### New and changed features

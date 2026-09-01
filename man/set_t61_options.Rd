@@ -28,7 +28,6 @@ The following options are available to set:
 \item \code{theme61.max_discrete_fills}: The maximum number of levels a discrete fill aesthetic can have before automatic fill scale injection errors out instead of applying \code{scale_fill_e61()}. This is 12 by default.
 \item \code{theme61.open_in_browser}: If TRUE, graphs will also open in the browser in addition to the Viewer pane. This is FALSE by default.
 \item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
-\item \code{theme61.sec_axis_msg}: Controls the reminder from \link{sec_rescale_inv} that rescaled secondary axis changes need the graph code run twice to take effect. By default (unset), it appears at most once every 30 minutes. Set to TRUE to show it every time, or FALSE to turn it off entirely.
 }
 }
 \section{Environment variables}{

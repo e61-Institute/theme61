@@ -8,7 +8,7 @@
 scale_y_continuous_e61(
   limits = NULL,
   sec_axis = ggplot2::dup_axis(),
-  rescale_sec = FALSE,
+  rescale_sec = lifecycle::deprecated(),
   expand_bottom = 0,
   expand_top = 0,
   add_space = FALSE,
@@ -34,12 +34,15 @@ limits of the scale. The break increments will be automatically chosen.}
 \item{\code{NULL} to use the default scale range.}
 }}
 
-\item{sec_axis}{Logical. Defaults to duplicating the y-axis so it shows on
-the left and right. Set to FALSE to hide the secondary axis.}
+\item{sec_axis}{Defaults to duplicating the y-axis so it shows on the left
+and right. Set to FALSE to hide the secondary axis, or supply
+\code{\link[=sec_rescale_axis]{sec_rescale_axis()}} to put the secondary axis on a different scale to the
+primary axis.}
 
-\item{rescale_sec}{Logical. Set this to TRUE if you are using a rescaled
-secondary axis, otherwise leave it as FALSE (default). To add a rescaled
-secondary axis, see the documentation for \link{sec_rescale}.}
+\item{rescale_sec}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
+\code{sec_axis = sec_rescale_axis(scale, shift, name)} instead, which takes the
+rescaling directly rather than relying on values stashed by a previous
+call to \code{\link[=sec_rescale_inv]{sec_rescale_inv()}}.}
 
 \item{expand_bottom, expand_top}{Numeric. Add extra space between data points
 and the top/bottom of the graph. See \link[ggplot2:expansion]{expansion} for
