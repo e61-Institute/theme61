@@ -7,3 +7,4 @@ tests/testthat/Rplots.pdf
 .DS_Store
 /check
 *.tar.gz
+.claude/worktrees/
