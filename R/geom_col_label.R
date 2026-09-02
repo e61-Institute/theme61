@@ -32,6 +32,13 @@
 #' @param reverse Logical. Reverse the stacking order used to position labels
 #'   within stacked columns. Set this to match `position_stack(reverse =
 #'   TRUE)` if you used that for your `geom_col()`. Defaults to FALSE.
+#' @param position One of `"stack"` (the default), `"dodge"`, or `"dodge2"`.
+#'   Set this to match the `position` you used on the corresponding
+#'   [ggplot2::geom_col()] call. `"dodge"`/`"dodge2"` split each bar's width
+#'   the same way [ggplot2::position_dodge()]/[ggplot2::position_dodge2()]
+#'   do (based on the `fill`/`group` aesthetic), and each label shows that
+#'   bar's own share of the panel-wide total rather than a share of its
+#'   (non-existent) stack.
 #' @param na.rm If FALSE, the default, missing values are removed with a
 #'   warning. If TRUE, missing values are silently removed.
 #' @param show.legend logical. Should this layer be included in the legends?
@@ -100,10 +107,12 @@ geom_col_label <- function(mapping = NULL,
                            accuracy = 1,
                            align = "top",
                            reverse = FALSE,
+                           position = "stack",
                            na.rm = FALSE,
                            show.legend = NA,
                            inherit.aes = TRUE) {
 
+  position <- match.arg(position, c("stack", "dodge", "dodge2"))
   align_num <- .resolve_col_label_align(align)
   edge_align <- align_num <= 0 || align_num >= 1
 
@@ -120,6 +129,44 @@ geom_col_label <- function(mapping = NULL,
     params$na.rm <- na.rm
     if (is.null(params$vjust)) params$vjust <- default_vjust
     params
+  }
+
+  if (position %in% c("dodge", "dodge2")) {
+
+    # Mirror geom_col(position = "dodge"/"dodge2")'s own width-splitting so
+    # labels land on the bar geom_col actually draws, instead of reimplementing
+    # that logic - position_dodge()/position_dodge2() only move x (never y),
+    # so StatColLabelDodge computes each label's own y/percentage directly,
+    # unlike the stacked path below which leans on position_stack()'s vjust.
+    dodge_position <- if (position == "dodge") {
+      ggplot2::position_dodge(width = NULL)
+    } else {
+      ggplot2::position_dodge2(width = NULL, padding = 0.1)
+    }
+
+    layers[[1]] <- ggplot2::layer(
+      data = data,
+      mapping = mapping,
+      stat = StatColLabelDodge,
+      geom = GeomTextFlipAware,
+      position = dodge_position,
+      show.legend = show.legend,
+      inherit.aes = inherit.aes,
+      params = base_params(if (edge_align) 0 else 0.5)
+    )
+
+    layers[[length(layers) + 1]] <- ggplot2::layer(
+      data = data,
+      mapping = mapping,
+      stat = StatColLabelSpacer,
+      geom = ggplot2::GeomBlank,
+      position = "identity",
+      show.legend = FALSE,
+      inherit.aes = inherit.aes,
+      params = list(align = align_num, na.rm = na.rm, position = position)
+    )
+
+    return(layers)
   }
 
   interior_params <- base_params(0.5)
@@ -172,7 +219,7 @@ geom_col_label <- function(mapping = NULL,
     position = "identity",
     show.legend = FALSE,
     inherit.aes = inherit.aes,
-    params = list(align = align_num, na.rm = na.rm)
+    params = list(align = align_num, na.rm = na.rm, position = position)
   )
 
   layers
@@ -356,6 +403,65 @@ StatColLabelFloat <- ggplot2::ggproto("StatColLabelFloat", ggplot2::Stat,
   }
 )
 
+# Dodged/grouped columns (position = "dodge"/"dodge2"): each bar is drawn
+# independently, side by side, rather than stacked - so unlike StatColLabel
+# each label's percentage is the bar's own share of the panel-wide total, and
+# unlike StatColLabelFloat every bar needs this treatment, not just lone
+# (unstacked) x values. x-positioning is left entirely to the caller's
+# position_dodge()/position_dodge2() (passed as this layer's `position`),
+# since those only move x and never touch y - so this stat computes the
+# final y (and vjust) directly, the same way StatColLabelFloat does for a
+# lone row, rather than leaning on position_stack()'s vjust interpolation
+# (which position_dodge() has no equivalent for).
+StatColLabelDodge <- ggplot2::ggproto("StatColLabelDodge", ggplot2::Stat,
+  required_aes = c("x", "y"),
+
+  default_aes = ggplot2::aes(label = ggplot2::after_stat(label)),
+
+  compute_panel = function(data, scales, accuracy = 1, align = 1) {
+
+    # position_dodge()/position_dodge2() only look at xmin/xmax (or their own
+    # `width` param) to find each bar's pre-dodge width, never a data$width
+    # column - so without these they'd see xmin == xmax == x and collapse
+    # every bar to the same spot. Same formula GeomBar$setup_data() uses, so
+    # bars and labels dodge into the same slots.
+    if (is.null(data$xmin) && is.null(data$xmax)) {
+      width <- ggplot2::resolution(data$x, zero = FALSE) * 0.9
+      data$xmin <- data$x - width / 2
+      data$xmax <- data$x + width / 2
+    }
+
+    total <- sum(data$y, na.rm = TRUE)
+    data$label <- col_label_percent(data$y, total, accuracy)
+
+    # Interior (0 < align < 1): centre the label at that fraction of the
+    # bar's own height - the direct equivalent of position_stack(vjust =
+    # align)'s interpolation for a bar that isn't part of a stack.
+    if (align > 0 && align < 1) {
+      data$y <- data$y * align
+      return(data)
+    }
+
+    gap <- diff(range(c(0, data$y), na.rm = TRUE)) * .COL_LABEL_GAP_FRAC
+    if (!is.finite(gap)) gap <- 0
+
+    user_limits <- scales$y$limits
+    if (length(user_limits) < 2) user_limits <- c(NA, NA)
+
+    if (align >= 1) {
+      new_y <- data$y + gap
+      if (!is.na(user_limits[2])) new_y <- pmin(new_y, user_limits[2])
+    } else {
+      base <- min(0, min(data$y, na.rm = TRUE))
+      new_y <- base + gap
+      if (!is.na(user_limits[1])) new_y <- pmax(new_y, user_limits[1])
+    }
+    data$y <- new_y
+
+    data
+  }
+)
+
 # Reserves headroom for single (non-stacked) columns' floating "top" label,
 # via an invisible geom_blank() layer whose (x, y) still counts towards the
 # y scale's trained range. This is the only remaining case that needs it:
@@ -368,21 +474,30 @@ StatColLabelFloat <- ggplot2::ggproto("StatColLabelFloat", ggplot2::Stat,
 StatColLabelSpacer <- ggplot2::ggproto("StatColLabelSpacer", ggplot2::Stat,
   required_aes = c("x", "y"),
 
-  compute_panel = function(data, scales, align = 1) {
+  compute_panel = function(data, scales, align = 1, position = "stack") {
 
     if (align < 1) return(data[0, , drop = FALSE])
 
-    n_per_x <- tapply(data$y, data$x, length)
-    single <- n_per_x <= 1
-    if (!any(single)) return(data[0, , drop = FALSE])
+    if (identical(position, "stack")) {
+      n_per_x <- tapply(data$y, data$x, length)
+      single <- n_per_x <= 1
+      if (!any(single)) return(data[0, , drop = FALSE])
 
-    per_x_total <- tapply(data$y, data$x, sum, na.rm = TRUE)
-    single_totals <- per_x_total[single]
+      per_x_total <- tapply(data$y, data$x, sum, na.rm = TRUE)
+      single_totals <- per_x_total[single]
 
-    pad <- diff(range(c(0, per_x_total), na.rm = TRUE)) * .COL_LABEL_HEADROOM_FRAC
-    if (!is.finite(pad) || pad == 0) pad <- 1
+      pad <- diff(range(c(0, per_x_total), na.rm = TRUE)) * .COL_LABEL_HEADROOM_FRAC
+      if (!is.finite(pad) || pad == 0) pad <- 1
 
-    padded <- max(single_totals, na.rm = TRUE) + pad
+      padded <- max(single_totals, na.rm = TRUE) + pad
+    } else {
+      # Dodged bars each float above their own top individually (there's no
+      # stack to sum), so headroom only needs to clear the tallest bar.
+      pad <- diff(range(c(0, data$y), na.rm = TRUE)) * .COL_LABEL_HEADROOM_FRAC
+      if (!is.finite(pad) || pad == 0) pad <- 1
+
+      padded <- max(data$y, na.rm = TRUE) + pad
+    }
 
     # Respect an explicit user limit (e.g. scale_y_continuous_e61(limits =
     # ...)) rather than padding past it - scale_y_continuous_e61() errors if
