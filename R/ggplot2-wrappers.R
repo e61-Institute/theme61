@@ -1,3 +1,62 @@
+#' Re-export the ggplot2 verbs theme61's examples and typical usage call
+#' directly, so they're available without attaching ggplot2 explicitly
+#' alongside the masked ggplot()/labs()/etc.
+#'
+#' @noRd
+#' @export
+aes <- ggplot2::aes
+#' @noRd
+#' @export
+geom_area <- ggplot2::geom_area
+#' @noRd
+#' @export
+geom_bar <- ggplot2::geom_bar
+#' @noRd
+#' @export
+geom_col <- ggplot2::geom_col
+#' @noRd
+#' @export
+geom_errorbar <- ggplot2::geom_errorbar
+#' @noRd
+#' @export
+geom_line <- ggplot2::geom_line
+#' @noRd
+#' @export
+geom_path <- ggplot2::geom_path
+#' @noRd
+#' @export
+geom_point <- ggplot2::geom_point
+#' @noRd
+#' @export
+geom_ribbon <- ggplot2::geom_ribbon
+#' @noRd
+#' @export
+geom_sf <- ggplot2::geom_sf
+#' @noRd
+#' @export
+geom_text <- ggplot2::geom_text
+#' @noRd
+#' @export
+coord_flip <- ggplot2::coord_flip
+#' @noRd
+#' @export
+coord_sf <- ggplot2::coord_sf
+#' @noRd
+#' @export
+position_stack <- ggplot2::position_stack
+#' @noRd
+#' @export
+scale_colour_brewer <- ggplot2::scale_colour_brewer
+#' @noRd
+#' @export
+scale_colour_gradient <- ggplot2::scale_colour_gradient
+#' @noRd
+#' @export
+scale_colour_manual <- ggplot2::scale_colour_manual
+#' @noRd
+#' @export
+scale_fill_manual <- ggplot2::scale_fill_manual
+
 #' Masks ggplot2::ggplot to add e61_plot class and apply theme_e61
 #'
 #' This wrapper tags the plot so theme61 can inject default scales at build time.
