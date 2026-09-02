@@ -10,14 +10,6 @@
 # directly, so the panel's pixel bounding box is derived from the plot's
 # gtable layout instead.
 
-#' Re-select dev_num as the current device, if it still exists -- text
-#' layout can open and abandon devices of its own, leaving one of those
-#' current instead, so drawing silently lands on the wrong device.
-#' @noRd
-t61_reclaim_device <- function(dev_num) {
-  if (dev_num %in% grDevices::dev.list()) grDevices::dev.set(dev_num)
-}
-
 #' Retry a flaky file-based call, backing off further each time -- rsvg can
 #' fail reading a freshly-written file on Windows (e.g. antivirus
 #' scanning it) even though it's already complete.
@@ -178,22 +170,11 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   # Opened before ggplotGrob() below: with no device open yet, that call
   # can silently open the session's own default device instead, corrupting
   # this render (confirmed cause of "Input file is too short" on Windows).
-  # dev.off() makes dev.next() current, not whatever the caller had open, so
-  # capture it and put it back -- otherwise a render here silently hands the
-  # caller a different device to take its text metrics from.
-  caller_dev <- grDevices::dev.cur()
-
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
-  svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
-  # Safety net if rendering errors partway: closes svg_file's own device
-  # only if the explicit close below hasn't already run.
-  dev_num <- grDevices::dev.cur()
-  on.exit({
-    t61_reclaim_device(dev_num)
-    if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
-    t61_reclaim_device(caller_dev)
-  }, add = TRUE)
+  device <- t61_open_device(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
+  # Safety net if rendering errors before the explicit release below.
+  on.exit(t61_release_device(device), add = TRUE)
 
   gt <- ggplot2::ggplotGrob(t61_strip_chrome(plot))
   # Still used for its facet bail-out (exactly one panel cell, structurally
@@ -205,12 +186,12 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   # leave a stray device current, and reclaiming only after drawing would
   # already be too late.
   final_gt <- ggplot2::ggplotGrob(t61_strip_chrome(t61_drop_e61_class(plot)))
-  t61_reclaim_device(dev_num)
+  t61_reclaim_device(device$dev)
   grid::grid.newpage()
   grid::grid.draw(final_gt)
-  t61_reclaim_device(dev_num)
-  if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
-  t61_reclaim_device(caller_dev)
+  # Released here, not just on exit: rsvg reads the SVG back below, so it has
+  # to be complete on disk first.
+  t61_release_device(device)
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)
@@ -307,33 +288,22 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
   marker <- marker + ggplot2::theme(panel.background = ggplot2::element_rect(fill = marker_colour, colour = NA))
   marker <- t61_drop_e61_class(marker)
 
-  # dev.off() makes dev.next() current, not whatever the caller had open, so
-  # capture it and put it back -- otherwise a render here silently hands the
-  # caller a different device to take its text metrics from.
-  caller_dev <- grDevices::dev.cur()
-
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
-  svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
-  # See the matching guard in t61_render_mask() -- closes svg_file's own
-  # device if rendering errors before the explicit close below gets to.
-  dev_num <- grDevices::dev.cur()
-  on.exit({
-    t61_reclaim_device(dev_num)
-    if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
-    t61_reclaim_device(caller_dev)
-  }, add = TRUE)
+  device <- t61_open_device(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
+  # Safety net if rendering errors before the explicit release below.
+  on.exit(t61_release_device(device), add = TRUE)
 
   # See the matching split in t61_render_mask() -- build (ggplotGrob()) and
   # draw as two explicit steps, not print(marker), so the device can be
   # reclaimed in between.
   marker_gt <- ggplot2::ggplotGrob(marker)
-  t61_reclaim_device(dev_num)
+  t61_reclaim_device(device$dev)
   grid::grid.newpage()
   grid::grid.draw(marker_gt)
-  t61_reclaim_device(dev_num)
-  if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
-  t61_reclaim_device(caller_dev)
+  # Released here, not just on exit: rsvg reads the SVG back below, so it has
+  # to be complete on disk first.
+  t61_release_device(device)
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)

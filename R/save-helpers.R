@@ -24,41 +24,19 @@ t61_quiet_na_removal <- function(expr) {
   )
 }
 
-#' Measure text on a device of our own, always.
-#'
-#' ggplotGrob()/ggplot_gtable() take text metrics from the current device, so
-#' whichever device happens to be open decides how titles wrap and how much
-#' room the panel gets. This used to open a device only when none was already
-#' current, which made the output depend on ambient session state: an analyst
-#' with a plot window open got measurably different graphs from the same
-#' script than one in a fresh session. Opening our own svglite device
-#' unconditionally -- the same device type save_graph() writes with -- makes
-#' the measurements reproducible.
+#' Run `expr` on an svglite device of our own, then give the caller theirs
+#' back. ggplotGrob()/ggplot_gtable() read text metrics from the current
+#' device, so measuring on an ambient one makes output depend on session state.
 #'
 #' Also muffles the "font family 'pt-sans' not found in PostScript font
 #' database" warning: grid's font-metric fallback doesn't know about
-#' sysfonts-registered families on some devices, but showtext still renders
-#' pt-sans correctly wherever it's actually drawn.
+#' sysfonts-registered families, but showtext renders pt-sans correctly.
 #' @noRd
 t61_with_device <- function(expr) {
-  # These calls nest (save_single()/save_multi() wrap whole blocks that then
-  # measure individual plots), and dev.off() makes dev.next() current rather
-  # than whatever was current before -- so put the caller's device back
-  # explicitly instead of assuming.
-  caller_dev <- grDevices::dev.cur()
-
   svg_file <- tempfile(fileext = ".svg")
-  svglite::svglite(svg_file)
-  dev_num <- grDevices::dev.cur()
-
+  device <- t61_open_device(svg_file)
   on.exit({
-    # Close this device by number. `expr` can leave a device of its own
-    # current, and a bare dev.off() would then close that one instead.
-    if (dev_num %in% grDevices::dev.list()) {
-      grDevices::dev.set(dev_num)
-      grDevices::dev.off()
-    }
-    t61_reclaim_device(caller_dev)
+    t61_release_device(device)
     unlink(svg_file)
   }, add = TRUE)
 
@@ -92,33 +70,18 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
     # add very slight width buffer
     width <- width + 0.1
 
-    # print() below can leave a device of its own current, and a bare dev.off()
-    # closes whatever is current -- which was closing the caller's device and
-    # leaving this one open. Close this device by number, then hand the
-    # caller's back.
-    caller_dev <- grDevices::dev.cur()
-
-    svglite::svglite(filename = file_name_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
-    dev_num <- grDevices::dev.cur()
-
-    closed <- FALSE
-    on.exit({
-      if (!closed) {
-        t61_reclaim_device(dev_num)
-        if (grDevices::dev.cur() == dev_num) try(grDevices::dev.off(), silent = TRUE)
-      }
-      t61_reclaim_device(caller_dev)
-    }, add = TRUE)
+    device <- t61_open_device(filename = file_name_i, width = cm_to_in(width),
+                              height = cm_to_in(height), bg = bg_colour)
+    on.exit(t61_release_device(device), add = TRUE)
 
     graph_i <- maybe_add_default_scales(graph)
     class(graph_i) <- setdiff(class(graph_i), "e61_plot")
 
     print(graph_i)
 
-    t61_reclaim_device(dev_num)
-    grDevices::dev.off()
-    closed <- TRUE
-    t61_reclaim_device(caller_dev)
+    # Released here, not just on exit: the SVG has to be complete on disk
+    # before the rsvg conversions below read it back.
+    t61_release_device(device)
 
     # Convert the rendered SVG into the requested format
     if (fmt == "png") {
