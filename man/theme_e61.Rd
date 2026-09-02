@@ -49,11 +49,12 @@ Sans.}
 \description{
 Returns a ggplot2 theme with e61 Institute styling applied.
 
-\strong{\code{set_base_size} is deprecated as of version 0.8.0.}
-Use \code{\link{set_t61_options}} to set the base size via the
-\code{theme61.base_size} option instead. This needs to be set outside of
-the function because it is called by other functions as part of the graph
-rendering process.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+}
+\details{
+Use \code{\link[=set_t61_options]{set_t61_options()}} to set the base size via the \code{theme61.base_size}
+option instead. This needs to be set outside of the function because it
+is called by other functions as part of the graph rendering process.
 }
 \examples{
 \dontrun{

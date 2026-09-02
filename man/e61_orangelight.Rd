@@ -3,14 +3,34 @@
 \docType{data}
 \name{e61_orangelight}
 \alias{e61_orangelight}
-\title{Hex code for the colour: e61 Orange Light}
+\alias{e61_orangelight1}
+\alias{e61_orangelight2}
+\alias{e61_orangelight3}
+\alias{e61_orangelight4}
+\alias{e61_orangelight5}
+\alias{e61_orangelight6}
+\alias{e61_orangelight7}
+\alias{e61_orangelight8}
+\title{Hex codes for the colour: e61 Orange Light}
 \format{
-An object of class \code{character} of length 1.
+A character string, a hex colour code.
 }
 \usage{
 e61_orangelight
 }
 \description{
-#FFC537
+Base shade and numbered variants 1 (darkest) to 8 (lightest).
+}
+\details{
+\itemize{
+\item e61_orangelight, e61_orangelight1: #FFC537
+\item e61_orangelight2: #FCC94D
+\item e61_orangelight3: #F9CE63
+\item e61_orangelight4: #F7D27A
+\item e61_orangelight5: #F4D790
+\item e61_orangelight6: #F1DCA6
+\item e61_orangelight7: #EFE0BD
+\item e61_orangelight8: #ECE5D3
+}
 }
 \keyword{datasets}
