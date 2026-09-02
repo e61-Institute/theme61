@@ -42,6 +42,13 @@ t61_get_logo <- function() {
     return(t61_env$logo)
   }
 
+  if (!requireNamespace("magick", quietly = TRUE)) {
+    cli::cli_abort(c(
+      "The {.pkg magick} package is needed for {.fn add_e61_logo}.",
+      "i" = 'Install it with {.run install.packages("magick")}.'
+    ))
+  }
+
   logo_path <- system.file("extdata", "e61-black-logo.png", package = "theme61")
 
   img <- tryCatch(

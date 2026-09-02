@@ -8,13 +8,13 @@ test_that("Dimensioning functions", {
     plot <- minimal_plot
 
     suppressWarnings(save_e61("custom-dim.png", plot, dim = list(width = 10, height = 10)))
-    g_info1 <- magick::image_info(magick::image_read("custom-dim.png"))
+    g_info1 <- png_info("custom-dim.png")
 
     suppressWarnings(save_e61("custom-dim.png", plot, dim = list(width = 10, height = 5)))
-    g_info2 <- magick::image_info(magick::image_read("custom-dim.png"))
+    g_info2 <- png_info("custom-dim.png")
 
     suppressWarnings(save_e61("custom-dim.png", plot, dim = list(width = 5, height = 10)))
-    g_info3 <- magick::image_info(magick::image_read("custom-dim.png"))
+    g_info3 <- png_info("custom-dim.png")
 
     expect_equal(g_info1$width, g_info2$width, tolerance = 1)
     expect_equal(g_info1$width, g_info3$width * 2, tolerance = 10)
@@ -475,8 +475,8 @@ test_that("PNG resolution changer works", {
     suppressWarnings(save_e61("png-1.png", plot))
     suppressWarnings(save_e61("png-2.png", plot, res = 2))
 
-    g_info1 <- magick::image_info(magick::image_read("png-1.png"))
-    g_info2 <- magick::image_info(magick::image_read("png-2.png"))
+    g_info1 <- png_info("png-1.png")
+    g_info2 <- png_info("png-2.png")
 
     expect_equal(g_info1$width * 2, g_info2$width, tolerance = 0.1)
     expect_equal(g_info1$height * 2, g_info2$height, tolerance = 0.1)
