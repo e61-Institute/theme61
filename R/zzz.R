@@ -14,6 +14,7 @@ t61_env <- NULL
   theme61.autolabel_fallback_msg = TRUE,
   theme61.autolabel_fast_msg = NA,
   theme61.base_size = 10,
+  theme61.default_save_format = NULL,
   theme61.disable_spellcheck = FALSE,
   theme61.iterate_mode = FALSE,
   theme61.max_discrete_colours = 12L,

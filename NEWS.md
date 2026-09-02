@@ -1,5 +1,7 @@
 # theme61 0.8.0
 
+01 Sep 2026
+
 #### New and changed features
 
 * Automatic plot labelling! `plot_label()` now has an algorithm that attempts to automatically position plot labels in sensible locations for most common geom types. See the documentation for more information: [plot_label()](https://e61-institute.github.io/theme61/reference/plot_label.html) or `?plot_label()`.
