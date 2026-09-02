@@ -43,8 +43,7 @@ sa3 <- sa3[sa3$gcc_code_2021 == "1GSYD", ] # let's just look at Sydney
    right = max(sa3$cent_long),
    top = max(sa3$cent_lat))
    ) +
- geom_point(aes(x = cent_long, y = cent_lat)) + #plot points
- theme_e61_spatial()
+ geom_point(aes(x = cent_long, y = cent_lat)) #plot points
 }
 }
 \seealso{

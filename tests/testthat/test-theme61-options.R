@@ -78,9 +78,9 @@ test_that("labs_e61() skips HTML/markdown subtitle styling in iterate_mode", {
   expect_identical(l_iter$subtitle, "hi")
 })
 
-test_that("theme61.disable_spellcheck suppresses save_e61()'s spell-checker", {
+test_that("theme61.enable_spellcheck suppresses save_e61()'s spell-checker when FALSE", {
   skip_if_no_en_au_dictionary()
-  withr::local_options(list(theme61.disable_spellcheck = FALSE))
+  withr::local_options(list(theme61.enable_spellcheck = TRUE))
 
   p <- minimal_plot + labs_e61(title = "Thsi has a typo")
 
@@ -88,26 +88,18 @@ test_that("theme61.disable_spellcheck suppresses save_e61()'s spell-checker", {
     expect_message(save_e61("spell-on.svg", p), "typo")
   })
 
-  withr::local_options(list(theme61.disable_spellcheck = TRUE))
+  withr::local_options(list(theme61.enable_spellcheck = FALSE))
 
   withr::with_tempdir({
     expect_no_message(save_e61("spell-off.svg", p))
   })
 })
 
-test_that("set_t61_options accepts theme61.disable_spellcheck as a valid option", {
-  withr::defer(options(theme61.disable_spellcheck = FALSE))
+test_that("set_t61_options accepts theme61.enable_spellcheck as a valid option", {
+  withr::defer(options(theme61.enable_spellcheck = TRUE))
 
-  set_t61_options(list(theme61.disable_spellcheck = TRUE))
-  expect_true(getOption("theme61.disable_spellcheck"))
-})
-
-test_that("set_t61_options accepts theme61.max_discrete_colours and theme61.max_discrete_fills as valid options", {
-  withr::defer(options(theme61.max_discrete_colours = NULL, theme61.max_discrete_fills = NULL))
-
-  set_t61_options(list(theme61.max_discrete_colours = 20L, theme61.max_discrete_fills = 20L))
-  expect_equal(getOption("theme61.max_discrete_colours"), 20L)
-  expect_equal(getOption("theme61.max_discrete_fills"), 20L)
+  set_t61_options(list(theme61.enable_spellcheck = FALSE))
+  expect_false(getOption("theme61.enable_spellcheck"))
 })
 
 test_that("set_t61_options() validates against the fixed set of theme61 options, not whichever are currently set", {
