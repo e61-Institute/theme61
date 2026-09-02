@@ -3,14 +3,35 @@
 \docType{data}
 \name{e61_greylight}
 \alias{e61_greylight}
-\title{Hex code for the colour: e61 Grey Light}
+\alias{e61_greylight1}
+\alias{e61_greylight2}
+\alias{e61_greylight3}
+\alias{e61_greylight4}
+\alias{e61_greylight5}
+\alias{e61_greylight6}
+\alias{e61_greylight7}
+\alias{e61_greylight8}
+\title{Hex codes for the colour: e61 Grey Light}
 \format{
-An object of class \code{character} of length 1.
+A character string, a hex colour code.
 }
 \usage{
 e61_greylight
 }
 \description{
-#828282
+Base shade and numbered variants 1 (darkest) to 8 (lightest).
+}
+\details{
+\itemize{
+\item e61_greylight: #828282
+\item e61_greylight1: #8F8F8F
+\item e61_greylight2: #9B9B9B
+\item e61_greylight3: #A8A8A8
+\item e61_greylight4: #B4B4B4
+\item e61_greylight5: #C1C1C1
+\item e61_greylight6: #CDCDCD
+\item e61_greylight7: #DADADA
+\item e61_greylight8: #E6E6E6
+}
 }
 \keyword{datasets}
