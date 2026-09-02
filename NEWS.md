@@ -1,5 +1,7 @@
 # theme61 0.8.0
 
+01 Sep 2026
+
 #### New and changed features
 
 * Automatic plot labelling! `plot_label()` now has an algorithm that attempts to automatically position plot labels in sensible locations for most common geom types. See the documentation for more information: [plot_label()](https://e61-institute.github.io/theme61/reference/plot_label.html) or `?plot_label()`.
@@ -17,6 +19,13 @@
 * Improvements to margins, text wrapping, whitespace and text overlap/clipping issues.
 * Fixed footnotes, sources and titles being mangled when their text happened to look like the formatting theme61 adds around them. Footnotes containing the word "Source" (or a colon) are no longer mistaken for the sources line, and titles, subtitles and y-axis titles containing HTML-like text are no longer garbled, because `labs_e61()` now keeps each piece of text separate instead of splitting the formatted text back apart when it wraps your graph's labels.
 * Fixed issue with PDFs not rendering as previews in Viewer.
+
+#### Deprecated features
+
+* `set_base_size()` is now deprecated. Use `set_t61_options(list(theme61.base_size = ...))` instead.
+* Removed the `theme61.max_discrete_colours`/`theme61.max_discrete_fills` options; the discrete palette limit of 12 is fixed and was never actually configurable via these. `set_t61_options()` now hard-errors if you try to set either.
+* `theme_e61_spatial()` is now defunct. Use `theme_e61()` instead -- spatial styling has applied automatically on save/print for a full release cycle now.
+* `save_e61()`'s `title`/`subtitle`/`footnotes`/`sources`, `ncol`/`nrow`/`align`/`axis`, and `pad_width`/`pad_height`/`outer_width`/`outer_height`/`height_adj`/`rel_heights`/`spacing_adj` arguments are now defunct, after a full release cycle of warning. Use `labs`, `layout`, and `spacing` instead.
 
 # theme61 0.7.1
 

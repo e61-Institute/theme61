@@ -153,117 +153,6 @@ theme_e61 <- function(
   ret
 }
 
-#' e61 theme for spatial maps
-#'
-#' `r lifecycle::badge("deprecated")`
-#'
-#' Map-specific axis/gridline styling is now applied automatically on
-#' save/print based on whether a plot contains a spatial layer - use
-#' [theme_e61()] for both regular and spatial plots.
-#'
-#' @inheritParams theme_e61
-#' @export
-theme_e61_spatial <- function(
-    legend = c("none", "bottom", "top", "left", "right", "inside"),
-    legend_position = NULL,
-    legend_title = FALSE,
-    base_family = "pt-sans",
-    aspect_ratio = NULL,
-    background = "white",
-    base_line_size = points_to_mm(0.75),
-    base_rect_size = points_to_mm(1)
-) {
-  lifecycle::deprecate_warn(
-    "0.8.0", "theme_e61_spatial()", "theme_e61()",
-    details = "Spatial styling is now applied automatically on save/print."
-  )
-
-  legend <- match.arg(
-    legend,
-    choices = c("none", "bottom", "top", "left", "right", "inside")
-  )
-
-  aspect_ratio <- if (is.null(aspect_ratio)) 0.75 else aspect_ratio
-
-  if (legend == "inside") {
-    .validate_legend_position(legend_position)
-  }
-
-  base_size <- getOption("theme61.base_size", default = 10)
-  half_line <- base_size / 2
-
-  ret <-
-    theme(
-      aspect.ratio = aspect_ratio,
-      line = element_line(colour = "black", linewidth = base_line_size),
-      rect = element_rect(fill = background, colour = NA, linewidth = base_rect_size),
-      # base text
-      text = element_text(
-        colour = "black",
-        family = base_family,
-        size = base_size
-      ),
-      # titles
-      plot.title.position   = "plot",
-      plot.caption.position = "plot",
-      plot.title = element_text(
-        size = rel(1.3),
-        hjust = 0,
-        face = "bold",
-        margin = margin(b = half_line)
-      ),
-      plot.subtitle = ggtext::element_markdown(
-        size = rel(1.15),
-        hjust = 0,
-        margin = margin(b = base_size)
-      ),
-      plot.caption = element_text(
-        size = rel(0.8),
-        hjust = 0,
-        margin = margin(t = half_line)
-      ),
-      plot.margin = margin(t = half_line * 2, r = half_line, b = half_line, l = half_line),
-
-      # panel and axes
-      panel.background = element_blank(),
-      panel.border = element_blank(),
-      axis.text = element_blank(),
-      axis.ticks.x = element_blank(),
-      axis.line.x = element_blank(),
-
-      # child keys, not the parent panel.grid.major - a child key always
-      # wins over a parent-level override regardless of add order
-      panel.grid.major.x = element_blank(),
-      panel.grid.major.y = element_blank(),
-      panel.grid.minor = element_blank(),
-
-      # legend
-      legend.position = legend,
-      legend.direction = if (grepl("bottom|top", legend)) "horizontal" else "vertical",
-      legend.background = element_blank(),
-      legend.key = element_blank(),
-      legend.text = element_text(size = rel(0.9))
-    )
-
-  if (legend_title) {
-    ret <- ret + theme(legend.title = element_text(size = rel(0.9)))
-  } else {
-    ret <- ret + theme(legend.title = element_blank())
-  }
-
-  if (legend == "inside") {
-    ret <- ret + theme(legend.position.inside = legend_position)
-  }
-
-  # facet spacing
-  ret <- ret %+replace% theme(
-    panel.spacing.x = unit(2, "lines"),
-    panel.spacing.y = unit(2, "lines")
-  )
-
-  ret
-}
-
 #' Converts all legend colours to squares
 #'
 #' Legend symbols for line graphs default to coloured lines, which can sometimes
@@ -343,14 +232,22 @@ format_flip <- function(x_adj = 0, current_theme = NULL) {
 
 #' Sets the base size for the theme
 #'
-#' \code{set_base_size} sets the base size for the theme to be used in
-#' \code{theme_e61()}. This needs to be set outside of the function because it
+#' `r lifecycle::badge("deprecated")`
+#'
+#' Use [set_t61_options()] to set the base size via the `theme61.base_size`
+#' option instead. This needs to be set outside of the function because it
 #' is called by other functions as part of the graph rendering process.
+#'
 #' @param base_size Numeric. Graph font size. Default is 10.
 #' @return \code{set_base_size} is used for its side effects.
 #' @rdname theme_e61
 #' @export
 set_base_size <- function(base_size) {
+  lifecycle::deprecate_warn(
+    "0.8.0", "set_base_size()", "set_t61_options(list(theme61.base_size = ...))",
+    details = "Use set_t61_options() to set the theme61.base_size option instead."
+  )
+
   if (!is.numeric(base_size) || length(base_size) != 1 || base_size <= 0) {
     stop("base_size must be a single positive number.")
   }
