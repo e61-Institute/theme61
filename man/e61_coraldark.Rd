@@ -3,14 +3,34 @@
 \docType{data}
 \name{e61_coraldark}
 \alias{e61_coraldark}
-\title{Hex code for the colour: e61 Coral Dark}
+\alias{e61_coraldark1}
+\alias{e61_coraldark2}
+\alias{e61_coraldark3}
+\alias{e61_coraldark4}
+\alias{e61_coraldark5}
+\alias{e61_coraldark6}
+\alias{e61_coraldark7}
+\alias{e61_coraldark8}
+\title{Hex codes for the colour: e61 Coral Dark}
 \format{
-An object of class \code{character} of length 1.
+A character string, a hex colour code.
 }
 \usage{
 e61_coraldark
 }
 \description{
-#e35d4f
+Base shade and numbered variants 1 (darkest) to 8 (lightest).
+}
+\details{
+\itemize{
+\item e61_coraldark, e61_coraldark1: #e35d4f
+\item e61_coraldark2: #e66d61
+\item e61_coraldark3: #e97d72
+\item e61_coraldark4: #eb8e84
+\item e61_coraldark5: #ee9e95
+\item e61_coraldark6: #f1aea7
+\item e61_coraldark7: #f4beb9
+\item e61_coraldark8: #f7ceca
+}
 }
 \keyword{datasets}

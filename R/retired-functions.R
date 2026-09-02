@@ -16,6 +16,16 @@ e61_chart_maker <- function(...) {
   )
 }
 
+#' Defunct
+#' @export
+#' @noRd
+theme_e61_spatial <- function(...) {
+  lifecycle::deprecate_stop(
+    when = "0.8.1", what = "theme_e61_spatial()", with = "theme_e61()",
+    details = "Spatial styling is now applied automatically on save/print."
+  )
+}
+
 # # Keep this as an example of a defunct function
 #
 # #' Defunct
