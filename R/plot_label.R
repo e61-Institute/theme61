@@ -36,7 +36,6 @@
 #'   call `save_e61()` first. Useful for grabbing the chosen positions once
 #'   so you can pin them (or hand-tweak just one or two) instead of
 #'   auto-positioning every time. Defaults to FALSE.
-#' @param facet_name,facet_value `r lifecycle::badge("deprecated")`
 #'
 #' @details
 #' ## Default label text and colour

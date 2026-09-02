@@ -77,8 +77,6 @@ are chosen. Set to FALSE to always use the exact \code{x}/\code{y} you supply --
 call \code{save_e61()} first. Useful for grabbing the chosen positions once
 so you can pin them (or hand-tweak just one or two) instead of
 auto-positioning every time. Defaults to FALSE.}
-
-\item{facet_name, facet_value}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }
 \value{
 Object to add to a ggplot (via \code{+}).

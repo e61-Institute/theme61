@@ -184,13 +184,13 @@ sizes, panel spacing) is computed for a fixed target size (\code{dim}, or the
 same defaults \code{save_e61} would otherwise use) - it won't reflow if you
 resize the device afterwards.}
 
-\item{title, subtitle, footnotes, sources}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+\item{title, subtitle, footnotes, sources}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#defunct}{\figure{lifecycle-defunct.svg}{options: alt='[Defunct]'}}}{\strong{[Defunct]}}
 Use \code{labs} instead.}
 
-\item{ncol, nrow, align, axis}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{layout}
+\item{ncol, nrow, align, axis}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#defunct}{\figure{lifecycle-defunct.svg}{options: alt='[Defunct]'}}}{\strong{[Defunct]}} Use \code{layout}
 instead.}
 
-\item{pad_width, pad_height, outer_width, outer_height, height_adj, rel_heights, spacing_adj}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{spacing} instead.}
+\item{pad_width, pad_height, outer_width, outer_height, height_adj, rel_heights, spacing_adj}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#defunct}{\figure{lifecycle-defunct.svg}{options: alt='[Defunct]'}}}{\strong{[Defunct]}} Use \code{spacing} instead.}
 }
 \value{
 Invisibly returns the file name.

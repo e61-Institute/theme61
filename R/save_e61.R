@@ -141,13 +141,13 @@
 #'   same defaults `save_e61` would otherwise use) - it won't reflow if you
 #'   resize the device afterwards.
 #' @param ... (multi-panel specific) Plot objects to put on the panel.
-#' @param title,subtitle,footnotes,sources `r lifecycle::badge("deprecated")`
+#' @param title,subtitle,footnotes,sources `r lifecycle::badge("defunct")`
 #'   Use `labs` instead.
-#' @param ncol,nrow,align,axis `r lifecycle::badge("deprecated")` Use `layout`
+#' @param ncol,nrow,align,axis `r lifecycle::badge("defunct")` Use `layout`
 #'   instead.
 #' @param
 #' pad_width,pad_height,outer_width,outer_height,height_adj,rel_heights,spacing_adj
-#' `r lifecycle::badge("deprecated")` Use `spacing` instead.
+#' `r lifecycle::badge("defunct")` Use `spacing` instead.
 #' @return Invisibly returns the file name.
 #' @export
 
@@ -213,13 +213,14 @@ save_e61 <- function(filename = NULL,
     plots <- c(list(...), plotlist)
   }
 
-  # Fold deprecated top-level arguments into their replacement list args ----
-  # (mirrors the pattern used for plot_label()'s deprecated facet_name/facet_value)
+  # Defunct top-level arguments: error immediately if supplied, instead of
+  # folding into their replacement list args, since they were already
+  # deprecated for a full release cycle.
 
-  .save_e61_deprecate_into <- function(list_arg, list_name, element, value, arg_name) {
+  .save_e61_defunct <- function(value, arg_name, list_name, element) {
     if (lifecycle::is_present(value)) {
-      lifecycle::deprecate_warn(
-        when = "0.8.0",
+      lifecycle::deprecate_stop(
+        when = "0.8.1",
         what = paste0("save_e61(", arg_name, " = )"),
         with = paste0("save_e61(", list_name, " = )"),
         details = paste0(
@@ -227,37 +228,33 @@ save_e61 <- function(filename = NULL,
           list_name, " = list(", element, " = ...)"
         )
       )
-      list_arg[[element]] <- value
     }
-    list_arg
   }
 
-  labs   <- .save_e61_deprecate_into(labs, "labs", "title", title, "title")
-  labs   <- .save_e61_deprecate_into(labs, "labs", "subtitle", subtitle, "subtitle")
-  labs   <- .save_e61_deprecate_into(labs, "labs", "footnotes", footnotes, "footnotes")
-  labs   <- .save_e61_deprecate_into(labs, "labs", "sources", sources, "sources")
+  .save_e61_defunct(title, "title", "labs", "title")
+  .save_e61_defunct(subtitle, "subtitle", "labs", "subtitle")
+  .save_e61_defunct(footnotes, "footnotes", "labs", "footnotes")
+  .save_e61_defunct(sources, "sources", "labs", "sources")
 
-  layout <- .save_e61_deprecate_into(layout, "layout", "ncol", ncol, "ncol")
-  layout <- .save_e61_deprecate_into(layout, "layout", "nrow", nrow, "nrow")
-  layout <- .save_e61_deprecate_into(layout, "layout", "align", align, "align")
-  layout <- .save_e61_deprecate_into(layout, "layout", "axis", axis, "axis")
+  .save_e61_defunct(ncol, "ncol", "layout", "ncol")
+  .save_e61_defunct(nrow, "nrow", "layout", "nrow")
+  .save_e61_defunct(align, "align", "layout", "align")
+  .save_e61_defunct(axis, "axis", "layout", "axis")
 
-  spacing <- .save_e61_deprecate_into(spacing, "spacing", "pad_width", pad_width, "pad_width")
-  spacing <- .save_e61_deprecate_into(spacing, "spacing", "pad_height", pad_height, "pad_height")
-  spacing <- .save_e61_deprecate_into(spacing, "spacing", "outer_width", outer_width, "outer_width")
-  spacing <- .save_e61_deprecate_into(spacing, "spacing", "outer_height", outer_height, "outer_height")
-  spacing <- .save_e61_deprecate_into(spacing, "spacing", "height_adj", height_adj, "height_adj")
-  spacing <- .save_e61_deprecate_into(spacing, "spacing", "rel_heights", rel_heights, "rel_heights")
+  .save_e61_defunct(pad_width, "pad_width", "spacing", "pad_width")
+  .save_e61_defunct(pad_height, "pad_height", "spacing", "pad_height")
+  .save_e61_defunct(outer_width, "outer_width", "spacing", "outer_width")
+  .save_e61_defunct(outer_height, "outer_height", "spacing", "outer_height")
+  .save_e61_defunct(height_adj, "height_adj", "spacing", "height_adj")
+  .save_e61_defunct(rel_heights, "rel_heights", "spacing", "rel_heights")
 
   if (lifecycle::is_present(spacing_adj)) {
-    lifecycle::deprecate_warn(
-      when = "0.8.0",
+    lifecycle::deprecate_stop(
+      when = "0.8.1",
       what = "save_e61(spacing_adj = )",
       with = "save_e61(spacing = )",
       details = "Set `title`/`subtitle` inside the `spacing` list instead: spacing = list(title = ..., subtitle = ...)"
     )
-    if (!is.null(spacing_adj$title)) spacing$title <- spacing_adj$title
-    if (!is.null(spacing_adj$subtitle)) spacing$subtitle <- spacing_adj$subtitle
   }
 
   # Fill in defaults for any list elements the caller didn't supply
