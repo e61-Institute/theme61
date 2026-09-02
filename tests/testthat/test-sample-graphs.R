@@ -1,4 +1,5 @@
 test_that("Single-panel graph examples", {
+  skip_snapshot_off_ci_linux()
 
   withr::local_seed(42)
   withr::local_options(list(theme61.enable_spellcheck = FALSE))
@@ -159,6 +160,7 @@ test_that("Single-panel graph examples", {
 })
 
 test_that("Multi-panel graph examples", {
+  skip_snapshot_off_ci_linux()
 
   withr::local_seed(42)
   withr::local_options(list(theme61.enable_spellcheck = FALSE))
@@ -324,14 +326,14 @@ test_that("Multi-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61("plot-multi-1x2-1-title-no subtitle.svg", p1_t, p2_t,
+      save_e61("plot-multi-1x2-1-title-no-subtitle.svg", p1_t, p2_t,
                labs = list(title = "Multi-panel graph title text"))))
   })
 
 })
 
 test_that("Map examples", {
-
+  skip_snapshot_off_ci_linux()
   skip_if_not_installed("sf")
   withr::local_options(list(theme61.enable_spellcheck = FALSE))
 
