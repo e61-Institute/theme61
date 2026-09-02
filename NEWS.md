@@ -16,6 +16,7 @@
 * Fixed an issue where `labs_e61` would leave whitespace above subtitles and y-axis titles when a plot had a subtitle but no title.
 * Improvements to margins, text wrapping, whitespace and text overlap/clipping issues.
 * Fixed issue with PDFs not rendering as previews in Viewer.
+* The minimum required version of rsvg is now 2.6.0. Earlier versions contain a resizing bug in `rsvg_svg()` that affects the rescaling `save_e61()` does when saving PNG and JPG files.
 
 # theme61 0.7.1
 

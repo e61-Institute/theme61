@@ -19,16 +19,16 @@ Imports:
     ggtext (>= 0.1.2),
     gh (>= 1.4.0),
     glue,
-    grDevices (>= 4.2.2),
-    grid (>= 4.2.2),
+    grDevices,
+    grid,
     here (>= 1.0.1),
     hunspell (>= 3.0.6),
     later (>= 1.4.4),
-    lifecycle,
+    lifecycle (>= 1.0.0),
     magick (>= 2.7.3),
     remotes (>= 2.4.2),
     rlang (>= 1.1.0),
-    rsvg (>= 2.4.0),
+    rsvg (>= 2.6.0),
     scales (>= 1.4.0),
     showtext (>= 0.9-6),
     stats,
@@ -41,13 +41,15 @@ Imports:
 Suggests:
     testthat (>= 3.1.10),
     withr (>= 2.5.0),
-    curl,
     ggmap (>= 3.0.0),
     ggrepel (>= 0.9.2),
     knitr,
     rmarkdown,
     rstudioapi,
-    sf
+    sf,
+    strayr
+Remotes:
+    runapp-aus/strayr
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/e61-institute/theme61,
