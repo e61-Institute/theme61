@@ -192,11 +192,13 @@ infer_discrete_nlevels <- function(plot, aes_name) {
   length(unique(as.character(val)))
 }
 
+#' Matches the hard cap in get_palette() -- not configurable, since no value
+#' passed there can ever raise it past 12.
 #' @noRd
-abort_too_many_discrete_levels <- function(aes_name, n, max_n) {
+abort_too_many_discrete_levels <- function(aes_name, n) {
   rlang::abort(
     paste0(
-      "theme61 does not support more than ", max_n,
+      "theme61 does not support more than 12",
       " discrete ", aes_name, " values automatically (", n, " requested). ",
       "Please supply your own ", aes_name, " scale (e.g. ",
       if (aes_name == "colour") "scale_colour_manual()" else "scale_fill_manual()",
@@ -254,11 +256,9 @@ maybe_add_default_scales <- function(plot) {
     typ <- infer_aes_type(plot, "colour")
 
     if (identical(typ, "discrete")) {
-      max_n <- getOption("theme61.max_discrete_colours", 12L)
-
       lev_n <- infer_discrete_nlevels(plot, "colour")
-      if (!is.na(lev_n) && lev_n > max_n) {
-        abort_too_many_discrete_levels("colour", lev_n, max_n)
+      if (!is.na(lev_n) && lev_n > 12L) {
+        abort_too_many_discrete_levels("colour", lev_n)
       }
 
       plot <- plot + scale_colour_e61()
@@ -273,11 +273,9 @@ maybe_add_default_scales <- function(plot) {
     typ <- infer_aes_type(plot, "fill")
 
     if (identical(typ, "discrete")) {
-      max_n <- getOption("theme61.max_discrete_fills", 12L)
-
       lev_n <- infer_discrete_nlevels(plot, "fill")
-      if (!is.na(lev_n) && lev_n > max_n) {
-        abort_too_many_discrete_levels("fill", lev_n, max_n)
+      if (!is.na(lev_n) && lev_n > 12L) {
+        abort_too_many_discrete_levels("fill", lev_n)
       }
 
       plot <- plot + scale_fill_e61()

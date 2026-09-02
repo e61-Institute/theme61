@@ -9,17 +9,23 @@ t61_env <- NULL
 
 # Default theme61.* options - keep in sync with ?set_t61_options.
 .t61_default_options <- list(
-  theme61.auto_label = TRUE,
   theme61.auto_theme = TRUE,
+  theme61.autolabel = TRUE,
   theme61.autolabel_fallback_msg = TRUE,
   theme61.autolabel_fast_msg = NA,
   theme61.base_size = 10,
-  theme61.disable_spellcheck = FALSE,
+  theme61.default_save_format = NULL,
+  theme61.enable_spellcheck = TRUE,
   theme61.iterate_mode = FALSE,
-  theme61.max_discrete_colours = 12L,
-  theme61.max_discrete_fills = 12L,
   theme61.open_in_browser = FALSE,
   theme61.preview_on_print = TRUE
+)
+
+# Retired theme61.* options: set_t61_options() hard-errors on these instead
+# of folding them into its generic "invalid option" message.
+.t61_retired_options <- list(
+  theme61.max_discrete_colours = "The discrete colour palette is always capped at 12 levels. Supply your own scale (e.g. scale_colour_manual()) if you need more.",
+  theme61.max_discrete_fills = "The discrete fill palette is always capped at 12 levels. Supply your own scale (e.g. scale_fill_manual()) if you need more."
 )
 
 # Runs on load, including namespace-qualified use (theme61::save_e61())

@@ -30,16 +30,14 @@ t61_should_show_cooldown_msg <- function(opt_name, cooldown_mins = 30) {
 #'
 #' @details The following options are available to set:
 #'  \itemize{
-#'    \item \code{theme61.auto_label}: If TRUE (default), \code{plot_label()} text without an explicit `x`/`y` gets automatically positioned by \code{save_e61()} (see \code{?plot_label}). Set to FALSE to turn automatic positioning off entirely and restore the previous behaviour, where \code{x}/\code{y} are always required (\code{plot_label()} errors immediately if you omit them, regardless of \code{auto_position}) -- no auto-positioning work is attempted, so there's no performance cost from the feature at all.
 #'    \item \code{theme61.auto_theme}: If TRUE (default), \code{theme_e61()} is automatically applied whenever you call \code{ggplot()}. Set to FALSE to turn this off and apply your own theme instead.
-#'    \item \code{theme61.autolabel_fallback_msg}: If TRUE (default), every time an auto-positioned \code{plot_label()} text settles for a fallback position -- rather than a real, collision-checked placement -- a message names the label and the reason (e.g. not yet supported under \code{coord_flip()} with an area/pointbar series, or no good spot was found). Set to FALSE to turn it off.
-#'    \item \code{theme61.autolabel_fast_msg}: Controls the reminder that auto-positioned \code{plot_label()} text shown in the Viewer pane preview (or any \code{save_e61(fast_labels = TRUE)} call) uses a quick placement heuristic, not the real collision-avoiding search -- labels may overlap there even when \code{save_e61()} would place them cleanly. By default (unset), it appears at most once every 30 minutes. Set to TRUE to show it every time, or FALSE to turn it off entirely.
+#'    \item \code{theme61.autolabel}: If TRUE (default), \code{plot_label()} text without an explicit \code{x}/\code{y} gets automatically positioned by \code{save_e61()} (see \code{?plot_label}). Set to FALSE to turn automatic positioning off, requiring you to provide \code{x}/\code{y}. Disabling auto-position (or providing \code{x}/\code{y}) improves performance by not running the feature.
+#'    \item \code{theme61.autolabel_fallback_msg}: If TRUE (default), every time an auto-positioned \code{plot_label()} text settles for a fallback position rather than a "good" placement, a message names the label and the reason. Set to FALSE to turn it off.
+#'    \item \code{theme61.autolabel_fast_msg}: Controls the reminder that auto-positioned \code{plot_label()} text shown in the Viewer pane preview (or any \code{save_e61(fast_labels = TRUE)} call) uses a quick placement heuristic instead of the full search algorithm, which may result in label overlaps. By default (unset), it appears at most once every 30 minutes. Set to TRUE to show it every time, or FALSE to turn it off entirely.
 #'    \item \code{theme61.base_size}: The base font size for graphs. This is 10 by default.
 #'    \item \code{theme61.default_save_format}: The default file save format if format is not specified in [save_e61] and the file extension is not provided in \code{filename}. Unset by default, in which case [save_e61]'s own default (all supported formats: svg, pdf, eps, png, jpg) is used. Set via \code{set_format()} (or this function) to restrict the default(s); clear with \code{unset_format()} to go back to saving every format.
-#'    \item \code{theme61.disable_spellcheck}: If TRUE, [save_e61]'s spell-checker is skipped entirely, regardless of its \code{spell_check} argument. This is FALSE by default.
+#'    \item \code{theme61.enable_spellcheck}: If FALSE, [save_e61]'s spell-checker is skipped entirely, regardless of its \code{spell_check} argument. This is TRUE by default.
 #'    \item \code{theme61.iterate_mode}: If TRUE, all of theme61's automatic styling and Viewer pane preview rendering is skipped, so graphs print to the Plots pane with plain ggplot2 defaults as fast as possible. This is FALSE by default. Masked functions (\code{ggsave()}, \code{labs()}, \code{facet_wrap()}, \code{facet_grid()}) also stop redirecting to their theme61 equivalents and pass straight through to the underlying ggplot2 function instead. Any theme61 functions you call explicitly (e.g. \code{scale_colour_e61()}, \code{theme_e61()}, \code{labs_e61()}) still apply as normal, since they become part of the plot object regardless of this option.
-#'    \item \code{theme61.max_discrete_colours}: The maximum number of levels a discrete colour aesthetic can have before automatic colour scale injection errors out instead of applying \code{scale_colour_e61()}. This is 12 by default.
-#'    \item \code{theme61.max_discrete_fills}: The maximum number of levels a discrete fill aesthetic can have before automatic fill scale injection errors out instead of applying \code{scale_fill_e61()}. This is 12 by default.
 #'    \item \code{theme61.open_in_browser}: If TRUE, graphs will also open in the browser in addition to the Viewer pane. This is FALSE by default.
 #'    \item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
 #'  }
@@ -91,6 +89,18 @@ set_t61_options <- function(opt = NULL) {
     # theme61.* options happen to be set already.
     valid_opts <- names(.t61_default_options)
     invalid_opts <- setdiff(names(opt), valid_opts)
+
+    # Retired options get a hard error explaining why, instead of being
+    # folded into the generic "invalid option" message below.
+    retired_opts <- intersect(invalid_opts, names(.t61_retired_options))
+    for (nm in retired_opts) {
+      lifecycle::deprecate_stop(
+        when = "0.8.0", what = I(nm),
+        details = .t61_retired_options[[nm]]
+      )
+    }
+
+    invalid_opts <- setdiff(invalid_opts, retired_opts)
     if (length(invalid_opts) > 0) {
       stop(paste0(
         "Invalid options supplied: ", paste(invalid_opts, collapse = ", "),

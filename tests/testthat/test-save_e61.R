@@ -637,7 +637,7 @@ test_that("Spell checker works", {
 
 })
 
-test_that("Deprecated top-level arguments still work and fold into the new list args", {
+test_that("Defunct top-level arguments now error instead of folding into the new list args", {
 
   df1 <- data.frame(x = c(0, 1), y = c(0, 1))
   df2 <- data.frame(x = c(0, 1), y = c(1, 4))
@@ -645,21 +645,28 @@ test_that("Deprecated top-level arguments still work and fold into the new list 
   p1 <- ggplot(df1, aes(x, y)) + geom_point()
   p2 <- ggplot(df2, aes(x, y)) + geom_point()
 
-  # Old-style top-level args should still work, but warn
-  lifecycle::expect_deprecated(
-    obj_old <- save_e61(plotlist = list(p1, p2), title = "Combined", return_plot_obj = TRUE)
-  )
-  expect_s3_class(obj_old, "patchwork")
-
-  lifecycle::expect_deprecated(
-    save_e61(plotlist = list(p1, p2), ncol = 1, return_plot_obj = TRUE)
+  # Old-style top-level args now error instead of warning
+  expect_error(
+    save_e61(plotlist = list(p1, p2), title = "Combined", return_plot_obj = TRUE),
+    class = "lifecycle_error_deprecated"
   )
 
-  lifecycle::expect_deprecated(
-    save_e61(plotlist = list(p1, p2), pad_width = 5, return_plot_obj = TRUE)
+  expect_error(
+    save_e61(plotlist = list(p1, p2), ncol = 1, return_plot_obj = TRUE),
+    class = "lifecycle_error_deprecated"
   )
 
-  # The new list-based equivalent shouldn't warn at all
+  expect_error(
+    save_e61(plotlist = list(p1, p2), pad_width = 5, return_plot_obj = TRUE),
+    class = "lifecycle_error_deprecated"
+  )
+
+  expect_error(
+    save_e61(plotlist = list(p1, p2), spacing_adj = list(title = 1), return_plot_obj = TRUE),
+    class = "lifecycle_error_deprecated"
+  )
+
+  # The new list-based equivalent shouldn't warn or error at all
   expect_no_warning(
     obj_new <- save_e61(plotlist = list(p1, p2), labs = list(title = "Combined"),
                         layout = list(ncol = 1), spacing = list(pad_width = 5),
