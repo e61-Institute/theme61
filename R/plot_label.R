@@ -86,7 +86,7 @@
 #' positioning to fall back on, so `x`/`y` are required in those cases (as
 #' they are whenever `auto_position = FALSE`).
 #'
-#' Set `theme61.auto_label = FALSE` (see [set_t61_options()]) to turn
+#' Set `theme61.autolabel = FALSE` (see [set_t61_options()]) to turn
 #' automatic positioning off globally -- `x`/`y` are then always required,
 #' the same as `auto_position = FALSE`, and no auto-positioning work is
 #' attempted at all (no performance cost from the feature).
@@ -129,9 +129,9 @@ plot_label <-
     if (!isTRUE(auto_position) && is.null(x)) {
       cli::cli_abort("`x` and `y` are required when `auto_position = FALSE` (there's no automatic positioning to fall back on).")
     }
-    if (isTRUE(auto_position) && is.null(x) && isFALSE(getOption("theme61.auto_label", TRUE))) {
+    if (isTRUE(auto_position) && is.null(x) && isFALSE(getOption("theme61.autolabel", TRUE))) {
       cli::cli_abort(
-        "`x`/`y` are required because automatic positioning is disabled (`theme61.auto_label = FALSE`) -- see `?set_t61_options`."
+        "`x`/`y` are required because automatic positioning is disabled (`theme61.autolabel = FALSE`) -- see `?set_t61_options`."
       )
     }
     if (isTRUE(auto_position) && is.null(x) && any(angle != 0)) {

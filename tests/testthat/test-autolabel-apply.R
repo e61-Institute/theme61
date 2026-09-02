@@ -66,9 +66,9 @@ test_that("t61_apply_autolabel finds a good spot near each series when no positi
   expect_lt(abs(d$y[2] - 6), 5)   # series B ranges 2-10
 })
 
-test_that("t61_apply_autolabel is a complete no-op when theme61.auto_label = FALSE", {
+test_that("t61_apply_autolabel is a complete no-op when theme61.autolabel = FALSE", {
   skip_on_cran()
-  withr::local_options(list(theme61.auto_label = FALSE))
+  withr::local_options(list(theme61.autolabel = FALSE))
 
   # x/y given explicitly since plot_label() itself now requires them when
   # the option is off (see test-plot_label.R) -- a deliberately bad spot,

@@ -1,7 +1,7 @@
 test_that("Single-panel graph examples", {
 
   withr::local_seed(42)
-  withr::local_options(list(theme61.disable_spellcheck = TRUE))
+  withr::local_options(list(theme61.enable_spellcheck = FALSE))
 
   ## Cont-y var with values from 0-20 ----
   data <- data.frame(x = factor(1:10), y = runif(10, 0, 20))
@@ -161,7 +161,7 @@ test_that("Single-panel graph examples", {
 test_that("Multi-panel graph examples", {
 
   withr::local_seed(42)
-  withr::local_options(list(theme61.disable_spellcheck = TRUE))
+  withr::local_options(list(theme61.enable_spellcheck = FALSE))
 
   # Graphs to use in the panels
 
@@ -333,7 +333,7 @@ test_that("Multi-panel graph examples", {
 test_that("Map examples", {
 
   skip_if_not_installed("sf")
-  withr::local_options(list(theme61.disable_spellcheck = TRUE))
+  withr::local_options(list(theme61.enable_spellcheck = FALSE))
 
   # A small synthetic grid of adjacent polygons stands in for real ABS SA4
   # boundaries - geom_sf()/theme_e61_spatial() only care that the data is a

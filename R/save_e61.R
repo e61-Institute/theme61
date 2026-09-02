@@ -113,7 +113,7 @@
 #'   positions are unaffected either way. Defaults to FALSE.
 #' @param spell_check Logical. Check spelling of words in the title and caption.
 #'   Defaults to TRUE. Set to FALSE to turn off, or set the
-#'   `theme61.disable_spellcheck` option to skip it session-wide (see
+#'   `theme61.enable_spellcheck` option to FALSE to skip it session-wide (see
 #'   [set_t61_options]). Words listed in `inst/extdata/custom_dictionary.txt`
 #'   are skipped - add words to that file if they should not be flagged.
 #' @param preview Logical. Set to TRUE to show a preview of the graph in the
@@ -399,7 +399,7 @@ save_e61 <- function(filename = NULL,
 
   # Spell checker -------------------------------------------------------
 
-  if (spell_check && !isTRUE(getOption("theme61.disable_spellcheck", FALSE))) {
+  if (spell_check && isTRUE(getOption("theme61.enable_spellcheck", TRUE))) {
     # Loop through the plots. unlist() (not c()) so that plots with no typos
     # (check_plot_spelling() returns NULL) are dropped rather than counted as
     # an empty message.

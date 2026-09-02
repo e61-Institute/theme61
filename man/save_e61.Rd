@@ -149,7 +149,7 @@ positions are unaffected either way. Defaults to FALSE.}
 
 \item{spell_check}{Logical. Check spelling of words in the title and caption.
 Defaults to TRUE. Set to FALSE to turn off, or set the
-\code{theme61.disable_spellcheck} option to skip it session-wide (see
+\code{theme61.enable_spellcheck} option to FALSE to skip it session-wide (see
 \link{set_t61_options}). Words listed in \code{inst/extdata/custom_dictionary.txt}
 are skipped - add words to that file if they should not be flagged.}
 

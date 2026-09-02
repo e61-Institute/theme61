@@ -9,13 +9,13 @@ t61_env <- NULL
 
 # Default theme61.* options - keep in sync with ?set_t61_options.
 .t61_default_options <- list(
-  theme61.auto_label = TRUE,
   theme61.auto_theme = TRUE,
+  theme61.autolabel = TRUE,
   theme61.autolabel_fallback_msg = TRUE,
   theme61.autolabel_fast_msg = NA,
   theme61.base_size = 10,
   theme61.default_save_format = NULL,
-  theme61.disable_spellcheck = FALSE,
+  theme61.enable_spellcheck = TRUE,
   theme61.iterate_mode = FALSE,
   theme61.open_in_browser = FALSE,
   theme61.preview_on_print = TRUE,
