@@ -5,3 +5,4 @@
 docs
 tests/testthat/Rplots.pdf
 .DS_Store
+.claude/worktrees/
