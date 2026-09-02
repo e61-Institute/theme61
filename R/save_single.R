@@ -164,7 +164,9 @@ save_single <- function(
   # update the width after this check
   width <- tot_panel_width + known_wd
 
-  plot <- update_labs(plot, width)
+  # `p` above was already built from this exact plot to measure axis widths;
+  # reusing it here avoids a second, identical build inside update_labs().
+  plot <- update_labs(plot, width, built_grob = p)
 
   if(!is_spatial_chart){
 
