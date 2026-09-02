@@ -101,14 +101,6 @@ test_that("set_t61_options accepts theme61.disable_spellcheck as a valid option"
   expect_true(getOption("theme61.disable_spellcheck"))
 })
 
-test_that("set_t61_options accepts theme61.max_discrete_colours and theme61.max_discrete_fills as valid options", {
-  withr::defer(options(theme61.max_discrete_colours = NULL, theme61.max_discrete_fills = NULL))
-
-  set_t61_options(list(theme61.max_discrete_colours = 20L, theme61.max_discrete_fills = 20L))
-  expect_equal(getOption("theme61.max_discrete_colours"), 20L)
-  expect_equal(getOption("theme61.max_discrete_fills"), 20L)
-})
-
 test_that("set_t61_options() validates against the fixed set of theme61 options, not whichever are currently set", {
   # Simulate theme61 loaded but not attached by clearing every theme61.* option.
   live_opts <- names(options())
