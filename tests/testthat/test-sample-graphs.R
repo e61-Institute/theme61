@@ -336,9 +336,9 @@ test_that("Map examples", {
   withr::local_options(list(theme61.enable_spellcheck = FALSE))
 
   # A small synthetic grid of adjacent polygons stands in for real ABS SA4
-  # boundaries - geom_sf()/theme_e61_spatial() only care that the data is a
-  # valid multi-polygon sf object with a fill column, not that the shapes
-  # are real geography, so there's no need for strayr here.
+  # boundaries - geom_sf() only cares that the data is a valid multi-polygon
+  # sf object with a fill column, not that the shapes are real geography, so
+  # there's no need for strayr here.
   sydney_map <- {
     xs <- seq(150.5, 151.3, length.out = 4)
     ys <- seq(-34.2, -33.6, length.out = 3)

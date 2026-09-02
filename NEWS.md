@@ -23,6 +23,7 @@
 
 * `set_base_size()` is now deprecated. Use `set_t61_options(list(theme61.base_size = ...))` instead.
 * Removed the `theme61.max_discrete_colours`/`theme61.max_discrete_fills` options; the discrete palette limit of 12 is fixed and was never actually configurable via these. `set_t61_options()` now hard-errors if you try to set either.
+* `theme_e61_spatial()` is now defunct. Use `theme_e61()` instead -- spatial styling has applied automatically on save/print for a full release cycle now.
 
 # theme61 0.7.1
 
