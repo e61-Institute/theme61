@@ -13,6 +13,7 @@
 #### Performance improvements and bug fixes
 
 * Fixed `geom_col_label()` silently ignoring `position = "dodge"`/`"dodge2"` and computing labels as if the columns were stacked. It now takes a `position` argument, splitting and positioning labels the same way `geom_col()` does, with each label showing its own bar's share of the total.
+* Fixed `geom_col_label()` rendering literal `"Inf"`/`"-Inf"` label text when a panel's (or stack's) values summed to zero, instead of a blank label.
 * Graphs should save faster thanks to internal improvements to save_e61().
 * Fixed an issue where `labs_e61` would leave whitespace above subtitles and y-axis titles when a plot had a subtitle but no title.
 * Improvements to margins, text wrapping, whitespace and text overlap/clipping issues.
