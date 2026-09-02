@@ -38,18 +38,12 @@ t61_retry <- function(fn, attempts = 8, pause = 0.1) {
 #' to it here would fire those side effects once per panel, per mask
 #' render, stomping on the real preview/save this call is itself part of.
 #'
-#' Must mirror ggplot_build.e61_plot()'s mutations exactly (incl.
-#' finalise_e61_plot() - format_flip()/map_axis_correction() change axis
-#' text/gridlines, which changes the panel's own pixel box), or this read
-#' disagrees with the plot's normal build on panel geometry.
+#' Delegates to t61_finalise_e61_plot_for_build() so this can't drift out
+#' of sync with what ggplot_build.e61_plot() applies.
 #' @noRd
 t61_drop_e61_class <- function(plot) {
   if (inherits(plot, "e61_plot")) {
-    plot <- finalise_e61_plot(plot)
-    plot <- maybe_add_default_scales(plot)
-    plot <- maybe_adjust_facet_spacing(plot)
-    plot <- maybe_leftalign_discrete_y_text(plot)
-    class(plot) <- setdiff(class(plot), c("e61_map", "e61_plot"))
+    plot <- t61_finalise_e61_plot_for_build(plot)
   }
   plot
 }
