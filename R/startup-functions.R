@@ -1,22 +1,14 @@
-#' The tag of the most recent theme61 release on GitHub, as a
-#' `package_version`, or NULL if it can't be determined.
+#' The most recent theme61 release tag on GitHub as a `package_version`, or
+#' NULL if it can't be determined.
 #'
-#' Hits the REST API directly rather than via gh: one unauthenticated
-#' request for one field doesn't justify gh's dependency chain (httr2,
-#' openssl, gitcreds and friends). The cost is gh's credential handling,
-#' so this shares GitHub's 60-requests/hour/IP unauthenticated budget --
-#' acceptable for a check whose failure mode is already "say nothing".
-#'
-#' `per_page=1` keeps the payload to a single release, and the first
-#' `tag_name` in the response is the most recent one (the API orders
-#' releases newest-first), matching what the gh version read.
+#' Unauthenticated, so it shares GitHub's 60-requests/hour/IP budget. The API
+#' orders releases newest-first, so the first `tag_name` is the latest.
 #' @noRd
 t61_latest_release <- function() {
 
   url <- "https://api.github.com/repos/e61-institute/theme61/releases?per_page=1"
 
-  # download.file() honours options(timeout), which defaults to 60s -- far
-  # too long to block a package load on an unreachable network.
+  # Default timeout is 60s, far too long to block a package load on.
   old_timeout <- options(timeout = 5)
   on.exit(options(old_timeout), add = TRUE)
 
@@ -50,9 +42,8 @@ t61_latest_release <- function() {
   tag <- sub('"$', "", tag)
   tag <- sub("^v", "", tag)
 
-  # Guard the comparison in check_pkg_ver(): unlike gh's parsed JSON, this
-  # is scraped text, so a rate-limit body or an unexpected tag format must
-  # not turn a startup check into a startup error.
+  # Scraped text, so a rate-limit body or odd tag must not reach the version
+  # comparison in check_pkg_ver() and turn a startup check into an error.
   if (!grepl("^[0-9]+([.-][0-9]+)*$", tag)) return(NULL)
 
   tryCatch(package_version(tag), error = function(e) NULL)
@@ -111,12 +102,8 @@ check_pkg_ver <- function(test = FALSE) {
 
 }
 
-#' Update theme61 from GitHub.
-#'
-#' `dependencies = NA` (remotes' default) rather than TRUE: TRUE also
-#' installs Suggests, which for theme61 means pulling sf, strayr's readr/
-#' readxl chain and the vignette toolchain onto every analyst's machine on
-#' every update, none of which the package needs to draw a graph.
+#' Update theme61 from GitHub. `dependencies = NA` rather than TRUE, which
+#' would also install Suggests - none of which is needed to draw a graph.
 #' @noRd
 t61_self_update <- function() {
   if (!requireNamespace("remotes", quietly = TRUE)) {
@@ -197,9 +184,8 @@ t61_self_update <- function() {
   )
 }
 
-# Needed to make sure tests work. Wrappers rather than direct copies of the
-# base/utils functions: copying the binding pulls their .Internal() calls into
-# this namespace, which R CMD check flags as theme61 calling .Internal itself.
+# Needed to make sure tests work. Wrappers, not copied bindings: a copy pulls
+# the .Internal() call into this namespace, which R CMD check flags.
 .t61_readline <- function(...) base::readline(...)
 .t61_interactive <- function(...) base::interactive(...)
 .t61_download_file <- function(...) utils::download.file(...)

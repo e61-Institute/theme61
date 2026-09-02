@@ -569,9 +569,8 @@ save_e61 <- function(filename = NULL,
     file_to_open <- paste0(filename, ".", format[[1]])
 
     if (isTRUE(getOption("theme61.open_in_browser", FALSE))) {
-      # Resolved against the working directory, not the project root: the
-      # file was just written relative to the former, and here::here() would
-      # mangle an absolute filename or one saved outside the project.
+      # Against the working directory, not the project root: that's where the
+      # file was just written, and it may be absolute or outside the project.
       out <- try(utils::browseURL(normalizePath(file_to_open, mustWork = FALSE)))
 
       if (inherits(out, "try-error")) cli::cli_warn("Graph file could not be opened")

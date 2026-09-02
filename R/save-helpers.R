@@ -306,11 +306,8 @@ check_plot_spelling <- function(plot) {
 
   }
 
-#' Composite a readPNG() array over white and drop its alpha channel.
-#'
-#' JPEG has no transparency, so a partly-transparent pixel has to be
-#' resolved against some background before encoding. White matches what
-#' ImageMagick's JPEG writer did here previously.
+#' Composite a readPNG() array over white and drop its alpha channel, since
+#' JPEG has no transparency to encode it into.
 #' @noRd
 flatten_on_white <- function(img) {
 
@@ -371,8 +368,8 @@ svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
 
   rsvg::rsvg_png(svg = file_in, file = file_temp_out)
 
-  # native = TRUE decodes to a nativeRaster, whose dim() is c(height, width) --
-  # cheaper than decoding to a full numeric array just to measure it.
+  # native = TRUE gives dim() c(height, width) without decoding to a full
+  # numeric array just to measure it.
   natural_dim <- dim(png::readPNG(file_temp_out, native = TRUE))
 
   rsvg::rsvg_svg(svg = file_in,
