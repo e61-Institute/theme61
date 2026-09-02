@@ -178,6 +178,11 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   # Opened before ggplotGrob() below: with no device open yet, that call
   # can silently open the session's own default device instead, corrupting
   # this render (confirmed cause of "Input file is too short" on Windows).
+  # dev.off() makes dev.next() current, not whatever the caller had open, so
+  # capture it and put it back -- otherwise a render here silently hands the
+  # caller a different device to take its text metrics from.
+  caller_dev <- grDevices::dev.cur()
+
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
   svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
@@ -187,6 +192,7 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   on.exit({
     t61_reclaim_device(dev_num)
     if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
+    t61_reclaim_device(caller_dev)
   }, add = TRUE)
 
   gt <- ggplot2::ggplotGrob(t61_strip_chrome(plot))
@@ -204,6 +210,7 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   grid::grid.draw(final_gt)
   t61_reclaim_device(dev_num)
   if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
+  t61_reclaim_device(caller_dev)
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)
@@ -300,6 +307,11 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
   marker <- marker + ggplot2::theme(panel.background = ggplot2::element_rect(fill = marker_colour, colour = NA))
   marker <- t61_drop_e61_class(marker)
 
+  # dev.off() makes dev.next() current, not whatever the caller had open, so
+  # capture it and put it back -- otherwise a render here silently hands the
+  # caller a different device to take its text metrics from.
+  caller_dev <- grDevices::dev.cur()
+
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
   svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54, bg = "white")
@@ -309,6 +321,7 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
   on.exit({
     t61_reclaim_device(dev_num)
     if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
+    t61_reclaim_device(caller_dev)
   }, add = TRUE)
 
   # See the matching split in t61_render_mask() -- build (ggplotGrob()) and
@@ -320,6 +333,7 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
   grid::grid.draw(marker_gt)
   t61_reclaim_device(dev_num)
   if (grDevices::dev.cur() == dev_num) grDevices::dev.off()
+  t61_reclaim_device(caller_dev)
 
   png_file <- tempfile(fileext = ".png")
   on.exit(unlink(png_file), add = TRUE)

@@ -5,13 +5,9 @@
 # but showtext still renders pt-sans correctly wherever it's actually drawn.
 # Tests that just need the built gtable (not testing this warning itself)
 # should call this instead of ggplot2::ggplotGrob() directly.
+# t61_with_device() also muffles the warning, and - more importantly - stops
+# ggplotGrob() opening the session's default device and leaving it current,
+# which would change the text metrics every later test measures with.
 quiet_ggplotGrob <- function(plot) {
-  withCallingHandlers(
-    ggplot2::ggplotGrob(plot),
-    warning = function(w) {
-      if (grepl("not found in PostScript font database", conditionMessage(w), fixed = TRUE)) {
-        invokeRestart("muffleWarning")
-      }
-    }
-  )
+  t61_with_device(ggplot2::ggplotGrob(plot))
 }

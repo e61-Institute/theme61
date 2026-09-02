@@ -12,11 +12,20 @@
 #'
 #' @noRd
 t61_measure_label_cm <- function(label, size_mm = 3.5, width_cm = 16, height_cm = 12) {
+  caller_dev <- grDevices::dev.cur()
+
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
 
   svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54)
-  on.exit(grDevices::dev.off(), add = TRUE)
+  dev_num <- grDevices::dev.cur()
+  on.exit({
+    if (dev_num %in% grDevices::dev.list()) {
+      grDevices::dev.set(dev_num)
+      grDevices::dev.off()
+    }
+    t61_reclaim_device(caller_dev)
+  }, add = TRUE)
 
   # ggplot2's geom_text/geom_label "size" aesthetic is in mm; convert to pt
   # the same way ggplot2 does internally (.pt = 72.27 / 25.4).

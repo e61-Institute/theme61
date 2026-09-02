@@ -424,18 +424,29 @@ get_text_height <- function(text, font_size = 10) {
 }
 
 #' Run `expr` with a throwaway svglite device as the active graphics device,
-#' so text can be measured with real font metrics. The device is opened and
-#' closed around `expr`, which restores whatever device (if any) was active
-#' beforehand as a side effect of `dev.off()`, so this never disturbs a
-#' device the user has open.
+#' so text can be measured with real font metrics.
+#'
+#' Closes that device by number and puts the caller's back explicitly. A bare
+#' dev.off() does neither: it closes whatever is current, and then makes
+#' dev.next() current, which wraps around rather than returning to the device
+#' that was active before.
 #' @noRd
 measure_device <- function(expr) {
 
+  caller_dev <- grDevices::dev.cur()
+
   measure_file <- tempfile(fileext = ".svg")
-  on.exit(unlink(measure_file))
+  on.exit(unlink(measure_file), add = TRUE)
 
   svglite::svglite(measure_file, width = 10, height = 10)
-  on.exit(grDevices::dev.off(), add = TRUE)
+  dev_num <- grDevices::dev.cur()
+  on.exit({
+    if (dev_num %in% grDevices::dev.list()) {
+      grDevices::dev.set(dev_num)
+      grDevices::dev.off()
+    }
+    t61_reclaim_device(caller_dev)
+  }, add = TRUE)
 
   expr
 }
