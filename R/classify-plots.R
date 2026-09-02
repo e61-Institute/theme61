@@ -71,8 +71,8 @@ classify_e61_map <- function(x, force = NULL) {
 finalise_e61_plot <- function(plot) {
   plot <- classify_e61_map(plot)
 
-  # Corrects a map built with plain theme_e61() instead of theme_e61_spatial(),
-  # without overriding elements the user set explicitly.
+  # Applies map-specific axis/gridline chrome, without overriding elements
+  # the user set explicitly.
   if (inherits(plot, "e61_map")) {
     plot <- plot + map_axis_correction(plot)
   }

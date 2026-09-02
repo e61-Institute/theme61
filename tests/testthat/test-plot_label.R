@@ -300,8 +300,8 @@ test_that("x/y are optional when auto_position = TRUE, required otherwise", {
   )
 })
 
-test_that("theme61.auto_label = FALSE restores the old always-required x/y behaviour", {
-  withr::local_options(list(theme61.auto_label = FALSE))
+test_that("theme61.autolabel = FALSE restores the old always-required x/y behaviour", {
+  withr::local_options(list(theme61.autolabel = FALSE))
 
   # auto_position = TRUE (the default) normally allows x/y to be omitted --
   # with the option off, it no longer does.
