@@ -3,14 +3,34 @@
 \docType{data}
 \name{e61_maroonlight}
 \alias{e61_maroonlight}
-\title{Hex code for the colour: e61 Maroon Light}
+\alias{e61_maroonlight1}
+\alias{e61_maroonlight2}
+\alias{e61_maroonlight3}
+\alias{e61_maroonlight4}
+\alias{e61_maroonlight5}
+\alias{e61_maroonlight6}
+\alias{e61_maroonlight7}
+\alias{e61_maroonlight8}
+\title{Hex codes for the colour: e61 Maroon Light}
 \format{
-An object of class \code{character} of length 1.
+A character string, a hex colour code.
 }
 \usage{
 e61_maroonlight
 }
 \description{
-#b40000
+Base shade and numbered variants 1 (darkest) to 8 (lightest).
+}
+\details{
+\itemize{
+\item e61_maroonlight, e61_maroonlight1: #b40000
+\item e61_maroonlight2: #bd2020
+\item e61_maroonlight3: #c74040
+\item e61_maroonlight4: #d06060
+\item e61_maroonlight5: #da8080
+\item e61_maroonlight6: #e39f9f
+\item e61_maroonlight7: #ecbfbf
+\item e61_maroonlight8: #f6dfdf
+}
 }
 \keyword{datasets}

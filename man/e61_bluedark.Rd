@@ -3,14 +3,34 @@
 \docType{data}
 \name{e61_bluedark}
 \alias{e61_bluedark}
-\title{Hex code for the colour: e61 Blue Dark}
+\alias{e61_bluedark1}
+\alias{e61_bluedark2}
+\alias{e61_bluedark3}
+\alias{e61_bluedark4}
+\alias{e61_bluedark5}
+\alias{e61_bluedark6}
+\alias{e61_bluedark7}
+\alias{e61_bluedark8}
+\title{Hex codes for the colour: e61 Blue Dark}
 \format{
-An object of class \code{character} of length 1.
+A character string, a hex colour code.
 }
 \usage{
 e61_bluedark
 }
 \description{
-#10485E
+Base shade and numbered variants 1 (darkest) to 8 (lightest).
+}
+\details{
+\itemize{
+\item e61_bluedark, e61_bluedark1: #10485E
+\item e61_bluedark2: #2B5C6F
+\item e61_bluedark3: #467081
+\item e61_bluedark4: #618492
+\item e61_bluedark5: #7D99A3
+\item e61_bluedark6: #98ADB5
+\item e61_bluedark7: #B3C1C7
+\item e61_bluedark8: #CED5D8
+}
 }
 \keyword{datasets}
