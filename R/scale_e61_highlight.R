@@ -104,7 +104,7 @@ scale_fill_e61_highlight <- function(highlight, unhighlighted = e61_greylight3, 
 # New methods ----
 
 # ggplot2 v4+ hook
-#' @export
+#' @exportS3Method ggplot2::update_ggplot
 update_ggplot.e61_scale_highlight <- function(object, plot, ...) {
   plot + .build_highlight_scale(object, plot)
 }
