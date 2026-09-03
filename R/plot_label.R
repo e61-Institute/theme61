@@ -235,11 +235,11 @@ plot_label <-
 .find_facet_proto <- function(plot, facet_name) {
   if (is.null(facet_name) || !nzchar(facet_name)) return(NULL)
 
-  if (!is.null(plot$data) && facet_name %in% names(plot$data)) {
-    return(plot$data[[facet_name]])
+  if (!is.null(plot@data) && facet_name %in% names(plot@data)) {
+    return(plot@data[[facet_name]])
   }
 
-  for (ly in plot$layers) {
+  for (ly in plot@layers) {
     d <- ly$data
     if (!is.null(d) && facet_name %in% names(d)) {
       return(d[[facet_name]])
@@ -266,7 +266,7 @@ plot_label <-
 
 # Best-effort extractor of facet variable names from a ggplot
 .get_facet_vars <- function(plot) {
-  f <- plot$facet
+  f <- plot@facet
   if (is.null(f) || is.null(f$params)) return(character())
 
   # facet_wrap(~a + b)
@@ -471,7 +471,7 @@ plot_label <-
 # New methods ----
 
 # ggplot2 v4+ hook
-#' @export
+#' @exportS3Method ggplot2::update_ggplot
 update_ggplot.e61_plot_label <- function(object, plot, ...) {
   plot + .build_plot_label_layer(object, plot)
 }
