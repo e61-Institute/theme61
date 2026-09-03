@@ -24,24 +24,22 @@ t61_quiet_na_removal <- function(expr) {
   )
 }
 
-#' With no device open, ggplotGrob()/ggplot_gtable() can silently open the
-#' session's default device to measure text -- left open, that can corrupt
-#' later renders. Opens a throwaway device first only if none is open.
+#' Run `expr` on an svglite device of our own, then give the caller theirs
+#' back. ggplotGrob()/ggplot_gtable() read text metrics from the current
+#' device, so measuring on an ambient one makes output depend on session state.
 #'
 #' Also muffles the "font family 'pt-sans' not found in PostScript font
 #' database" warning: grid's font-metric fallback doesn't know about
-#' sysfonts-registered families on some devices, but showtext still renders
-#' pt-sans correctly wherever it's actually drawn.
+#' sysfonts-registered families, but showtext renders pt-sans correctly.
 #' @noRd
 t61_with_device <- function(expr) {
-  if (grDevices::dev.cur() == 1) {
-    svg_file <- tempfile(fileext = ".svg")
-    svglite::svglite(svg_file)
-    on.exit({
-      grDevices::dev.off()
-      unlink(svg_file)
-    }, add = TRUE)
-  }
+  svg_file <- tempfile(fileext = ".svg")
+  device <- t61_open_device(svg_file)
+  on.exit({
+    t61_release_device(device)
+    unlink(svg_file)
+  }, add = TRUE)
+
   withCallingHandlers(
     expr,
     warning = function(w) {

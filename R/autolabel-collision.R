@@ -15,8 +15,8 @@ t61_measure_label_cm <- function(label, size_mm = 3.5, width_cm = 16, height_cm 
   svg_file <- tempfile(fileext = ".svg")
   on.exit(unlink(svg_file), add = TRUE)
 
-  svglite::svglite(svg_file, width = width_cm / 2.54, height = height_cm / 2.54)
-  on.exit(grDevices::dev.off(), add = TRUE)
+  device <- t61_open_device(svg_file, width = width_cm / 2.54, height = height_cm / 2.54)
+  on.exit(t61_release_device(device), add = TRUE)
 
   # ggplot2's geom_text/geom_label "size" aesthetic is in mm; convert to pt
   # the same way ggplot2 does internally (.pt = 72.27 / 25.4).
