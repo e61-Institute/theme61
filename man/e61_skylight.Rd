@@ -3,14 +3,34 @@
 \docType{data}
 \name{e61_skylight}
 \alias{e61_skylight}
-\title{Hex code for the colour: e61 Sky Light}
+\alias{e61_skylight1}
+\alias{e61_skylight2}
+\alias{e61_skylight3}
+\alias{e61_skylight4}
+\alias{e61_skylight5}
+\alias{e61_skylight6}
+\alias{e61_skylight7}
+\alias{e61_skylight8}
+\title{Hex codes for the colour: e61 Sky Light}
 \format{
-An object of class \code{character} of length 1.
+A character string, a hex colour code.
 }
 \usage{
 e61_skylight
 }
 \description{
-#66CED6
+Base shade and numbered variants 1 (darkest) to 8 (lightest).
+}
+\details{
+\itemize{
+\item e61_skylight, e61_skylight1: #66CED6
+\item e61_skylight2: #79D4DB
+\item e61_skylight3: #8CDAE0
+\item e61_skylight4: #9FE0E5
+\item e61_skylight5: #B2E6EA
+\item e61_skylight6: #C5ECEF
+\item e61_skylight7: #D8F2F4
+\item e61_skylight8: #EBF8F9
+}
 }
 \keyword{datasets}

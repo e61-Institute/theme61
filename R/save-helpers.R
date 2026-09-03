@@ -222,6 +222,11 @@ resolve_text_size <- function(plot, base_size) {
 }
 
 #' Helper function that spell checks any string vector that is supplied
+#'
+#' Skips the check (rather than erroring) if the system has no en_AU
+#' hunspell dictionary installed -- hunspell only bundles en_US, so en_AU
+#' isn't guaranteed to be present outside of Linux CI, which installs it
+#' explicitly.
 #' @noRd
 check_spelling <- function(vector) {
   if (!is.null(vector) && !is.character(vector)) {
@@ -230,7 +235,19 @@ check_spelling <- function(vector) {
 
   # Check spelling of each element in the vector, treating words in
   # custom_dictionary.txt (e.g. "e61") as correctly spelled
-  dict <- hunspell::dictionary("en_AU", add_words = t61_custom_dictionary())
+  dict <- tryCatch(
+    hunspell::dictionary("en_AU", add_words = t61_custom_dictionary()),
+    error = function(e) NULL
+  )
+  if (is.null(dict)) {
+    if (!isTRUE(t61_env$spellcheck_dict_warned)) {
+      cli::cli_alert_info(
+        "No en_AU dictionary found; skipping save_e61()'s spell-checker for this session.")
+      t61_env$spellcheck_dict_warned <- TRUE
+    }
+    return(invisible(NULL))
+  }
+
   retval <- hunspell::hunspell(vector, dict = dict)
   retval <- unlist(retval)
 

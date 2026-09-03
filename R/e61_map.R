@@ -28,8 +28,7 @@
 #'    right = max(sa3$cent_long),
 #'    top = max(sa3$cent_lat))
 #'    ) +
-#'  geom_point(aes(x = cent_long, y = cent_lat)) + #plot points
-#'  theme_e61_spatial()
+#'  geom_point(aes(x = cent_long, y = cent_lat)) #plot points
 #' }
 add_map_e61 <-
   function(bbox = c(

@@ -1,7 +1,8 @@
 test_that("Single-panel graph examples", {
+  skip_snapshot_off_ci_linux()
 
   withr::local_seed(42)
-  withr::local_options(list(theme61.disable_spellcheck = TRUE))
+  withr::local_options(list(theme61.enable_spellcheck = FALSE))
 
   ## Cont-y var with values from 0-20 ----
   data <- data.frame(x = factor(1:10), y = runif(10, 0, 20))
@@ -159,9 +160,10 @@ test_that("Single-panel graph examples", {
 })
 
 test_that("Multi-panel graph examples", {
+  skip_snapshot_off_ci_linux()
 
   withr::local_seed(42)
-  withr::local_options(list(theme61.disable_spellcheck = TRUE))
+  withr::local_options(list(theme61.enable_spellcheck = FALSE))
 
   # Graphs to use in the panels
 
@@ -324,21 +326,21 @@ test_that("Multi-panel graph examples", {
 
   withr::with_tempdir({
     expect_snapshot_file(suppressWarnings(
-      save_e61("plot-multi-1x2-1-title-no subtitle.svg", p1_t, p2_t,
+      save_e61("plot-multi-1x2-1-title-no-subtitle.svg", p1_t, p2_t,
                labs = list(title = "Multi-panel graph title text"))))
   })
 
 })
 
 test_that("Map examples", {
-
+  skip_snapshot_off_ci_linux()
   skip_if_not_installed("sf")
-  withr::local_options(list(theme61.disable_spellcheck = TRUE))
+  withr::local_options(list(theme61.enable_spellcheck = FALSE))
 
   # A small synthetic grid of adjacent polygons stands in for real ABS SA4
-  # boundaries - geom_sf()/theme_e61_spatial() only care that the data is a
-  # valid multi-polygon sf object with a fill column, not that the shapes
-  # are real geography, so there's no need for strayr here.
+  # boundaries - geom_sf() only cares that the data is a valid multi-polygon
+  # sf object with a fill column, not that the shapes are real geography, so
+  # there's no need for strayr here.
   sydney_map <- {
     xs <- seq(150.5, 151.3, length.out = 4)
     ys <- seq(-34.2, -33.6, length.out = 3)

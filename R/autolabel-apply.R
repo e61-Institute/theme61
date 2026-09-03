@@ -338,12 +338,12 @@ t61_print_label_positions <- function(text, x, y, is_date_x, is_date_y) {
 #' @noRd
 t61_apply_autolabel <- function(plot, width_cm, height_cm, print_positions = FALSE, fast = FALSE) {
 
-  # theme61.auto_label = FALSE restores the pre-feature behaviour (x/y
+  # theme61.autolabel = FALSE restores the pre-feature behaviour (x/y
   # always required -- enforced in plot_label() itself) and must incur no
   # performance cost at all, so this is checked first and unconditionally,
   # before targets are even collected (which alone requires a full
   # ggplot_build()).
-  if (isFALSE(getOption("theme61.auto_label", TRUE))) return(plot)
+  if (isFALSE(getOption("theme61.autolabel", TRUE))) return(plot)
 
   targets <- tryCatch(t61_collect_autolabel_targets(plot), error = function(e) {
     # Only worth a warning if some label actually needed this (no x/y of
