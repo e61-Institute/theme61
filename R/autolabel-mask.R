@@ -205,8 +205,7 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   on.exit(unlink(png_file), add = TRUE)
   t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height))
 
-  img <- magick::image_read(png_file)
-  raster <- as.raster(img)
+  raster <- as.raster(png::readPNG(png_file))
 
   rgb_vals <- col2rgb(raster)
   is_ink <- colSums(rgb_vals) < (255 * 3 - 10) # small tolerance for anti-aliasing
@@ -321,8 +320,7 @@ t61_render_panel_box_px <- function(plot, width_cm, height_cm, px_width, px_heig
   on.exit(unlink(png_file), add = TRUE)
   t61_retry(function() rsvg::rsvg_png(svg_file, png_file, width = px_width, height = px_height))
 
-  img <- magick::image_read(png_file)
-  raster <- as.raster(img)
+  raster <- as.raster(png::readPNG(png_file))
 
   rgb_vals <- col2rgb(raster)
   is_marker <- colSums(abs(rgb_vals - as.vector(col2rgb(marker_colour)))) < 30

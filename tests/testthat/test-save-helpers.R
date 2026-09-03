@@ -141,8 +141,8 @@ test_that("svg_to_bitmap() rescales output regardless of the res argument passed
     out_default <- svg_to_bitmap("plot.svg", "default.png", res = 1)
     out_double <- svg_to_bitmap("plot.svg", "double.png", res = 2)
 
-    info_default <- magick::image_info(magick::image_read("default.png"))
-    info_double <- magick::image_info(magick::image_read("double.png"))
+    info_default <- png_info("default.png")
+    info_double <- png_info("double.png")
 
     expect_equal(info_double$width, info_default$width * 2)
     expect_equal(info_double$height, info_default$height * 2)
