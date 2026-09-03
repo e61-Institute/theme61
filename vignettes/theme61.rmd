@@ -95,7 +95,6 @@ This is the e61 Institute colour palette.
 All the colours are package objects that can be selected by using the appropriate name. For example, `e61_tealdark3` selects the colour 'Teal dark' with the shade in column '3'.
 
 ```{r theme61-colours, echo = FALSE}
-source("colour-palette.R")
 knitr::include_graphics("../man/figures/g-palette-colours.svg")
 ```
 
