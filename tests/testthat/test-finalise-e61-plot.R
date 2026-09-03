@@ -17,7 +17,7 @@ test_that("finalise_e61_plot() classifies maps and corrects their axis chrome", 
     theme_e61(legend = "bottom")
 
   # Emulate a spatial layer via the GeomSf heuristic used by classify_e61_map()
-  p$layers <- c(p$layers, list(list(geom = structure(list(), class = "GeomSf"))))
+  p@layers <- c(p@layers, list(list(geom = structure(list(), class = "GeomSf"))))
 
   out <- finalise_e61_plot(p)
 
@@ -44,7 +44,7 @@ test_that("finalise_e61_plot() respects gridlines the user set explicitly", {
     geom_point() +
     theme_e61(legend = "bottom") +
     theme(panel.grid.major.y = element_line(colour = "red"))
-  p$layers <- c(p$layers, list(list(geom = structure(list(), class = "GeomSf"))))
+  p@layers <- c(p@layers, list(list(geom = structure(list(), class = "GeomSf"))))
 
   out <- finalise_e61_plot(p)
 
@@ -60,7 +60,7 @@ test_that("finalise_e61_plot() is idempotent on maps", {
     geom_point() +
     theme_e61(legend = "bottom") +
     theme(panel.grid.major.y = element_line(colour = "red"))
-  p$layers <- c(p$layers, list(list(geom = structure(list(), class = "GeomSf"))))
+  p@layers <- c(p@layers, list(list(geom = structure(list(), class = "GeomSf"))))
 
   out <- finalise_e61_plot(p)
   out2 <- finalise_e61_plot(out)
