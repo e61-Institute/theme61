@@ -24,24 +24,22 @@ t61_quiet_na_removal <- function(expr) {
   )
 }
 
-#' With no device open, ggplotGrob()/ggplot_gtable() can silently open the
-#' session's default device to measure text -- left open, that can corrupt
-#' later renders. Opens a throwaway device first only if none is open.
+#' Run `expr` on an svglite device of our own, then give the caller theirs
+#' back. ggplotGrob()/ggplot_gtable() read text metrics from the current
+#' device, so measuring on an ambient one makes output depend on session state.
 #'
 #' Also muffles the "font family 'pt-sans' not found in PostScript font
 #' database" warning: grid's font-metric fallback doesn't know about
-#' sysfonts-registered families on some devices, but showtext still renders
-#' pt-sans correctly wherever it's actually drawn.
+#' sysfonts-registered families, but showtext renders pt-sans correctly.
 #' @noRd
 t61_with_device <- function(expr) {
-  if (grDevices::dev.cur() == 1) {
-    svg_file <- tempfile(fileext = ".svg")
-    svglite::svglite(svg_file)
-    on.exit({
-      grDevices::dev.off()
-      unlink(svg_file)
-    }, add = TRUE)
-  }
+  svg_file <- tempfile(fileext = ".svg")
+  device <- t61_open_device(svg_file)
+  on.exit({
+    t61_release_device(device)
+    unlink(svg_file)
+  }, add = TRUE)
+
   withCallingHandlers(
     expr,
     warning = function(w) {
@@ -72,20 +70,18 @@ save_graph <- function(graph, format, filename, width, height, bg_colour, res) {
     # add very slight width buffer
     width <- width + 0.1
 
-    svglite::svglite(filename = file_name_i, width = cm_to_in(width), height = cm_to_in(height), bg = bg_colour)
-
-    closed <- FALSE
-    on.exit({
-      if (!closed) try(grDevices::dev.off(), silent = TRUE)
-    }, add = TRUE)
+    device <- t61_open_device(filename = file_name_i, width = cm_to_in(width),
+                              height = cm_to_in(height), bg = bg_colour)
+    on.exit(t61_release_device(device), add = TRUE)
 
     graph_i <- maybe_add_default_scales(graph)
     class(graph_i) <- setdiff(class(graph_i), "e61_plot")
 
     print(graph_i)
 
-    grDevices::dev.off()
-    closed <- TRUE
+    # Released here, not just on exit: the SVG has to be complete on disk
+    # before the rsvg conversions below read it back.
+    t61_release_device(device)
 
     # Convert the rendered SVG into the requested format
     if (fmt == "png") {
