@@ -77,8 +77,6 @@ are chosen. Set to FALSE to always use the exact \code{x}/\code{y} you supply --
 call \code{save_e61()} first. Useful for grabbing the chosen positions once
 so you can pin them (or hand-tweak just one or two) instead of
 auto-positioning every time. Defaults to FALSE.}
-
-\item{facet_name, facet_value}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }
 \value{
 Object to add to a ggplot (via \code{+}).
@@ -140,7 +138,7 @@ A facetted plot, or rotated text (\code{angle != 0}), has no automatic
 positioning to fall back on, so \code{x}/\code{y} are required in those cases (as
 they are whenever \code{auto_position = FALSE}).
 
-Set \code{theme61.auto_label = FALSE} (see \code{\link[=set_t61_options]{set_t61_options()}}) to turn
+Set \code{theme61.autolabel = FALSE} (see \code{\link[=set_t61_options]{set_t61_options()}}) to turn
 automatic positioning off globally -- \code{x}/\code{y} are then always required,
 the same as \code{auto_position = FALSE}, and no auto-positioning work is
 attempted at all (no performance cost from the feature).

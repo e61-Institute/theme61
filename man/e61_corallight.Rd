@@ -3,14 +3,34 @@
 \docType{data}
 \name{e61_corallight}
 \alias{e61_corallight}
-\title{Hex code for the colour: e61 Coral Light}
+\alias{e61_corallight1}
+\alias{e61_corallight2}
+\alias{e61_corallight3}
+\alias{e61_corallight4}
+\alias{e61_corallight5}
+\alias{e61_corallight6}
+\alias{e61_corallight7}
+\alias{e61_corallight8}
+\title{Hex codes for the colour: e61 Coral Light}
 \format{
-An object of class \code{character} of length 1.
+A character string, a hex colour code.
 }
 \usage{
 e61_corallight
 }
 \description{
-#f88379
+Base shade and numbered variants 1 (darkest) to 8 (lightest).
+}
+\details{
+\itemize{
+\item e61_corallight, e61_corallight1: #f88379
+\item e61_corallight2: #f98f86
+\item e61_corallight3: #f99c94
+\item e61_corallight4: #faa8a1
+\item e61_corallight5: #fbb5af
+\item e61_corallight6: #fcc1bc
+\item e61_corallight7: #fccdc9
+\item e61_corallight8: #fddad7
+}
 }
 \keyword{datasets}
