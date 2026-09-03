@@ -1,3 +1,54 @@
+#' The most recent theme61 release tag on GitHub as a `package_version`, or
+#' NULL if it can't be determined.
+#'
+#' Unauthenticated, so it shares GitHub's 60-requests/hour/IP budget. The API
+#' orders releases newest-first, so the first `tag_name` is the latest.
+#' @noRd
+t61_latest_release <- function() {
+
+  url <- "https://api.github.com/repos/e61-institute/theme61/releases?per_page=1"
+
+  # Default timeout is 60s, far too long to block a package load on.
+  old_timeout <- options(timeout = 5)
+  on.exit(options(old_timeout), add = TRUE)
+
+  destfile <- tempfile(fileext = ".json")
+  on.exit(unlink(destfile), add = TRUE)
+
+  ok <- tryCatch({
+    suppressWarnings(
+      .t61_download_file(url, destfile = destfile, quiet = TRUE, mode = "wb")
+    )
+    TRUE
+  },
+  # Any network problem at all: say so once and move on
+  error = function(e) {
+    packageStartupMessage("R could not check if your version of theme61 is up-to-date.")
+    FALSE
+  })
+
+  if (!ok || !file.exists(destfile)) return(NULL)
+
+  json <- tryCatch(
+    readChar(destfile, file.size(destfile), useBytes = TRUE),
+    error = function(e) NULL
+  )
+  if (is.null(json)) return(NULL)
+
+  tag <- regmatches(json, regexpr('"tag_name"\\s*:\\s*"[^"]*"', json))
+  if (length(tag) == 0) return(NULL)
+
+  tag <- sub('^"tag_name"\\s*:\\s*"', "", tag)
+  tag <- sub('"$', "", tag)
+  tag <- sub("^v", "", tag)
+
+  # Scraped text, so a rate-limit body or odd tag must not reach the version
+  # comparison in check_pkg_ver() and turn a startup check into an error.
+  if (!grepl("^[0-9]+([.-][0-9]+)*$", tag)) return(NULL)
+
+  tryCatch(package_version(tag), error = function(e) NULL)
+}
+
 #' Checks theme61 version
 #'
 #' Compares the version of theme61 currently installed with the latest version
@@ -8,29 +59,13 @@
 #'
 #' @param test Logical. For testing the interactive prompt.
 #' @noRd
-#' @importFrom gh gh
 check_pkg_ver <- function(test = FALSE) {
 
-  # Checks Github for latest version of theme61
-  releases <- tryCatch({
-    gh("GET /repos/{owner}/{repo}/releases",
-           owner = "e61-institute",
-           repo = "theme61",
-           .max_wait = 5)
-    },
-    # Early return if there is a network error for any reason
-    error = function(e) {
-      packageStartupMessage("R could not check if your version of theme61 is up-to-date.")
-      NULL
-    }
-    )
+  latest_v <- t61_latest_release()
 
-  if (is.null(releases) || length(releases) == 0) {
+  if (is.null(latest_v)) {
     return(invisible(NULL))
   }
-
-  latest_v <- releases[[1]][["tag_name"]]
-  latest_v <- gsub("v", "", latest_v, fixed = TRUE)
 
   # Get the latest version of the local installation
   inst_v <- packageVersion("theme61")
@@ -60,12 +95,24 @@ check_pkg_ver <- function(test = FALSE) {
       resp <- .t61_readline()
     }
 
-    if (resp == "Y" && !test)
-      remotes::install_github("e61-institute/theme61", dependencies = TRUE, upgrade = "always")
+    if (resp == "Y" && !test) t61_self_update()
   }
 
   invisible(NULL)
 
+}
+
+#' Update theme61 from GitHub. `dependencies = NA` rather than TRUE, which
+#' would also install Suggests - none of which is needed to draw a graph.
+#' @noRd
+t61_self_update <- function() {
+  if (!requireNamespace("remotes", quietly = TRUE)) {
+    cli::cli_alert_warning(
+      'The {.pkg remotes} package is needed to update theme61. Run {.run install.packages("remotes")} and try again.')
+    return(invisible(NULL))
+  }
+
+  remotes::install_github("e61-institute/theme61", dependencies = NA, upgrade = "always")
 }
 
 #' Register the bundled PT Sans font with sysfonts/showtext and systemfonts
@@ -137,8 +184,8 @@ check_pkg_ver <- function(test = FALSE) {
   )
 }
 
-# Needed to make sure tests work. Wrapped (rather than aliased directly to
-# base::readline) so R CMD check's .Internal() scan doesn't trip over
-# readline()'s own implementation.
+# Needed to make sure tests work. Wrappers, not copied bindings: a copy pulls
+# the .Internal() call into this namespace, which R CMD check flags.
 .t61_readline <- function(...) base::readline(...)
-.t61_interactive <- base::interactive
+.t61_interactive <- function(...) base::interactive(...)
+.t61_download_file <- function(...) utils::download.file(...)

@@ -20,7 +20,7 @@ p <- ggplot(inputs, aes(x = col, y = row, fill = value)) +
 
 save_e61(
   plot = p,
-  filename = here::here("man/figures/g-palette-colours.svg"),
+  filename = "man/figures/g-palette-colours.svg",
   dim = list(height = 6),
   auto_scale = FALSE
 )
@@ -46,6 +46,6 @@ p <- ggplot(data, aes(x = call, y = y, fill = call)) +
 
 save_e61(
   plot = p,
-  filename = here::here("man/figures/g-palette-state-colours.svg"),
+  filename = "man/figures/g-palette-state-colours.svg",
   auto_scale = FALSE
 )

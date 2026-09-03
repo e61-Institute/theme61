@@ -544,9 +544,9 @@ save_e61 <- function(filename = NULL,
     file_to_open <- paste0(filename, ".", format[[1]])
 
     if (isTRUE(getOption("theme61.open_in_browser", FALSE))) {
-      file_to_open_browser <- shQuote(here::here(file_to_open))
-
-      out <- try(utils::browseURL(here::here(file_to_open)))
+      # Against the working directory, not the project root: that's where the
+      # file was just written, and it may be absolute or outside the project.
+      out <- try(utils::browseURL(normalizePath(file_to_open, mustWork = FALSE)))
 
       if (inherits(out, "try-error")) cli::cli_warn("Graph file could not be opened")
 

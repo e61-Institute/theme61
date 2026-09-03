@@ -19,6 +19,8 @@
 * Fixed an issue where `labs_e61` would leave whitespace above subtitles and y-axis titles when a plot had a subtitle but no title.
 * Improvements to margins, text wrapping, whitespace and text overlap/clipping issues.
 * Fixed issue with PDFs not rendering as previews in Viewer.
+* The minimum required version of rsvg is now 2.6.0. Earlier versions contain a resizing bug in `rsvg_svg()` that affects the rescaling `save_e61()` does when saving PNG and JPG files.
+* theme61 installs a smaller set of packages: `gh` and `here` are no longer needed at all, and `magick` and `remotes` have moved to Suggests. `add_e61_logo()` now asks you to install `magick` if you don't have it; everything else works as before. Updating from the in-session prompt no longer installs Suggests either, so re-installing pulls down much less.
 
 #### Deprecated features
 
