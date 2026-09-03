@@ -352,19 +352,16 @@ get_text_height <- function(text, font_size = 10) {
   })
 }
 
-#' Run `expr` with a throwaway svglite device as the active graphics device,
-#' so text can be measured with real font metrics. The device is opened and
-#' closed around `expr`, which restores whatever device (if any) was active
-#' beforehand as a side effect of `dev.off()`, so this never disturbs a
-#' device the user has open.
+#' Run `expr` on a throwaway svglite device, so text is measured with real
+#' font metrics rather than base R's built-in tables.
 #' @noRd
 measure_device <- function(expr) {
 
   measure_file <- tempfile(fileext = ".svg")
-  on.exit(unlink(measure_file))
+  on.exit(unlink(measure_file), add = TRUE)
 
-  svglite::svglite(measure_file, width = 10, height = 10)
-  on.exit(grDevices::dev.off(), add = TRUE)
+  device <- t61_open_device(measure_file, width = 10, height = 10)
+  on.exit(t61_release_device(device), add = TRUE)
 
   expr
 }
