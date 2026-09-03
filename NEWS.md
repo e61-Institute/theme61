@@ -19,6 +19,8 @@
 * Improvements to margins, text wrapping, whitespace and text overlap/clipping issues.
 * Fixed issue with PDFs not rendering as previews in Viewer.
 * Fixed left-aligned categorical y-axis text not triggering for `coord_flip()` horizontal bar charts, or when the y aesthetic was mapped inside a layer (e.g. `geom_col(aes(y = ...))`) rather than in `ggplot()` itself (#382).
+* The minimum required version of rsvg is now 2.6.0. Earlier versions contain a resizing bug in `rsvg_svg()` that affects the rescaling `save_e61()` does when saving PNG and JPG files.
+* theme61 installs a smaller set of packages: `gh` and `here` are no longer needed at all, and `magick` and `remotes` have moved to Suggests. `add_e61_logo()` now asks you to install `magick` if you don't have it; everything else works as before. Updating from the in-session prompt no longer installs Suggests either, so re-installing pulls down much less.
 
 #### Deprecated features
 
