@@ -14,6 +14,7 @@ name: Close issues on merge to dev
 # close-milestone-on-release.yaml once that version actually reaches main.
 permissions:
   issues: write
+  pull-requests: read
   contents: read
 
 jobs:
@@ -21,17 +22,18 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - uses: actions/github-script@v7
         with:
           script: |
-            const { execSync } = require('child_process');
-            const base = context.payload.pull_request.base.sha;
-            const head = context.payload.pull_request.head.sha;
-            const log = execSync(`git log ${base}..${head} --pretty=%B`).toString();
+            // Read commit messages via the API rather than local git history:
+            // dev accepts direct pushes/resets, which can make a PR's base
+            // sha unreachable and break a `git log base..head` diff entirely.
+            const commits = await github.paginate(github.rest.pulls.listCommits, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+            const log = commits.map(c => c.commit.message).join('\n');
 
             const re = /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/gi;
             const numbers = new Set();
