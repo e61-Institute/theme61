@@ -25,8 +25,10 @@ save_single <- function(
   # Plot is assumed pre-classified and prepared by save_e61()
   is_spatial_chart <- inherits(plot, "e61_map")
 
-  # Discrete y-axis (e.g. ridgeline)
-  discrete_y <- has_discrete_y_scale(plot)
+  # Whether the y aesthetic itself is discrete (e.g. ridgeline), so numeric
+  # auto-scaling below should be skipped - independent of coord_flip(),
+  # unlike the left-aligned-text check this shares its name with.
+  discrete_y <- has_discrete_y_scale(plot, respect_coord_flip = FALSE)
 
   # Set maximum width based on output type
   if (is.null(chart_type)) chart_type <- "normal"

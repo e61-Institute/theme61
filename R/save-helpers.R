@@ -140,8 +140,15 @@ make_preview_svg <- function(graph, format, filename, width, height, bg_colour, 
 }
 
 #' Function to check if a plot has a discrete y-scale
+#'
+#' @param respect_coord_flip Whether a discrete mapping/scale on the visual
+#'   y-axis after `coord_flip()` counts (the left-align caller wants this);
+#'   `FALSE` always answers for the `y` aesthetic itself, ignoring any flip
+#'   (the auto-scaling caller wants this - it's asking whether the mapped y
+#'   *variable* is continuous and needs numeric limits/breaks computed,
+#'   which has nothing to do with which screen edge it ends up drawn on).
 #' @noRd
-has_discrete_y_scale <- function(plot) {
+has_discrete_y_scale <- function(plot, respect_coord_flip = TRUE) {
   # Check if the plot is a ggplot object
   if (!inherits(plot, "ggplot")) {
     return(FALSE)
@@ -149,7 +156,7 @@ has_discrete_y_scale <- function(plot) {
 
   # coord_flip() swaps the visual axes, so a discrete *x* mapping ends up
   # drawn on the visual y-axis, and any explicit x scale is what governs it.
-  is_flipped <- inherits(plot@coordinates, "CoordFlip")
+  is_flipped <- respect_coord_flip && inherits(plot@coordinates, "CoordFlip")
 
   # Is aes_name mapped (plot-level, else any layer's own mapping) to a
   # discrete variable? A mapping may reference a layer-only column or an
