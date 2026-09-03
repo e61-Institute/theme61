@@ -319,6 +319,32 @@ check_plot_spelling <- function(plot) {
 
   }
 
+#' Composite a readPNG() array over white and drop its alpha channel, since
+#' JPEG has no transparency to encode it into.
+#' @noRd
+flatten_on_white <- function(img) {
+
+  # Greyscale with no alpha channel: nothing to composite
+  if (length(dim(img)) == 2) return(img)
+
+  n_channels <- dim(img)[[3]]
+
+  # RGB or greyscale, already opaque
+  if (n_channels %in% c(1L, 3L)) {
+    return(if (n_channels == 1L) img[, , 1] else img)
+  }
+
+  # Grey + alpha (2) or RGB + alpha (4): the last plane is the alpha channel
+  alpha <- img[, , n_channels]
+  colour <- img[, , seq_len(n_channels - 1L), drop = FALSE]
+
+  for (i in seq_len(dim(colour)[[3]])) {
+    colour[, , i] <- colour[, , i] * alpha + (1 - alpha)
+  }
+
+  if (dim(colour)[[3]] == 1L) colour[, , 1] else colour
+}
+
 #' Converts SVG to a bitmap file
 #'
 #' Converts an SVG file to a bitmap file, currently supports JPEG and PNG.
@@ -355,21 +381,31 @@ svg_to_bitmap <- function(file_in, file_out = NULL, res = 1, delete = FALSE) {
 
   rsvg::rsvg_png(svg = file_in, file = file_temp_out)
 
-  g_info <- magick::image_info(magick::image_read(file_temp_out))
+  # native = TRUE gives dim() c(height, width) without decoding to a full
+  # numeric array just to measure it.
+  natural_dim <- dim(png::readPNG(file_temp_out, native = TRUE))
 
   rsvg::rsvg_svg(svg = file_in,
                  file = file_temp_svg,
-                 width = g_info$width * res,
-                 height = g_info$height * res
+                 width = natural_dim[[2]] * res,
+                 height = natural_dim[[1]] * res
   )
 
   if(fmt == "png"){
     rsvg::rsvg_png(svg = file_temp_svg, file = file_out)
 
   } else if(fmt == "jpg"){
-    image_temp <- magick::image_read_svg(file_temp_svg)
+    # rsvg has no SVG -> JPEG writer, so render to PNG and re-encode.
+    file_temp_png <- tempfile(fileext = ".png")
+    on.exit(unlink(file_temp_png), add = TRUE)
 
-    magick::image_write(image = image_temp, path = file_out, format = "jpg")
+    rsvg::rsvg_png(svg = file_temp_svg, file = file_temp_png)
+
+    jpeg::writeJPEG(
+      flatten_on_white(png::readPNG(file_temp_png)),
+      target = file_out,
+      quality = 0.95
+    )
   }
 
   if (delete) unlink(file_in)
