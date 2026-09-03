@@ -43,8 +43,8 @@ test_that("classify_e61_map() adds e61_map iff plot is spatial (GeomSf heuristic
 
   # Spatial plot: emulate a geom whose class contains "GeomSf" without requiring sf
   p_sf <- ggplot() + geom_point(aes(1, 1))
-  p_sf$layers <- c(
-    p_sf$layers,
+  p_sf@layers <- c(
+    p_sf@layers,
     list(list(geom = structure(list(), class = "GeomSf")))
   )
 
@@ -70,8 +70,8 @@ test_that("classify_e61_map() preserves/ensures e61_plot when tagging e61_map", 
   p <- as_e61_plot(ggplot() + geom_point(aes(1, 1)))
 
   # Make it "spatial" via GeomSf heuristic
-  p$layers <- c(
-    p$layers,
+  p@layers <- c(
+    p@layers,
     list(list(geom = structure(list(), class = "GeomSf")))
   )
 
@@ -90,7 +90,7 @@ test_that("classify_e61_map() works for lists (including mixed ggplot/e61_plot/e
 
   # "spatial" ggplot (should become e61_map)
   p3 <- ggplot() + geom_point(aes(1, 1))
-  p3$layers <- c(p3$layers, list(list(geom = structure(list(), class = "GeomSf"))))
+  p3@layers <- c(p3@layers, list(list(geom = structure(list(), class = "GeomSf"))))
 
   # already e61_map (build from p3 then classify once)
   p4 <- classify_e61_map(p3)

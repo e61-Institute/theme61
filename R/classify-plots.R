@@ -1,40 +1,21 @@
 # as_e61_plot ----
 
-#' Generic to coerce plots to e61_plot class
-#' @keywords internal
-#' @export
-as_e61_plot <- function(x, ...) {
-  UseMethod("as_e61_plot")
-}
+#' Tag a plot (or a list of plots) with the e61_plot class.
+#'
+#' The e61_plot tag has to sit first in the class vector so theme61's S3
+#' methods (print, ggplot_build) take priority over ggplot2's own.
+#' @noRd
+as_e61_plot <- function(x) {
+  if (inherits(x, "e61_plot")) return(x)
 
-#' Method for plain ggplot
-#' @keywords internal
-#' @export
-as_e61_plot.ggplot <- function(x, ...) {
-  if (!inherits(x, "e61_plot")) {
+  if (inherits(x, "ggplot")) {
     class(x) <- c("e61_plot", class(x))
+    return(x)
   }
-  x
-}
 
-#' Method for existing e61_plot class objects
-#' @keywords internal
-#' @export
-as_e61_plot.e61_plot <- function(x, ...) {
-  x
-}
+  # Checked after ggplot, since a ggplot is itself list-backed.
+  if (is.list(x)) return(lapply(x, as_e61_plot))
 
-#' Method that works for lists of plots
-#' @keywords internal
-#' @export
-as_e61_plot.list <- function(x, ...) {
-  lapply(x, as_e61_plot)
-}
-
-#' Method that fails for non-plots
-#' @keywords internal
-#' @export
-as_e61_plot.default <- function(x, ...) {
   stop(
     "Object of class ", paste(class(x), collapse = "/"),
     " cannot be converted to an e61 plot"
@@ -55,59 +36,26 @@ should_be_map <- function(x, force) {
   identical(force, TRUE) || (is.null(force) && is_spatial(x))
 }
 
-#' Generic to coerce plots to e61_map class
-#' @keywords internal
-#' @export
-classify_e61_map <- function(x, ..., force = NULL) {
-  UseMethod("classify_e61_map")
-}
+#' Tag a spatial plot (or a list of plots) with the e61_map class.
+#'
+#' `force = TRUE` bypasses the GeomSf heuristic; `NULL` (the default) leaves
+#' the decision to it.
+#' @noRd
+classify_e61_map <- function(x, force = NULL) {
+  if (inherits(x, "e61_map")) return(x)
 
-#' Method for e61_plot
-#' @keywords internal
-#' @export
-classify_e61_map.e61_plot <- function(x, ..., force = NULL) {
-
-  if (should_be_map(x, force)) {
-    class(x) <- c("e61_map", class(x))
+  if (inherits(x, "ggplot")) {
+    if (should_be_map(x, force)) {
+      # e61_map sits ahead of e61_plot, which as_e61_plot() adds if missing.
+      x <- as_e61_plot(x)
+      class(x) <- c("e61_map", class(x))
+    }
+    return(x)
   }
 
-  x
-}
+  # Checked after ggplot, since a ggplot is itself list-backed.
+  if (is.list(x)) return(lapply(x, classify_e61_map))
 
-#' Method for ggplot
-#' @keywords internal
-#' @export
-classify_e61_map.ggplot <- function(x, ..., force = NULL) {
-
-  if (should_be_map(x, force)) {
-
-    # Adds e61_plot if not already present, then prepends e61_map
-    x <- as_e61_plot(x)
-    class(x) <- c("e61_map", class(x))
-  }
-
-  x
-}
-
-#' Method for existing e61_map class objects
-#' @keywords internal
-#' @export
-classify_e61_map.e61_map <- function(x, ...) {
-
-  x
-}
-
-#' Method that works for lists of plots
-#' @keywords internal
-#' @export
-classify_e61_map.list <- function(x, ...) {
-  lapply(x, classify_e61_map)
-}
-
-#' Method that fails for non-plots
-#' @keywords internal
-#' @export
-classify_e61_map.default <- function(x, ...) {
   stop(
     "Object of class ", paste(class(x), collapse = "/"),
     " cannot be converted to an e61 map"
