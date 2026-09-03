@@ -11,6 +11,7 @@ geom_col_label(
   accuracy = 1,
   align = "top",
   reverse = FALSE,
+  position = "stack",
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -43,6 +44,14 @@ that fraction of its height.}
 
 \item{reverse}{Logical. Reverse the stacking order used to position labels
 within stacked columns. Set this to match \code{position_stack(reverse = TRUE)} if you used that for your \code{geom_col()}. Defaults to FALSE.}
+
+\item{position}{One of \code{"stack"} (the default), \code{"dodge"}, or \code{"dodge2"}.
+Set this to match the \code{position} you used on the corresponding
+\code{\link[ggplot2:geom_col]{ggplot2::geom_col()}} call. \code{"dodge"}/\code{"dodge2"} split each bar's width
+the same way \code{\link[ggplot2:position_dodge]{ggplot2::position_dodge()}}/\code{\link[ggplot2:position_dodge2]{ggplot2::position_dodge2()}}
+do (based on the \code{fill}/\code{group} aesthetic), and each label shows that
+bar's own share of the panel-wide total rather than a share of its
+(non-existent) stack.}
 
 \item{na.rm}{If FALSE, the default, missing values are removed with a
 warning. If TRUE, missing values are silently removed.}

@@ -309,6 +309,90 @@ test_that("Reserved headroom respects an explicit scale_y_continuous_e61(limits 
   expect_equal(range_y[2], 100)
 })
 
+test_that("position = 'dodge' computes each bar's own share, not a stacked total", {
+  data <- data.frame(
+    x = rep(c("A", "B"), each = 2), grp = rep(c("g1", "g2"), 2), value = c(10, 20, 30, 5)
+  )
+
+  p <- ggplot(data, aes(x, value, fill = grp)) +
+    geom_col(position = "dodge") +
+    geom_col_label(position = "dodge")
+
+  built <- ggplot_build(p)
+  label_data <- get_label_data(built)
+
+  # each bar's share of the panel-wide total (65), not a share of its x's
+  # own stack (which position = "stack" would give: 33%/67%, 86%/14%)
+  total <- sum(data$value)
+  expect_setequal(label_data$label, scales::label_percent(accuracy = 1)(data$value / total))
+})
+
+test_that("position = 'dodge' places each label on its own dodged bar, not in the gap between bars", {
+  data <- data.frame(
+    x = rep(c("A", "B"), each = 2), grp = rep(c("g1", "g2"), 2), value = c(10, 20, 30, 5)
+  )
+
+  p <- ggplot(data, aes(x, value, fill = grp)) +
+    geom_col(position = "dodge") +
+    geom_col_label(position = "dodge")
+
+  built <- ggplot_build(p)
+  label_data <- get_label_data(built)
+  bar_data <- built$data[[1]]
+
+  # labels land at each bar's own dodged x (matching geom_col's own dodged
+  # bars), not all stacked at the shared category x
+  expect_equal(sort(label_data$x), sort(bar_data$x))
+  expect_equal(length(unique(label_data$x)), 4)
+
+  # "top" (the default align) floats each label just above its own bar's
+  # own value, not above the (non-existent) stack total
+  expect_true(all(label_data$y > data$value))
+  ordered <- label_data[order(label_data$x), ]
+  expect_true(all(diff(ordered$y[order(data$value)]) >= 0))
+})
+
+test_that("position = 'dodge2' also dodges labels onto their own bar", {
+  data <- data.frame(
+    x = rep(c("A", "B"), each = 2), grp = rep(c("g1", "g2"), 2), value = c(10, 20, 30, 5)
+  )
+
+  p <- ggplot(data, aes(x, value, fill = grp)) +
+    geom_col(position = "dodge2") +
+    geom_col_label(position = "dodge2")
+
+  built <- ggplot_build(p)
+  label_data <- get_label_data(built)
+
+  expect_equal(length(unique(label_data$x)), 4)
+  expect_true(all(label_data$y > data$value))
+})
+
+test_that("position = 'dodge' respects align = 'middle'/'bottom'", {
+  data <- data.frame(
+    x = rep(c("A", "B"), each = 2), grp = rep(c("g1", "g2"), 2), value = c(10, 20, 30, 5)
+  )
+
+  p_middle <- ggplot(data, aes(x, value, fill = grp)) +
+    geom_col(position = "dodge") +
+    geom_col_label(position = "dodge", align = "middle")
+
+  label_middle <- get_label_data(ggplot_build(p_middle))
+  expect_equal(sort(label_middle$y), sort(data$value * 0.5))
+
+  p_bottom <- ggplot(data, aes(x, value, fill = grp)) +
+    geom_col(position = "dodge") +
+    geom_col_label(position = "dodge", align = "bottom")
+
+  label_bottom <- get_label_data(ggplot_build(p_bottom))
+  expect_true(all(label_bottom$y > 0))
+  expect_true(all(label_bottom$y < data$value))
+})
+
+test_that("Unrecognised position values raise an error", {
+  expect_error(geom_col_label(position = "fill"))
+})
+
 test_that("A single column's own gap respects an explicit tight limit too", {
   # Regression test: the "float" layer's label position (not just the
   # spacer's reserved headroom) must also be clamped to a user-supplied
@@ -333,4 +417,46 @@ test_that("A single column's own gap respects an explicit tight limit too", {
 
   label_data_room <- get_label_data(ggplot_build(p_room))
   expect_gt(label_data_room$y, 100)
+})
+
+test_that("Zero-sum panels render blank labels, not Inf/-Inf", {
+  # Regression test for #380: when a panel's values sum to zero (e.g. 10 and -10),
+  # the division in col_label_percent() would produce Inf/-Inf text labels.
+  # Instead, labels should be blank (empty strings).
+  data <- data.frame(grp = c("A", "B"), value = c(10, -10))
+
+  p <- ggplot(data, aes(grp, value)) +
+    geom_col() +
+    geom_col_label()
+
+  label_data <- get_label_data(ggplot_build(p))
+
+  # Labels should be empty strings, not "Inf"/"-Inf"
+  expect_true(all(label_data$label == ""))
+  # Positions should still be set (even if not meaningful) and not contain Inf
+  expect_true(all(is.finite(label_data$y)))
+})
+
+test_that("A zero-sum stack next to a nonzero stack blanks only the zero one", {
+  # Regression test for a Codex finding on #387: col_label_percent()'s zero
+  # guard used `||` on `total`, a per-row vector (one stack total per x), so
+  # only the first row's total was ever checked. In a panel mixing a
+  # zero-sum stack ("A") with a nonzero one ("B"), the zero stack must still
+  # blank regardless of row order, and the nonzero stack must still show its
+  # real percentages rather than being blanked by the other stack's total.
+  data <- data.frame(
+    grp = c("A", "A", "B", "B"),
+    fill = c("g1", "g2", "g1", "g2"),
+    value = c(10, -10, 30, 10)
+  )
+
+  p <- ggplot(data, aes(grp, value, fill = fill)) +
+    geom_col() +
+    geom_col_label()
+
+  label_data <- get_label_data(ggplot_build(p))
+  by_grp <- split(label_data$label, label_data$x)
+
+  expect_true(all(unlist(by_grp[names(by_grp) == "1"]) == ""))
+  expect_setequal(unlist(by_grp[names(by_grp) == "2"]), c("75%", "25%"))
 })
