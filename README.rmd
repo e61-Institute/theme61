@@ -30,7 +30,12 @@ If you haven't already, install the `remotes` package:
 
 Then install from GitHub:
 
-`remotes::install_github("e61-institute/theme61", dependencies = TRUE, upgrade = "always")`
+`remotes::install_github("e61-institute/theme61", upgrade = "always")`
+
+theme61 works out of the box with the packages this installs. A few optional
+features need one extra package each, which you can install if and when you
+want them: `magick` for `add_e61_logo()`, `ggmap` and `sf` for the map
+functions, and `remotes` itself for the in-session update prompt.
 
 Then load into R:
 
