@@ -7,3 +7,14 @@ minimal_plot_label <-
   ggplot(data.frame(x = c(0, 3), y = c(0, 3)), aes(x, y)) +
   geom_point()
 
+
+# ggplot2 opens the session default device when none is open and leaves it
+# current, making the suite order-dependent. Open one up front so nothing has to.
+grDevices::pdf(NULL)
+withr::defer(grDevices::dev.off(), testthat::teardown_env())
+
+# Catch any test that still opens or closes one: a leak silently changes the
+# text metrics every later test measures with.
+testthat::set_state_inspector(function() {
+  list(devices = grDevices::dev.list())
+})
