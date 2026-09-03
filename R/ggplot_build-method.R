@@ -1,3 +1,17 @@
+#' Finalise an e61_plot for a normal ggplot2 build: the single definition
+#' shared by the dispatch method below and any caller needing the mutated
+#' plot object back (not just built data), or needing to layer its own
+#' mutation on top before building.
+#' @noRd
+t61_finalise_e61_plot_for_build <- function(plot) {
+  plot <- finalise_e61_plot(plot)
+  plot <- maybe_add_default_scales(plot)
+  plot <- maybe_adjust_facet_spacing(plot)
+  plot <- maybe_leftalign_discrete_y_text(plot)
+  class(plot) <- setdiff(class(plot), c("e61_map", "e61_plot"))
+  plot
+}
+
 #' Method for theme61 plots to add default scales at build time
 #' @keywords internal
 #' @export
@@ -14,19 +28,12 @@ ggplot_build.e61_plot <- function(plot, ...) {
 
   # Defensive: handles ggplot_build() called directly, without
   # print.e61_plot()/save_e61(). Idempotent either way.
-  plot2 <- finalise_e61_plot(plot)
-  plot2 <- maybe_add_default_scales(plot2)
-  plot2 <- maybe_adjust_facet_spacing(plot2)
-  plot2 <- maybe_leftalign_discrete_y_text(plot2)
-
-  # prevent recursion: drop our class before calling ggplot2 build
-  class(plot2) <- setdiff(class(plot2), c("e61_map", "e61_plot"))
-
+  #
   # Every ggplot_build(<e61_plot>) call in the package dispatches here, so
   # guarding this one spot covers them all: with no device open, this can
   # otherwise silently open the session's default device (seen in practice
   # corrupting a later svglite render on Windows).
-  t61_with_device(ggplot2::ggplot_build(plot2, ...))
+  t61_with_device(ggplot2::ggplot_build(t61_finalise_e61_plot_for_build(plot), ...))
 }
 
 # Helpers ----

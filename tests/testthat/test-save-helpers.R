@@ -4,11 +4,66 @@ test_that("check_spelling() treats words in the custom dictionary as correctly s
   expect_match(check_spelling("Thsi has a typo"), "Thsi")
 })
 
+test_that("render_e61 writes every requested format from a single render", {
+  g <- minimal_plot
+
+  withr::with_tempdir({
+    render_e61(graph = g, format = c("svg", "pdf", "png"), filename = "plot",
+                width = 10, height = 10, bg_colour = "white", res = 1)
+
+    expect_setequal(list.files(), c("plot.svg", "plot.pdf", "plot.png"))
+    expect_gt(file.size("plot.svg"), 0)
+    expect_gt(file.size("plot.pdf"), 0)
+    expect_gt(file.size("plot.png"), 0)
+  })
+})
+
+test_that("render_e61 returns the svg it rendered, and only leaves it on disk when asked for", {
+  g <- minimal_plot
+
+  withr::with_tempdir({
+    # svg requested: the returned path is the saved file itself
+    svg_out <- render_e61(graph = g, format = c("svg", "pdf"), filename = "plot",
+                           width = 10, height = 10, bg_colour = "white", res = 1)
+    expect_equal(svg_out, "plot.svg")
+    expect_true(file.exists(svg_out))
+
+    # svg not requested: the intermediate render is cleaned up
+    tmp_out <- render_e61(graph = g, format = "pdf", filename = "nosvg",
+                           width = 10, height = 10, bg_colour = "white", res = 1)
+    expect_false(file.exists(tmp_out))
+    expect_false(file.exists("nosvg.svg"))
+
+    # ... unless the caller asked to keep it (for the Viewer preview)
+    kept <- render_e61(graph = g, format = "pdf", filename = "kept",
+                        width = 10, height = 10, bg_colour = "white", res = 1,
+                        keep_svg = TRUE)
+    expect_true(file.exists(kept))
+  })
+})
+
+test_that("make_preview_svg reuses a render_e61 svg instead of re-rendering", {
+  g <- minimal_plot
+
+  withr::with_tempdir({
+    kept <- render_e61(graph = g, format = "png", filename = "plot",
+                        width = 10, height = 10, bg_colour = "white", res = 1,
+                        keep_svg = TRUE)
+
+    preview <- make_preview_svg(graph = g, format = "png", filename = "plot",
+                                 width = 10, height = 10, bg_colour = "white", res = 1,
+                                 svg_file = kept)
+
+    expect_true(file.exists(preview))
+    expect_identical(unname(tools::md5sum(kept)), unname(tools::md5sum(preview)))
+  })
+})
+
 test_that("make_preview_svg copies the saved svg when svg was one of the saved formats", {
   g <- minimal_plot
 
   withr::with_tempdir({
-    save_graph(graph = g, format = "svg", filename = "plot",
+    render_e61(graph = g, format = "svg", filename = "plot",
                 width = 10, height = 10, bg_colour = "white", res = 1)
 
     preview <- make_preview_svg(graph = g, format = c("svg", "pdf"), filename = "plot",
@@ -24,7 +79,7 @@ test_that("make_preview_svg renders a fresh svg when svg was not a saved format"
   g <- minimal_plot
 
   withr::with_tempdir({
-    save_graph(graph = g, format = "pdf", filename = "plot",
+    render_e61(graph = g, format = "pdf", filename = "plot",
                 width = 10, height = 10, bg_colour = "white", res = 1)
 
     expect_false(file.exists("plot.svg"))
@@ -41,7 +96,7 @@ test_that("make_preview_svg renders a fresh svg when only png was a saved format
   g <- minimal_plot
 
   withr::with_tempdir({
-    save_graph(graph = g, format = "png", filename = "plot",
+    render_e61(graph = g, format = "png", filename = "plot",
                 width = 10, height = 10, bg_colour = "white", res = 1)
 
     expect_false(file.exists("plot.svg"))
@@ -58,7 +113,7 @@ test_that("svg_to_bitmap() does not write intermed.svg/intermed.<fmt> into the w
   g <- minimal_plot
 
   withr::with_tempdir({
-    save_graph(graph = g, format = "svg", filename = "plot",
+    render_e61(graph = g, format = "svg", filename = "plot",
                 width = 10, height = 10, bg_colour = "white", res = 1)
 
     out <- svg_to_bitmap("plot.svg", "output.png", res = 2)
@@ -80,7 +135,7 @@ test_that("svg_to_bitmap() rescales output regardless of the res argument passed
   g <- minimal_plot
 
   withr::with_tempdir({
-    save_graph(graph = g, format = "svg", filename = "plot",
+    render_e61(graph = g, format = "svg", filename = "plot",
                 width = 10, height = 10, bg_colour = "white", res = 1)
 
     out_default <- svg_to_bitmap("plot.svg", "default.png", res = 1)

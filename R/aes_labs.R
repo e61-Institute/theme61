@@ -31,10 +31,13 @@ resolve_label_text <- function(plot, grobs, layout_names, text_type, plot_width)
 #' Get aesthetic titles, subtitles and footnotes.
 #' plot - Plot object to adjust.
 #' plot_width - Numeric. Width of the plot.
+#' built_grob - Optional, a grob already built from this exact, unmutated
+#'   plot (e.g. by the caller measuring axis widths just before calling this
+#'   function) - reused instead of building a second, identical grob.
 #' @noRd
-update_labs <- function(plot, plot_width){
+update_labs <- function(plot, plot_width, built_grob = NULL){
 
-  p <- t61_ggplotGrob_quiet_na(plot)
+  p <- if(is.null(built_grob)) t61_ggplotGrob_quiet_na(plot) else built_grob
 
   title_text <- resolve_label_text(plot, p$grobs, p$layout$name, "title", plot_width)
 

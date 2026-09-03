@@ -164,7 +164,9 @@ save_single <- function(
   # update the width after this check
   width <- tot_panel_width + known_wd
 
-  plot <- update_labs(plot, width)
+  # p was just built above (for axis widths) from this exact, unmutated
+  # plot - reuse it instead of update_labs() building an identical grob.
+  plot <- update_labs(plot, width, built_grob = p)
 
   if(!is_spatial_chart){
 

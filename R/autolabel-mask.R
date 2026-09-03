@@ -30,20 +30,12 @@ t61_retry <- function(fn, attempts = 8, pause = 0.1) {
 #' to it here would fire those side effects once per panel, per mask
 #' render, stomping on the real preview/save this call is itself part of.
 #'
-#' ggplot_build.e61_plot() (see ggplot_build-method.R) applies its own
-#' mutations -- default scales, facet spacing, discrete y-text alignment --
-#' before building, and every other read of this plot (e.g. t61_render_mask()'s
-#' own ggplot_build() call for panel_params) goes through that dispatch.
-#' Applying the same mutations here before stripping the class keeps this
-#' raster's coordinate system consistent with those reads, rather than
-#' silently reverting to plain ggplot2 defaults for this render alone.
+#' Delegates to t61_finalise_e61_plot_for_build() so this can't drift out
+#' of sync with what ggplot_build.e61_plot() applies.
 #' @noRd
 t61_drop_e61_class <- function(plot) {
   if (inherits(plot, "e61_plot")) {
-    plot <- maybe_add_default_scales(plot)
-    plot <- maybe_adjust_facet_spacing(plot)
-    plot <- maybe_leftalign_discrete_y_text(plot)
-    class(plot) <- setdiff(class(plot), "e61_plot")
+    plot <- t61_finalise_e61_plot_for_build(plot)
   }
   plot
 }
@@ -154,7 +146,10 @@ t61_strip_chrome <- function(plot) {
 #' @noRd
 t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
 
-  built <- ggplot2::ggplot_build(plot)
+  # One build of the class-stripped, fully-mutated plot serves both
+  # panel_params (below) and the drawn gtable, instead of two separate builds.
+  final_plot <- t61_strip_chrome(t61_drop_e61_class(plot))
+  built <- ggplot2::ggplot_build(final_plot)
 
   # panel_params (used below for x_range/y_range/breaks) already reflects
   # coord_flip() -- it describes the screen's rendered axes, not the raw
@@ -167,7 +162,7 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
 
   px_height <- round(px_width * height_cm / width_cm)
 
-  # Opened before ggplotGrob() below: with no device open yet, that call
+  # Opened before ggplot_gtable() below: with no device open yet, that call
   # can silently open the session's own default device instead, corrupting
   # this render (confirmed cause of "Input file is too short" on Windows).
   svg_file <- tempfile(fileext = ".svg")
@@ -176,16 +171,17 @@ t61_render_mask <- function(plot, width_cm, height_cm, px_width = 400L) {
   # Safety net if rendering errors before the explicit release below.
   on.exit(t61_release_device(device), add = TRUE)
 
-  gt <- ggplot2::ggplotGrob(t61_strip_chrome(plot))
-  # Still used for its facet bail-out (exactly one panel cell, structurally
-  # checked via the gtable layout) -- but NOT for the cm box it would
-  # otherwise compute; see t61_render_panel_box_px() for why.
-  if (is.null(t61_panel_box_cm(gt, width_cm, height_cm))) return(NULL)
-
   # Built and drawn as two explicit steps, not print(plot): building can
   # leave a stray device current, and reclaiming only after drawing would
   # already be too late.
-  final_gt <- ggplot2::ggplotGrob(t61_strip_chrome(t61_drop_e61_class(plot)))
+  final_gt <- ggplot2::ggplot_gtable(built)
+
+  # Facet bail-out (exactly one panel cell, structurally checked via the
+  # gtable layout) -- NOT for the cm box it would otherwise compute; see
+  # t61_render_panel_box_px() for why. Checked against the gtable that
+  # actually gets drawn, so it can share that build.
+  if (is.null(t61_panel_box_cm(final_gt, width_cm, height_cm))) return(NULL)
+
   t61_reclaim_device(device$dev)
   grid::grid.newpage()
   grid::grid.draw(final_gt)
