@@ -203,6 +203,10 @@ test_that("Single-panel graph examples", {
   })
 
   # 7 - Plot with coordinates flipped ----
+  # Reseed immediately before generating this synthetic data: it should
+  # depend only on the seed, not on how many RNG draws the p1-p6 renders
+  # above happen to consume internally.
+  withr::local_seed(42)
   bar_chart <- ggplot(data.frame(x = factor(1:10), y = runif(10, 0, 20)), aes(x, y)) +
     geom_col()
 
