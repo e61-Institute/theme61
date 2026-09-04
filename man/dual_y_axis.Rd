@@ -3,15 +3,14 @@
 \name{sec_rescale_inv}
 \alias{sec_rescale_inv}
 \alias{sec_rescale}
+\alias{sec_rescale_axis}
 \title{Dual y-axis graphing functions}
 \usage{
 sec_rescale_inv(values, scale = 1, shift = 0)
 
-sec_rescale(
-  values,
-  scale = t61_env$sec_axis_scale,
-  shift = t61_env$sec_axis_shift
-)
+sec_rescale(values, scale, shift)
+
+sec_rescale_axis(scale = 1, shift = 0, name = ggplot2::waiver())
 }
 \arguments{
 \item{values}{Vector of data that would normally be passed as the y aesthetic
@@ -24,6 +23,14 @@ rescale this to 0 to 5.}
 \item{shift}{Numeric. Moves the axis up and down. For example, if the scale
 was 0 to 5, \code{shift = 5} moves the secondary scale down by 5 units to
 range from -5 to 0.}
+
+\item{name}{Character. Title for the secondary axis. Defaults to
+\link[ggplot2:waiver]{waiver()}, which reuses the primary axis title.}
+}
+\value{
+\code{sec_rescale_axis()} returns a secondary axis object that can be
+passed to the \code{sec_axis} argument of \code{\link[=scale_y_continuous_e61]{scale_y_continuous_e61()}} (or to
+\code{sec.axis} in \code{\link[ggplot2:scale_y_continuous]{ggplot2::scale_y_continuous()}}).
 }
 \description{
 \code{ggplot2}, by design, makes it rather difficult to create graphs where
@@ -34,17 +41,21 @@ uses and the following functions enable this with as little fiddliness as
 possible.
 }
 \details{
-\code{sec_rescale_inv} is used in the geom that will be displayed on the
-secondary axis. \code{sec_rescale} is used in the \code{sec_axis} argument of
-\code{scale_y_continuous_e61}.
+Two functions are needed to make a rescaled secondary axis:
+\itemize{
+\item \code{sec_rescale_inv()} transforms the y aesthetic of the series that is to be
+plotted against the secondary axis, so it is drawn in the units of the
+primary axis.
+\item \code{sec_rescale_axis()} builds the secondary axis itself, and is passed to the
+\code{sec_axis} argument of \code{\link[=scale_y_continuous_e61]{scale_y_continuous_e61()}}.
+}
 
-See the examples for how to use the two functions to manipulate the secondary
-axis. Trial and error will be needed to select appropriate scale and shift
-values.
+Give both functions the same \code{scale} and \code{shift} values. Trial and error will
+be needed to select appropriate values.
 
-\strong{Note:} Due to the way that ggplot functions interact with the R
-environment, you have to run the code that generates the graph \strong{twice}
-after you change it before the changes will show up.
+\code{sec_rescale()} converts values from the primary axis back into the secondary
+axis units. It is used internally by \code{sec_rescale_axis()} and is exported for
+users who want to do the conversion themselves.
 }
 \examples{
 
@@ -54,11 +65,13 @@ data <- data.frame(x = 1:5, y1 = 1:5 * 10, y2 = 5:1 - 5)
 
 ggplot(data, aes(x)) +
   geom_col(aes(y = y1)) +
+  # Rescale the secondary series into primary axis units...
   geom_point(aes(y = sec_rescale_inv(y2, scale = 0.1, shift = 5))) +
-  # Some extra arguments are required to correctly format the secondary axis:
-  # Set rescaled_sec = TRUE in scale_y_continuous_e61() to format the breaks correctly.
-  # The secondary y-axis label (name = "\%") needs to be explicitly specified otherwise it will not appear.
-  scale_y_continuous_e61(limits = c(0, 60, 10), sec_axis = sec_axis(~sec_rescale(.), name = "\%"), rescale_sec = TRUE) +
+  # ... and give the secondary axis the same scale and shift.
+  scale_y_continuous_e61(
+    limits = c(0, 60, 10),
+    sec_axis = sec_rescale_axis(scale = 0.1, shift = 5, name = "\%")
+  ) +
   labs_e61(y = "\%")
 }
 

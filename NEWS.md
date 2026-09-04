@@ -1,3 +1,25 @@
+# theme61 0.8.1
+
+#### New and changed features
+
+* New function `sec_rescale_axis()` builds a rescaled secondary y-axis directly from the `scale` and `shift` you supply, e.g. `scale_y_continuous_e61(limits = c(0, 100, 25), sec_axis = sec_rescale_axis(scale = 0.1, shift = 0, name = "%"))`. Use it in place of hand-writing `sec_axis(~sec_rescale(.))`.
+* **Breaking change:** the `rescale_sec` argument of `scale_y_continuous_e61()` has been removed outright, rather than soft-deprecated. Its `t61_env`-based implementation was fundamentally broken (see Bug fixes below), so there was no working behaviour worth preserving for a deprecation cycle. Replace `sec_axis = sec_axis(~sec_rescale(.)), rescale_sec = TRUE` with `sec_axis = sec_rescale_axis(scale, shift, name)`, using the same `scale` and `shift` values you pass to `sec_rescale_inv()`. `sec_rescale()` also now requires explicit `scale`/`shift` arguments rather than falling back to shared session state.
+* Removed the `theme61.sec_axis_msg` option, along with the reminder it controlled, as the secondary axis code no longer needs to be run twice.
+
+#### Bug fixes
+
+* Rescaled secondary y-axes no longer need the graph code to be run twice, and no longer silently draw stale breaks. `sec_rescale_inv()` (evaluated when the graph is built) used to stash the scale and shift for `scale_y_continuous_e61(rescale_sec = TRUE)` (evaluated when the scale is added to the graph) to read back, so the axis was always formatted using the values from the *previous* graph: a fresh session, or a second dual-axis graph in the same session, got the wrong breaks with no warning. `sec_rescale_axis()` carries the scale and shift itself, so the breaks are correct the first time.
+* The minimum required version of rsvg is now 2.6.0. Earlier versions contain a resizing bug in `rsvg_svg()` that affects the rescaling `save_e61()` does when saving PNG and JPG files.
+* theme61 installs a smaller set of packages: `gh` and `here` are no longer needed at all, and `magick` and `remotes` have moved to Suggests. `add_e61_logo()` now asks you to install `magick` if you don't have it; everything else works as before. Updating from the in-session prompt no longer installs Suggests either, so re-installing pulls down much less.
+* Fixed `patchwork` being dropped from `Imports` by the dependency trim above, which broke every multi-panel `save_e61()`/`save_multi()` call (`patchwork` is still a hard, unguarded dependency there).
+
+#### Deprecated features
+
+* `set_base_size()` is now deprecated. Use `set_t61_options(list(theme61.base_size = ...))` instead.
+* Removed the `theme61.max_discrete_colours`/`theme61.max_discrete_fills` options; the discrete palette limit of 12 is fixed and was never actually configurable via these. `set_t61_options()` now hard-errors if you try to set either.
+* `theme_e61_spatial()` is now defunct. Use `theme_e61()` instead -- spatial styling has applied automatically on save/print for a full release cycle now.
+* `save_e61()`'s `title`/`subtitle`/`footnotes`/`sources`, `ncol`/`nrow`/`align`/`axis`, and `pad_width`/`pad_height`/`outer_width`/`outer_height`/`height_adj`/`rel_heights`/`spacing_adj` arguments are now defunct, after a full release cycle of warning. Use `labs`, `layout`, and `spacing` instead.
+
 # theme61 0.8.0
 
 01 Sep 2026
@@ -18,16 +40,6 @@
 * Fixed an issue where `labs_e61` would leave whitespace above subtitles and y-axis titles when a plot had a subtitle but no title.
 * Improvements to margins, text wrapping, whitespace and text overlap/clipping issues.
 * Fixed issue with PDFs not rendering as previews in Viewer.
-* The minimum required version of rsvg is now 2.6.0. Earlier versions contain a resizing bug in `rsvg_svg()` that affects the rescaling `save_e61()` does when saving PNG and JPG files.
-* theme61 installs a smaller set of packages: `gh` and `here` are no longer needed at all, and `magick` and `remotes` have moved to Suggests. `add_e61_logo()` now asks you to install `magick` if you don't have it; everything else works as before. Updating from the in-session prompt no longer installs Suggests either, so re-installing pulls down much less.
-* Fixed `patchwork` being dropped from `Imports` by the dependency trim above, which broke every multi-panel `save_e61()`/`save_multi()` call (`patchwork` is still a hard, unguarded dependency there).
-
-#### Deprecated features
-
-* `set_base_size()` is now deprecated. Use `set_t61_options(list(theme61.base_size = ...))` instead.
-* Removed the `theme61.max_discrete_colours`/`theme61.max_discrete_fills` options; the discrete palette limit of 12 is fixed and was never actually configurable via these. `set_t61_options()` now hard-errors if you try to set either.
-* `theme_e61_spatial()` is now defunct. Use `theme_e61()` instead -- spatial styling has applied automatically on save/print for a full release cycle now.
-* `save_e61()`'s `title`/`subtitle`/`footnotes`/`sources`, `ncol`/`nrow`/`align`/`axis`, and `pad_width`/`pad_height`/`outer_width`/`outer_height`/`height_adj`/`rel_heights`/`spacing_adj` arguments are now defunct, after a full release cycle of warning. Use `labs`, `layout`, and `spacing` instead.
 
 # theme61 0.7.1
 

@@ -18,8 +18,7 @@ t61_env <- NULL
   theme61.enable_spellcheck = TRUE,
   theme61.iterate_mode = FALSE,
   theme61.open_in_browser = FALSE,
-  theme61.preview_on_print = TRUE,
-  theme61.sec_axis_msg = NA
+  theme61.preview_on_print = TRUE
 )
 
 # Retired theme61.* options: set_t61_options() hard-errors on these instead

@@ -126,6 +126,17 @@ test_that("Y-axis customisation options", {
   expect_false(is.null(y1$limits))
   expect_false(is.null(y2$limits))
 
+  # ---- auto_scale should not clobber a user-specified secondary axis (#392)
+  p6 <- p +
+    scale_y_continuous_e61(limits = c(0, 1.5, 0.5),
+                            sec_axis = sec_axis(~. * 2, name = "double")) +
+    labs_e61(title = "Y-scale testing")
+
+  y6_after <- get_y_scale(p6)$secondary.axis
+
+  expect_false(inherits(y6_after, "waiver") || is.null(y6_after))
+  expect_identical(y6_after$name, "double")
+
   # ---- flipped graph: save_e61 should behave like format_flip() was applied
   p5_manual <- p +
     theme_e61() +

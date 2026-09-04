@@ -8,7 +8,6 @@
 scale_y_continuous_e61(
   limits = NULL,
   sec_axis = ggplot2::dup_axis(),
-  rescale_sec = FALSE,
   expand_bottom = 0,
   expand_top = 0,
   add_space = FALSE,
@@ -34,12 +33,10 @@ limits of the scale. The break increments will be automatically chosen.}
 \item{\code{NULL} to use the default scale range.}
 }}
 
-\item{sec_axis}{Logical. Defaults to duplicating the y-axis so it shows on
-the left and right. Set to FALSE to hide the secondary axis.}
-
-\item{rescale_sec}{Logical. Set this to TRUE if you are using a rescaled
-secondary axis, otherwise leave it as FALSE (default). To add a rescaled
-secondary axis, see the documentation for \link{sec_rescale}.}
+\item{sec_axis}{Defaults to duplicating the y-axis so it shows on the left
+and right. Set to FALSE to hide the secondary axis, or supply
+\code{\link[=sec_rescale_axis]{sec_rescale_axis()}} to put the secondary axis on a different scale to the
+primary axis.}
 
 \item{expand_bottom, expand_top}{Numeric. Add extra space between data points
 and the top/bottom of the graph. See \link[ggplot2:expansion]{expansion} for

@@ -40,7 +40,6 @@ t61_should_show_cooldown_msg <- function(opt_name, cooldown_mins = 30) {
 #'    \item \code{theme61.iterate_mode}: If TRUE, all of theme61's automatic styling and Viewer pane preview rendering is skipped, so graphs print to the Plots pane with plain ggplot2 defaults as fast as possible. This is FALSE by default. Masked functions (\code{ggsave()}, \code{labs()}, \code{facet_wrap()}, \code{facet_grid()}) also stop redirecting to their theme61 equivalents and pass straight through to the underlying ggplot2 function instead. Any theme61 functions you call explicitly (e.g. \code{scale_colour_e61()}, \code{theme_e61()}, \code{labs_e61()}) still apply as normal, since they become part of the plot object regardless of this option.
 #'    \item \code{theme61.open_in_browser}: If TRUE, graphs will also open in the browser in addition to the Viewer pane. This is FALSE by default.
 #'    \item \code{theme61.preview_on_print}: If TRUE (default), graphs will be automatically previewed in the Viewer pane when printed to the console.
-#'    \item \code{theme61.sec_axis_msg}: Controls the reminder from [sec_rescale_inv] that rescaled secondary axis changes need the graph code run twice to take effect. By default (unset), it appears at most once every 30 minutes. Set to TRUE to show it every time, or FALSE to turn it off entirely.
 #'  }
 #'
 #' @section Environment variables: A few behaviours run once, when theme61 is

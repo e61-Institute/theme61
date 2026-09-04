@@ -64,10 +64,19 @@ update_scales <- function(plot, auto_scale){
 
   sec_axis <- !(is.null(test_sec_axis) || test_sec_axis == 0)
 
+  # Preserve a rescaled secondary axis (built with sec_rescale_axis()) instead
+  # of clobbering it with a plain dup_axis() below. scale_y_continuous_e61()
+  # itself defaults sec_axis to a plain dup_axis(), so by this point almost
+  # every plot already has a non-empty secondary axis on its y scale
+  # regardless of user intent - the t61_rescale attribute sec_rescale_axis()
+  # attaches is the only reliable signal that it's a genuinely custom one.
+  user_sec_axis <- layer_scales(plot)$y$secondary.axis
+  if (is.null(user_sec_axis) || is.null(attr(user_sec_axis, "t61_rescale"))) user_sec_axis <- NULL
+
   # if the y-variable class is numeric, or the plot is a density or histogram, then update the chart scales
   if (check_y_var){
 
-    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis, build)})
+    suppressMessages({plot <- update_chart_scales(plot, auto_scale, sec_axis, build, user_sec_axis)})
 
     # if the y-var class is NULL, send a warning message about the auto updating of chart scales
   } else if (!check_y_var & is.null(getOption("warn_y_var"))){
@@ -134,8 +143,11 @@ check_for_y_var <- function(plot, build = NULL){
 
 #' Aesthetically update the y-axis scales and labels
 #' build - optional, reuse an existing ggplot_build(plot) instead of rebuilding
+#' user_sec_axis - the plot's existing secondary axis object (if any), reused
+#' as-is so auto-scaling doesn't overwrite a user-specified secondary axis
+#' (e.g. one built with sec_axis()) with a plain dup_axis().
 #' @noRd
-update_chart_scales <- function(plot, auto_scale, sec_axis, build = NULL){
+update_chart_scales <- function(plot, auto_scale, sec_axis, build = NULL, user_sec_axis = NULL){
 
   y_scale <- layer_scales(plot)$y
 
@@ -242,7 +254,8 @@ update_chart_scales <- function(plot, auto_scale, sec_axis, build = NULL){
   if(auto_scale){
     suppressWarnings({
       if (sec_axis) {
-        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = dup_axis(), add_space = TRUE)
+        sec_axis_arg <- if (!is.null(user_sec_axis)) user_sec_axis else dup_axis()
+        plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = sec_axis_arg, add_space = TRUE)
       } else {
         plot <- plot + scale_y_continuous_e61(limits = lims, sec_axis = FALSE, add_space = TRUE)
       }
