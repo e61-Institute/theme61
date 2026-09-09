@@ -26,6 +26,10 @@
 #'   only. It is recommended that as a user you do not include it in your
 #'   function call. Defaults to FALSE to ensure that we only add the extra white
 #'   space above the chart when we are saving it.
+#' @param rescale_sec `r lifecycle::badge("defunct")` Its `t61_env`-based
+#'   implementation was fundamentally broken (see `NEWS.md`), so it was
+#'   removed outright rather than deprecated. Use
+#'   `sec_axis = sec_rescale_axis(scale, shift, name)` instead.
 #' @inheritDotParams ggplot2::scale_y_continuous name oob na.value trans guide position
 #' @rdname e61_axes
 #' @export
@@ -35,7 +39,22 @@ scale_y_continuous_e61 <- function(limits = NULL,
                                    expand_bottom = 0,
                                    expand_top = 0,
                                    add_space = FALSE,
+                                   rescale_sec = lifecycle::deprecated(),
                                    ...) {
+
+  # Defunct: the old t61_env-based implementation was dysfunctional enough
+  # that it was removed rather than kept around for a deprecation cycle -
+  # error with a clear pointer to sec_rescale_axis() instead of letting this
+  # silently fall through to `...` and become an opaque "unused argument"
+  # error from ggplot2::scale_y_continuous().
+  if (lifecycle::is_present(rescale_sec)) {
+    lifecycle::deprecate_stop(
+      when = "0.8.1",
+      what = "scale_y_continuous_e61(rescale_sec = )",
+      with = "sec_rescale_axis()",
+      details = "Pass `sec_axis = sec_rescale_axis(scale, shift, name)` instead, using the same `scale`/`shift` values you pass to `sec_rescale_inv()`."
+    )
+  }
 
   # Set sec_axis to default behaviour if we don't want it
   if (isFALSE(sec_axis)) sec_axis <- ggplot2::waiver()

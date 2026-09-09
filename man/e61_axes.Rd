@@ -11,6 +11,7 @@ scale_y_continuous_e61(
   expand_bottom = 0,
   expand_top = 0,
   add_space = FALSE,
+  rescale_sec = lifecycle::deprecated(),
   ...
 )
 
@@ -46,6 +47,11 @@ details.}
 only. It is recommended that as a user you do not include it in your
 function call. Defaults to FALSE to ensure that we only add the extra white
 space above the chart when we are saving it.}
+
+\item{rescale_sec}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#defunct}{\figure{lifecycle-defunct.svg}{options: alt='[Defunct]'}}}{\strong{[Defunct]}} Its \code{t61_env}-based
+implementation was fundamentally broken (see \code{NEWS.md}), so it was
+removed outright rather than deprecated. Use
+\code{sec_axis = sec_rescale_axis(scale, shift, name)} instead.}
 
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:scale_y_continuous]{ggplot2::scale_y_continuous}}

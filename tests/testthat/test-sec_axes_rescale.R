@@ -197,14 +197,17 @@ test_that("faceted plots with a rescaled secondary axis build and render without
 test_that("scale_y_continuous_e61() no longer accepts rescale_sec", {
   # Hard-deprecated (not soft-deprecated): the old t61_env-based path was
   # dysfunctional enough that it was removed outright rather than kept
-  # around for two releases. Passing it now just becomes a stray `...` arg
-  # forwarded to ggplot2::scale_y_continuous(), which errors on it.
+  # around for two releases. `rescale_sec` is kept as a formal argument
+  # (rather than silently falling into `...`) purely so this errors with a
+  # clear pointer to sec_rescale_axis() instead of an opaque "unused
+  # argument" error from ggplot2::scale_y_continuous().
   expect_error(
     scale_y_continuous_e61(
       limits = c(0, 25, 5),
       sec_axis = ggplot2::sec_axis(~sec_rescale(., scale = 10, shift = 0)),
       rescale_sec = TRUE
-    )
+    ),
+    class = "lifecycle_error_deprecated"
   )
 })
 
