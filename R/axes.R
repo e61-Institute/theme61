@@ -26,9 +26,7 @@
 #'   only. It is recommended that as a user you do not include it in your
 #'   function call. Defaults to FALSE to ensure that we only add the extra white
 #'   space above the chart when we are saving it.
-#' @param rescale_sec `r lifecycle::badge("defunct")` Its `t61_env`-based
-#'   implementation was fundamentally broken (see `NEWS.md`), so it was
-#'   removed outright rather than deprecated. Use
+#' @param rescale_sec `r lifecycle::badge("defunct")` Use
 #'   `sec_axis = sec_rescale_axis(scale, shift, name)` instead.
 #' @inheritDotParams ggplot2::scale_y_continuous name oob na.value trans guide position
 #' @rdname e61_axes
