@@ -64,12 +64,7 @@ update_scales <- function(plot, auto_scale){
 
   sec_axis <- !(is.null(test_sec_axis) || test_sec_axis == 0)
 
-  # Preserve a rescaled secondary axis (built with sec_rescale_axis()) instead
-  # of clobbering it with a plain dup_axis() below. scale_y_continuous_e61()
-  # itself defaults sec_axis to a plain dup_axis(), so by this point almost
-  # every plot already has a non-empty secondary axis on its y scale
-  # regardless of user intent - the t61_rescale attribute sec_rescale_axis()
-  # attaches is the only reliable signal that it's a genuinely custom one.
+  # Preserve a rescaled secondary axis (built with sec_rescale_axis())
   user_sec_axis <- layer_scales(plot)$y$secondary.axis
   if (is.null(user_sec_axis) || is.null(attr(user_sec_axis, "t61_rescale"))) user_sec_axis <- NULL
 
