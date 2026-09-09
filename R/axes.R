@@ -6,11 +6,10 @@
 #' @param expand_bottom,expand_top Numeric. Add extra space between data points
 #'   and the top/bottom of the graph. See [expansion][ggplot2::expansion] for
 #'   details.
-#' @param sec_axis Logical. Defaults to duplicating the y-axis so it shows on
-#'   the left and right. Set to FALSE to hide the secondary axis.
-#' @param rescale_sec Logical. Set this to TRUE if you are using a rescaled
-#'   secondary axis, otherwise leave it as FALSE (default). To add a rescaled
-#'   secondary axis, see the documentation for [sec_rescale].
+#' @param sec_axis Defaults to duplicating the y-axis so it shows on the left
+#'   and right. Set to FALSE to hide the secondary axis, or supply
+#'   [sec_rescale_axis()] to put the secondary axis on a different scale to the
+#'   primary axis.
 #' @param expand_left,expand_right Numeric. Add extra space between data points
 #'   and the left/right of the graph. See [expansion][ggplot2::expansion] for
 #'   details.
@@ -27,17 +26,33 @@
 #'   only. It is recommended that as a user you do not include it in your
 #'   function call. Defaults to FALSE to ensure that we only add the extra white
 #'   space above the chart when we are saving it.
+#' @param rescale_sec `r lifecycle::badge("defunct")` Use
+#'   `sec_axis = sec_rescale_axis(scale, shift, name)` instead.
 #' @inheritDotParams ggplot2::scale_y_continuous name oob na.value trans guide position
 #' @rdname e61_axes
 #' @export
 
 scale_y_continuous_e61 <- function(limits = NULL,
                                    sec_axis = ggplot2::dup_axis(),
-                                   rescale_sec = FALSE,
                                    expand_bottom = 0,
                                    expand_top = 0,
                                    add_space = FALSE,
+                                   rescale_sec = lifecycle::deprecated(),
                                    ...) {
+
+  # Defunct: the old t61_env-based implementation was dysfunctional enough
+  # that it was removed rather than kept around for a deprecation cycle -
+  # error with a clear pointer to sec_rescale_axis() instead of letting this
+  # silently fall through to `...` and become an opaque "unused argument"
+  # error from ggplot2::scale_y_continuous().
+  if (lifecycle::is_present(rescale_sec)) {
+    lifecycle::deprecate_stop(
+      when = "0.8.1",
+      what = "scale_y_continuous_e61(rescale_sec = )",
+      with = "sec_rescale_axis()",
+      details = "Pass `sec_axis = sec_rescale_axis(scale, shift, name)` instead, using the same `scale`/`shift` values you pass to `sec_rescale_inv()`."
+    )
+  }
 
   # Set sec_axis to default behaviour if we don't want it
   if (isFALSE(sec_axis)) sec_axis <- ggplot2::waiver()
@@ -45,13 +60,23 @@ scale_y_continuous_e61 <- function(limits = NULL,
   # Prepares limits and breaks
   breaks <- resolve_breaks_e61(limits)
 
-  # Prepares breaks for the rescaled secondary axis if used
-  if (isTRUE(rescale_sec)) {
-    sec_breaks <- sec_rescale(breaks)
-    sec_labels <- sec_breaks
-    sec_labels[is.na(sec_labels)] <- ""
-    sec_axis$breaks <- sec_breaks
-    sec_axis$labels <- sec_labels
+  # sec_rescale_axis() carries its scale/shift with it, so the secondary breaks
+  # can be lined up with the primary ones here without any shared session state.
+  rescale <- attr(sec_axis, "t61_rescale")
+
+  is_rescaled <- !is.null(rescale)
+
+  if (!is.null(rescale)) {
+
+    sec <- sec_axis_scaling_e61(breaks, rescale$scale, rescale$shift)
+
+    sec_axis <- new_sec_rescale_axis(
+      scale = rescale$scale,
+      shift = rescale$shift,
+      name = rescale$name,
+      breaks = sec$breaks,
+      labels = sec$labels
+    )
   }
 
   if (!is.null(limits) && add_space) {
@@ -85,7 +110,7 @@ scale_y_continuous_e61 <- function(limits = NULL,
   class(retval) <- c(class(retval), "scale_e61")
 
   # Set an additional class if rescaled dual axis used
-  if (isTRUE(rescale_sec)) class(retval) <- c(class(retval), "rescale_y")
+  if (is_rescaled) class(retval) <- c(class(retval), "rescale_y")
 
   # Only add our data-range check if numeric limits were supplied
   if (!is.null(limits) && is.numeric(limits)) {
@@ -152,6 +177,24 @@ scale_x_continuous_e61 <- function(limits = NULL,
 
   return(retval)
 
+}
+
+#' Convert the primary axis breaks into breaks and labels for a rescaled
+#' secondary axis, so ticks line up on both axes. Falls back to waiver() when
+#' the primary breaks are not an explicit numeric vector (e.g. no limits were
+#' supplied), leaving ggplot2 to derive the secondary breaks itself.
+#' @noRd
+sec_axis_scaling_e61 <- function(breaks, scale, shift) {
+
+  if (!is.numeric(breaks)) {
+    return(list(breaks = ggplot2::waiver(), labels = ggplot2::waiver()))
+  }
+
+  sec_breaks <- sec_rescale(breaks, scale = scale, shift = shift)
+  sec_labels <- sec_breaks
+  sec_labels[is.na(sec_labels)] <- ""
+
+  list(breaks = sec_breaks, labels = sec_labels)
 }
 
 #' Resolve the `breaks` argument for scale_x/y_continuous_e61() from a
