@@ -48,9 +48,7 @@ only. It is recommended that as a user you do not include it in your
 function call. Defaults to FALSE to ensure that we only add the extra white
 space above the chart when we are saving it.}
 
-\item{rescale_sec}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#defunct}{\figure{lifecycle-defunct.svg}{options: alt='[Defunct]'}}}{\strong{[Defunct]}} Its \code{t61_env}-based
-implementation was fundamentally broken (see \code{NEWS.md}), so it was
-removed outright rather than deprecated. Use
+\item{rescale_sec}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#defunct}{\figure{lifecycle-defunct.svg}{options: alt='[Defunct]'}}}{\strong{[Defunct]}} Use
 \code{sec_axis = sec_rescale_axis(scale, shift, name)} instead.}
 
 \item{...}{
