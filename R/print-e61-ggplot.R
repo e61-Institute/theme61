@@ -29,31 +29,7 @@ print.e61_plot <- function(x, ...) {
     requireNamespace("rstudioapi", quietly = TRUE) &&
     rstudioapi::isAvailable()
 
-  # Alter defaults for facets with free y scales
-  free_y <- isTRUE(x@facet$params$free$y)
-
-  # Detect whether user supplied a y scale (pre-build)
-  ys <- x@scales$get_scales("y")
-  user_has_y <- !is.null(ys)
-
-  # Detect whether user supplied custom limits
-  user_limits <- FALSE
-  if (user_has_y) {
-    lim <- ys$limits
-    user_limits <- !is.null(lim) && !inherits(lim, "waiver")
-  }
-
-  # Decide whether to autoscale in preview
-  auto_scale_preview <- TRUE
-  if (free_y) {
-    if (!user_has_y) {
-      auto_scale_preview <- FALSE
-    } else if (!inherits(ys, "scale_e61")) {
-      auto_scale_preview <- FALSE
-    } else if (user_limits) {
-      auto_scale_preview <- FALSE
-    }
-  }
+  auto_scale_preview <- t61_preview_auto_scale(x)
 
   # Plots pane render (must include theme61 defaults)
   x_plot <- finalise_e61_plot(x)
@@ -139,4 +115,38 @@ activate_viewer_after_plot <- function() {
   }
 
   invisible(TRUE)
+}
+
+#' Whether a print()/knit preview should auto-scale the y-axis: not for free-y
+#' facets unless the user supplied their own scale_e61() y scale without
+#' fixed limits.
+#' @noRd
+t61_preview_auto_scale <- function(x) {
+  # Alter defaults for facets with free y scales
+  free_y <- isTRUE(x@facet$params$free$y)
+
+  # Detect whether user supplied a y scale (pre-build)
+  ys <- x@scales$get_scales("y")
+  user_has_y <- !is.null(ys)
+
+  # Detect whether user supplied custom limits
+  user_limits <- FALSE
+  if (user_has_y) {
+    lim <- ys$limits
+    user_limits <- !is.null(lim) && !inherits(lim, "waiver")
+  }
+
+  # Decide whether to autoscale in preview
+  auto_scale_preview <- TRUE
+  if (free_y) {
+    if (!user_has_y) {
+      auto_scale_preview <- FALSE
+    } else if (!inherits(ys, "scale_e61")) {
+      auto_scale_preview <- FALSE
+    } else if (user_limits) {
+      auto_scale_preview <- FALSE
+    }
+  }
+
+  auto_scale_preview
 }

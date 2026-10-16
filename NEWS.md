@@ -1,3 +1,9 @@
+# theme61 (development version)
+
+#### New and changed features
+
+* Graphs printed in Quarto/R Markdown documents now look like the version `save_e61()` saves, instead of being stretched to the chunk's `fig.width`/`fig.height` with text and axes far too small relative to the panel. Use the chunk's `out.width` to change the displayed size, or set the `theme61.knit_as_saved` option to `FALSE` to go back to knitr's default rendering.
+
 # theme61 0.8.0
 
 01 Sep 2026
