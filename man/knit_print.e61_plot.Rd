@@ -9,12 +9,13 @@
 \description{
 Plots shown in knitr/Quarto documents never go through \code{\link[=save_e61]{save_e61()}}, so
 knitr draws them at the chunk's \code{fig.width}/\code{fig.height} (7 x 5in by
-default) - roughly twice the size \code{save_e61()} lays a chart out for. Text
-keeps its absolute point size while the panel stretches, so it looks far
-too small. To compensate, the text is scaled by how much larger the figure
-is than the chart \code{save_e61()} would make, before printing as usual.
+default) - roughly twice the size \code{save_e61()} lays a chart out for. Text,
+lines and points keep their absolute sizes while the panel stretches, so
+they look far too small. To compensate, every absolute size is scaled by
+how much larger the figure is than the chart \code{save_e61()} would make, so
+the figure looks like the saved chart scaled to fit.
 }
 \details{
-Set the \code{theme61.knit_scale_text} option to FALSE to turn this off.
+Set the \code{theme61.knit_rescale} option to FALSE to turn this off.
 }
 \keyword{internal}

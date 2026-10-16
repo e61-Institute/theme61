@@ -32,20 +32,38 @@ print.e61_plot <- function(x, ...) {
     requireNamespace("rstudioapi", quietly = TRUE) &&
     rstudioapi::isAvailable()
 
-  auto_scale_preview <- t61_preview_auto_scale(x)
+  # Alter defaults for facets with free y scales
+  free_y <- isTRUE(x@facet$params$free$y)
 
-  # Plots pane render (must include theme61 defaults)
-  x_plot <- finalise_e61_plot(x)
-  x_plot <- maybe_add_default_scales(x_plot)
-  class(x_plot) <- setdiff(class(x_plot), c("e61_map", "e61_plot"))
+  # Detect whether user supplied a y scale (pre-build)
+  ys <- x@scales$get_scales("y")
+  user_has_y <- !is.null(ys)
 
-  # Without this, auto-positioned labels stay at their NA placeholder here
-  # (only the Viewer preview below resolves one) and silently vanish.
-  # width/height are just a rough estimate for this cheap fast placement.
-  # Runs before the Viewer preview below (which suppresses its own
-  # equivalent pass's messages) so theme61.autolabel_fast_msg gets a
-  # chance to actually reach the console.
-  x_plot <- suppressWarnings(t61_apply_autolabel(x_plot, width_cm = 16, height_cm = 12, fast = TRUE))
+  # Detect whether user supplied custom limits
+  user_limits <- FALSE
+  if (user_has_y) {
+    lim <- ys$limits
+    user_limits <- !is.null(lim) && !inherits(lim, "waiver")
+  }
+
+  # Decide whether to autoscale in preview
+  auto_scale_preview <- TRUE
+  if (free_y) {
+    if (!user_has_y) {
+      auto_scale_preview <- FALSE
+    } else if (!inherits(ys, "scale_e61")) {
+      auto_scale_preview <- FALSE
+    } else if (user_limits) {
+      auto_scale_preview <- FALSE
+    }
+  }
+
+  # Plots pane render (must include theme61 defaults). width/height are
+  # just a rough estimate for the cheap fast label placement. Runs before the
+  # Viewer preview below (which suppresses its own equivalent pass's
+  # messages) so theme61.autolabel_fast_msg gets a chance to actually reach
+  # the console.
+  x_plot <- t61_plots_pane_plot(x, width_cm = 16, height_cm = 12)
 
   # Viewer preview (render in background). Auto-positioned plot_label()
   # text without an explicit x/y uses the cheap, render-free fast
@@ -91,6 +109,19 @@ print.e61_plot <- function(x, ...) {
   invisible(x)
 }
 
+#' The plot print() actually draws: theme61 defaults applied, rescaled by
+#' `scale` (see knit_print.e61_plot()), and auto-positioned labels resolved.
+#' Without the latter they stay at their NA placeholder and silently vanish.
+#' @noRd
+t61_plots_pane_plot <- function(x, width_cm, height_cm, scale = 1) {
+  x_plot <- finalise_e61_plot(x)
+  x_plot <- t61_rescale_plot(x_plot, scale)
+  x_plot <- maybe_add_default_scales(x_plot)
+  class(x_plot) <- setdiff(class(x_plot), c("e61_map", "e61_plot"))
+
+  suppressWarnings(t61_apply_autolabel(x_plot, width_cm = width_cm, height_cm = height_cm, fast = TRUE))
+}
+
 #' @noRd
 activate_viewer_after_plot <- function() {
   if (!interactive() ||
@@ -118,38 +149,4 @@ activate_viewer_after_plot <- function() {
   }
 
   invisible(TRUE)
-}
-
-#' Whether a print()/knit preview should auto-scale the y-axis: not for free-y
-#' facets unless the user supplied their own scale_e61() y scale without
-#' fixed limits.
-#' @noRd
-t61_preview_auto_scale <- function(x) {
-  # Alter defaults for facets with free y scales
-  free_y <- isTRUE(x@facet$params$free$y)
-
-  # Detect whether user supplied a y scale (pre-build)
-  ys <- x@scales$get_scales("y")
-  user_has_y <- !is.null(ys)
-
-  # Detect whether user supplied custom limits
-  user_limits <- FALSE
-  if (user_has_y) {
-    lim <- ys$limits
-    user_limits <- !is.null(lim) && !inherits(lim, "waiver")
-  }
-
-  # Decide whether to autoscale in preview
-  auto_scale_preview <- TRUE
-  if (free_y) {
-    if (!user_has_y) {
-      auto_scale_preview <- FALSE
-    } else if (!inherits(ys, "scale_e61")) {
-      auto_scale_preview <- FALSE
-    } else if (user_limits) {
-      auto_scale_preview <- FALSE
-    }
-  }
-
-  auto_scale_preview
 }

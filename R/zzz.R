@@ -17,7 +17,7 @@ t61_env <- NULL
   theme61.default_save_format = NULL,
   theme61.enable_spellcheck = TRUE,
   theme61.iterate_mode = FALSE,
-  theme61.knit_scale_text = TRUE,
+  theme61.knit_rescale = TRUE,
   theme61.open_in_browser = FALSE,
   theme61.preview_on_print = TRUE,
   theme61.sec_axis_msg = NA
