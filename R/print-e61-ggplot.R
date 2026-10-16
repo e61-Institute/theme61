@@ -25,7 +25,10 @@ print.e61_plot <- function(x, ...) {
     return(NextMethod())
   }
 
+  # Not while knitting: rendering from the RStudio console is interactive,
+  # but the Viewer preview is a full save_e61() per chart that nobody sees.
   in_rstudio <- interactive() &&
+    !isTRUE(getOption("knitr.in.progress")) &&
     requireNamespace("rstudioapi", quietly = TRUE) &&
     rstudioapi::isAvailable()
 

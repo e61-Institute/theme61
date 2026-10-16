@@ -2,7 +2,7 @@
 
 #### New and changed features
 
-* Graphs printed in Quarto/R Markdown documents now look like the version `save_e61()` saves, instead of being stretched to the chunk's `fig.width`/`fig.height` with text and axes far too small relative to the panel. Use the chunk's `out.width` to change the displayed size, or set the `theme61.knit_as_saved` option to `FALSE` to go back to knitr's default rendering.
+* Text in graphs printed in Quarto/R Markdown documents is now scaled to the chunk's `fig.width`/`fig.height`, so it looks the same relative to the panel as in the file `save_e61()` saves. Previously knitr drew graphs about twice as large as `save_e61()` does, leaving text and axis labels far too small. Set the `theme61.knit_scale_text` option to `FALSE` to turn this off.
 
 # theme61 0.8.0
 
